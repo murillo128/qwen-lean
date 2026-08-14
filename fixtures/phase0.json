@@ -1,0 +1,49 @@
+{
+  "fixture_id": "phase0-fixtures-v1",
+  "tasks": [
+    {
+      "id": "core-identity",
+      "preamble": "import Init",
+      "declaration": "theorem phase0_identity (P : Prop) (h : P) : P",
+      "declaration_name": "phase0_identity"
+    },
+    {
+      "id": "mathlib-add-zero",
+      "preamble": "import Mathlib",
+      "declaration": "theorem phase0_add_zero (n : ℕ) : n + 0 = n",
+      "declaration_name": "phase0_add_zero"
+    }
+  ],
+  "candidates": [
+    {
+      "task_id": "core-identity",
+      "candidate_id": "invalid-proof",
+      "candidate_text": "exact missing_hypothesis",
+      "expected_category": "lean_rejected"
+    },
+    {
+      "task_id": "core-identity",
+      "candidate_id": "valid-core-proof",
+      "candidate_text": "exact h",
+      "expected_category": "verified"
+    },
+    {
+      "task_id": "core-identity",
+      "candidate_id": "placeholder-proof",
+      "candidate_text": "sorry",
+      "expected_category": "lean_rejected"
+    },
+    {
+      "task_id": "core-identity",
+      "candidate_id": "empty-proof",
+      "candidate_text": "",
+      "expected_category": "empty_candidate"
+    },
+    {
+      "task_id": "mathlib-add-zero",
+      "candidate_id": "valid-mathlib-proof",
+      "candidate_text": "simpa using Nat.add_zero n",
+      "expected_category": "verified"
+    }
+  ]
+}

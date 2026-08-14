@@ -14,7 +14,11 @@ This is intentionally simpler than an interactive prover that repeatedly chooses
 
 Tactic-level generation, premise retrieval, and proof search are later milestones, not v1 requirements.
 
-**Exact prompt and proof-target serialization:** OPEN
+**Exact prompt and proof-target serialization:** ACCEPTED — `whole-proof-v1` uses
+plain code completion ending at `<declaration> := by\n  `, and verifier input is
+that same prefix followed directly by the raw generated continuation. Only line
+endings and trailing transport whitespace may be normalized; no proof extraction
+or semantic repair is allowed.
 
 ## D002 — Task success is determined by Lean
 
