@@ -25,7 +25,7 @@ A fresh reviewer needs:
 2. this skill;
 3. the controlling issue or exact checkpoint section;
 4. the exact published target or range;
-5. immutable technical evidence required by that checkpoint.
+5. the technical evidence required by that checkpoint.
 
 Load prior comments or reviews only when an unresolved material finding depends on them.
 
@@ -41,36 +41,13 @@ The reviewer must:
 
 Independence does not mean maximal hostility. Test declared risks and plausible normal use, not every imaginable malformed input or representational variant unless the issue requires that boundary.
 
-## Profiles
-
-### STANDARD
-
-Review only declared material checkpoints. Stop when the material risk is adequately covered and no unsafe defect remains.
-
-### HIGH_ASSURANCE
-
-Apply additional issue-defined checks only within the explicit architecture, numerical, concurrency, persistence, backend, data, or security boundary. Do not infer this profile from issue size.
-
-## Authority and evidence boundaries
-
-Treat these as authoritative when the issue declares them:
-
-- code and tests at the exact target;
-- immutable input and artifact identities;
-- technical manifests containing revisions, environment, commands, results, metrics, gates, and limitations;
-- reproduced or credibly inspected runtime evidence.
-
-Treat GitHub metadata and workflow bookkeeping as derived state unless they are themselves under test.
-
-When raw evidence is stored in an immutable checksum-addressed external archive, validate its identity, index, relevant samples, reproduction path, and claimed aggregates proportionally.
-
 ## Materiality
 
 Return `FAIL` only when a finding:
 
 - violates an explicit invariant or acceptance criterion;
 - exposes a plausible normal-path defect;
-- makes required technical evidence materially false, incomplete, ambiguous, or non-reproducible;
+- makes required technical evidence materially false, incomplete, or misleading;
 - introduces unapproved scope, architecture, dependency, format, or behavior;
 - makes progression from the reviewed target unsafe.
 
@@ -86,7 +63,7 @@ For every `FAIL`, state:
 
 ### 1. Establish risk and authority
 
-Identify the checkpoint outcome, scope, invariants, acceptance criteria, authoritative evidence, exact target, and explicit threat or failure boundary.
+Identify the checkpoint outcome, scope, invariants, acceptance criteria, evidence, exact target, and explicit failure boundary.
 
 ### 2. Inspect the exact target
 
@@ -95,7 +72,7 @@ Check:
 - diff and scope compliance;
 - implementation and integration;
 - credible required evidence;
-- plausible correctness, ownership, lifetime, numerical, concurrency, data, backend, or performance failures covered by the checkpoint;
+- plausible correctness, numerical, data, backend, or performance failures covered by the checkpoint;
 - unexpected dependencies, secrets, restricted artifacts, or behavior;
 - safety to proceed.
 
@@ -107,14 +84,9 @@ Distinguish commands personally run from committed or external evidence inspecte
 
 ### 4. Determine whether the review is final
 
-A checkpoint can serve as final review when the issue declares it final-capable and the exact target includes:
+A checkpoint can serve as final review when the issue declares it final-capable and the exact target includes the complete final diff and all remaining acceptance criteria.
 
-- the complete final diff;
-- final dependency revisions relevant to the contract;
-- immutable final technical evidence;
-- all remaining acceptance criteria and unresolved material findings.
-
-A later change to code, tests, technical evidence, dependencies, configuration, or technical claims invalidates that verdict and requires review of the changed target. Workflow-only metadata changes do not.
+A later technical change invalidates that verdict and requires review of the changed target. Workflow-only metadata changes do not.
 
 ### 5. Report briefly
 
@@ -137,7 +109,7 @@ Return `BLOCKED` only when required evidence or independent-review capability re
 
 ## Repeated-review circuit breaker
 
-Under `STANDARD`, when two consecutive reviews fail for substantially the same validation, attestation, parser, documentation-sync, or bookkeeping mechanism:
+When two consecutive reviews fail for substantially the same validation or bookkeeping mechanism:
 
 - stop open-ended searches for representational variants;
 - use `PASS_WITH_NOTES` when progression is technically safe and the remaining concern is non-material;
@@ -161,37 +133,15 @@ Transport failure is an attempt result, not a verdict.
 ```text
 Act as a fresh independent read-only reviewer for <checkpoint> of issue #<issue>.
 
-Review exact target <sha-or-range> against the issue's complete technical contract,
-material risks, acceptance criteria, and immutable technical evidence. Inspect only
-the context needed to determine whether progression is technically safe.
-
-This checkpoint is <final-capable | not final-capable>. If final-capable, confirm
-whether the target contains the complete final diff and all remaining evidence.
+Review exact target <sha-or-range> against the issue's technical contract,
+material risks, acceptance criteria, and relevant evidence. Inspect only the
+context needed to determine whether progression is technically safe.
 
 Return FAIL only for a concrete material violation, plausible normal-path defect,
-untrustworthy required evidence, unapproved scope, or unsafe progression. Treat
+misleading required evidence, unapproved scope, or unsafe progression. Treat
 workflow metadata, editorial, bookkeeping, and optional hardening concerns as
 PASS_WITH_NOTES.
 
 Do not implement fixes or mutate repository or GitHub state. Return exactly PASS,
 PASS_WITH_NOTES, FAIL, or BLOCKED.
-```
-
-## Concise review comment
-
-```markdown
-## <Checkpoint> — PASS | PASS_WITH_NOTES | FAIL | BLOCKED
-
-**Target:** `<SHA/range>`
-**Safe to proceed:** yes | no
-**Serves as final review:** yes | no
-
-**Material findings:**
-- <none or finding with violated criterion and consequence>
-
-**Validation/evidence:**
-- <command, manifest, artifact, or external archive identity and result>
-
-**Required delta or notes:**
-- <none, smallest correction, design return, missing evidence, or non-blocking note>
 ```
