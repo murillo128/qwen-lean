@@ -46,7 +46,7 @@ Information has one primary home to avoid documentation drift:
 
 - [`PLAN.md`](PLAN.md) defines the technical sequence and exit gates.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) records durable accepted, open, rejected, and observed technical decisions and their rationale.
-- [Epic #1](../../issues/1) tracks current roadmap status and links active execution issues; it does not duplicate the technical plan.
+- [Epic #1](/murillo128/qwen-lean/issues/1) tracks current roadmap status and links active execution issues; it does not duplicate the technical plan.
 - Individual GitHub issues are bounded execution contracts for one phase or change.
 - [`AGENTS.md`](AGENTS.md) and `.agents/skills/` define how ChatGPT, Codex, and reviewers should operate in the repository.
 
