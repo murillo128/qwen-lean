@@ -111,15 +111,4 @@ This is a separate milestone. The task changes from generating an entire proof i
 
 **Exit gate:** to be defined by a dedicated design issue when this phase becomes active.
 
-## Planning questions intentionally left open
-
-These should be resolved by the phase that first needs them rather than prematurely frozen here:
-
-- exact theorem prompt and target serialization;
-- exact mathlib extraction implementation and retained context;
-- exact structural unit used for dataset splitting;
-- sequence length, LoRA rank/alpha, learning rate, batch construction, and epoch count;
-- experiment tracking backend;
-- the second external Lean benchmark after miniF2F;
-- cloud/GPU provider for each run;
-- whether later inference should use merged adapters, dynamic LoRA serving, or another deployment form.
+Open technical choices are owned by `docs/DECISIONS.md` and should be resolved only by the phase that first needs them.
