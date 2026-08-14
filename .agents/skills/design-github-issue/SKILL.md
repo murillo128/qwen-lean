@@ -1,6 +1,6 @@
 ---
 name: design-github-issue
-description: Define a self-contained execution-ready GitHub issue that resolves material decisions and gives a fresh executor the facts needed to implement safely.
+description: Define a self-contained execution-ready GitHub issue that resolves material decisions, teaches the relevant mechanism concisely, and gives a fresh executor the facts needed to implement safely.
 ---
 
 # Design a GitHub Execution Issue
@@ -14,6 +14,7 @@ The design authority owns:
 - the observable outcome;
 - material architectural and validation decisions;
 - the complete phase-specific context needed to execute safely;
+- a concise explanation of how the designed mechanism works when that helps the user understand the project;
 - scope, invariants, exclusions, failure semantics, and acceptance criteria;
 - risk-based review checkpoints when useful;
 - the issue's initial readiness and any design-authority state transition.
@@ -29,6 +30,20 @@ Design the issue for an executor that:
 - must be able to distinguish required behavior from examples, observations, alternatives, and future work.
 
 The issue must contain every phase-specific fact, decision, constraint, and acceptance rule required for correct implementation. Links are supporting references, not substitutes for material instructions.
+
+## Explain how it works for a learning user
+
+The issue is also a compact learning surface for the user. When the work introduces a non-obvious mechanism, model-training technique, evaluation concept, data flow, or system boundary, include a short `How it works` section.
+
+- Explain the end-to-end mechanism or data/control flow, not the implementation line by line.
+- On first use within the issue, define specialized terms in one concise sentence when they are needed to understand the design. Do not assume prior Python, ML-framework, training, or systems knowledge unnecessarily.
+- Make clear how the important components interact and why the chosen approach matters to the outcome.
+- Mention a material trade-off when it explains a design choice; do not enumerate every alternative.
+- Distinguish concepts from product/library names where confusion is plausible. For example, explain what LoRA does separately from the fact that PEFT implements it.
+- Reuse durable documentation through links when it already owns the full explanation; give only the short phase-specific reminder needed to understand this issue.
+- Do not turn the issue into a tutorial, glossary, or generic explanation of Git/GitHub workflow.
+
+Keep this proportional. One to four short paragraphs, a small diagram, or a compact bullet flow is usually enough.
 
 ## Load material design context
 
@@ -85,7 +100,11 @@ At issue publication, set exactly one state label through `codex-github-operatio
 
 State what must become true, why it matters, the current limitation, and the boundary of the requested change.
 
-### 2. Resolve material unknowns
+### 2. Explain the mechanism concisely
+
+Add `How it works` when needed so the user can understand the design without hidden prerequisite knowledge. Define new concepts on first use, show the relevant flow, and keep the explanation focused on the mechanism being built in this issue.
+
+### 3. Resolve material unknowns
 
 Resolve questions that can change behavior, compatibility, architecture, data handling, model behavior, failure handling, validation, licensing, or deployment strategy.
 
@@ -100,11 +119,11 @@ Use these classifications only when useful:
 
 Do not turn `OPEN` or `SPECULATIVE` items into implementation requirements. Record durable cross-phase architecture in an appropriate repository decision document; keep phase-local choices in the issue.
 
-### 3. Bound implementation without under-specifying it
+### 4. Bound implementation without under-specifying it
 
 Define the smallest coherent outcome, permitted subsystem or files, explicit exclusions, and invariants. Include exact files or seams when an executor could otherwise modify the wrong layer.
 
-### 4. Define validation that proves the outcome
+### 5. Define validation that proves the outcome
 
 Specify material validation concretely:
 
@@ -116,13 +135,13 @@ Specify material validation concretely:
 
 Use exact commands when arguments or environment are part of what is being proven; otherwise identify the target and required result without freezing replaceable invocation syntax.
 
-### 5. Keep evidence proportional
+### 6. Keep evidence proportional
 
 Capture enough technical evidence to support the decision or comparison being made. This may include model/dataset identity, configuration, commands, results, metrics, artifacts, and limitations.
 
 Do not require elaborate provenance, immutable archives, hashes, or machine-readable manifests unless the issue specifically needs them.
 
-### 6. Add review checkpoints when they reduce risk
+### 7. Add review checkpoints when they reduce risk
 
 Add independent checkpoints only for distinct material risks such as architecture, data integrity, numerical behavior, backend execution, broad refactoring, or decision-driving performance evidence.
 
@@ -135,11 +154,11 @@ A checkpoint defines:
 
 When the last checkpoint can inspect the complete final diff and all remaining acceptance criteria, it can be declared **final-capable**.
 
-### 7. Define dependency and publication boundaries
+### 8. Define dependency and publication boundaries
 
 When work depends on external repositories, models, datasets, or generated artifacts, specify the identity and update boundary needed for the current task. Do not require bookkeeping commits that add no technical value.
 
-### 8. Define restart semantics
+### 9. Define restart semantics
 
 Distinguish:
 
@@ -151,7 +170,7 @@ Distinguish:
 
 Two consecutive review failures for substantially the same validation or bookkeeping mechanism should trigger design review before a third corrective cycle. This never waives a continuing material defect.
 
-### 9. Check overlap
+### 10. Check overlap
 
 Inspect only plausibly overlapping open issues, PRs, branches, and recent attempts. Link superseded work and summarize its material constraint instead of copying its history.
 
@@ -160,6 +179,7 @@ Inspect only plausibly overlapping open issues, PRs, branches, and recent attemp
 Before marking the issue `execution-ready`, confirm:
 
 - a fresh executor can implement without design-session reasoning;
+- the user can understand the relevant mechanism without unexplained essential jargon;
 - the observable outcome and terminology are unambiguous;
 - all material facts and decisions are present;
 - linked sources supplement rather than replace the contract;
@@ -179,6 +199,9 @@ Before marking the issue `execution-ready`, confirm:
 
 ## Goal and current limitation
 <Observable outcome, why it matters, and current behavior.>
+
+## How it works
+<Concise explanation of the mechanism/data flow and any essential new concepts. Omit only when the work is genuinely self-explanatory.>
 
 ## Baseline and inputs
 <Material baseline facts, models, datasets, artifacts, and defaults.>
