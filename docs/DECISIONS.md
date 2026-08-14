@@ -14,6 +14,8 @@ This is intentionally simpler than an interactive prover that repeatedly chooses
 
 Tactic-level generation, premise retrieval, and proof search are later milestones, not v1 requirements.
 
+**Exact prompt and proof-target serialization:** OPEN
+
 ## D002 — Task success is determined by Lean
 
 **Status:** ACCEPTED
@@ -46,9 +48,9 @@ The first training method is supervised fine-tuning (SFT) using QLoRA.
 
 SFT trains the model on known input/output examples. LoRA keeps the base model frozen and trains small low-rank adapter matrices; QLoRA combines LoRA with a quantized base model so the experiment fits on much less GPU memory than full-parameter fine-tuning.
 
-The initial intent is 4-bit base-model quantization with trainable LoRA adapters. Exact quantization settings, LoRA rank/alpha, sequence length, optimizer parameters, and training schedule remain phase-local decisions informed by data and hardware measurements.
+The initial intent is 4-bit base-model quantization with trainable LoRA adapters. Full-parameter fine-tuning is not part of the first experiment.
 
-Full-parameter fine-tuning is not part of the first experiment.
+**Exact quantization settings, LoRA rank/alpha, sequence length, optimizer parameters, and training schedule:** OPEN
 
 ## D005 — ML and inference stack
 
@@ -68,6 +70,8 @@ Use the standard Python Hugging Face/PyTorch ecosystem rather than a custom trai
 
 Direct Transformers generation is acceptable for small diagnostics where introducing vLLM adds no value. The evaluator contract must remain the same regardless of inference transport.
 
+**Experiment-tracking backend:** OPEN
+
 ## D006 — The repository is operated by agents, not by a human CLI user
 
 **Status:** ACCEPTED
@@ -86,7 +90,7 @@ The first supervised corpus should be built primarily from real verified Lean/ma
 
 The extraction path must preserve enough context to reconstruct examples and reason about split contamination. A maintained Lean extraction/tracing tool such as LeanDojo-v2 is a preferred candidate, but the exact extraction implementation is not yet fixed.
 
-**Extraction implementation:** OPEN
+**Extraction implementation and retained context:** OPEN
 
 The Phase 2 design should choose between LeanDojo-v2 and a simpler direct Lean/mathlib extraction path after inspecting what context the whole-proof task actually needs.
 
@@ -96,9 +100,9 @@ The Phase 2 design should choose between LeanDojo-v2 and a simpler direct Lean/m
 
 Do not rely on a random theorem-pair split for the main held-out comparison. Closely related lemmas from the same file or namespace can make a random split unrealistically easy.
 
-Use a structural grouping boundary such as file, namespace, source unit, or a stronger contamination-aware rule. The exact grouping unit remains open until the extracted corpus is inspected.
+Use a structural grouping boundary such as file, namespace, source unit, or a stronger contamination-aware rule.
 
-**Exact split unit:** OPEN
+**Exact split unit and deduplication rules:** OPEN
 
 ## D009 — miniF2F is the first external benchmark
 
@@ -122,7 +126,7 @@ The software should remain provider-neutral Linux/NVIDIA code. Vast.ai, OCI, Lin
 
 Claims about fit, memory, throughput, or cost must be based on measured configurations rather than assumed from the GPU model name.
 
-**Compute provider per run:** OPEN
+**Compute provider and machine flavor per run:** OPEN
 
 ## D011 — Artifact ownership
 
@@ -140,17 +144,4 @@ The project needs enough metadata to understand what was run and make fair compa
 
 For material comparisons, record the model/tokenizer, dataset/split, relevant training or generation configuration, Lean/evaluation contract, hardware details that affect interpretation, and produced metrics. Deterministic seeds, repeated runs, immutable hashes, and extensive provenance are used when they matter to the question being answered, not as universal requirements.
 
-## Open decisions to resolve in later phases
-
-The following are intentionally not frozen by this initial scaffold:
-
-- exact theorem prompt and proof-target format;
-- extraction implementation and retained Lean context;
-- structural split unit and deduplication rules;
-- context length and training hyperparameters;
-- exact experiment-tracking backend;
-- second external benchmark;
-- compute provider and machine flavor for each experiment;
-- detailed self-training sampling/filtering policy;
-- RL reward shaping beyond verified proof success;
-- tactic-level architecture, retrieval, and search strategy.
+Future-phase details such as verifier-filtered self-training policy, RL reward shaping, and tactic-level search architecture are intentionally deferred until their phase becomes active rather than recorded as premature decisions here.
