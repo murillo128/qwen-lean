@@ -1,6 +1,6 @@
 ---
 name: design-github-issue
-description: Define a self-contained execution-ready GitHub issue that resolves material decisions, gives a fresh executor every fact needed to implement safely, and avoids duplicating workflow history or derived metadata.
+description: Define a self-contained execution-ready GitHub issue that resolves material decisions and gives a fresh executor the facts needed to implement safely.
 ---
 
 # Design a GitHub Execution Issue
@@ -15,7 +15,7 @@ The design authority owns:
 - material architectural and validation decisions;
 - the complete phase-specific context needed to execute safely;
 - scope, invariants, exclusions, failure semantics, and acceptance criteria;
-- risk-based review checkpoints;
+- risk-based review checkpoints when useful;
 - the issue's initial readiness and any design-authority state transition.
 
 It does not implement code, operate branches, publish commits, or perform independent review.
@@ -41,7 +41,7 @@ Then inspect only what is needed to settle the phase:
 
 - exact plan and decision sections;
 - relevant source seams, APIs, ownership boundaries, state, and tests;
-- the prior accepted manifest or baseline behavior;
+- baseline behavior or prior experiment results that constrain the work;
 - required hardware, model, dataset, artifact, dependency, or environment inputs;
 - overlapping current work and superseded attempts when their findings constrain the design.
 
@@ -53,13 +53,12 @@ Depending on the phase, include:
 
 - current limitation and observable goal;
 - accepted baseline behavior and defaults that must remain unchanged;
-- exact relevant repository or dependency inputs when reproducibility or compatibility depends on them;
-- inspected implementation seams, ownership and lifetime boundaries, data shapes, states, identifiers, and error mapping;
+- relevant model, dataset, dependency, or artifact inputs when they affect the result;
+- inspected implementation seams and data shapes;
 - resolved API or configuration semantics and invalid combinations;
-- ordering, concurrency, cancellation, teardown, and failure behavior;
-- required telemetry and resource bounds;
+- ordering, failure behavior, and resource constraints where relevant;
 - permitted implementation scope and explicit exclusions;
-- stable commands, targets, fixtures, hardware, datasets, and artifact identities needed for validation;
+- commands, targets, fixtures, hardware, datasets, and artifacts needed for validation;
 - objective acceptance criteria and material review risks;
 - prior negative evidence when it prohibits repeating a known-invalid mechanism.
 
@@ -88,7 +87,7 @@ State what must become true, why it matters, the current limitation, and the bou
 
 ### 2. Resolve material unknowns
 
-Resolve questions that can change behavior, compatibility, architecture, ownership, lifetime, numerical semantics, data handling, backend support, failure handling, validation, licensing, or deployment strategy.
+Resolve questions that can change behavior, compatibility, architecture, data handling, model behavior, failure handling, validation, licensing, or deployment strategy.
 
 Use these classifications only when useful:
 
@@ -110,44 +109,35 @@ Define the smallest coherent outcome, permitted subsystem or files, explicit exc
 Specify material validation concretely:
 
 - repository-native build, test, lint, evaluation, or benchmark targets;
-- correctness, repeated-run, failure-path, numerical, data, concurrency, lifetime, or performance checks;
+- correctness, repeated-run, failure-path, numerical, data, or performance checks when relevant;
 - required environment and external artifacts;
 - objective pass/fail criteria;
-- authoritative technical evidence artifacts when needed.
+- technical evidence artifacts when useful.
 
 Use exact commands when arguments or environment are part of what is being proven; otherwise identify the target and required result without freezing replaceable invocation syntax.
 
-### 5. Keep technical evidence independent from workflow
+### 5. Keep evidence proportional
 
-Machine-readable technical evidence should contain technical and reproducibility data such as:
+Capture enough technical evidence to support the decision or comparison being made. This may include model/dataset identity, configuration, commands, results, metrics, artifacts, and limitations.
 
-- implementation and dependency revisions;
-- model, dataset, input, and artifact identities and hashes;
-- environment and configuration;
-- commands, results, metrics, gates, and limitations.
+Do not require elaborate provenance, immutable archives, hashes, or machine-readable manifests unless the issue specifically needs them.
 
-Do not require GitHub workflow metadata unless it is itself a technical input to the system under test.
+### 6. Add review checkpoints when they reduce risk
 
-When raw evidence is large or repetitive, use an authorized immutable checksum-addressed archive and keep in Git only the manifest, bounded summaries, schemas, reproduction tooling, small fixtures, and archive index.
-
-### 6. Add risk-based checkpoints
-
-Under `STANDARD`, add independent checkpoints only for distinct material risks such as architecture, ownership or lifetime, persistent state, numerical behavior, data integrity, concurrency, backend execution, broad refactoring, or decision-driving performance evidence.
-
-Use `HIGH_ASSURANCE` only when explicitly justified.
+Add independent checkpoints only for distinct material risks such as architecture, data integrity, numerical behavior, backend execution, broad refactoring, or decision-driving performance evidence.
 
 A checkpoint defines:
 
-- the covered outcome and exact target semantics;
+- the covered outcome and target semantics;
 - material risks and acceptance criteria;
 - evidence to inspect or reproduce;
 - what would make progression unsafe.
 
-When the last checkpoint can inspect the complete final diff, immutable final technical evidence, and all remaining acceptance criteria, declare it **final-capable**.
+When the last checkpoint can inspect the complete final diff and all remaining acceptance criteria, it can be declared **final-capable**.
 
 ### 7. Define dependency and publication boundaries
 
-When work depends on submodules, vendored code, external repositories, models, datasets, or generated artifacts, specify the exact identity and update boundary required for reproducibility and review. Do not require bookkeeping commits that add no technical value.
+When work depends on external repositories, models, datasets, or generated artifacts, specify the identity and update boundary needed for the current task. Do not require bookkeeping commits that add no technical value.
 
 ### 8. Define restart semantics
 
@@ -159,7 +149,7 @@ Distinguish:
 - replaceable tool failure: use another transport or leave a handoff;
 - real blocker: no safe practical continuation exists.
 
-Under `STANDARD`, two consecutive review failures for substantially the same validation or bookkeeping mechanism trigger design review before a third corrective cycle. This never waives a continuing material defect.
+Two consecutive review failures for substantially the same validation or bookkeeping mechanism should trigger design review before a third corrective cycle. This never waives a continuing material defect.
 
 ### 9. Check overlap
 
@@ -175,8 +165,7 @@ Before marking the issue `execution-ready`, confirm:
 - linked sources supplement rather than replace the contract;
 - scope, invariants, failure behavior, and acceptance are clear;
 - required inputs and validation capabilities are identified;
-- checkpoints match distinct risks and avoid duplicate final review;
-- technical evidence is independent from workflow metadata;
+- review checkpoints, if any, match distinct risks;
 - dependency and external-evidence boundaries are explicit when applicable;
 - `execution-ready` is the issue's only state label.
 
@@ -187,16 +176,15 @@ Before marking the issue `execution-ready`, confirm:
 
 ## Readiness
 **Initial state:** execution-ready | design-required | investigation-required | blocked
-**Profile:** STANDARD | HIGH_ASSURANCE
 
 ## Goal and current limitation
 <Observable outcome, why it matters, and current behavior.>
 
-## Authoritative baseline and inputs
-<All material baseline facts, revisions, models, datasets, artifacts, and defaults.>
+## Baseline and inputs
+<Material baseline facts, models, datasets, artifacts, and defaults.>
 
 ## Resolved technical contract
-<APIs, ownership, state, ordering, failure semantics, bounds, and concrete seams.>
+<APIs, data flow, failure semantics, bounds, and concrete seams.>
 
 ## Scope
 ### In scope
@@ -207,10 +195,10 @@ Before marking the issue `execution-ready`, confirm:
 <Required targets, cases, environment, artifacts, and objective gates.>
 
 ## Checkpoints
-<Distinct risk checkpoints; mark the last one final-capable when applicable.>
+<Only distinct material-risk checkpoints; mark the last one final-capable when applicable.>
 
 ## Delivery
-<PR shape, dependency/publication boundaries, evidence retention, and observable completion.>
+<PR shape, dependency/publication boundaries, and observable completion.>
 ```
 
 Add or split sections when technical completeness requires it.
