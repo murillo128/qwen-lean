@@ -65,6 +65,8 @@ def run_vllm_memorization(
     workload_path: Path,
     adapter_dir: Path,
     output: Path,
+    *,
+    optimizer_step: int | None = None,
 ) -> dict[str, Any]:
     examples, _ = load_phase3_workload(workload_path, config)
     phase1 = _phase1_config(config)
@@ -124,6 +126,7 @@ def run_vllm_memorization(
         "serialization_id": config.value["serialization"]["id"],
         "workload_id": config.workload["id"],
         "selected_record_ids": list(config.selected_record_ids),
+        "optimizer_step": optimizer_step,
         "generation_settings": sampling,
         "inference_engine": phase1.engine["name"],
         "inference_engine_version": engine_version,

@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,11 @@ from qwen_lean.phase3 import (
     select_overfit_workload,
     tokenize_sft_record,
 )
+from qwen_lean.phase3_training import (
+    validate_resume_checkpoint,
+    validate_training_boundary,
+)
+from qwen_lean.phase3_evidence import _amended_memorization_results
 from qwen_lean.prompt import render_prompt
 from qwen_lean.schema import TaskRecord
 
@@ -194,6 +200,62 @@ def test_phase3_config_pins_base_tokenizer_and_qlora_targets() -> None:
         "down_proj",
     ]
     assert len(config.selected_record_ids) == len(set(config.selected_record_ids)) == 64
+
+
+def test_amended_training_boundaries_are_fixed_and_resumable(tmp_path: Path) -> None:
+    config = Phase3Config.load(ROOT / "config/phase3-overfit.json")
+
+    for target_step in (100, 200, 300, 400, 500, 600):
+        validate_training_boundary(config, target_step)
+    for invalid_step in (0, 99, 150, 700):
+        with pytest.raises(ValueError, match="target step"):
+            validate_training_boundary(config, invalid_step)
+
+    checkpoint = tmp_path / "checkpoint-100"
+    checkpoint.mkdir()
+    for name in (
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+    ):
+        (checkpoint / name).write_text("fixture", encoding="utf-8")
+    (checkpoint / "trainer_state.json").write_text(
+        '{"global_step": 100}\n', encoding="utf-8"
+    )
+
+    assert validate_resume_checkpoint(config, checkpoint, 200) == 100
+    with pytest.raises(ValueError, match="exactly one 100-step boundary"):
+        validate_resume_checkpoint(config, checkpoint, 300)
+
+
+def test_amended_training_rejects_adapter_only_checkpoint(tmp_path: Path) -> None:
+    config = Phase3Config.load(ROOT / "config/phase3-overfit.json")
+    checkpoint = tmp_path / "checkpoint-100"
+    checkpoint.mkdir()
+    (checkpoint / "adapter_config.json").write_text("{}", encoding="utf-8")
+    (checkpoint / "adapter_model.safetensors").write_text("fixture", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="not resumable"):
+        validate_resume_checkpoint(config, checkpoint, 200)
+
+
+def test_amended_evidence_recovers_boundary_from_result_filename(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "memorization-amended"
+    directory.mkdir()
+    for step in (100, 200):
+        (directory / f"step-{step}.json").write_text(
+            json.dumps({"optimizer_step": None, "exact_matches": step // 10}),
+            encoding="utf-8",
+        )
+
+    values = _amended_memorization_results(tmp_path)
+
+    assert [value["optimizer_step"] for value in values] == [100, 200]
+    assert [value["exact_matches"] for value in values] == [10, 20]
 
 
 def test_adapter_support_is_opt_in_and_metadata_cannot_impersonate_base(

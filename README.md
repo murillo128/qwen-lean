@@ -198,26 +198,49 @@ uv run --frozen --extra training qwen-lean phase3-preflight \
   --output artifacts/phase3/preflight.json
 uv run --frozen --extra training qwen-lean phase3-train \
   --workload artifacts/phase3/workload.json \
-  --output-dir artifacts/phase3/training
+  --output-dir artifacts/phase3/training-amended \
+  --target-step 100
 ```
 
-In fresh processes, validate standard PEFT reload and the required local-vLLM
-memorization gate. Run the miniF2F adapter smoke only after memorization passes:
+Each eligible 100-step checkpoint must pass the required local-vLLM memorization
+gate in a fresh process. If it fails, resume the same optimizer trajectory exactly
+one boundary at a time; do not warm-start an adapter with a reset optimizer:
+
+```bash
+uv run --frozen --extra baseline qwen-lean phase3-memorization \
+  --workload artifacts/phase3/workload.json \
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-100 \
+  --optimizer-step 100 \
+  --output artifacts/phase3/memorization-amended/step-100.json
+uv run --frozen --extra training qwen-lean phase3-train \
+  --workload artifacts/phase3/workload.json \
+  --output-dir artifacts/phase3/training-amended \
+  --target-step 200 \
+  --resume-from-checkpoint \
+    artifacts/phase3/training-amended/trainer-state/checkpoint-100
+```
+
+After the first checkpoint reaches 56/64, validate standard PEFT reload and run
+the miniF2F adapter smoke with that exact accepted checkpoint:
 
 ```bash
 uv run --frozen --extra training qwen-lean phase3-adapter-reload \
   --workload artifacts/phase3/workload.json \
-  --adapter-dir artifacts/phase3/training/adapter \
-  --output artifacts/phase3/adapter-reload.json
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-200 \
+  --output artifacts/phase3/adapter-reload-amended.json
 uv run --frozen --extra baseline qwen-lean phase3-memorization \
   --workload artifacts/phase3/workload.json \
-  --adapter-dir artifacts/phase3/training/adapter \
-  --output artifacts/phase3/memorization.json
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-200 \
+  --optimizer-step 200 \
+  --output artifacts/phase3/memorization-amended/step-200.json
 uv run --frozen --extra baseline qwen-lean phase3-adapter-smoke \
   --benchmark-root /tmp/qwen-lean-minif2f \
-  --adapter-dir artifacts/phase3/training/adapter \
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-200 \
   --output-dir artifacts/phase3/minif2f-smoke
 ```
+
+The step numbers above illustrate the first resume boundary; continue through at
+most step 600 only when the preceding eligible checkpoint fails vLLM.
 
 Compact evidence can be generated after the required local artifacts exist:
 

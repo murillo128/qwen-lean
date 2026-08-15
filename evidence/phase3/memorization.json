@@ -1,15 +1,17 @@
 {
+  "accepted_checkpoint_step": null,
   "adapter": {
     "artifact_id": "phase3-overfit64-v1-lora",
     "base_model_id": "Qwen/Qwen3-8B-Base",
     "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
-    "ignored_local_path": "artifacts/phase3/training/adapter",
+    "ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-600",
     "merged": false,
     "rank": 16
   },
   "candidate_results_retained_outside_git": true,
-  "exact_match_rate": 0.421875,
-  "exact_matches": 27,
+  "checkpoint_series_file": "memorization-checkpoints.json",
+  "exact_match_rate": 0.765625,
+  "exact_matches": 49,
   "examples": 64,
   "generation_infrastructure_errors": 0,
   "generation_settings": {
@@ -33,6 +35,7 @@
     "tokenizer_id": "Qwen/Qwen3-8B-Base",
     "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
   },
+  "optimizer_step": 600,
   "pipeline_interpretation": "training-workload memorization check, not generalization",
   "runtime": {
     "cuda_device": "NVIDIA RTX 4000 Ada Generation",

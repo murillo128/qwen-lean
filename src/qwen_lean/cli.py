@@ -150,6 +150,8 @@ def _parser() -> argparse.ArgumentParser:
         "--config", type=Path, default=root / "config/phase3-overfit.json"
     )
     phase3_train.add_argument("--output-dir", type=Path, required=True)
+    phase3_train.add_argument("--target-step", type=int, required=True)
+    phase3_train.add_argument("--resume-from-checkpoint", type=Path)
 
     phase3_reload = subparsers.add_parser(
         "phase3-adapter-reload", help="reload the saved PEFT adapter on the pinned base"
@@ -170,6 +172,7 @@ def _parser() -> argparse.ArgumentParser:
         "--config", type=Path, default=root / "config/phase3-overfit.json"
     )
     phase3_memorization.add_argument("--output", type=Path, required=True)
+    phase3_memorization.add_argument("--optimizer-step", type=int)
 
     phase3_smoke = subparsers.add_parser(
         "phase3-adapter-smoke", help="run the adapter-backed miniF2F dev16 Lean smoke"
@@ -329,7 +332,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "phase3-train":
         value = run_overfit_training(
-            Phase3Config.load(args.config), args.workload, args.output_dir
+            Phase3Config.load(args.config),
+            args.workload,
+            args.output_dir,
+            target_step=args.target_step,
+            resume_from_checkpoint=args.resume_from_checkpoint,
         )
         print(json.dumps(value, indent=2))
         return 0
@@ -350,6 +357,7 @@ def main(argv: list[str] | None = None) -> int:
             args.workload,
             args.adapter_dir,
             args.output,
+            optimizer_step=args.optimizer_step,
         )
         print(
             json.dumps(

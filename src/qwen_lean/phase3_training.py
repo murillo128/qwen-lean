@@ -26,6 +26,15 @@ PREFLIGHT_SCHEMA_VERSION = "phase3-preflight-v1"
 TRAINING_RUN_SCHEMA_VERSION = "phase3-training-run-v1"
 ADAPTER_RELOAD_SCHEMA_VERSION = "phase3-adapter-reload-v1"
 
+_RESUMABLE_CHECKPOINT_FILES = (
+    "adapter_config.json",
+    "adapter_model.safetensors",
+    "optimizer.pt",
+    "rng_state.pth",
+    "scheduler.pt",
+    "trainer_state.json",
+)
+
 
 @dataclass
 class QLoRARuntime:
@@ -180,6 +189,8 @@ def _build_trainer(
     output_dir: Path,
     *,
     callbacks: list[Any] | None = None,
+    max_steps: int | None = None,
+    save_checkpoints: bool = False,
 ) -> Any:
     try:
         from datasets import Dataset
@@ -197,19 +208,24 @@ def _build_trainer(
         learning_rate=float(training["learning_rate"]),
         weight_decay=float(training["weight_decay"]),
         max_grad_norm=float(training["maximum_gradient_norm"]),
-        max_steps=int(training["maximum_optimizer_steps"]),
+        max_steps=(
+            int(training["maximum_optimizer_steps"]) if max_steps is None else max_steps
+        ),
         lr_scheduler_type=str(training["lr_schedule"]),
         warmup_steps=int(training["warmup_steps"]),
         optim=str(training["optimizer"]),
         seed=int(training["seed"]),
         data_seed=int(training["seed"]),
+        ignore_data_skip=False,
         bf16=True,
         fp16=False,
         logging_strategy="steps",
         logging_steps=1,
         logging_first_step=True,
         logging_nan_inf_filter=False,
-        save_strategy="no",
+        save_strategy="steps" if save_checkpoints else "no",
+        save_steps=int(training["memorization_probe_interval_steps"]),
+        save_only_model=False,
         report_to=[],
         remove_unused_columns=False,
         gradient_checkpointing=True,
@@ -232,6 +248,94 @@ def _build_trainer(
     runtime.model = trainer.model
     _capture_and_validate_trainables(runtime, config)
     return trainer
+
+
+def validate_training_boundary(config: Phase3Config, target_step: int) -> None:
+    interval = int(config.training["memorization_probe_interval_steps"])
+    maximum = int(config.training["maximum_optimizer_steps"])
+    if target_step < interval or target_step > maximum or target_step % interval:
+        raise ValueError(
+            f"target step must be one of {list(range(interval, maximum + 1, interval))}"
+        )
+
+
+def validate_resume_checkpoint(
+    config: Phase3Config, checkpoint: Path, target_step: int
+) -> int:
+    validate_training_boundary(config, target_step)
+    missing = [
+        name
+        for name in _RESUMABLE_CHECKPOINT_FILES
+        if not (checkpoint / name).is_file()
+    ]
+    if missing:
+        raise ValueError(
+            f"checkpoint {checkpoint} is not resumable; missing files: {missing}"
+        )
+    try:
+        state = json.loads(
+            (checkpoint / "trainer_state.json").read_text(encoding="utf-8")
+        )
+        checkpoint_step = int(state["global_step"])
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+        raise ValueError(
+            f"checkpoint {checkpoint} has an invalid trainer_state.json"
+        ) from error
+    expected_name = f"checkpoint-{checkpoint_step}"
+    if checkpoint.name != expected_name:
+        raise ValueError(
+            f"checkpoint directory {checkpoint.name!r} must be {expected_name!r}"
+        )
+    interval = int(config.training["memorization_probe_interval_steps"])
+    if target_step != checkpoint_step + interval:
+        raise ValueError(
+            "Phase 3 must resume exactly one 100-step boundary at a time: "
+            f"checkpoint={checkpoint_step}, target={target_step}"
+        )
+    return checkpoint_step
+
+
+def _checkpoint_inventory(checkpoint: Path) -> dict[str, Any]:
+    missing = [
+        name
+        for name in _RESUMABLE_CHECKPOINT_FILES
+        if not (checkpoint / name).is_file()
+    ]
+    if missing:
+        raise RuntimeError(
+            f"saved checkpoint {checkpoint} is not resumable; missing files: {missing}"
+        )
+    return {
+        "relative_path": f"trainer-state/{checkpoint.name}",
+        "files": sorted(path.name for path in checkpoint.iterdir() if path.is_file()),
+        "optimizer_state_preserved": True,
+        "scheduler_state_preserved": True,
+        "rng_state_preserved": True,
+        "adapter_format": "peft-lora",
+        "merged": False,
+    }
+
+
+def _load_prior_training_run(
+    output_dir: Path,
+    config: Phase3Config,
+    examples: Sequence[TokenizedSFTExample],
+    resume_step: int,
+) -> dict[str, Any]:
+    path = output_dir / "run.json"
+    if not path.is_file():
+        raise ValueError(f"resume requires prior trajectory metadata at {path}")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if int(value.get("optimizer_steps_completed", -1)) != resume_step:
+        raise ValueError("prior trajectory metadata does not match resume checkpoint")
+    if value.get("model") != config.model or value.get("training") != config.training:
+        raise ValueError(
+            "prior trajectory changed the Phase 3 model or training config"
+        )
+    expected_ids = [example.record_id for example in examples]
+    if value.get("workload", {}).get("selected_record_ids") != expected_ids:
+        raise ValueError("prior trajectory changed the Phase 3 workload or data order")
+    return value
 
 
 def teacher_forced_metrics(
@@ -414,13 +518,45 @@ def run_training_preflight(
 
 
 def run_overfit_training(
-    config: Phase3Config, workload_path: Path, output_dir: Path
+    config: Phase3Config,
+    workload_path: Path,
+    output_dir: Path,
+    *,
+    target_step: int,
+    resume_from_checkpoint: Path | None = None,
 ) -> dict[str, Any]:
+    validate_training_boundary(config, target_step)
     torch, device_index, properties = _require_local_cuda()
     torch.manual_seed(int(config.training["seed"]))
     torch.cuda.manual_seed_all(int(config.training["seed"]))
     torch.cuda.reset_peak_memory_stats(device_index)
     examples, _ = load_phase3_workload(workload_path, config)
+    interval = int(config.training["memorization_probe_interval_steps"])
+    if resume_from_checkpoint is None:
+        if target_step != interval:
+            raise ValueError(
+                "a fresh Phase 3 trajectory must start at the first 100-step boundary"
+            )
+        if (output_dir / "run.json").exists() or any(
+            (output_dir / "trainer-state").glob("checkpoint-*")
+        ):
+            raise ValueError(
+                "fresh Phase 3 training requires a new output trajectory directory"
+            )
+        resume_step = 0
+        prior_run: dict[str, Any] | None = None
+    else:
+        resume_from_checkpoint = resume_from_checkpoint.resolve()
+        expected_parent = (output_dir / "trainer-state").resolve()
+        if resume_from_checkpoint.parent != expected_parent:
+            raise ValueError(
+                "resume checkpoint must belong to this output trajectory: "
+                f"expected parent {expected_parent}"
+            )
+        resume_step = validate_resume_checkpoint(
+            config, resume_from_checkpoint, target_step
+        )
+        prior_run = _load_prior_training_run(output_dir, config, examples, resume_step)
     runtime = load_qlora_runtime(config)
 
     try:
@@ -428,8 +564,9 @@ def run_overfit_training(
     except ImportError as error:
         raise RuntimeError("Phase 3 requires Transformers") from error
 
-    probes: list[dict[str, Any]] = []
-    interval = int(config.training["memorization_probe_interval_steps"])
+    probes: list[dict[str, Any]] = (
+        [] if prior_run is None else list(prior_run.get("memorization_probes", []))
+    )
     loss_threshold = float(config.training["target_cross_entropy_threshold"])
     accuracy_threshold = float(config.training["target_accuracy_threshold"])
     pad_token_id = int(runtime.tokenizer.pad_token_id)
@@ -478,12 +615,6 @@ def run_overfit_training(
                 )
                 metrics["optimizer_step"] = step
                 probes.append(metrics)
-                if (
-                    metrics["mean_target_token_cross_entropy"] <= loss_threshold
-                    and metrics["target_token_next_token_accuracy"]
-                    >= accuracy_threshold
-                ):
-                    control.should_training_stop = True
             return control
 
     trainer = _build_trainer(
@@ -492,54 +623,70 @@ def run_overfit_training(
         config,
         output_dir / "trainer-state",
         callbacks=[Phase3SafetyAndProbeCallback()],
+        max_steps=target_step,
+        save_checkpoints=True,
     )
-    pre_training = teacher_forced_metrics(
-        runtime.model, examples, pad_token_id=pad_token_id
+    pre_training = (
+        teacher_forced_metrics(runtime.model, examples, pad_token_id=pad_token_id)
+        if prior_run is None
+        else prior_run["pre_training_teacher_forced"]
     )
     started = time.perf_counter()
-    train_result = trainer.train()
-    training_wall_time = time.perf_counter() - started
-    final_metrics = teacher_forced_metrics(
-        runtime.model, examples, pad_token_id=pad_token_id
+    train_result = trainer.train(
+        resume_from_checkpoint=(
+            None if resume_from_checkpoint is None else str(resume_from_checkpoint)
+        )
     )
+    training_wall_time = time.perf_counter() - started
     completed_steps = int(trainer.state.global_step)
-    if completed_steps % interval != 0:
-        raise RuntimeError("Phase 3 training stopped outside a 100-step probe boundary")
-    if not (
+    if completed_steps != target_step:
+        raise RuntimeError(
+            f"Phase 3 training stopped at step {completed_steps}, expected {target_step}"
+        )
+    if not probes or int(probes[-1]["optimizer_step"]) != completed_steps:
+        raise RuntimeError("Phase 3 did not record its final full-64 boundary probe")
+    final_metrics = {
+        key: value for key, value in probes[-1].items() if key != "optimizer_step"
+    }
+    teacher_forced_eligible = bool(
         final_metrics["mean_target_token_cross_entropy"] <= loss_threshold
         and final_metrics["target_token_next_token_accuracy"] >= accuracy_threshold
-    ):
-        raise RuntimeError(
-            "Phase 3 failed the teacher-forced memorization gate by "
-            f"{completed_steps} optimizer steps"
-        )
+    )
     if not (
         final_metrics["mean_target_token_cross_entropy"]
         < pre_training["mean_target_token_cross_entropy"]
     ):
         raise RuntimeError("Phase 3 target-token loss did not improve")
 
-    adapter_dir = output_dir / "adapter"
-    runtime.model.save_pretrained(
-        adapter_dir,
-        safe_serialization=True,
-        save_embedding_layers=False,
-    )
-    expected_adapter_files = {
-        "adapter_config.json",
-        "adapter_model.safetensors",
-    }
-    missing = sorted(
-        name for name in expected_adapter_files if not (adapter_dir / name).is_file()
-    )
-    if missing:
-        raise RuntimeError(f"saved PEFT adapter is incomplete: {missing}")
-    if any(path.name.startswith("model-") for path in adapter_dir.iterdir()):
+    checkpoint = output_dir / "trainer-state" / f"checkpoint-{completed_steps}"
+    checkpoint_metadata = _checkpoint_inventory(checkpoint)
+    if any(path.name.startswith("model-") for path in checkpoint.iterdir()):
         raise RuntimeError("Phase 3 unexpectedly saved merged base-model shards")
+
+    checkpoint_candidates = (
+        [] if prior_run is None else list(prior_run.get("checkpoint_candidates", []))
+    )
+    checkpoint_candidates.append(
+        {
+            "optimizer_step": completed_steps,
+            "teacher_forced_eligible": teacher_forced_eligible,
+            "teacher_forced": final_metrics,
+            **checkpoint_metadata,
+        }
+    )
+    prior_wall_time = (
+        0.0
+        if prior_run is None
+        else float(prior_run["runtime"]["cumulative_training_wall_time_seconds"])
+    )
 
     value = {
         "schema_version": TRAINING_RUN_SCHEMA_VERSION,
-        "status": "teacher_forced_gate_passed",
+        "status": (
+            "checkpoint_candidate_ready"
+            if teacher_forced_eligible
+            else "checkpoint_recorded"
+        ),
         "model": config.model,
         "dataset": config.value["dataset"],
         "serialization": config.value["serialization"],
@@ -552,9 +699,22 @@ def run_overfit_training(
         "lora": config.lora,
         "training": config.training,
         "optimizer_steps_completed": completed_steps,
+        "trajectory": {
+            "same_trajectory_resume": resume_from_checkpoint is not None,
+            "resumed_from_step": resume_step,
+            "target_step": target_step,
+            "next_boundary_step": (
+                None
+                if completed_steps == int(config.training["maximum_optimizer_steps"])
+                else completed_steps + interval
+            ),
+            "data_order_seed": int(config.training["seed"]),
+        },
         "pre_training_teacher_forced": pre_training,
         "memorization_probes": probes,
         "final_teacher_forced": final_metrics,
+        "teacher_forced_checkpoint_eligible": teacher_forced_eligible,
+        "checkpoint_candidates": checkpoint_candidates,
         "trainable_parameter_count": runtime.trainable_parameter_count,
         "total_parameter_count": runtime.total_parameter_count,
         "trainable_parameter_fraction": (
@@ -563,17 +723,18 @@ def run_overfit_training(
         "quantized_linear_modules": runtime.quantized_linear_modules,
         "adapter": {
             "artifact_id": config.lora["artifact_id"],
-            "relative_path": "adapter",
+            "relative_path": checkpoint_metadata["relative_path"],
             "format": "peft-lora",
             "merged": False,
-            "files": sorted(
-                path.name for path in adapter_dir.iterdir() if path.is_file()
-            ),
+            "files": checkpoint_metadata["files"],
         },
         "packages": _package_versions(),
         "runtime": {
             "python": platform.python_version(),
-            "training_wall_time_seconds": training_wall_time,
+            "stage_training_wall_time_seconds": training_wall_time,
+            "cumulative_training_wall_time_seconds": (
+                prior_wall_time + training_wall_time
+            ),
             "trainer_metrics": {
                 key: value
                 for key, value in train_result.metrics.items()
@@ -586,6 +747,13 @@ def run_overfit_training(
     (output_dir / "run.json").write_text(
         json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+    if (
+        completed_steps == int(config.training["maximum_optimizer_steps"])
+        and not teacher_forced_eligible
+    ):
+        raise RuntimeError(
+            "Phase 3 exhausted 600 steps without an eligible teacher-forced checkpoint"
+        )
     return value
 
 
