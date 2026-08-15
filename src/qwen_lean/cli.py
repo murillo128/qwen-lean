@@ -49,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return 0
 
-    _, tasks, _ = load_fixture_set(args.fixtures)
+    fixture_id, tasks, _ = load_fixture_set(args.fixtures)
     try:
         task = next(task for task in tasks if task.id == args.task_id)
     except StopIteration:
@@ -59,6 +59,7 @@ def main(argv: list[str] | None = None) -> int:
         task,
         args.output_dir,
         args.project_root,
+        task_source=fixture_id,
         timeout_seconds=args.timeout,
         max_new_tokens=args.max_new_tokens,
     )
