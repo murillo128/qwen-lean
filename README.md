@@ -111,6 +111,7 @@ git clone --filter=blob:none --no-checkout https://github.com/google-deepmind/mi
 git -C /tmp/qwen-lean-minif2f fetch --depth=1 origin f0a20e14c1eeccd859d51bb4c2b3ee487889c303
 git -C /tmp/qwen-lean-minif2f checkout --detach f0a20e14c1eeccd859d51bb4c2b3ee487889c303
 (cd /tmp/qwen-lean-minif2f && lake exe cache get)
+(cd /tmp/qwen-lean-minif2f && lake build MiniF2F.ProblemImports)
 uv run qwen-lean minif2f-validate --benchmark-root /tmp/qwen-lean-minif2f
 ```
 
