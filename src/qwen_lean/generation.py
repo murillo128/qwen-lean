@@ -38,11 +38,21 @@ def run_model_smoke(
         if not torch.cuda.is_available():
             raise RuntimeError("the Phase 0 model smoke requires a CUDA GPU")
 
+        cuda_device_index = 0
+        cuda_properties = torch.cuda.get_device_properties(cuda_device_index)
         runtime.update(
             {
                 "torch": torch.__version__,
                 "transformers": transformers.__version__,
-                "cuda_device": torch.cuda.get_device_name(0),
+                "inference_execution": "local_cuda",
+                "cuda_device_index": cuda_device_index,
+                "cuda_device": cuda_properties.name,
+                "cuda_device_capability": [
+                    cuda_properties.major,
+                    cuda_properties.minor,
+                ],
+                "cuda_device_total_memory_bytes": cuda_properties.total_memory,
+                "torch_cuda_version": torch.version.cuda,
             }
         )
         tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -50,9 +60,13 @@ def run_model_smoke(
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_ID,
             torch_dtype=torch.bfloat16,
-            device_map={"": 0},
+            device_map={"": cuda_device_index},
             low_cpu_mem_usage=True,
         )
+        if model.device.type != "cuda" or model.device.index != cuda_device_index:
+            raise RuntimeError(
+                f"model loaded on {model.device}, expected local cuda:{cuda_device_index}"
+            )
         prompt = render_prompt(task)
         inputs = tokenizer(prompt, return_tensors="pt")
         inputs = {name: tensor.to(model.device) for name, tensor in inputs.items()}

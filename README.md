@@ -83,8 +83,9 @@ Evaluate the deterministic fixture set and write `run.json` plus
 uv run qwen-lean fixture --output-dir artifacts/fixture
 ```
 
-On a CUDA machine with enough memory for the unchanged 8B checkpoint, run the
-separate direct-Transformers smoke path:
+On the project-controlled local Ada GPU, run the separate direct-Transformers
+smoke path. Hugging Face Hub may supply the model artifacts, but generation
+executes in this local CUDA process:
 
 ```bash
 uv sync --frozen --extra model
