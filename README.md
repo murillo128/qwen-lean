@@ -56,8 +56,46 @@ Chat discussion is exploratory until a durable decision is recorded in `docs/DEC
 
 The first cycle uses whole-proof generation with `Qwen/Qwen3-8B-Base`, Lean 4/mathlib verification, QLoRA-based SFT, and a Python ML stack built around PyTorch, Transformers, TRL, PEFT, and Hugging Face Datasets. vLLM is the intended batch inference runtime once evaluation moves beyond tiny smoke tests.
 
-Exact prompts, dataset extraction details, training hyperparameters, and later-stage methods are intentionally not frozen here. See the decision log and plan for what is accepted versus still open.
+See the decision log and plan for which prompt, dataset, training, and later-stage
+choices are accepted versus still open.
+
+## Phase 0 evaluator
+
+The Phase 0 runtime implements the `whole-proof-v1` code-completion contract and
+checks every candidate in an isolated process using Lean 4/mathlib `v4.32.0`.
+Lean's `hasSorry` diagnostic is promoted to an error so `sorry` and `admit`
+cannot be reported as verified proofs without rejecting unrelated warnings.
+
+After installing `uv` and `elan`, prepare the pinned Lean dependency and run the
+normal test suite:
+
+```bash
+lake update
+lake exe cache get
+uv sync --frozen
+uv run pytest
+```
+
+Evaluate the deterministic fixture set and write `run.json` plus
+`results.jsonl`:
+
+```bash
+uv run qwen-lean fixture --output-dir artifacts/fixture
+```
+
+On the project-controlled local Ada GPU, run the separate direct-Transformers
+smoke path. Hugging Face Hub may supply the model artifacts, but generation
+executes in this local CUDA process:
+
+```bash
+uv sync --frozen --extra model
+uv run --extra model qwen-lean model-smoke --output-dir artifacts/model-smoke
+```
+
+The smoke is a plumbing check, not a model-quality baseline. Its continuation is
+sent unmodified, aside from transport whitespace normalization, through the same
+Lean verifier used by fixture candidates.
 
 ## Status
 
-The project is in initial planning and scaffolding. The roadmap epic owns the current phase; phase implementation should begin only after a controlling issue defines its scope and acceptance criteria.
+The roadmap epic owns the current phase and links its controlling execution issue.

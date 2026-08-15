@@ -1,0 +1,33 @@
+[project]
+name = "qwen-lean"
+version = "0.1.0"
+description = "Verified whole-proof evaluation for Qwen and Lean"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = []
+
+[project.optional-dependencies]
+model = [
+  "accelerate==1.10.1",
+  "torch==2.8.0",
+  "transformers==4.55.4",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+]
+
+[project.scripts]
+qwen-lean = "qwen_lean.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qwen_lean"]

@@ -1,0 +1,13 @@
+{
+  "candidate_source": "fixture",
+  "generation_settings": null,
+  "lean_toolchain": "leanprover/lean4:v4.32.0",
+  "mathlib_revision": "v4.32.0",
+  "model_id": null,
+  "prompt_format_id": "whole-proof-v1",
+  "runtime": {},
+  "schema_version": "phase0-v1",
+  "task_source": "phase0-fixtures-v1",
+  "tokenizer_id": null,
+  "verifier_timeout_seconds": 30.0
+}

@@ -1,0 +1,1 @@
+{"candidate_id": "model-0", "candidate_index": 0, "candidate_text": " -- BEGIN\n   exact h\n   -- END", "category": "verified", "diagnostics": {"stderr": "", "stdout": ""}, "generation_latency_seconds": 24.777102287000048, "lean_exit_code": 0, "task_id": "core-identity", "total_latency_seconds": 29.601174381000078, "verification_latency_seconds": 4.823958881999943}

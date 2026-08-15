@@ -1,0 +1,8 @@
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.lake/
+
+# Local evaluator output; reviewed compact evidence lives under evidence/phase0.
+artifacts/

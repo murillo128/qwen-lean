@@ -1,0 +1,32 @@
+{
+  "candidate_source": "model",
+  "generation_settings": {
+    "device": "cuda:0",
+    "do_sample": false,
+    "dtype": "bfloat16",
+    "max_new_tokens": 128,
+    "stop": "tokenizer_eos_or_token_limit"
+  },
+  "lean_toolchain": "leanprover/lean4:v4.32.0",
+  "mathlib_revision": "v4.32.0",
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "prompt_format_id": "whole-proof-v1",
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "inference_execution": "local_cuda",
+    "python": "3.12.14",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8",
+    "transformers": "4.55.4"
+  },
+  "schema_version": "phase0-v1",
+  "task_source": "phase0-fixtures-v1",
+  "tokenizer_id": "Qwen/Qwen3-8B-Base",
+  "verifier_timeout_seconds": 30.0
+}

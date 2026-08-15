@@ -14,7 +14,11 @@ This is intentionally simpler than an interactive prover that repeatedly chooses
 
 Tactic-level generation, premise retrieval, and proof search are later milestones, not v1 requirements.
 
-**Exact prompt and proof-target serialization:** OPEN
+**Exact prompt and proof-target serialization:** ACCEPTED — `whole-proof-v1` uses
+plain code completion ending at `<declaration> := by\n  `, and verifier input is
+that same prefix followed directly by the raw generated continuation. Only line
+endings and trailing transport whitespace may be normalized; no proof extraction
+or semantic repair is allowed.
 
 ## D002 — Task success is determined by Lean
 
@@ -116,17 +120,17 @@ A second, harder/current Lean benchmark should be added after the first evaluati
 
 **Second external benchmark:** OPEN
 
-## D010 — v1 should fit a single 24 GB NVIDIA GPU
+## D010 — v1 uses project-controlled local NVIDIA GPU compute
 
 **Status:** ACCEPTED
 
 Design the first Qwen3-8B QLoRA training path to be viable on one 24 GB NVIDIA GPU, such as the RTX 3090 class, using memory-saving techniques when required. A 48 GB GPU is a convenience for larger batches/context and faster iteration, not a baseline requirement.
 
-The software should remain provider-neutral Linux/NVIDIA code. Vast.ai, OCI, Linode, Hugging Face Jobs, or another provider can be selected per experiment based on access, cost, and operational convenience.
+All model inference and generation must execute on project-controlled local GPU compute. The current default is the available NVIDIA Ada GPU; a controlling issue may identify another project-controlled local device. Hugging Face Hub or another artifact store may supply and cache model or tokenizer files, but Hugging Face Jobs, hosted inference endpoints, Spaces compute, and other hosted GPU execution are not inference backends for this project. Training execution is governed separately by its controlling phase.
 
 Claims about fit, memory, throughput, or cost must be based on measured configurations rather than assumed from the GPU model name.
 
-**Compute provider and machine flavor per run:** OPEN
+**Exact project-controlled device for later phases or runs:** OPEN
 
 ## D011 — Artifact ownership
 
@@ -134,7 +138,7 @@ Claims about fit, memory, throughput, or cost must be based on measured configur
 
 Keep source code, configuration, small fixtures, compact evaluation evidence, and documentation in GitHub.
 
-Keep large model weights, LoRA checkpoints, datasets, caches, and bulky logs outside Git, normally in Hugging Face Hub or another appropriate artifact store. Check licenses and redistribution terms before publishing derived weights or datasets, and never commit secrets or machine credentials.
+Keep large model weights, LoRA checkpoints, datasets, caches, and bulky logs outside Git, normally in Hugging Face Hub or another appropriate artifact store. Artifact storage or distribution does not authorize hosted model execution; D010 governs inference compute. Check licenses and redistribution terms before publishing derived weights or datasets, and never commit secrets or machine credentials.
 
 ## D012 — Practical experiment fidelity, not high-assurance reproducibility
 
