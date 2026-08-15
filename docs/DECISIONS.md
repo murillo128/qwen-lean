@@ -92,11 +92,9 @@ A polished end-user CLI and notebook-first workflow are not project goals. A sma
 
 The first supervised corpus should be built primarily from real verified Lean/mathlib theorem/proof pairs. Synthetic proof generation is deliberately postponed until a baseline training and verification loop exists.
 
-The extraction path must preserve enough context to reconstruct examples and reason about split contamination. A maintained Lean extraction/tracing tool such as LeanDojo-v2 is a preferred candidate, but the exact extraction implementation is not yet fixed.
+The extraction path preserves enough context to reconstruct examples and reason about split contamination.
 
-**Extraction implementation and retained context:** OPEN
-
-The Phase 2 design should choose between LeanDojo-v2 and a simpler direct Lean/mathlib extraction path after inspecting what context the whole-proof task actually needs.
+**Extraction implementation and retained context:** ACCEPTED — the first verified corpus uses LeanDojo-v2 repository tracing over the pinned mathlib source. Records retain source identity and spans, declaration and raw tactic-proof text, derived whole-proof completions, and resolved premise metadata sufficient to reconstruct the declaration in its original source-file context. Exact tool and source revisions remain phase-local configuration.
 
 ## D008 — Dataset splitting must be contamination-aware
 
@@ -104,9 +102,7 @@ The Phase 2 design should choose between LeanDojo-v2 and a simpler direct Lean/m
 
 Do not rely on a random theorem-pair split for the main held-out comparison. Closely related lemmas from the same file or namespace can make a random split unrealistically easy.
 
-Use a structural grouping boundary such as file, namespace, source unit, or a stronger contamination-aware rule.
-
-**Exact split unit and deduplication rules:** OPEN
+**Exact split unit and deduplication rules:** ACCEPTED — the first internal split groups by source file and joins files into indivisible connected components when they share a normalized statement fingerprint. Components are assigned deterministically by record count to 90% train, 5% validation, and 5% held-out; held-out is not used for fitting or model selection. Exact normalized statement matches from the pinned miniF2F validation and test declarations are excluded before splitting.
 
 ## D009 — miniF2F is the first external benchmark
 

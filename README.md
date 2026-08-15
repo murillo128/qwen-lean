@@ -135,6 +135,50 @@ Each model run writes versioned `run.json`, raw `results.jsonl`, and `summary.js
 Only compact accepted baseline evidence belongs under `evidence/`; raw continuations
 and external benchmark/model caches remain local and ignored.
 
+## Phase 2 verified mathlib corpus
+
+Phase 2 uses LeanDojo-v2 at the revision pinned in
+`config/phase2-mathlib.json` to trace the matching mathlib v4.32.0 source. Its
+broad dependencies live in the separate `tools/phase2-extractor` uv project and
+cannot change the evaluator/model environment. The pipeline retains original
+source identity and spans, screens exact miniF2F statement overlap, creates
+file/duplicate-component 90/5/5 splits, and records Qwen tokenizer lengths
+without imposing a training cutoff.
+
+With the pinned miniF2F checkout prepared as above, run the deterministic pilot
+before the full corpus:
+
+```bash
+uv run --frozen --project tools/phase2-extractor \
+  python tools/phase2_extract.py \
+  --mini-root /tmp/qwen-lean-minif2f \
+  --output-dir artifacts/phase2/pilot \
+  --pilot --verify --loader-smoke
+```
+
+Then build and verify the full local corpus and write only compact evidence into
+Git:
+
+```bash
+uv run --frozen --project tools/phase2-extractor \
+  python tools/phase2_extract.py \
+  --mini-root /tmp/qwen-lean-minif2f \
+  --output-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --verify --loader-smoke \
+  --evidence-dir evidence/phase2
+```
+
+The generated `train.jsonl`, `validation.jsonl`, `heldout.jsonl`, trace, source
+checkout, and tokenizer cache stay under ignored `artifacts/`. A later training
+phase can load the local files without LeanDojo or source parsing:
+
+```bash
+uv run --frozen --extra phase2 qwen-lean phase2-loader-smoke \
+  --artifact-dir artifacts/phase2/mathlib-whole-proof-v1
+```
+
+Phase 2 does not publish the corpus or train a model.
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.
