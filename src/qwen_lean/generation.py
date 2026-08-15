@@ -21,6 +21,7 @@ def run_model_smoke(
     output_dir: Path,
     project_root: Path,
     *,
+    task_source: str,
     timeout_seconds: float = 30.0,
     max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS,
 ) -> tuple[RunMetadata, CandidateResult]:
@@ -89,6 +90,7 @@ def run_model_smoke(
     except Exception as error:
         generation_latency = time.perf_counter() - generation_started
         metadata = _model_metadata(
+            task_source,
             tokenizer_id,
             timeout_seconds,
             max_new_tokens,
@@ -112,6 +114,7 @@ def run_model_smoke(
     verifier = LeanVerifier(project_root, timeout_seconds=timeout_seconds)
     outcome = verifier.verify(task, candidate_text)
     metadata = _model_metadata(
+        task_source,
         tokenizer_id,
         timeout_seconds,
         max_new_tokens,
@@ -134,6 +137,7 @@ def run_model_smoke(
 
 
 def _model_metadata(
+    task_source: str,
     tokenizer_id: str,
     timeout_seconds: float,
     max_new_tokens: int,
@@ -141,7 +145,7 @@ def _model_metadata(
 ) -> RunMetadata:
     return RunMetadata(
         candidate_source="model",
-        task_source="phase0-fixtures-v1",
+        task_source=task_source,
         prompt_format_id=PROMPT_FORMAT_ID,
         lean_toolchain=LEAN_TOOLCHAIN,
         mathlib_revision=MATHLIB_REVISION,

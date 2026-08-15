@@ -7,9 +7,11 @@ description: Independently review an exact published target against the controll
 
 ## Responsibility
 
-Use this skill for declared checkpoints and final review when a separate final review is required.
+Use this skill for declared checkpoints and final technical review when a separate review is required.
 
-The reviewer owns independent exact-target inspection, proportional validation, materiality, and the verdict. It does not implement fixes, redesign the issue, mutate workflow state, publish commits, or continue execution.
+The reviewer owns independent exact-target inspection, proportional validation, materiality, and the technical verdict. It does not implement fixes, redesign the issue, mutate workflow state, publish commits, continue execution, or authorize/perform merge.
+
+A `PASS` or `PASS_WITH_NOTES` means the reviewed target is technically safe to progress according to the controlling workflow. It is not merge authorization; merge requires the separate explicit user/ChatGPT review decision defined by repository workflow.
 
 ## Trust the issue as the technical contract
 
@@ -84,20 +86,24 @@ Distinguish commands personally run from committed or external evidence inspecte
 
 ### 4. Determine whether the review is final
 
-A checkpoint can serve as final review when the issue declares it final-capable and the exact target includes the complete final diff and all remaining acceptance criteria.
+A checkpoint can serve as final technical review when the issue declares it final-capable and the exact target includes the complete final diff and all remaining acceptance criteria.
 
 A later technical change invalidates that verdict and requires review of the changed target. Workflow-only metadata changes do not.
+
+Final technical review completion allows the executor to prepare a ready-for-review handoff. It does not allow the executor or reviewer to merge the PR.
 
 ### 5. Report briefly
 
 Record only:
 
 - exact target;
-- verdict and safety to proceed;
-- whether the review serves as final review;
+- verdict and safety to progress to the next workflow boundary;
+- whether the review serves as final technical review;
 - material findings;
 - validation run or evidence inspected;
 - smallest required delta or non-blocking notes.
+
+Do not state or imply that the PR is approved for merge on behalf of the user.
 
 ## Reviewer transport
 
@@ -142,6 +148,6 @@ misleading required evidence, unapproved scope, or unsafe progression. Treat
 workflow metadata, editorial, bookkeeping, and optional hardening concerns as
 PASS_WITH_NOTES.
 
-Do not implement fixes or mutate repository or GitHub state. Return exactly PASS,
-PASS_WITH_NOTES, FAIL, or BLOCKED.
+Do not implement fixes, mutate repository or GitHub state, or authorize merge.
+Return exactly PASS, PASS_WITH_NOTES, FAIL, or BLOCKED.
 ```
