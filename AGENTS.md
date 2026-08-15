@@ -99,6 +99,16 @@ Keep enough experiment metadata to understand what was run and compare results m
 
 Large checkpoints, model weights, datasets, caches, and bulky logs belong outside Git. Commit scripts, configs, small fixtures, and concise evidence that helps inspect or repeat useful experiments.
 
+## Inference execution
+
+All model inference and generation for this project must execute on project-controlled local GPU compute. Use the available NVIDIA Ada GPU unless a controlling issue explicitly identifies another project-controlled local device.
+
+Artifact distribution is separate from inference execution. Hugging Face Hub or another artifact store may be used to download or cache models, tokenizers, adapters, or datasets, but model forward passes and generation must not be delegated to Hugging Face Jobs, Inference API/Endpoints, Spaces compute, or another hosted inference/GPU-job service.
+
+A runner without access to the project GPU must not silently substitute hosted compute. Use the repository's normal handoff/blocker workflow to continue on a runner that can access the local GPU.
+
+This invariant applies to evaluation, smoke tests, baseline generation, and inference used during later training or data-generation workflows. Training compute is governed separately by the controlling phase and its accepted decisions.
+
 ## Performance and hardware claims
 
 Measure the quantities relevant to the current issue instead of inferring them from hardware names or theoretical capability. When cost, memory, or throughput matters, record the actual training or inference configuration, precision/quantization, sequence lengths, batch sizes, gradient accumulation, device type, peak memory, throughput, and materially relevant timing data.
