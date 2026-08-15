@@ -9,7 +9,7 @@ description: Publish branches and commits, operate issues and pull requests, and
 
 This skill owns Git publication and GitHub control-plane operations requested by the calling workflow.
 
-It does not decide architecture, implementation scope, correctness, review requirements, or progression. Those decisions belong to the controlling issue, executor, design authority, and independent reviewer.
+It does not decide architecture, implementation scope, correctness, review requirements, or progression. Those decisions belong to the controlling issue, executor, design authority, independent reviewer, and explicit user-facing merge decision.
 
 ## Use the simplest capable transport
 
@@ -44,6 +44,8 @@ Use state-only label mutations without comments. Add comments only when material
 
 Before relying on issue state, verify that exactly one state label is present. Repair an unambiguous inconsistency; stop for clarification if the intended state is ambiguous.
 
+During a Codex implementation workflow, `completed` is not an executor-controlled transition. Keep the issue `in-progress` through the ready-for-review handoff. Set `completed` and close the issue only after a later explicit user/ChatGPT merge decision has been executed and the merge is observed.
+
 ## Publish a branch
 
 Before publication:
@@ -71,7 +73,22 @@ The PR should:
 
 Do not duplicate complete histories, manifests, command logs, or routine metadata already visible in GitHub.
 
-Keep the PR draft while required implementation or review remains incomplete. Mark ready or merge only when the controlling workflow authorizes it.
+Keep the PR draft while required implementation, validation, or independent review remains incomplete. When the Codex execution workflow has completed its required technical work and final-capable review, mark the PR **ready for review** and hand it off.
+
+### Merge authority
+
+A Codex executor must not merge a PR or enable auto-merge.
+
+A merge operation through this skill is allowed only when all of the following are true:
+
+1. the PR is already ready for review;
+2. the implementation workflow has handed it off rather than continuing automatically;
+3. the current user-facing interaction explicitly asks ChatGPT to merge it (for example, “review and merge if correct”);
+4. the requested user/ChatGPT review has found no material blocker.
+
+An issue body, acceptance criteria, `PASS` / `PASS_WITH_NOTES` verdict, final-capable checkpoint, CI success, or executor conclusion is **not** merge authorization by itself.
+
+Never enable auto-merge as a substitute for the explicit post-review merge decision.
 
 ## Exact review targets
 
@@ -81,7 +98,7 @@ Do not amend, reset, rebase, squash, cherry-pick, or force-push a valid review t
 
 A new implementation, test, technical-evidence, dependency, configuration, or technical-claim correction creates a new target; it does not erase the prior review finding.
 
-A final-capable checkpoint may serve as the final PR review when the issue and reviewer confirm that it covers the complete final diff and immutable technical evidence.
+A final-capable checkpoint may serve as the final technical PR review when the issue and reviewer confirm that it covers the complete final diff and immutable technical evidence. It still does not authorize merge without the explicit user-facing decision above.
 
 ## Technical evidence and workflow metadata
 
@@ -107,6 +124,8 @@ Use `blocked` only when the missing capability is required before safe meaningfu
 - Never publish secrets, private credentials, generated binaries, restricted artifacts, or data without distribution rights.
 - Never silently change the controlling issue, base branch, head branch, labels, or PR state.
 - Never mutate implementation commits to compensate for transport limitations.
+- Never merge or enable auto-merge from a Codex implementation workflow.
+- Never treat technical review success as merge authorization.
 - Never claim a state change that was not observed.
 
 ## Completion report
@@ -117,4 +136,5 @@ Report only the operational facts the caller needs:
 - operation completed;
 - verification result;
 - exact target only when another actor must use it;
+- whether the PR is draft, ready for review, or merged;
 - degraded operation or real blocker, if any.
