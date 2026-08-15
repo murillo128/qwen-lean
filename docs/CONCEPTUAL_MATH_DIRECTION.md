@@ -14,6 +14,85 @@ From this viewpoint, formal mathematics is indispensable for precision and verif
 
 This is a research hypothesis rather than a philosophical claim that mathematics is "only" syntax or that formal proof is unimportant. One of the things the project could eventually test is whether separating conceptual reasoning from formal proof generation actually improves mathematical capability.
 
+## Philosophical context behind the hypothesis
+
+The discussion that motivated this direction started from a deliberately non-Platonic intuition: mathematical objects can be viewed as human-built representations for recurring relationships rather than as entities that must literally exist independently of us.
+
+Very simple ideas can generate large mathematical structures. Counting leads to arithmetic; asking whether one quantity divides another leads to divisibility, remainders, congruence classes, factorization, and number-theoretic structure. Repeated reversible transformations lead naturally to cycles, composition, inverses, symmetry, and group-like structure. The exact historical development is richer than any one lineage, but the recurring pattern is the important part here.
+
+A relationship is formalized, then often **reified** into a new object that can itself be studied. Relations between those objects become further objects and abstractions. Conceptually:
+
+```text
+simple relation or pattern
+          |
+          v
+formal definition / representation
+          |
+          v
+new mathematical object
+          |
+          v
+relations between those objects
+          |
+          v
+higher abstraction
+          |
+          v
+repeat
+```
+
+This recursive construction can produce a very deep formal tower whose connection to the original intuition becomes difficult to see. Much of pure mathematics can then be viewed, under this working interpretation, as exploring the consequences of representational systems that were introduced because they compressed some useful pattern.
+
+The fact that the same abstraction appears in many domains does not by itself require a Platonic interpretation. A group, graph, vector space, or similar structure can instead be thought of as an interface that intentionally preserves only a particular kind of relationship. It is then unsurprising that the same interface is useful wherever that relationship occurs. What is discovered is not necessarily a pre-existing abstract object, but which abstractions compress phenomena well and what consequences follow once their rules are fixed.
+
+This does **not** mean the consequences are arbitrary. We may choose the representation or axioms, but after doing so we do not freely choose their implications. In that sense there remains a genuine discovery problem inside a constructed formal system.
+
+A related intuition applies to mathematical physics and other mathematical sciences. The conceptual content of an idea can be much smaller than the formal machinery required to state it precisely, calculate with it, and propagate all its consequences. A symmetry, stationary principle, conservation idea, or geometric picture may be easy to describe while its coordinate expressions, tensor manipulations, differential equations, or perturbative calculations are large.
+
+That motivates a distinction between two kinds of complexity:
+
+```text
+semantic / conceptual complexity
+- what objects or phenomena matter?
+- what is the right viewpoint?
+- what is invariant?
+- which assumptions are essential?
+- what should be conjectured?
+
+mechanical / formal complexity
+- expand expressions
+- change coordinates or representations
+- normalize terms
+- apply lemmas
+- manipulate symbols
+- construct a fully checkable derivation
+```
+
+Today mathematicians and theoretical scientists often have to master both because the formal machinery has historically been executed largely by humans. The working hypothesis here is that an AI system might separate these roles more strongly: reason mainly in a compact conceptual representation, then delegate the exact formalization and derivation to a lower layer.
+
+The software analogy is useful but intentionally imperfect:
+
+```text
+conceptual mathematical idea     software/system design
+            |                              |
+            v                              v
+formal mathematical structure    implementation/IR
+            |                              |
+            v                              v
+Lean proof / derivation           compiled executable form
+            |                              |
+            v                              v
+kernel verification               compiler/tests/runtime checks
+```
+
+Under this analogy, large amounts of local theorem search, rewriting, tactic selection, and symbolic manipulation are closer to implementation or compilation than to the highest level of mathematical understanding. Automating that work could let a model spend more of its capacity on choosing representations, recognizing common structure, weakening assumptions, inventing useful abstractions, and proposing conjectures.
+
+There are important limits to this analogy. Mathematics is not merely bureaucratic translation. Formalization can reveal consequences that intuition misses, expose contradictions in an apparently simple idea, or show that a proposed abstraction is insufficient. In physics, mathematics also cannot prove that a model is true of nature; it proves consequences conditional on the model, while empirical evidence decides whether the model describes the world. The formal layer is therefore not disposable: it is both a correctness constraint and a cognitive tool that can feed surprising information back into the conceptual layer.
+
+The project does not need to resolve any philosophy-of-mathematics question. The useful research claim is narrower and empirical:
+
+> Some mathematical capability may improve if an LLM is trained to operate explicitly on compact conceptual descriptions and conjectures before being asked to compile those ideas into exact formal mathematics.
+
 ## Desired separation of layers
 
 The tentative mental model is:
