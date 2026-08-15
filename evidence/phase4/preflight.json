@@ -1,0 +1,92 @@
+{
+  "adapter_parameter_changed": true,
+  "adapter_parameter_checked": "base_model.model.model.layers.0.self_attn.q_proj.lora_B.default.weight",
+  "all_gradients_finite": true,
+  "batch": {
+    "completion_tokens_excluding_eos": 790,
+    "eos_supervised": true,
+    "gradient_accumulation_steps": 8,
+    "micro_batch_size": 1,
+    "padding_labels_masked": true,
+    "padding_tokens": 0,
+    "prompt_labels_masked": true,
+    "prompt_tokens": 233,
+    "supervised_tokens_including_eos": 791
+  },
+  "fresh_model_state_discarded_after_process": true,
+  "frozen_parameter_checked": "base_model.model.model.layers.0.self_attn.q_proj.base_layer.weight",
+  "frozen_parameter_unchanged": true,
+  "gradient_norm_before_clipping": 0.5098920464515686,
+  "lora": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "bias": "none",
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "modules_to_save": null,
+    "r": 16,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "loss": 1.330380916595459,
+  "memory_ceiling_bytes": 25769803776,
+  "memory_ceiling_passed": true,
+  "model": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+  },
+  "near_maximum_selection": {
+    "configured_maximum_sequence_tokens": 1024,
+    "record_id": "814d994304ccd1697fe097ea6a32e4738831d0eb2e3a980e619cf47e2e8a1317",
+    "selected_workload_maximum_sequence_tokens": 1024,
+    "sequence_tokens": 1024
+  },
+  "only_intended_lora_parameters_trainable": true,
+  "packages": {
+    "accelerate": "1.10.1",
+    "bitsandbytes": "0.47.0",
+    "datasets": "4.0.0",
+    "peft": "0.17.1",
+    "torch": "2.8.0",
+    "transformers": "4.55.4",
+    "trl": "0.22.2"
+  },
+  "passed": true,
+  "quantization": {
+    "compute_dtype": "bfloat16",
+    "double_quantization": true,
+    "load_in_4bit": true,
+    "quantization_type": "nf4"
+  },
+  "quantized_linear_modules": 252,
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "inference_execution": "local_cuda",
+    "peak_cuda_allocated_bytes": 9986938368,
+    "peak_cuda_reserved_bytes": 13056868352,
+    "python": "3.12.14",
+    "torch_cuda_version": "12.8"
+  },
+  "schema_version": "phase4-preflight-v1",
+  "total_parameter_count": 4761498624,
+  "trainable_parameter_count": 43646976,
+  "trainable_parameter_fraction": 0.009166646773770023,
+  "workload_id": "phase4-train4096-v1"
+}

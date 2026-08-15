@@ -217,9 +217,12 @@ def tokenize_sft_record(
     tokenizer: Tokenizer,
     *,
     maximum_sequence_tokens: int | None = None,
+    expected_split: str = "train",
 ) -> TokenizedSFTExample:
-    if record.split != "train":
-        raise ValueError(f"Phase 3 cannot tokenize non-train record {record.id}")
+    if record.split != expected_split:
+        raise ValueError(
+            f"cannot tokenize {record.split} record {record.id} as {expected_split}"
+        )
     if tokenizer.eos_token_id is None:
         raise ValueError("the pinned tokenizer has no EOS token")
     prompt = render_sft_prompt(record)

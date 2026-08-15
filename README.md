@@ -258,6 +258,75 @@ uv run qwen-lean phase3-evidence \
   --evidence-dir evidence/phase3
 ```
 
+## Phase 4 realistic smoke experiment
+
+Phase 4 deterministically selects 4,096 training, 512 validation, and 64
+heldout examples from the Phase 2 corpus. It trains the fixed 512-step QLoRA
+trajectory in two processes, with a mandatory full-state stop and resume at
+step 256:
+
+```bash
+uv run --frozen --extra training qwen-lean phase4-materialize \
+  --artifact-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --output artifacts/phase4/workloads.json
+uv run --frozen --extra training qwen-lean phase4-preflight \
+  --workload artifacts/phase4/workloads.json \
+  --output artifacts/phase4/preflight.json
+uv run --frozen --extra training qwen-lean phase4-train \
+  --workload artifacts/phase4/workloads.json \
+  --output-dir artifacts/phase4/training
+uv run --frozen --extra training qwen-lean phase4-train \
+  --workload artifacts/phase4/workloads.json \
+  --output-dir artifacts/phase4/training \
+  --resume-from-checkpoint \
+    artifacts/phase4/training/trainer-state/checkpoint-256
+```
+
+Selection uses only validation target-token cross-entropy at steps 128, 256,
+384, and 512. Reload the selected standard PEFT checkpoint in a fresh process,
+then evaluate the base model and selected adapter on identical heldout requests:
+
+```bash
+uv run --frozen --extra training qwen-lean phase4-adapter-reload \
+  --workload artifacts/phase4/workloads.json \
+  --training artifacts/phase4/training/run.json \
+  --adapter-dir artifacts/phase4/training/trainer-state/checkpoint-512 \
+  --output artifacts/phase4/adapter-reload.json
+uv run --frozen --extra baseline qwen-lean phase4-heldout \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase4/workloads.json \
+  --training artifacts/phase4/training/run.json \
+  --mode base --output-dir artifacts/phase4/heldout/base
+uv run --frozen --extra baseline qwen-lean phase4-heldout \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase4/workloads.json \
+  --training artifacts/phase4/training/run.json \
+  --mode adapter \
+  --adapter-dir artifacts/phase4/training/trainer-state/checkpoint-512 \
+  --output-dir artifacts/phase4/heldout/adapter
+uv run --frozen qwen-lean phase4-heldout-compare \
+  --base-dir artifacts/phase4/heldout/base \
+  --adapter-dir artifacts/phase4/heldout/adapter \
+  --output artifacts/phase4/heldout-comparison.json
+```
+
+Finally, evaluate the selected adapter in the built, pinned Phase 1 miniF2F
+environment and write compact review evidence. Raw candidates, checkpoints,
+weights, and workload rows remain under ignored `artifacts/`:
+
+```bash
+uv run --frozen --extra baseline qwen-lean phase4-minif2f \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --training artifacts/phase4/training/run.json \
+  --adapter-dir artifacts/phase4/training/trainer-state/checkpoint-512 \
+  --output-dir artifacts/phase4/minif2f
+uv run --frozen qwen-lean phase4-evidence \
+  --artifact-dir artifacts/phase4 \
+  --evidence-dir evidence/phase4
+```
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

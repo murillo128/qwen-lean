@@ -198,6 +198,11 @@ def _build_trainer(
     except ImportError as error:
         raise RuntimeError("Phase 3 requires TRL and Datasets") from error
     training = config.training
+    checkpoint_interval = int(
+        training["checkpoint_interval_steps"]
+        if "checkpoint_interval_steps" in training
+        else training["memorization_probe_interval_steps"]
+    )
     arguments = SFTConfig(
         output_dir=str(output_dir),
         overwrite_output_dir=True,
@@ -224,7 +229,7 @@ def _build_trainer(
         logging_first_step=True,
         logging_nan_inf_filter=False,
         save_strategy="steps" if save_checkpoints else "no",
-        save_steps=int(training["memorization_probe_interval_steps"]),
+        save_steps=checkpoint_interval,
         save_only_model=False,
         report_to=[],
         remove_unused_columns=False,

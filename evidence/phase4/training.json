@@ -1,0 +1,370 @@
+{
+  "adapter": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "relative_path": "trainer-state/checkpoint-512"
+  },
+  "checkpoint_candidates": [
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 128,
+      "relative_path": "trainer-state/checkpoint-128",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 21941,
+        "examples": 512,
+        "mean_target_token_cross_entropy": 1.5063058062841226,
+        "optimizer_step": 128,
+        "target_token_next_token_accuracy": 0.636284546008178,
+        "target_tokens": 34483,
+        "wall_time_seconds": 72.55963406000228
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 256,
+      "relative_path": "trainer-state/checkpoint-256",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 22209,
+        "examples": 512,
+        "mean_target_token_cross_entropy": 1.461881541336018,
+        "optimizer_step": 256,
+        "target_token_next_token_accuracy": 0.6440564916045588,
+        "target_tokens": 34483,
+        "wall_time_seconds": 72.5393018409959
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 384,
+      "relative_path": "trainer-state/checkpoint-384",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 22314,
+        "examples": 512,
+        "mean_target_token_cross_entropy": 1.4374670815385557,
+        "optimizer_step": 384,
+        "target_token_next_token_accuracy": 0.647101470289708,
+        "target_tokens": 34483,
+        "wall_time_seconds": 72.57049574999837
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 512,
+      "relative_path": "trainer-state/checkpoint-512",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 22374,
+        "examples": 512,
+        "mean_target_token_cross_entropy": 1.4309009798364822,
+        "optimizer_step": 512,
+        "target_token_next_token_accuracy": 0.6488414581097932,
+        "target_tokens": 34483,
+        "wall_time_seconds": 72.53901362800389
+      }
+    }
+  ],
+  "checkpoint_selection": {
+    "candidate_steps": [
+      128,
+      256,
+      384,
+      512
+    ],
+    "heldout_or_minif2f_consulted": false,
+    "metric": "validation_mean_target_token_cross_entropy",
+    "rule": "minimum validation mean target-token cross-entropy; ties earlier",
+    "selected_mean_target_token_cross_entropy": 1.4309009798364822,
+    "selected_optimizer_step": 512
+  },
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1"
+  },
+  "lora": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "bias": "none",
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "modules_to_save": null,
+    "r": 16,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "memory_ceiling_bytes": 25769803776,
+  "memory_ceiling_passed": true,
+  "model": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+  },
+  "optimizer_steps_completed": 512,
+  "packages": {
+    "accelerate": "1.10.1",
+    "bitsandbytes": "0.47.0",
+    "datasets": "4.0.0",
+    "peft": "0.17.1",
+    "torch": "2.8.0",
+    "transformers": "4.55.4",
+    "trl": "0.22.2"
+  },
+  "pre_training_validation": {
+    "correct_target_tokens": 20345,
+    "examples": 512,
+    "mean_target_token_cross_entropy": 1.8658065785112457,
+    "target_token_next_token_accuracy": 0.59000086999391,
+    "target_tokens": 34483,
+    "wall_time_seconds": 72.30035219099955
+  },
+  "quantization": {
+    "compute_dtype": "bfloat16",
+    "double_quantization": true,
+    "load_in_4bit": true,
+    "quantization_type": "nf4"
+  },
+  "quantized_linear_modules": 252,
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cumulative_training_wall_time_seconds": 2167.6071567469917,
+    "inference_execution": "local_cuda",
+    "peak_cuda_allocated_bytes": 10146326528,
+    "peak_cuda_reserved_bytes": 13010731008,
+    "python": "3.12.14",
+    "stage_training_wall_time_seconds": 1086.6096600149904,
+    "torch_cuda_version": "12.8",
+    "trainer_metrics": {
+      "epoch": 1.0,
+      "total_flos": 2.895368998428672e+16,
+      "train_loss": 0.7256900157080963,
+      "train_runtime": 1085.8223,
+      "train_samples_per_second": 3.772,
+      "train_steps_per_second": 0.472
+    }
+  },
+  "schema_version": "phase4-training-run-v1",
+  "selected_beats_pre_training_validation": true,
+  "serialization": {
+    "id": "mathlib-sft-v1",
+    "supervise_eos": true,
+    "supervise_prompt": false
+  },
+  "status": "passed",
+  "total_parameter_count": 4761498624,
+  "trainable_parameter_count": 43646976,
+  "trainable_parameter_fraction": 0.009166646773770023,
+  "training": {
+    "checkpoint_candidates": [
+      128,
+      256,
+      384,
+      512
+    ],
+    "checkpoint_interval_steps": 128,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": true,
+    "learning_rate": 0.0001,
+    "lr_schedule": "cosine",
+    "mandatory_process_stop_step": 256,
+    "maximum_gradient_norm": 1.0,
+    "maximum_optimizer_steps": 512,
+    "maximum_sequence_tokens": 1024,
+    "memory_ceiling_bytes": 25769803776,
+    "optimizer": "paged_adamw_8bit",
+    "packing": false,
+    "per_device_micro_batch_size": 1,
+    "seed": 0,
+    "trainer": "trl-sft",
+    "warmup_steps": 16,
+    "weight_decay": 0.0
+  },
+  "trajectory": {
+    "data_order_seed": 0,
+    "effective_batch_size": 8,
+    "examples_consumed_at_step": 4096,
+    "ignore_data_skip": false,
+    "mandatory_process_stop_observed": true,
+    "process_legs": [
+      {
+        "process_leg": 1,
+        "resume_checkpoint": null,
+        "started_from_optimizer_step": 0,
+        "stopped_at_optimizer_step": 256,
+        "training_wall_time_seconds": 1080.9974967320013
+      },
+      {
+        "process_leg": 2,
+        "resume_checkpoint": "trainer-state/checkpoint-256",
+        "started_from_optimizer_step": 256,
+        "stopped_at_optimizer_step": 512,
+        "training_wall_time_seconds": 1086.6096600149904
+      }
+    ],
+    "resume_state": {
+      "data_position_mechanism": "trainer global_step with ignore_data_skip=false",
+      "data_position_preserved": true,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 256,
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "trainer_epoch": 0.5
+    },
+    "same_trajectory_resume": true,
+    "scheduler_configured_for_512_steps": true
+  },
+  "validation_probes": [
+    {
+      "correct_target_tokens": 21941,
+      "examples": 512,
+      "mean_target_token_cross_entropy": 1.5063058062841226,
+      "optimizer_step": 128,
+      "target_token_next_token_accuracy": 0.636284546008178,
+      "target_tokens": 34483,
+      "wall_time_seconds": 72.55963406000228
+    },
+    {
+      "correct_target_tokens": 22209,
+      "examples": 512,
+      "mean_target_token_cross_entropy": 1.461881541336018,
+      "optimizer_step": 256,
+      "target_token_next_token_accuracy": 0.6440564916045588,
+      "target_tokens": 34483,
+      "wall_time_seconds": 72.5393018409959
+    },
+    {
+      "correct_target_tokens": 22314,
+      "examples": 512,
+      "mean_target_token_cross_entropy": 1.4374670815385557,
+      "optimizer_step": 384,
+      "target_token_next_token_accuracy": 0.647101470289708,
+      "target_tokens": 34483,
+      "wall_time_seconds": 72.57049574999837
+    },
+    {
+      "correct_target_tokens": 22374,
+      "examples": 512,
+      "mean_target_token_cross_entropy": 1.4309009798364822,
+      "optimizer_step": 512,
+      "target_token_next_token_accuracy": 0.6488414581097932,
+      "target_tokens": 34483,
+      "wall_time_seconds": 72.53901362800389
+    }
+  ],
+  "workloads": {
+    "cross_split_record_ids_disjoint": true,
+    "heldout": {
+      "id": "phase4-heldout64-v1",
+      "optimizer_batches": false,
+      "selected_record_ids_reference": "workloads.json#workloads.heldout.selected_record_ids"
+    },
+    "train": {
+      "examples": 4096,
+      "id": "phase4-train4096-v1",
+      "selected_record_ids_reference": "workloads.json#workloads.train.selected_record_ids"
+    },
+    "validation": {
+      "examples": 512,
+      "id": "phase4-validation512-v1",
+      "optimizer_batches": false,
+      "selected_record_ids_reference": "workloads.json#workloads.validation.selected_record_ids"
+    }
+  }
+}
