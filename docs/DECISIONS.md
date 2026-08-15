@@ -150,4 +150,25 @@ The project needs enough metadata to understand what was run and make fair compa
 
 For material comparisons, record the model/tokenizer, dataset/split, relevant training or generation configuration, Lean/evaluation contract, hardware details that affect interpretation, and produced metrics. Deterministic seeds, repeated runs, immutable hashes, and extensive provenance are used when they matter to the question being answered, not as universal requirements.
 
-Future-phase details such as verifier-filtered self-training policy, RL reward shaping, and tactic-level search architecture are intentionally deferred until their phase becomes active rather than recorded as premature decisions here.
+Future-phase details such as exact synthetic filtering thresholds, shaped-reward semantics, and tactic-level search architecture are intentionally deferred until the phase that first needs them.
+
+## D013 — Compare post-SFT methods as independent branches first
+
+**Status:** ACCEPTED
+
+Verifier-filtered self-training and verifier-reward reinforcement learning are initially separate experiments, not a mandatory sequential pipeline.
+
+After the first full SFT cycle is evaluated, select one reference SFT checkpoint without tuning against the held-out benchmark test split. Retain that checkpoint as the control and use it as the **same initialization** for both post-training branches:
+
+- Branch A: verifier-filtered self-training using Lean-verified synthetic proofs as additional supervised targets;
+- Branch B: GRPO / reinforcement learning from verifier reward.
+
+The first Branch B experiment uses a binary outcome reward: `1` only when the final reconstructed theorem is `verified` by the accepted Lean evaluator, and `0` otherwise. It must not initialize from Branch A for the first comparison.
+
+Where practical, the two branches should use the same theorem-source pool and comparable candidate-generation budgets. Their final evaluation must use the same prompt, Lean environment, verifier semantics, held-out workloads, and generation settings so differences can be attributed to the post-training method rather than the evaluator.
+
+If binary GRPO produces insufficient positive reward density or useful within-group variation, preserve that as an experimental result. Syntax validity, elaboration success, tactic/proof-state progress, or other reward shaping may then be tested only as a **separate named variant** with an explicit reward contract; do not silently change the reward during the binary experiment. Any partial reward must remain secondary to complete verifier success rather than becoming an alternative objective.
+
+Only after the independent comparison may a later experiment compose the methods, for example verifier-filtered self-training followed by GRPO, to test whether their gains are complementary.
+
+**Exact candidate counts, theorem pool, training budgets, GRPO group size, sparse-reward stopping rule, and any shaped-reward formula:** OPEN

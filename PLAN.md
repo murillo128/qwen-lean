@@ -71,37 +71,62 @@ Train the selected Qwen base model with QLoRA on the verified dataset at the sca
 
 **Exit gate:** a usable adapter/checkpoint exists, its training run is understood, and it has been evaluated through the unchanged harness on held-out data and the development benchmark.
 
-## Phase 6 — Comparative evaluation
+## Phase 6 — Comparative evaluation and common post-training parent
 
-**Purpose:** determine what changed, not merely whether a training job completed.
+**Purpose:** determine what changed after SFT and establish the common checkpoint from which later post-training methods will be compared independently.
 
 Compare the base model and the first full SFT model using the same evaluation contract. Report at least pass@1 and higher-k sampling metrics where useful, plus failure categories and operational measurements that help explain the result.
 
+Select one SFT checkpoint for later post-training without tuning against the external benchmark test split. That checkpoint becomes the common parent and retained control for both Phase 7 and Phase 8.
+
 Use the external benchmark test split only for checkpoints that have already been selected without tuning against that test set.
 
-**Exit gate:** the project can state a supported conclusion about whether SFT improved Lean proof generation, where it improved, and what important limitations remain.
+**Exit gate:** the project can state a supported conclusion about whether SFT improved Lean proof generation, where it improved, and what important limitations remain; one reference SFT checkpoint is explicitly selected as the common parent/control for the independent post-training branches.
 
-## Phase 7 — Verifier-filtered self-training
+## Phase 7 — Branch A: verifier-filtered self-training
 
-**Purpose:** use Lean's objective verifier to create better training data before introducing online reinforcement learning.
+**Purpose:** measure what is gained by turning the SFT model's own Lean-verified successes into additional supervised training data.
 
-Have the best SFT model sample multiple candidate proofs for additional theorem statements. Run candidates through Lean, keep successful examples under explicit filtering rules, and use the verified synthetic examples for a new supervised training iteration.
+Start from the reference SFT checkpoint selected in Phase 6. Sample multiple candidate proofs for additional theorem statements, run every candidate through the unchanged Lean verifier, retain successful examples under explicit filtering rules, and perform a new supervised training iteration on the resulting verified synthetic data.
 
-**Entry condition:** the SFT model must already solve enough examples for verifier filtering to yield useful data.
+This branch is independent of Phase 8. Where practical, use the same theorem-source pool and comparable generation budget intended for the GRPO branch so the later comparison is interpretable.
 
-**Exit gate:** self-training is compared against the best prior SFT checkpoint using the unchanged evaluation contract, with the contribution and limitations of synthetic verified data understood.
+**Entry condition:** the reference SFT model solves enough sampled examples for verifier filtering to produce a useful synthetic corpus.
 
-## Phase 8 — GRPO / verifier-reward reinforcement learning
+**Exit gate:** a self-trained Model A exists and has been evaluated against the retained reference SFT checkpoint using the unchanged task contract; synthetic-data yield, cost, and limitations are understood.
 
-**Purpose:** learn from online verifier feedback after the simpler verifier-filtered approach is understood.
+## Phase 8 — Branch B: GRPO / verifier-reward reinforcement learning
 
-Start with a sparse objective tied to valid proof completion and only add shaping signals if the sparse reward is empirically inadequate and the shaping semantics can be justified.
+**Purpose:** independently measure what is gained by training directly from online Lean verifier reward rather than converting successes into a new SFT dataset.
 
-**Entry condition:** generation, verification, reward computation, artifact handling, and comparative evaluation must already be stable enough that RL-specific failures can be distinguished from infrastructure failures.
+Start from the same reference SFT checkpoint selected in Phase 6, **not** from the Phase 7 self-trained checkpoint. The first GRPO/RLVR experiment uses a binary outcome reward tied to valid proof completion: `1` for a `verified` proof and `0` otherwise.
 
-**Exit gate:** the RL checkpoint is compared against the best supervised/self-trained checkpoint under the same task-level evaluator, with cost and stability considered alongside pass@k.
+Generate groups of candidate proofs, verify them through the unchanged Lean path, and use the verifier outcomes as the online training signal. Record reward density and group variation explicitly so sparse-reward failure can be distinguished from implementation failure.
 
-## Phase 9 — Tactic-level proving and search
+If the binary reward produces too little useful signal, do not silently change the reward function mid-experiment. Preserve that result and design any syntax/elaboration/proof-progress shaping as a distinct named follow-up variant with its own contract and evaluation.
+
+**Entry condition:** generation, verification, reward computation, artifact handling, and comparative evaluation are stable enough that RL-specific failures can be distinguished from infrastructure failures.
+
+**Exit gate:** a GRPO/RLVR Model B exists or the binary-reward experiment has produced a supported sparse-reward conclusion; the result is evaluated against the same retained SFT control without using Model A as its initialization.
+
+## Phase 9 — Independent post-training comparison
+
+**Purpose:** determine what each post-training method contributes before combining them.
+
+Compare at minimum:
+
+- the retained reference SFT checkpoint (control);
+- Model A from verifier-filtered self-training;
+- Model B from binary-reward GRPO/RLVR, when training produced a usable checkpoint;
+- any separately designed shaped-RL variant, if one was needed.
+
+Use the same prompt, Lean environment, held-out workloads, generation/evaluation settings, and verifier semantics. Compare task quality and also the cost needed to obtain it: candidate-generation volume, training GPU time, verifier workload, stability, and relevant failure distributions.
+
+Do not treat self-training followed by GRPO as the default experiment. Only after the independent comparison may a later design test whether the methods are complementary in sequence.
+
+**Exit gate:** the project can state which isolated post-training method improved over the common SFT parent, by how much, at what cost, and whether a combined follow-up is justified.
+
+## Phase 10 — Tactic-level proving and search
 
 **Purpose:** move beyond whole-proof generation if the project benefits from a more capable theorem-proving architecture.
 
