@@ -35,6 +35,42 @@ PHASE4_HELDOUT_RUN_SCHEMA_VERSION = "phase4-heldout-run-v1"
 PHASE4_HELDOUT_COMPARISON_SCHEMA_VERSION = "phase4-heldout-comparison-v1"
 
 
+def phase4_heldout_integrity_passed(summary: dict[str, Any]) -> bool:
+    return bool(
+        summary.get("complete")
+        and int(summary.get("infrastructure_error_count", -1)) == 0
+        and int(summary.get("verifier_timeout_count", -1)) == 0
+    )
+
+
+def _sanitized_adapter_metadata(
+    value: dict[str, Any] | None, selected_step: int
+) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    compact = {key: item for key, item in value.items() if key != "adapter_path"}
+    compact["ignored_local_path"] = (
+        f"artifacts/phase4/training/trainer-state/checkpoint-{selected_step}"
+    )
+    return compact
+
+
+def _runtime_identity(value: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value[key]
+        for key in (
+            "python",
+            "torch",
+            "torch_cuda_version",
+            "inference_execution",
+            "cuda_device_index",
+            "cuda_device",
+            "cuda_device_capability",
+            "cuda_device_total_memory_bytes",
+        )
+    }
+
+
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -334,9 +370,11 @@ def run_phase4_heldout(
             "run_wall_time_seconds": (generation_wall_time + verification_wall_time),
         }
     )
+    heldout_integrity_passed = phase4_heldout_integrity_passed(summary)
+    summary["phase4_heldout_integrity_passed"] = heldout_integrity_passed
     metadata = {
         "schema_version": PHASE4_HELDOUT_RUN_SCHEMA_VERSION,
-        "status": "passed" if summary["complete"] else "failed",
+        "status": "passed" if heldout_integrity_passed else "failed",
         "model_role": mode,
         "model": config.model,
         "adapter": None if adapter is None else adapter.metadata(),
@@ -384,10 +422,12 @@ def run_phase4_heldout(
     with (output_dir / "results.jsonl").open("w", encoding="utf-8") as stream:
         for result in results:
             stream.write(json.dumps(result.to_dict(), sort_keys=True) + "\n")
-    if not summary["complete"]:
+    if not heldout_integrity_passed:
         raise RuntimeError(
-            f"Phase 4 {mode} heldout evaluation is incomplete: "
-            f"{summary['completeness_errors']}"
+            f"Phase 4 {mode} heldout evaluation failed integrity gates: "
+            f"completeness={summary['completeness_errors']}, "
+            f"infrastructure_errors={summary['infrastructure_error_count']}, "
+            f"verifier_timeouts={summary['verifier_timeout_count']}"
         )
     return metadata, results, summary
 
@@ -409,7 +449,11 @@ def compare_phase4_heldout_runs(
         "workload_id",
         "selected_record_ids",
         "prompt_format_id",
+        "serialization_or_prompt_transformation",
         "generation_settings",
+        "inference_engine",
+        "inference_engine_version",
+        "source_repository",
         "source_revision",
         "lean_toolchain",
         "verification",
@@ -422,8 +466,17 @@ def compare_phase4_heldout_runs(
         "adapter", {}
     ).get("enabled"):
         raise ValueError("Phase 4 adapter run did not enable the selected adapter")
-    if not base_summary.get("complete") or not adapter_summary.get("complete"):
-        raise ValueError("Phase 4 heldout comparison requires complete runs")
+    base_runtime = _runtime_identity(base_run["runtime"])
+    adapter_runtime = _runtime_identity(adapter_run["runtime"])
+    if base_runtime != adapter_runtime:
+        raise ValueError("Phase 4 heldout comparison differs in local runtime identity")
+    for role, summary in (("base", base_summary), ("adapter", adapter_summary)):
+        if not phase4_heldout_integrity_passed(summary):
+            raise ValueError(
+                f"Phase 4 heldout {role} run has incomplete, infrastructure-error, "
+                "or timeout results"
+            )
+        summary["phase4_heldout_integrity_passed"] = True
     base_metrics = base_summary["pass_at_k"]
     adapter_metrics = adapter_summary["pass_at_k"]
     comparison = {
@@ -434,7 +487,36 @@ def compare_phase4_heldout_runs(
         "workload_id": base_run["workload_id"],
         "selected_record_ids": base_run["selected_record_ids"],
         "selected_optimizer_step": base_run["selected_optimizer_step"],
-        "generation_settings": base_run["generation_settings"],
+        "evaluation_contract": {
+            "model": base_run["model"],
+            "dataset_schema_version": base_run["dataset_schema_version"],
+            "dataset_split": base_run["dataset_split"],
+            "prompt_format_id": base_run["prompt_format_id"],
+            "serialization_or_prompt_transformation": base_run[
+                "serialization_or_prompt_transformation"
+            ],
+            "generation_settings": base_run["generation_settings"],
+            "inference_engine": {
+                "name": base_run["inference_engine"],
+                "version": base_run["inference_engine_version"],
+            },
+            "source_repository": base_run["source_repository"],
+            "source_revision": base_run["source_revision"],
+            "lean_toolchain": base_run["lean_toolchain"],
+            "verification": base_run["verification"],
+        },
+        "runs": {
+            "base": {
+                "adapter": None,
+                "runtime": base_runtime,
+            },
+            "adapter": {
+                "adapter": _sanitized_adapter_metadata(
+                    adapter_run["adapter"], int(base_run["selected_optimizer_step"])
+                ),
+                "runtime": adapter_runtime,
+            },
+        },
         "base": base_summary,
         "adapter": adapter_summary,
         "delta_adapter_minus_base": {

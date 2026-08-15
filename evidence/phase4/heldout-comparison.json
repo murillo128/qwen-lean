@@ -359,6 +359,7 @@
         "verified_candidate_count": 0
       }
     ],
+    "phase4_heldout_integrity_passed": true,
     "run_wall_time_seconds": 454.2165455069917,
     "schema_version": "phase1-summary-v1",
     "task_count": 64,
@@ -739,6 +740,7 @@
         "verified_candidate_count": 0
       }
     ],
+    "phase4_heldout_integrity_passed": true,
     "run_wall_time_seconds": 577.3514663219976,
     "schema_version": "phase1-summary-v1",
     "task_count": 64,
@@ -763,25 +765,94 @@
     "pass@1": 0.0078125,
     "pass@4": 0.03125
   },
-  "generation_settings": {
-    "candidates_per_task": 4,
-    "chat_template": null,
-    "do_sample": true,
-    "dtype": "bfloat16",
-    "enforce_eager": true,
-    "gpu_memory_utilization": 0.95,
-    "max_model_len": 2048,
-    "max_new_tokens": 1024,
-    "max_num_seqs": 32,
-    "quantization": null,
-    "seed": 0,
-    "stop": "tokenizer_eos_or_token_limit",
-    "temperature": 0.8,
-    "tensor_parallel_size": 1,
-    "top_k": -1,
-    "top_p": 0.95
+  "evaluation_contract": {
+    "dataset_schema_version": "mathlib-whole-proof-v1",
+    "dataset_split": "heldout",
+    "generation_settings": {
+      "candidates_per_task": 4,
+      "chat_template": null,
+      "do_sample": true,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "gpu_memory_utilization": 0.95,
+      "max_model_len": 2048,
+      "max_new_tokens": 1024,
+      "max_num_seqs": 32,
+      "quantization": null,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "tensor_parallel_size": 1,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "inference_engine": {
+      "name": "vllm",
+      "version": "0.10.2"
+    },
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "model": {
+      "add_special_tokens": false,
+      "chat_template": null,
+      "model_id": "Qwen/Qwen3-8B-Base",
+      "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "tokenizer_id": "Qwen/Qwen3-8B-Base",
+      "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+    },
+    "prompt_format_id": "whole-proof-v1",
+    "serialization_or_prompt_transformation": null,
+    "source_repository": "https://github.com/leanprover-community/mathlib4",
+    "source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "verification": {
+      "original_source_span_reconstruction": true,
+      "raw_continuation_no_repair": true,
+      "timeout_seconds": 300.0,
+      "workers": 8
+    }
   },
   "raw_candidate_results_retained_outside_git": true,
+  "runs": {
+    "adapter": {
+      "adapter": {
+        "adapter_id": "phase4-train4096-v1-lora",
+        "adapter_rank": 16,
+        "base_model_id": "Qwen/Qwen3-8B-Base",
+        "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+        "enabled": true,
+        "ignored_local_path": "artifacts/phase4/training/trainer-state/checkpoint-512",
+        "merged": false
+      },
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "inference_execution": "local_cuda",
+        "python": "3.12.14",
+        "torch": "2.8.0+cu128",
+        "torch_cuda_version": "12.8"
+      }
+    },
+    "base": {
+      "adapter": null,
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "inference_execution": "local_cuda",
+        "python": "3.12.14",
+        "torch": "2.8.0+cu128",
+        "torch_cuda_version": "12.8"
+      }
+    }
+  },
   "schema_version": "phase4-heldout-comparison-v1",
   "selected_optimizer_step": 512,
   "selected_record_ids": [

@@ -22,8 +22,13 @@ from qwen_lean.phase4 import (
     select_heldout_workload,
     select_sft_workload,
 )
-from qwen_lean.phase4_evidence import _compact_training
-from qwen_lean.phase4_inference import _phase1_config, heldout_generation_request
+from qwen_lean.phase4_evidence import _compact_training, _heldout_integrity_passed
+from qwen_lean.phase4_inference import (
+    _phase1_config,
+    compare_phase4_heldout_runs,
+    heldout_generation_request,
+    phase4_heldout_integrity_passed,
+)
 from qwen_lean.phase4_training import (
     select_validation_checkpoint,
     validate_phase4_resume_checkpoint,
@@ -329,3 +334,121 @@ def test_phase4_training_evidence_references_canonical_workload_ids() -> None:
         assert compact["workloads"][name]["selected_record_ids_reference"] == (
             f"workloads.json#workloads.{name}.selected_record_ids"
         )
+
+
+def test_phase4_heldout_integrity_rejects_timeouts_even_when_complete() -> None:
+    valid_summary = {
+        "complete": True,
+        "infrastructure_error_count": 0,
+        "verifier_timeout_count": 0,
+    }
+    comparison = {
+        "status": "passed",
+        "comparison_integrity_passed": True,
+        "base": valid_summary,
+        "adapter": valid_summary,
+        "evaluation_contract": {
+            "model": {"model_revision": "model-rev", "tokenizer_revision": "tok-rev"},
+            "inference_engine": {"name": "vllm", "version": "0.10.2"},
+            "prompt_format_id": "whole-proof-v1",
+            "source_revision": "source-rev",
+            "lean_toolchain": "leanprover/lean4:v4.32.0",
+            "verification": {
+                "original_source_span_reconstruction": True,
+                "raw_continuation_no_repair": True,
+            },
+        },
+        "runs": {
+            "base": {
+                "adapter": None,
+                "runtime": {"inference_execution": "local_cuda"},
+            },
+            "adapter": {
+                "adapter": {"enabled": True},
+                "runtime": {"inference_execution": "local_cuda"},
+            },
+        },
+    }
+
+    assert phase4_heldout_integrity_passed(valid_summary) is True
+    assert _heldout_integrity_passed(comparison) is True
+    timeout_summary = {**valid_summary, "verifier_timeout_count": 1}
+    assert phase4_heldout_integrity_passed(timeout_summary) is False
+    comparison["base"] = timeout_summary
+    assert _heldout_integrity_passed(comparison) is False
+
+
+def test_phase4_comparison_preserves_sanitized_observed_run_contract(
+    tmp_path: Path,
+) -> None:
+    base_dir = tmp_path / "base"
+    adapter_dir = tmp_path / "adapter"
+    base_dir.mkdir()
+    adapter_dir.mkdir()
+    runtime = {
+        "python": "3.12.14",
+        "torch": "2.8.0+cu128",
+        "torch_cuda_version": "12.8",
+        "inference_execution": "local_cuda",
+        "cuda_device_index": 0,
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [8, 9],
+        "cuda_device_total_memory_bytes": 20_989_804_544,
+    }
+    common_run = {
+        "model": {"model_id": "Qwen/Qwen3-8B-Base", "model_revision": "rev"},
+        "selected_optimizer_step": 512,
+        "dataset_schema_version": "mathlib-whole-proof-v1",
+        "dataset_split": "heldout",
+        "workload_id": HELDOUT_WORKLOAD_ID,
+        "selected_record_ids": ["record"],
+        "prompt_format_id": "whole-proof-v1",
+        "serialization_or_prompt_transformation": None,
+        "generation_settings": {"seed": 0, "dtype": "bfloat16"},
+        "inference_engine": "vllm",
+        "inference_engine_version": "0.10.2",
+        "source_repository": "https://github.com/leanprover-community/mathlib4",
+        "source_revision": "mathlib-rev",
+        "lean_toolchain": "leanprover/lean4:v4.32.0",
+        "verification": {
+            "original_source_span_reconstruction": True,
+            "raw_continuation_no_repair": True,
+        },
+        "runtime": runtime,
+    }
+    base_run = {**common_run, "model_role": "base", "adapter": None}
+    adapter_run = {
+        **common_run,
+        "model_role": "adapter",
+        "adapter": {
+            "enabled": True,
+            "merged": False,
+            "adapter_id": "phase4-train4096-v1-lora",
+            "adapter_path": "/ignored/checkpoint-512",
+            "adapter_rank": 16,
+            "base_model_id": "Qwen/Qwen3-8B-Base",
+            "base_model_revision": "rev",
+        },
+    }
+    summary = {
+        "complete": True,
+        "infrastructure_error_count": 0,
+        "verifier_timeout_count": 0,
+        "pass_at_k": {"pass@1": 0.0, "pass@4": 0.0},
+    }
+    for directory, run in ((base_dir, base_run), (adapter_dir, adapter_run)):
+        (directory / "run.json").write_text(json.dumps(run), encoding="utf-8")
+        (directory / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+
+    comparison = compare_phase4_heldout_runs(
+        base_dir, adapter_dir, tmp_path / "comparison.json"
+    )
+
+    assert comparison["evaluation_contract"]["inference_engine"] == {
+        "name": "vllm",
+        "version": "0.10.2",
+    }
+    assert comparison["runs"]["base"]["runtime"] == runtime
+    adapter_metadata = comparison["runs"]["adapter"]["adapter"]
+    assert "adapter_path" not in adapter_metadata
+    assert adapter_metadata["ignored_local_path"].endswith("checkpoint-512")

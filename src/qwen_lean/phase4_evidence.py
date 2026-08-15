@@ -116,6 +116,39 @@ def _compact_minif2f(
     }
 
 
+def _heldout_integrity_passed(value: dict[str, Any]) -> bool:
+    contract = value.get("evaluation_contract", {})
+    model = contract.get("model", {})
+    engine = contract.get("inference_engine", {})
+    verification = contract.get("verification", {})
+    runs = value.get("runs", {})
+    base_run = runs.get("base", {})
+    adapter_run = runs.get("adapter", {})
+    return bool(
+        value.get("status") == "passed"
+        and value.get("comparison_integrity_passed")
+        and all(
+            summary.get("complete")
+            and int(summary.get("infrastructure_error_count", -1)) == 0
+            and int(summary.get("verifier_timeout_count", -1)) == 0
+            for summary in (value.get("base", {}), value.get("adapter", {}))
+        )
+        and model.get("model_revision")
+        and model.get("tokenizer_revision")
+        and engine.get("name") == "vllm"
+        and engine.get("version")
+        and contract.get("prompt_format_id") == "whole-proof-v1"
+        and contract.get("source_revision")
+        and contract.get("lean_toolchain")
+        and verification.get("original_source_span_reconstruction") is True
+        and verification.get("raw_continuation_no_repair") is True
+        and base_run.get("adapter") is None
+        and base_run.get("runtime", {}).get("inference_execution") == "local_cuda"
+        and adapter_run.get("adapter", {}).get("enabled") is True
+        and adapter_run.get("runtime", {}).get("inference_execution") == "local_cuda"
+    )
+
+
 def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     workloads = _read(artifact_dir / "workloads.json")
     preflight = _read(artifact_dir / "preflight.json")
@@ -132,7 +165,7 @@ def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
             training.get("selected_beats_pre_training_validation")
         ),
         "adapter_reload": bool(adapter_reload.get("passed")),
-        "heldout_integrity": heldout.get("status") == "passed",
+        "heldout_integrity": _heldout_integrity_passed(heldout),
         "minif2f_integrity": bool(minif2f_summary.get("phase4_minif2f_passed")),
     }
     if not all(required_passes.values()):
