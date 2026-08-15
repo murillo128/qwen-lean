@@ -4,8 +4,15 @@ import argparse
 import json
 from pathlib import Path
 
+from .baseline import (
+    reverify_phase1_artifacts,
+    run_phase1_baseline,
+    validate_minif2f_environment,
+    write_environment_validation,
+)
 from .evaluator import load_fixture_set, run_fixture_evaluation
 from .generation import run_model_smoke
+from .minif2f import Phase1Config
 
 
 def _project_root() -> Path:
@@ -30,6 +37,44 @@ def _parser() -> argparse.ArgumentParser:
     smoke.add_argument("--project-root", type=Path, default=root)
     smoke.add_argument("--timeout", type=float, default=30.0)
     smoke.add_argument("--max-new-tokens", type=int, default=128)
+
+    minif2f_validate = subparsers.add_parser(
+        "minif2f-validate", help="validate the pinned miniF2F environment"
+    )
+    minif2f_validate.add_argument("--benchmark-root", type=Path, required=True)
+    minif2f_validate.add_argument(
+        "--config", type=Path, default=root / "config/phase1-minif2f.json"
+    )
+    minif2f_validate.add_argument("--timeout", type=float)
+    minif2f_validate.add_argument("--output", type=Path)
+
+    baseline = subparsers.add_parser(
+        "phase1-baseline", help="run the local-vLLM miniF2F baseline"
+    )
+    baseline.add_argument("--benchmark-root", type=Path, required=True)
+    baseline.add_argument(
+        "--config", type=Path, default=root / "config/phase1-minif2f.json"
+    )
+    baseline.add_argument(
+        "--workload",
+        default="minif2f-valid-dev16-v1",
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    baseline.add_argument("--output-dir", type=Path, required=True)
+    baseline.add_argument("--timeout", type=float)
+    baseline.add_argument("--verification-workers", type=int, default=8)
+
+    reverify = subparsers.add_parser(
+        "phase1-reverify", help="reverify stored Phase 1 candidate continuations"
+    )
+    reverify.add_argument("--benchmark-root", type=Path, required=True)
+    reverify.add_argument(
+        "--config", type=Path, default=root / "config/phase1-minif2f.json"
+    )
+    reverify.add_argument("--input-dir", type=Path, required=True)
+    reverify.add_argument("--output-dir", type=Path, required=True)
+    reverify.add_argument("--timeout", type=float)
+    reverify.add_argument("--verification-workers", type=int, default=8)
     return parser
 
 
@@ -48,6 +93,65 @@ def main(argv: list[str] | None = None) -> int:
                 print(mismatch)
             return 1
         return 0
+
+    if args.command == "minif2f-validate":
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        evidence = validate_minif2f_environment(
+            config,
+            args.benchmark_root,
+            timeout_seconds=timeout,
+        )
+        if args.output is not None:
+            write_environment_validation(args.output, evidence)
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "phase1-baseline":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = run_phase1_baseline(
+            config,
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            timeout_seconds=timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "phase1-reverify":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = reverify_phase1_artifacts(
+            config,
+            args.benchmark_root,
+            args.input_dir,
+            args.output_dir,
+            timeout_seconds=timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
 
     fixture_id, tasks, _ = load_fixture_set(args.fixtures)
     try:

@@ -113,16 +113,24 @@ class LeanVerifier:
                 latency_seconds=time.perf_counter() - started,
             )
 
+        diagnostics = {
+            "stdout": completed.stdout.replace(str(source_path), "Candidate.lean"),
+            "stderr": completed.stderr.replace(str(source_path), "Candidate.lean"),
+        }
+        has_error_diagnostic = any(
+            ": error:" in line
+            for stream in diagnostics.values()
+            for line in stream.splitlines()
+        )
         category: ResultCategory = (
-            "verified" if completed.returncode == 0 else "lean_rejected"
+            "verified"
+            if completed.returncode == 0 and not has_error_diagnostic
+            else "lean_rejected"
         )
         return VerificationOutcome(
             category=category,
             lean_exit_code=completed.returncode,
-            diagnostics={
-                "stdout": completed.stdout.replace(str(source_path), "Candidate.lean"),
-                "stderr": completed.stderr.replace(str(source_path), "Candidate.lean"),
-            },
+            diagnostics=diagnostics,
             latency_seconds=time.perf_counter() - started,
         )
 

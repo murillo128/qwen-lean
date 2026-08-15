@@ -1,0 +1,19 @@
+{
+  "benchmark_split": "validation",
+  "known_valid_candidate_category": "verified",
+  "known_valid_candidate_lean_exit_code": 0,
+  "known_valid_task_id": "mathd_algebra_182",
+  "placeholder_candidate_category": "lean_rejected",
+  "placeholder_candidate_lean_exit_code": 0,
+  "preamble": "import MiniF2F.ProblemImports\n\nopen scoped Real\nopen scoped Nat\nopen scoped Topology\nopen scoped Polynomial",
+  "primary_task_count": 244,
+  "verifier_environment": {
+    "dependencies": {
+      "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+      "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+    },
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "project": "google-deepmind/miniF2F",
+    "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+  }
+}

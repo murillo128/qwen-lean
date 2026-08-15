@@ -1,0 +1,1271 @@
+{
+  "candidate_count": 1952,
+  "candidates_per_task": 8,
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 1927,
+    "verified": 25,
+    "verifier_error": 0,
+    "verifier_timeout": 0
+  },
+  "category_fractions": {
+    "empty_candidate": 0.0,
+    "generation_error": 0.0,
+    "lean_rejected": 0.9871926229508197,
+    "verified": 0.012807377049180328,
+    "verifier_error": 0.0,
+    "verifier_timeout": 0.0
+  },
+  "complete": true,
+  "completeness_errors": [],
+  "finish_reason_counts": {
+    "eos": 1508,
+    "token_limit": 444
+  },
+  "infrastructure_error_count": 0,
+  "pass_at_k": {
+    "pass@1": 0.012807377049180328,
+    "pass@4": 0.04771662763466042,
+    "pass@8": 0.0860655737704918
+  },
+  "per_task": [
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2019_p21",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2015_p10",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2008_p8",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_182",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1984_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_780",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_116",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_13",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_169",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2009_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2019_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_13",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_sum2kp1npqsqm1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1991_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_149",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1984_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2008_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_2006_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_462",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1964_p1_2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_221",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_64",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1987_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_33",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12_2001_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1965_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_48",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_sqmod4in01d",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_466",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_48",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12_2000_p15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_132",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2009_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_188",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_224",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_divisibility_3divnto3m2n",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_sum_1oktkp1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_32",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_422",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2002_p11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_73",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_109",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_xmysqpymzsqpzmxsqeqxyz_xpypzp6dvdx3y3z3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1962_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_236",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_24",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_amgm_prod1toneq1_sum1tongeqn",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_101",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_257",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12_2000_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_547",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_200",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_510",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_140",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_455",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_45",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1994_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_739",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_245",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_apb4leq8ta4pb4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_28",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_543",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_480",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_69",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_433",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_126",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aimeII_2020_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2008_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_35",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_amgm_faxinrrp2msqrt2geq2mxm1div2x",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_335",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_35",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2021_p7",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_327",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1984_p15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_amgm_sqrtxymulxmyeqxpy_xpygeq4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2002_p21",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_192",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2002_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_102",
+      "verified_candidate_count": 2
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2010_p22",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_81",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_155",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1978_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2017_p7",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_42",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_110",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2021_p21",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_405",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_sumkmulnckeqnmul2pownm1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_393",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2004_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_303",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_151",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2011_p18",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_211",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_640",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2003_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_2rootsintpoly_am10tap11eqasqpam110",
+      "verified_candidate_count": 2
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1991_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_43",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1988_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1996_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_55",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_sqineq_2at2pclta2c2p41pc",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_43",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_214",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_96",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12_2001_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_185",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_binomnegdiscrineq_10alt28asqp1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_284",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2009_p2",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_709",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2013_p8",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_461",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_59",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_234",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1973_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2020_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_sqmod3in01d",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_131",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2003_p17",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_536",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_22",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_xsqpysqintdenomeq",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aimeII_2001_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_22",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1987_p8",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_136",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12_2000_p11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2003_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_198",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_149",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_132",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_37",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1983_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_37",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_458",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2008_p15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_301",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2009_p15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_sqineq_36azm9asqle36zsq",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2013_p7",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_104",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_252",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2020_p21",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_493",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_nckeqnm1ckpnm1ckm1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_3rootspoly_amdtamctambeqnasqmbpctapcbtdpasqmbpctapcbta",
+      "verified_candidate_count": 2
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_403",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_190",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_269",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1990_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_101",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_sqineq_4bap1lt4bsqpap1sq",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_156",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_451",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_144",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_282",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_410",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_232",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_77",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1974_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1988_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_530",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_109",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1967_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2003_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_aneqprodakp4_anmsqrtanp1eq2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_2rootspoly_apatapbeq2asqp2ab",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_sum_odd",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_568",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_616",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_690",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2016_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_405",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_110",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2003_p25",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2010_p10",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_509",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_159",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1997_p11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aimeI_2000_p7",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1988_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_divisibility_9div10tonm1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_126",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_323",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_421",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1987_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2009_p25",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1961_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_31",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_manipexpr_apbeq2cceqiacpbceqm2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_370",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_437",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1966_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_89",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1966_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_67",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_326",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_divisibility_3div2tooddnp1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_123",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_2varlineareq_xpeeq7_2xpeeq3_eeq11_xeqn4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1993_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_prmdvsneqnsqmodpeq0",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1964_p1_1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1990_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_ineq_nsqlefactn",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_30",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_267",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_961",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "induction_seq_mul2pnp1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2002_p12",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_manipexpr_2erprsqpesqeqnrpnesq",
+      "verified_candidate_count": 1
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_119",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2020_p13",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1977_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "numbertheory_2dvd4expn",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2010_p11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2003_p24",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2002_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_206",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_92",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_482",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12b_2002_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_668",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_251",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_84",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_412",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_181",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2016_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_247",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_sqineq_2unitcircatblt1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_629",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "amc12a_2017_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_amgm_sumasqdivbsqgeqsumbdiva",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_numbertheory_202",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "imo_1979_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_51",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "mathd_algebra_10",
+      "verified_candidate_count": 2
+    }
+  ],
+  "run_wall_time_seconds": 3097.130949546001,
+  "schema_version": "phase1-summary-v1",
+  "task_count": 244,
+  "tasks_with_verified_candidate": {
+    "count": 21,
+    "fraction": 0.0860655737704918
+  },
+  "timing_seconds": {
+    "candidate_total_latency_mean": 12.664242432838606,
+    "candidate_total_latency_sum": 24720.60122890096,
+    "generation_candidate_latency_mean": 5.044260550344275,
+    "generation_candidate_latency_sum": 9846.396594272024,
+    "verification_latency_mean": 7.619981882494332,
+    "verification_latency_sum": 14874.204634628935
+  },
+  "verifier_timeout_count": 0,
+  "workload_id": "minif2f-valid-v1"
+}

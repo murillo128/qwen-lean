@@ -1,0 +1,66 @@
+{
+  "benchmark_repository": "google-deepmind/miniF2F",
+  "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+  "benchmark_split": "validation",
+  "candidate_source": "model",
+  "candidates_per_task": 8,
+  "generation_settings": {
+    "candidates_per_task": 8,
+    "chat_template": null,
+    "do_sample": true,
+    "dtype": "bfloat16",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_new_tokens": 1024,
+    "max_num_seqs": 32,
+    "prompt_transformation": null,
+    "quantization": null,
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit",
+    "temperature": 0.8,
+    "tensor_parallel_size": 1,
+    "top_k": -1,
+    "top_p": 0.95
+  },
+  "inference_engine": "vllm",
+  "inference_engine_version": "0.10.2",
+  "lean_toolchain": "leanprover/lean4:v4.27.0",
+  "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "prompt_format_id": "whole-proof-v1",
+  "runtime": {
+    "candidate_generation_reused": true,
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "generation_wall_time_seconds": 157.37017581399778,
+    "inference_execution": "local_cuda",
+    "previous_verification_wall_time_seconds": 133.84686785400118,
+    "python": "3.12.14",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8",
+    "verification_wall_time_seconds": 134.09776167299788,
+    "verification_workers": 8
+  },
+  "schema_version": "phase1-v1",
+  "task_source": "google-deepmind/miniF2F@f0a20e14c1eeccd859d51bb4c2b3ee487889c303:MiniF2F/Valid.lean",
+  "tokenizer_id": "Qwen/Qwen3-8B-Base",
+  "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "verifier_environment": {
+    "dependencies": {
+      "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+      "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+    },
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "project": "google-deepmind/miniF2F",
+    "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+  },
+  "verifier_timeout_seconds": 30.0,
+  "workload_id": "minif2f-valid-dev16-v1"
+}
