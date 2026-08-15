@@ -46,11 +46,12 @@ Information has one primary home to avoid documentation drift:
 
 - [`PLAN.md`](PLAN.md) defines the technical sequence and exit gates.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) records durable accepted, open, rejected, and observed technical decisions and their rationale.
+- [`docs/CONCEPTUAL_MATH_DIRECTION.md`](docs/CONCEPTUAL_MATH_DIRECTION.md) records an exploratory long-term hypothesis about higher-level mathematical reasoning, conjecture generation, formalization, and AI-feedback training; it is not a roadmap commitment or accepted architecture.
 - [Epic #1](/murillo128/qwen-lean/issues/1) tracks current roadmap status and links active execution issues; it does not duplicate the technical plan.
 - Individual GitHub issues are bounded execution contracts for one phase or change.
 - [`AGENTS.md`](AGENTS.md) and `.agents/skills/` define how ChatGPT, Codex, and reviewers should operate in the repository.
 
-Chat discussion is exploratory until a durable decision is recorded in `docs/DECISIONS.md` or a phase contract is recorded in an issue.
+Chat discussion is exploratory until a durable decision is recorded in `docs/DECISIONS.md` or a phase contract is recorded in an issue. Exploratory research hypotheses may be preserved in the conceptual-direction document without becoming accepted project decisions.
 
 ## Initial technical direction
 
