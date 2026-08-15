@@ -179,6 +179,54 @@ uv run --frozen --extra phase2 qwen-lean phase2-loader-smoke \
 
 Phase 2 does not publish the corpus or train a model.
 
+## Phase 3 QLoRA sanity path
+
+Phase 3 materializes `phase3-overfit64-v1` from the Phase 2 `train` split using
+the pinned Qwen tokenizer, then trains the target-only `mathlib-sft-v1`
+serialization. The training extra pins TRL, PEFT, and bitsandbytes alongside the
+unchanged model stack. Workload data, trainer state, and adapter weights remain
+under ignored `artifacts/`.
+
+Materialize the fixed workload and run the real-GPU preflight before training:
+
+```bash
+uv run --frozen --extra training qwen-lean phase3-materialize \
+  --artifact-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --output artifacts/phase3/workload.json
+uv run --frozen --extra training qwen-lean phase3-preflight \
+  --workload artifacts/phase3/workload.json \
+  --output artifacts/phase3/preflight.json
+uv run --frozen --extra training qwen-lean phase3-train \
+  --workload artifacts/phase3/workload.json \
+  --output-dir artifacts/phase3/training
+```
+
+In fresh processes, validate standard PEFT reload and the required local-vLLM
+memorization gate. Run the miniF2F adapter smoke only after memorization passes:
+
+```bash
+uv run --frozen --extra training qwen-lean phase3-adapter-reload \
+  --workload artifacts/phase3/workload.json \
+  --adapter-dir artifacts/phase3/training/adapter \
+  --output artifacts/phase3/adapter-reload.json
+uv run --frozen --extra baseline qwen-lean phase3-memorization \
+  --workload artifacts/phase3/workload.json \
+  --adapter-dir artifacts/phase3/training/adapter \
+  --output artifacts/phase3/memorization.json
+uv run --frozen --extra baseline qwen-lean phase3-adapter-smoke \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --adapter-dir artifacts/phase3/training/adapter \
+  --output-dir artifacts/phase3/minif2f-smoke
+```
+
+Compact evidence can be generated after the required local artifacts exist:
+
+```bash
+uv run qwen-lean phase3-evidence \
+  --artifact-dir artifacts/phase3 \
+  --evidence-dir evidence/phase3
+```
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

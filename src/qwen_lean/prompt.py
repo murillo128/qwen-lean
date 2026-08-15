@@ -4,15 +4,20 @@ from .schema import TaskRecord
 
 
 PROMPT_FORMAT_ID = "whole-proof-v1"
-_INSTRUCTION = (
+PROOF_REQUEST_INSTRUCTION = (
     "/- Complete the proof below.\n"
     "Return only Lean code continuing after `by`; do not use `sorry` or `admit`. -/"
 )
 
 
+def render_proof_request(declaration: str) -> str:
+    """Render the shared instruction and statement-to-proof continuation prefix."""
+    return f"{PROOF_REQUEST_INSTRUCTION}\n{declaration} := by\n  "
+
+
 def render_prompt(task: TaskRecord) -> str:
     """Render the exact plain code-completion prefix for a whole proof."""
-    return f"{task.preamble}\n\n{_INSTRUCTION}\n{task.declaration} := by\n  "
+    return f"{task.preamble}\n\n{render_proof_request(task.declaration)}"
 
 
 def normalize_transport(candidate: str) -> str:

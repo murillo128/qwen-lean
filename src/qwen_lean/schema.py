@@ -16,9 +16,11 @@ CandidateSource = Literal["fixture", "model"]
 
 RESULT_SCHEMA_VERSION = "phase0-v1"
 PHASE1_RESULT_SCHEMA_VERSION = "phase1-v1"
+PHASE3_RESULT_SCHEMA_VERSION = "phase3-adapter-smoke-v1"
 SUPPORTED_RESULT_SCHEMA_VERSIONS = {
     RESULT_SCHEMA_VERSION,
     PHASE1_RESULT_SCHEMA_VERSION,
+    PHASE3_RESULT_SCHEMA_VERSION,
 }
 RESULT_CATEGORIES = {
     "verified",
@@ -71,6 +73,10 @@ class RunMetadata:
     candidates_per_task: int | None = None
     inference_engine: str | None = None
     inference_engine_version: str | None = None
+    adapter_enabled: bool = False
+    adapter_id: str | None = None
+    adapter_path: str | None = None
+    adapter_rank: int | None = None
     generation_settings: dict[str, Any] | None = None
     runtime: dict[str, Any] = field(default_factory=dict)
 

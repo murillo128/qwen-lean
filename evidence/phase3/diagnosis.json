@@ -1,0 +1,14 @@
+{
+  "accepted_vllm_bf16_exact_matches": 27,
+  "detailed_candidate_diagnostics_retained_outside_git": true,
+  "interpretation": "The accepted step-100 teacher-forced stop threshold did not imply the required sequence-level autoregressive memorization. The adapter also lost exact matches when moved from the NF4 training base to the unchanged BF16 Phase 1 inference base; BF16 Transformers reproduced the vLLM target-exact count, so this is not a vLLM-only loading fault.",
+  "minif2f_adapter_smoke_not_run_reason": "The required 56/64 adapter memorization prerequisite failed.",
+  "minif2f_adapter_smoke_run": false,
+  "required_exact_matches": 56,
+  "schema_version": "phase3-free-generation-diagnosis-v1",
+  "status": "design_required",
+  "transformers_4bit_exact_matches": 49,
+  "transformers_bf16_exact_matches": 27,
+  "vllm_and_transformers_bf16_target_exact_counts_equal": true,
+  "vllm_generation_infrastructure_errors": 0
+}

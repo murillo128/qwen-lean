@@ -4,6 +4,7 @@ import gc
 import json
 import platform
 import time
+from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -30,6 +31,38 @@ class GeneratedCandidate:
     finish_reason: str
     generation_latency_seconds: float
     generation_error: str | None = None
+
+
+@dataclass(frozen=True)
+class LoRAAdapterSpec:
+    adapter_id: str
+    path: Path
+    rank: int
+    base_model_id: str
+    base_model_revision: str
+
+    def validate(self, config: Phase1Config) -> None:
+        if not self.adapter_id or self.adapter_id == self.base_model_id:
+            raise ValueError("adapter identity must be distinct from the base model")
+        if self.rank < 1:
+            raise ValueError("adapter rank must be positive")
+        if self.base_model_id != str(config.model["model_id"]):
+            raise ValueError("adapter base model differs from the inference config")
+        if self.base_model_revision != str(config.model["model_revision"]):
+            raise ValueError("adapter base revision differs from the inference config")
+        if not (self.path / "adapter_config.json").is_file():
+            raise ValueError(f"adapter config does not exist: {self.path}")
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "enabled": True,
+            "adapter_id": self.adapter_id,
+            "adapter_path": str(self.path.resolve()),
+            "adapter_rank": self.rank,
+            "base_model_id": self.base_model_id,
+            "base_model_revision": self.base_model_revision,
+            "merged": False,
+        }
 
 
 def validate_minif2f_environment(
@@ -80,6 +113,9 @@ def run_phase1_baseline(
     *,
     timeout_seconds: float,
     verification_workers: int,
+    sampling_override: Mapping[str, Any] | None = None,
+    adapter: LoRAAdapterSpec | None = None,
+    result_schema_version: str = PHASE1_RESULT_SCHEMA_VERSION,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
     all_tasks = materialize_validation_tasks(config, benchmark_root)
     tasks = config.select_workload(workload_id, all_tasks)
@@ -91,8 +127,13 @@ def run_phase1_baseline(
     environment = environment_validation["verifier_environment"]
 
     runtime = _local_cuda_runtime(config)
+    sampling = dict(config.sampling if sampling_override is None else sampling_override)
+    if adapter is not None:
+        adapter.validate(config)
     generation_started = time.perf_counter()
-    generated, engine_version = _generate_candidates(config, tasks)
+    generated, engine_version = _generate_candidates(
+        config, tasks, sampling=sampling, adapter=adapter
+    )
     generation_wall_time = time.perf_counter() - generation_started
     runtime["generation_wall_time_seconds"] = generation_wall_time
 
@@ -104,7 +145,6 @@ def run_phase1_baseline(
     runtime["verification_wall_time_seconds"] = verification_wall_time
     runtime["verification_workers"] = verification_workers
 
-    sampling = config.sampling
     summary = summarize_results(
         results,
         expected_task_ids=[task.id for task in tasks],
@@ -114,7 +154,7 @@ def run_phase1_baseline(
     summary["run_wall_time_seconds"] = generation_wall_time + verification_wall_time
 
     metadata = RunMetadata(
-        schema_version=PHASE1_RESULT_SCHEMA_VERSION,
+        schema_version=result_schema_version,
         candidate_source="model",
         task_source=(
             f"{config.benchmark['repository']}@{config.benchmark['revision']}:"
@@ -136,6 +176,10 @@ def run_phase1_baseline(
         candidates_per_task=int(sampling["candidates_per_task"]),
         inference_engine=str(config.engine["name"]),
         inference_engine_version=engine_version,
+        adapter_enabled=adapter is not None,
+        adapter_id=None if adapter is None else adapter.adapter_id,
+        adapter_path=None if adapter is None else str(adapter.path.resolve()),
+        adapter_rank=None if adapter is None else adapter.rank,
         generation_settings={
             **sampling,
             "dtype": str(config.engine["dtype"]),
@@ -147,6 +191,7 @@ def run_phase1_baseline(
             "quantization": config.engine["quantization"],
             "chat_template": None,
             "prompt_transformation": None,
+            "adapter": None if adapter is None else adapter.metadata(),
         },
         runtime=runtime,
     )
@@ -263,7 +308,12 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
 
 
 def _generate_candidates(
-    config: Phase1Config, tasks: list[TaskRecord]
+    config: Phase1Config,
+    tasks: list[TaskRecord],
+    *,
+    prompts: list[str] | None = None,
+    sampling: Mapping[str, Any] | None = None,
+    adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[list[GeneratedCandidate], str]:
     try:
         import vllm
@@ -278,48 +328,35 @@ def _generate_candidates(
             f"vLLM version mismatch: expected {configured_version}, got {vllm.__version__}"
         )
 
-    sampling = config.sampling
-    prompts = [render_prompt(task) for task in tasks]
+    sampling = dict(config.sampling if sampling is None else sampling)
+    prompts = [render_prompt(task) for task in tasks] if prompts is None else prompts
+    if len(prompts) != len(tasks):
+        raise ValueError("vLLM prompt count differs from task count")
     started = time.perf_counter()
     try:
-        llm = LLM(
-            model=str(config.model["model_id"]),
-            revision=str(config.model["model_revision"]),
-            tokenizer=str(config.model["tokenizer_id"]),
-            tokenizer_revision=str(config.model["tokenizer_revision"]),
-            dtype=str(engine["dtype"]),
-            tensor_parallel_size=int(engine["tensor_parallel_size"]),
-            gpu_memory_utilization=float(engine["gpu_memory_utilization"]),
-            max_model_len=int(engine["max_model_len"]),
-            max_num_seqs=int(engine["max_num_seqs"]),
-            enforce_eager=bool(engine["enforce_eager"]),
-            quantization=engine["quantization"],
-            seed=int(sampling["seed"]),
-            trust_remote_code=False,
-        )
+        llm = LLM(**vllm_engine_kwargs(config, sampling, adapter))
+        generate_kwargs: dict[str, Any] = {"use_tqdm": True}
+        if adapter is not None:
+            from vllm.lora.request import LoRARequest
+
+            generate_kwargs["lora_request"] = LoRARequest(
+                adapter.adapter_id, 1, str(adapter.path.resolve())
+            )
         outputs = llm.generate(
             prompts,
-            SamplingParams(
-                n=int(sampling["candidates_per_task"]),
-                temperature=float(sampling["temperature"]),
-                top_p=float(sampling["top_p"]),
-                top_k=int(sampling["top_k"]),
-                max_tokens=int(sampling["max_new_tokens"]),
-                seed=int(sampling["seed"]),
-                ignore_eos=False,
-                skip_special_tokens=True,
-                spaces_between_special_tokens=True,
-            ),
-            use_tqdm=True,
+            SamplingParams(**vllm_sampling_kwargs(sampling)),
+            **generate_kwargs,
         )
     except Exception as error:
         latency = time.perf_counter() - started
         message = f"{type(error).__name__}: {error}"
-        return _generation_error_records(config, tasks, message, latency), vllm.__version__
+        return _generation_error_records(tasks, sampling, message, latency), vllm.__version__
 
     wall_time = time.perf_counter() - started
     try:
-        generated = _convert_vllm_outputs(config, tasks, prompts, outputs, wall_time)
+        generated = _convert_vllm_outputs(
+            tasks, prompts, outputs, wall_time, sampling=sampling
+        )
     finally:
         del llm
         gc.collect()
@@ -333,16 +370,17 @@ def _generate_candidates(
 
 
 def _convert_vllm_outputs(
-    config: Phase1Config,
     tasks: list[TaskRecord],
     prompts: list[str],
     outputs: list[Any],
     wall_time: float,
+    *,
+    sampling: Mapping[str, Any],
 ) -> list[GeneratedCandidate]:
-    n = int(config.sampling["candidates_per_task"])
+    n = int(sampling["candidates_per_task"])
     if len(outputs) != len(tasks):
         message = f"vLLM returned {len(outputs)} requests for {len(tasks)} tasks"
-        return _generation_error_records(config, tasks, message, wall_time)
+        return _generation_error_records(tasks, sampling, message, wall_time)
 
     generated: list[GeneratedCandidate] = []
     fallback_latency = wall_time / len(tasks) if tasks else wall_time
@@ -355,7 +393,7 @@ def _convert_vllm_outputs(
                 f"{request_output.prompt == prompt}, indices={indices}"
             )
             generated.extend(
-                _generation_error_records(config, [task], message, fallback_latency)
+                _generation_error_records([task], sampling, message, fallback_latency)
             )
             continue
         latency = _request_latency(request_output, fallback_latency)
@@ -374,12 +412,12 @@ def _convert_vllm_outputs(
 
 
 def _generation_error_records(
-    config: Phase1Config,
     tasks: list[TaskRecord],
+    sampling: Mapping[str, Any],
     message: str,
     latency: float,
 ) -> list[GeneratedCandidate]:
-    n = int(config.sampling["candidates_per_task"])
+    n = int(sampling["candidates_per_task"])
     return [
         GeneratedCandidate(
             task=task,
@@ -393,6 +431,53 @@ def _generation_error_records(
         for task in tasks
         for index in range(n)
     ]
+
+
+def vllm_engine_kwargs(
+    config: Phase1Config,
+    sampling: Mapping[str, Any],
+    adapter: LoRAAdapterSpec | None,
+) -> dict[str, Any]:
+    engine = config.engine
+    kwargs: dict[str, Any] = {
+        "model": str(config.model["model_id"]),
+        "revision": str(config.model["model_revision"]),
+        "tokenizer": str(config.model["tokenizer_id"]),
+        "tokenizer_revision": str(config.model["tokenizer_revision"]),
+        "dtype": str(engine["dtype"]),
+        "tensor_parallel_size": int(engine["tensor_parallel_size"]),
+        "gpu_memory_utilization": float(engine["gpu_memory_utilization"]),
+        "max_model_len": int(engine["max_model_len"]),
+        "max_num_seqs": int(engine["max_num_seqs"]),
+        "enforce_eager": bool(engine["enforce_eager"]),
+        "quantization": engine["quantization"],
+        "seed": int(sampling["seed"]),
+        "trust_remote_code": False,
+    }
+    if adapter is not None:
+        adapter.validate(config)
+        kwargs.update(
+            {
+                "enable_lora": True,
+                "max_lora_rank": adapter.rank,
+                "max_loras": 1,
+            }
+        )
+    return kwargs
+
+
+def vllm_sampling_kwargs(sampling: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "n": int(sampling["candidates_per_task"]),
+        "temperature": float(sampling["temperature"]),
+        "top_p": float(sampling["top_p"]),
+        "top_k": int(sampling["top_k"]),
+        "max_tokens": int(sampling["max_new_tokens"]),
+        "seed": int(sampling["seed"]),
+        "ignore_eos": False,
+        "skip_special_tokens": True,
+        "spaces_between_special_tokens": True,
+    }
 
 
 def _request_latency(request_output: Any, fallback: float) -> float:
