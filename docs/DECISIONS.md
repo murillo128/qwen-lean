@@ -122,17 +122,19 @@ A second, harder/current Lean benchmark should be added after the first evaluati
 
 **Second external benchmark:** OPEN
 
-## D010 — v1 uses project-controlled local NVIDIA GPU compute
+## D010 — First training path should fit a single 24 GB NVIDIA GPU
 
 **Status:** ACCEPTED
 
 Design the first Qwen3-8B QLoRA training path to be viable on one 24 GB NVIDIA GPU, such as the RTX 3090 class, using memory-saving techniques when required. A 48 GB GPU is a convenience for larger batches/context and faster iteration, not a baseline requirement.
 
-All model inference and generation must execute on project-controlled local GPU compute. The current default is the available NVIDIA Ada GPU; a controlling issue may identify another project-controlled local device. Hugging Face Hub or another artifact store may supply and cache model or tokenizer files, but Hugging Face Jobs, hosted inference endpoints, Spaces compute, and other hosted GPU execution are not inference backends for this project. Training execution is governed separately by its controlling phase.
+Training software should remain provider-neutral Linux/NVIDIA code. Vast.ai, OCI, Linode, Hugging Face Jobs, or another provider may be selected for training per experiment based on access, cost, and operational convenience.
+
+Model inference and generation execution policy is a repository-wide invariant owned by `AGENTS.md`; this training decision does not override it.
 
 Claims about fit, memory, throughput, or cost must be based on measured configurations rather than assumed from the GPU model name.
 
-**Exact project-controlled device for later phases or runs:** OPEN
+**Training provider and machine flavor per run:** OPEN
 
 ## D011 — Artifact ownership
 
@@ -140,7 +142,7 @@ Claims about fit, memory, throughput, or cost must be based on measured configur
 
 Keep source code, configuration, small fixtures, compact evaluation evidence, and documentation in GitHub.
 
-Keep large model weights, LoRA checkpoints, datasets, caches, and bulky logs outside Git, normally in Hugging Face Hub or another appropriate artifact store. Artifact storage or distribution does not authorize hosted model execution; D010 governs inference compute. Check licenses and redistribution terms before publishing derived weights or datasets, and never commit secrets or machine credentials.
+Keep large model weights, LoRA checkpoints, datasets, caches, and bulky logs outside Git, normally in Hugging Face Hub or another appropriate artifact store. Check licenses and redistribution terms before publishing derived weights or datasets, and never commit secrets or machine credentials.
 
 ## D012 — Practical experiment fidelity, not high-assurance reproducibility
 
@@ -150,4 +152,25 @@ The project needs enough metadata to understand what was run and make fair compa
 
 For material comparisons, record the model/tokenizer, dataset/split, relevant training or generation configuration, Lean/evaluation contract, hardware details that affect interpretation, and produced metrics. Deterministic seeds, repeated runs, immutable hashes, and extensive provenance are used when they matter to the question being answered, not as universal requirements.
 
-Future-phase details such as verifier-filtered self-training policy, RL reward shaping, and tactic-level search architecture are intentionally deferred until their phase becomes active rather than recorded as premature decisions here.
+Future-phase details such as exact synthetic filtering thresholds, shaped-reward semantics, and tactic-level search architecture are intentionally deferred until the phase that first needs them.
+
+## D013 — Compare post-SFT methods as independent branches first
+
+**Status:** ACCEPTED
+
+Verifier-filtered self-training and verifier-reward reinforcement learning are initially separate experiments, not a mandatory sequential pipeline.
+
+After the first full SFT cycle is evaluated, select one reference SFT checkpoint without tuning against the held-out benchmark test split. Retain that checkpoint as the control and use it as the **same initialization** for both post-training branches:
+
+- Branch A: verifier-filtered self-training using Lean-verified synthetic proofs as additional supervised targets;
+- Branch B: GRPO / reinforcement learning from verifier reward.
+
+The first Branch B experiment uses a binary outcome reward: `1` only when the final reconstructed theorem is `verified` by the accepted Lean evaluator, and `0` otherwise. It must not initialize from Branch A for the first comparison.
+
+Where practical, the two branches should use the same theorem-source pool and comparable candidate-generation budgets. Their final evaluation must use the same prompt, Lean environment, verifier semantics, held-out workloads, and generation settings so differences can be attributed to the post-training method rather than the evaluator.
+
+If binary GRPO produces insufficient positive reward density or useful within-group variation, preserve that as an experimental result. Syntax validity, elaboration success, tactic/proof-state progress, or other reward shaping may then be tested only as a **separate named variant** with an explicit reward contract; do not silently change the reward during the binary experiment. Any partial reward must remain secondary to complete verifier success rather than becoming an alternative objective.
+
+Only after the independent comparison may a later experiment compose the methods, for example verifier-filtered self-training followed by GRPO, to test whether their gains are complementary.
+
+**Exact candidate counts, theorem pool, training budgets, GRPO group size, sparse-reward stopping rule, and any shaped-reward formula:** OPEN

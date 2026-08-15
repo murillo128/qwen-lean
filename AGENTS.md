@@ -131,6 +131,8 @@ Never force-push or rewrite shared history without explicit user approval.
 - Avoid unrelated formatting changes.
 - Commit messages should describe one intentional outcome.
 - Direct commits to the default branch require explicit user instruction; otherwise use a feature branch and draft pull request.
+- Codex implementation workflows end at a **ready-for-review** pull request and handoff; Codex must not merge or enable auto-merge.
+- Merge requires an explicit user instruction in a later user-facing review interaction after ChatGPT/user review; issue acceptance, CI success, or independent-review `PASS` alone is not merge authorization.
 
 ## Current work
 

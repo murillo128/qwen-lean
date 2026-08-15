@@ -19,7 +19,7 @@ The design authority owns:
 - the issue's initial readiness and any design-authority state transition;
 - a separate concise explanation to the user of how the designed mechanism works when that helps them learn the project.
 
-It does not implement code, operate branches, publish commits, or perform independent review.
+It does not implement code, operate branches, publish commits, perform independent review, or grant the executor merge authority.
 
 ## Assume a fresh executor
 
@@ -82,7 +82,9 @@ Depending on the phase, include:
 
 Use precise names, paths, values, examples, and equations where they remove ambiguity.
 
-Do not copy generic Git, publication, review, label, or reporting procedure already owned by skills. Do not duplicate chronological histories, complete logs, routine GitHub metadata, or user-oriented teaching content.
+Do not copy generic Git, publication, review, label, merge, or reporting procedure already owned by skills. Do not duplicate chronological histories, complete logs, routine GitHub metadata, or user-oriented teaching content.
+
+An issue may state observable post-merge completion conditions, but it must not authorize Codex/the executor to merge or enable auto-merge. The repository GitHub workflow owns that boundary: Codex delivers a ready-for-review PR; a later explicit user/ChatGPT review decides whether to merge.
 
 ## Readiness
 
@@ -151,7 +153,7 @@ A checkpoint defines:
 - evidence to inspect or reproduce;
 - what would make progression unsafe.
 
-When the last checkpoint can inspect the complete final diff and all remaining acceptance criteria, it can be declared **final-capable**.
+When the last checkpoint can inspect the complete final diff and all remaining acceptance criteria, it can be declared **final-capable**. A final-capable verdict is a technical gate to the ready-for-review handoff, not merge authorization.
 
 ### 7. Define dependency and publication boundaries
 
@@ -192,6 +194,7 @@ Before marking the issue `execution-ready`, confirm:
 - review checkpoints, if any, match distinct risks;
 - dependency and external-evidence boundaries are explicit when applicable;
 - no user-oriented tutorial content has been added merely for pedagogy;
+- no issue text grants the executor merge or auto-merge authority;
 - `execution-ready` is the issue's only state label.
 
 Then ensure the assistant response explains any non-obvious mechanism to the user separately and at an appropriate level.
@@ -225,7 +228,7 @@ Then ensure the assistant response explains any non-obvious mechanism to the use
 <Only distinct material-risk checkpoints; mark the last one final-capable when applicable.>
 
 ## Delivery
-<PR shape, dependency/publication boundaries, and observable completion.>
+<PR shape, dependency/publication boundaries, ready-for-review handoff, and observable post-merge completion. Do not authorize executor merge.>
 ```
 
 Add or split sections when technical completeness requires it.
