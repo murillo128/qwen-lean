@@ -1,0 +1,124 @@
+{
+  "accepted_checkpoint_step": 600,
+  "checkpoints": [
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-100",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 100,
+      "teacher_forced": {
+        "correct_target_tokens": 2755,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.040915009928947504,
+        "target_token_next_token_accuracy": 0.9895833333333334,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.450735646001704
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 22,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "failed"
+    },
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-200",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 200,
+      "teacher_forced": {
+        "correct_target_tokens": 2766,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.031315740111589045,
+        "target_token_next_token_accuracy": 0.9935344827586207,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.491286330994626
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 34,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "failed"
+    },
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-300",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 300,
+      "teacher_forced": {
+        "correct_target_tokens": 2780,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.008564742851732084,
+        "target_token_next_token_accuracy": 0.9985632183908046,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.483718744995713
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 44,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "failed"
+    },
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-400",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 400,
+      "teacher_forced": {
+        "correct_target_tokens": 2771,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.02869840660323148,
+        "target_token_next_token_accuracy": 0.9953304597701149,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.495888623998326
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 43,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "failed"
+    },
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-500",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 500,
+      "teacher_forced": {
+        "correct_target_tokens": 2775,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.021288860767903126,
+        "target_token_next_token_accuracy": 0.9967672413793104,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.493264470998838
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 44,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "failed"
+    },
+    {
+      "adapter_ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-600",
+      "generation_time_contract_status": "failed",
+      "generation_time_minimum_exact_matches": 56,
+      "optimizer_step": 600,
+      "teacher_forced": {
+        "correct_target_tokens": 2775,
+        "examples": 64,
+        "mean_target_token_cross_entropy": 0.023710844909042007,
+        "target_token_next_token_accuracy": 0.9967672413793104,
+        "target_tokens": 2784,
+        "wall_time_seconds": 8.484638287998678
+      },
+      "teacher_forced_eligible": true,
+      "vllm_exact_matches": 49,
+      "vllm_generation_infrastructure_errors": 0,
+      "vllm_minimum_exact_matches": 48,
+      "vllm_status": "passed"
+    }
+  ],
+  "detailed_candidate_outputs_retained_outside_git": true,
+  "maximum_optimizer_steps": 600,
+  "schema_version": "phase3-checkpoint-memorization-series-v1",
+  "status": "passed",
+  "stopping_contract": "existing step-600 checkpoint with CE <= 0.05, accuracy >= 99.5%, at least 48/64 exact BF16 vLLM continuations, and at least 48/64 Lean-accepted raw continuations"
+}

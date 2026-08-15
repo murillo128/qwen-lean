@@ -44,11 +44,12 @@ def validate_record_source_identity(
     return source
 
 
-def _run_lean_source(
+def run_lean_source(
     source: str,
     mathlib_root: Path,
     *,
     timeout_seconds: float,
+    lean_environment_root: Path | None = None,
 ) -> LeanCheck:
     started = time.perf_counter()
     try:
@@ -57,7 +58,9 @@ def _run_lean_source(
             source_path.write_text(source, encoding="utf-8", newline="\n")
             completed = subprocess.run(
                 ["lake", "env", "lean", "-E", "hasSorry", str(source_path)],
-                cwd=mathlib_root,
+                cwd=mathlib_root
+                if lean_environment_root is None
+                else lean_environment_root,
                 text=True,
                 capture_output=True,
                 timeout=timeout_seconds,
@@ -78,8 +81,18 @@ def _run_lean_source(
     diagnostic = (completed.stderr + "\n" + completed.stdout).replace(
         str(source_path), "Reconstructed.lean"
     )
-    has_error = any(": error:" in line for line in diagnostic.splitlines())
-    status = "accepted" if completed.returncode == 0 and not has_error else "rejected"
+    lines = diagnostic.splitlines()
+    has_error = any(": error:" in line or ": error(" in line for line in lines)
+    if completed.returncode == 0 and not has_error:
+        status = "accepted"
+    elif any(
+        line.startswith("Reconstructed.lean:")
+        and (": error:" in line or ": error(" in line)
+        for line in lines
+    ):
+        status = "rejected"
+    else:
+        status = "infrastructure_error"
     return LeanCheck(
         status,
         completed.returncode,
@@ -188,13 +201,11 @@ def verify_phase2_sample(
                 "negative_substitution": None,
             }
         reconstructed = substitute_span(source, record.proof_span, record.proof)
-        original = _run_lean_source(
-            reconstructed, mathlib_root, timeout_seconds=timeout
-        )
+        original = run_lean_source(reconstructed, mathlib_root, timeout_seconds=timeout)
         negative: LeanCheck | None = None
         if record.id in negative_ids:
             controlled = substitute_span(source, record.proof_span, INVALID_PROOF)
-            negative = _run_lean_source(
+            negative = run_lean_source(
                 controlled, mathlib_root, timeout_seconds=timeout
             )
         return {

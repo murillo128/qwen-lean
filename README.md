@@ -179,6 +179,85 @@ uv run --frozen --extra phase2 qwen-lean phase2-loader-smoke \
 
 Phase 2 does not publish the corpus or train a model.
 
+## Phase 3 QLoRA sanity path
+
+Phase 3 materializes `phase3-overfit64-v1` from the Phase 2 `train` split using
+the pinned Qwen tokenizer, then trains the target-only `mathlib-sft-v1`
+serialization. The training extra pins TRL, PEFT, and bitsandbytes alongside the
+unchanged model stack. Workload data, trainer state, and adapter weights remain
+under ignored `artifacts/`.
+
+Materialize the fixed workload and run the real-GPU preflight before training:
+
+```bash
+uv run --frozen --extra training qwen-lean phase3-materialize \
+  --artifact-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --output artifacts/phase3/workload.json
+uv run --frozen --extra training qwen-lean phase3-preflight \
+  --workload artifacts/phase3/workload.json \
+  --output artifacts/phase3/preflight.json
+uv run --frozen --extra training qwen-lean phase3-train \
+  --workload artifacts/phase3/workload.json \
+  --output-dir artifacts/phase3/training-amended \
+  --target-step 100
+```
+
+Each eligible 100-step checkpoint must pass the required local-vLLM memorization
+gate in a fresh process. If it fails, resume the same optimizer trajectory exactly
+one boundary at a time; do not warm-start an adapter with a reset optimizer:
+
+```bash
+uv run --frozen --extra baseline qwen-lean phase3-memorization \
+  --workload artifacts/phase3/workload.json \
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-100 \
+  --optimizer-step 100 \
+  --output artifacts/phase3/memorization-amended/step-100.json
+uv run --frozen --extra training qwen-lean phase3-train \
+  --workload artifacts/phase3/workload.json \
+  --output-dir artifacts/phase3/training-amended \
+  --target-step 200 \
+  --resume-from-checkpoint \
+    artifacts/phase3/training-amended/trainer-state/checkpoint-100
+```
+
+The superseding Phase 3 gate accepts the existing step-600 checkpoint when its
+full-set teacher-forced CE is at most `0.05`, target-token accuracy is at least
+`99.5%`, and fresh BF16 vLLM produces at least 48/64 exact continuations with no
+generation infrastructure errors. Verify those same raw continuations in their
+pinned original mathlib source contexts before running the miniF2F smoke:
+
+```bash
+uv run --frozen --extra training qwen-lean phase3-adapter-reload \
+  --workload artifacts/phase3/workload.json \
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-600 \
+  --output artifacts/phase3/adapter-reload-amended.json
+uv run --frozen qwen-lean phase3-semantic-verify \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root .lake/packages/mathlib \
+  --memorization artifacts/phase3/memorization-amended/step-600.json \
+  --training artifacts/phase3/training-amended/run.json \
+  --output artifacts/phase3/semantic-verification-step-600.json
+uv run --frozen --extra baseline qwen-lean phase3-adapter-smoke \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --adapter-dir artifacts/phase3/training-amended/trainer-state/checkpoint-600 \
+  --output-dir artifacts/phase3/minif2f-smoke-step-600
+```
+
+The semantic gate attempts all 64 candidates and requires at least 48 Lean
+acceptances with zero verifier infrastructure errors and unresolved timeouts. It
+uses only transport normalization and inserts each raw continuation directly
+after `by\n  `; it does not extract or repair generated text. The miniF2F smoke is
+a plumbing gate, so zero verified proofs is allowed when all 16 candidates are
+generated and checked without infrastructure failures.
+
+Compact evidence can be generated after the required local artifacts exist:
+
+```bash
+uv run qwen-lean phase3-evidence \
+  --artifact-dir artifacts/phase3 \
+  --evidence-dir evidence/phase3
+```
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

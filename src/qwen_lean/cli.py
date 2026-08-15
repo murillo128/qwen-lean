@@ -16,6 +16,24 @@ from .minif2f import Phase1Config
 from .phase2_corpus import load_phase2_dataset
 from .phase2_extraction import Phase2Config, write_compact_evidence
 from .phase2_verification import verify_phase2_sample
+from .phase3 import (
+    Phase3Config,
+    load_phase2_train_records,
+    load_pinned_tokenizer,
+    select_overfit_workload,
+    write_phase3_workload,
+)
+from .phase3_inference import (
+    run_adapter_minif2f_smoke,
+    run_vllm_memorization,
+)
+from .phase3_evidence import write_phase3_evidence
+from .phase3_training import (
+    run_adapter_reload_check,
+    run_overfit_training,
+    run_training_preflight,
+)
+from .phase3_verification import run_phase3_semantic_verification
 
 
 def _project_root() -> Path:
@@ -105,6 +123,94 @@ def _parser() -> argparse.ArgumentParser:
     phase2_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase2_evidence.add_argument("--verification", type=Path)
     phase2_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    phase3_materialize = subparsers.add_parser(
+        "phase3-materialize",
+        help="materialize the deterministic Phase 3 overfit workload",
+    )
+    phase3_materialize.add_argument("--artifact-dir", type=Path, required=True)
+    phase3_materialize.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_materialize.add_argument("--output", type=Path, required=True)
+
+    phase3_preflight = subparsers.add_parser(
+        "phase3-preflight", help="run the one-step QLoRA GPU preflight"
+    )
+    phase3_preflight.add_argument("--workload", type=Path, required=True)
+    phase3_preflight.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_preflight.add_argument("--output", type=Path, required=True)
+
+    phase3_train = subparsers.add_parser(
+        "phase3-train", help="overfit the fixed 64-example Phase 3 workload"
+    )
+    phase3_train.add_argument("--workload", type=Path, required=True)
+    phase3_train.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_train.add_argument("--output-dir", type=Path, required=True)
+    phase3_train.add_argument("--target-step", type=int, required=True)
+    phase3_train.add_argument("--resume-from-checkpoint", type=Path)
+
+    phase3_reload = subparsers.add_parser(
+        "phase3-adapter-reload", help="reload the saved PEFT adapter on the pinned base"
+    )
+    phase3_reload.add_argument("--workload", type=Path, required=True)
+    phase3_reload.add_argument("--adapter-dir", type=Path, required=True)
+    phase3_reload.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_reload.add_argument("--output", type=Path, required=True)
+
+    phase3_memorization = subparsers.add_parser(
+        "phase3-memorization", help="run the adapter-backed vLLM overfit probe"
+    )
+    phase3_memorization.add_argument("--workload", type=Path, required=True)
+    phase3_memorization.add_argument("--adapter-dir", type=Path, required=True)
+    phase3_memorization.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_memorization.add_argument("--output", type=Path, required=True)
+    phase3_memorization.add_argument("--optimizer-step", type=int)
+
+    phase3_smoke = subparsers.add_parser(
+        "phase3-adapter-smoke", help="run the adapter-backed miniF2F dev16 Lean smoke"
+    )
+    phase3_smoke.add_argument("--benchmark-root", type=Path, required=True)
+    phase3_smoke.add_argument("--adapter-dir", type=Path, required=True)
+    phase3_smoke.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_smoke.add_argument("--output-dir", type=Path, required=True)
+    phase3_smoke.add_argument("--timeout", type=float, default=30.0)
+    phase3_smoke.add_argument("--verification-workers", type=int, default=8)
+
+    phase3_semantic = subparsers.add_parser(
+        "phase3-semantic-verify",
+        help="verify the raw step-600 continuations in original mathlib contexts",
+    )
+    phase3_semantic.add_argument("--dataset-dir", type=Path, required=True)
+    phase3_semantic.add_argument("--mathlib-root", type=Path, required=True)
+    phase3_semantic.add_argument("--memorization", type=Path, required=True)
+    phase3_semantic.add_argument("--training", type=Path, required=True)
+    phase3_semantic.add_argument("--output", type=Path, required=True)
+    phase3_semantic.add_argument("--optimizer-step", type=int, default=600)
+    phase3_semantic.add_argument("--workers", type=int)
+    phase3_semantic.add_argument("--timeout", type=float)
+    phase3_semantic.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_semantic.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    phase3_evidence = subparsers.add_parser(
+        "phase3-evidence", help="write compact evidence from local Phase 3 artifacts"
+    )
+    phase3_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    phase3_evidence.add_argument("--evidence-dir", type=Path, required=True)
     return parser
 
 
@@ -208,6 +314,116 @@ def main(argv: list[str] | None = None) -> int:
             args.evidence_dir,
             verification_path=args.verification,
         )
+        print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "phase3-materialize":
+        config = Phase3Config.load(args.config)
+        tokenizer = load_pinned_tokenizer(config)
+        examples, eligible = select_overfit_workload(
+            load_phase2_train_records(args.artifact_dir), tokenizer, config
+        )
+        write_phase3_workload(
+            args.output,
+            config,
+            examples,
+            eligible_examples=eligible,
+            eos_token_id=int(tokenizer.eos_token_id),
+        )
+        print(
+            json.dumps(
+                {
+                    "workload_id": config.workload["id"],
+                    "eligible_examples": eligible,
+                    "selected_examples": len(examples),
+                    "output": str(args.output),
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.command == "phase3-preflight":
+        value = run_training_preflight(
+            Phase3Config.load(args.config), args.workload, args.output
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase3-train":
+        value = run_overfit_training(
+            Phase3Config.load(args.config),
+            args.workload,
+            args.output_dir,
+            target_step=args.target_step,
+            resume_from_checkpoint=args.resume_from_checkpoint,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase3-adapter-reload":
+        value = run_adapter_reload_check(
+            Phase3Config.load(args.config),
+            args.workload,
+            args.adapter_dir,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase3-memorization":
+        value = run_vllm_memorization(
+            Phase3Config.load(args.config),
+            args.workload,
+            args.adapter_dir,
+            args.output,
+            optimizer_step=args.optimizer_step,
+        )
+        print(
+            json.dumps(
+                {
+                    "status": value["status"],
+                    "exact_matches": value["exact_matches"],
+                    "examples": value["examples"],
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.command == "phase3-adapter-smoke":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_adapter_minif2f_smoke(
+            Phase3Config.load(args.config),
+            args.benchmark_root,
+            args.adapter_dir,
+            args.output_dir,
+            timeout_seconds=args.timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase3-semantic-verify":
+        evidence = run_phase3_semantic_verification(
+            Phase3Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.memorization,
+            args.training,
+            args.output,
+            optimizer_step=args.optimizer_step,
+            workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(evidence["summary"], indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "phase3-evidence":
+        write_phase3_evidence(args.artifact_dir, args.evidence_dir)
         print(str(args.evidence_dir))
         return 0
 

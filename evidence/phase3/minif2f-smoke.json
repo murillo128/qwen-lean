@@ -1,0 +1,192 @@
+{
+  "adapter": {
+    "artifact_id": "phase3-overfit64-v1-lora",
+    "ignored_local_path": "artifacts/phase3/training-amended/trainer-state/checkpoint-600",
+    "merged": false,
+    "rank": 16
+  },
+  "benchmark_repository": "google-deepmind/miniF2F",
+  "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+  "candidate_results_retained_outside_git": true,
+  "generation_settings": {
+    "candidates_per_task": 1,
+    "chat_template": null,
+    "do_sample": false,
+    "dtype": "bfloat16",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_new_tokens": 256,
+    "max_num_seqs": 32,
+    "prompt_transformation": null,
+    "quantization": null,
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit",
+    "temperature": 0.0,
+    "tensor_parallel_size": 1,
+    "top_k": -1,
+    "top_p": 1.0
+  },
+  "inference_engine": "vllm",
+  "inference_engine_version": "0.10.2",
+  "lean_toolchain": "leanprover/lean4:v4.27.0",
+  "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "generation_wall_time_seconds": 57.201549524004804,
+    "inference_execution": "local_cuda",
+    "python": "3.12.14",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8",
+    "verification_wall_time_seconds": 24.895808651999687,
+    "verification_workers": 8
+  },
+  "schema_version": "phase3-minif2f-adapter-smoke-evidence-v1",
+  "status": "passed",
+  "summary": {
+    "adapter_enabled": true,
+    "adapter_id": "phase3-overfit64-v1-lora",
+    "candidate_count": 16,
+    "candidates_per_task": 1,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 16,
+      "verified": 0,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 1.0,
+      "verified": 0.0,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "completeness_errors": [],
+    "expected_candidates": 16,
+    "finish_reason_counts": {
+      "eos": 8,
+      "token_limit": 8
+    },
+    "infrastructure_error_count": 0,
+    "infrastructure_errors": 0,
+    "observed_candidates": 16,
+    "pass_at_k": {
+      "pass@1": 0.0
+    },
+    "per_task": [
+      {
+        "candidate_count": 1,
+        "task_id": "aimeII_2001_p3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aimeII_2020_p6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aimeI_2000_p7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1983_p9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1984_p15",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1984_p5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1987_p8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1988_p3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1988_p4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1990_p2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1991_p1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1991_p6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1994_p4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1996_p5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "aime_1997_p11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 1,
+        "task_id": "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i",
+        "verified_candidate_count": 0
+      }
+    ],
+    "phase1_quality_comparable": false,
+    "phase3_pipeline_smoke": true,
+    "phase3_smoke_passed": true,
+    "run_wall_time_seconds": 82.09735817600449,
+    "schema_version": "phase1-summary-v1",
+    "task_count": 16,
+    "tasks_with_verified_candidate": {
+      "count": 0,
+      "fraction": 0.0
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 15.20092998650125,
+      "candidate_total_latency_sum": 243.21487978402,
+      "generation_candidate_latency_mean": 3.2284486463131543,
+      "generation_candidate_latency_sum": 51.65517834101047,
+      "verification_latency_mean": 11.972481340188097,
+      "verification_latency_sum": 191.55970144300954
+    },
+    "verifier_timeout_count": 0,
+    "workload_id": "minif2f-valid-dev16-v1"
+  },
+  "workload_id": "minif2f-valid-dev16-v1"
+}

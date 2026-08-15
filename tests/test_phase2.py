@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -29,6 +30,7 @@ from qwen_lean.phase2_schema import (
     SourcePosition,
     SourceSpan,
 )
+from qwen_lean.phase2_verification import run_lean_source
 
 SOURCE_REPOSITORY = "https://github.com/leanprover-community/mathlib4"
 SOURCE_REVISION = "81a5d257c8e410db227a6665ed08f64fea08e997"
@@ -40,6 +42,36 @@ class WordTokenizer:
     def encode(self, text: str, *, add_special_tokens: bool) -> list[str]:
         assert add_special_tokens is False
         return text.split()
+
+
+@pytest.mark.parametrize(
+    ("diagnostic", "expected_status"),
+    [
+        (
+            "Reconstructed.lean:1:1: error(lean.unknownIdentifier): Unknown identifier",
+            "rejected",
+        ),
+        ("error: external command 'git' exited with code 128", "infrastructure_error"),
+    ],
+)
+def test_lean_check_distinguishes_source_rejection_from_infrastructure_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    diagnostic: str,
+    expected_status: str,
+) -> None:
+    monkeypatch.setattr(
+        "qwen_lean.phase2_verification.subprocess.run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args=args, returncode=1, stdout="", stderr=diagnostic
+        ),
+    )
+
+    outcome = run_lean_source(
+        "theorem example : True := by trivial", tmp_path, timeout_seconds=1
+    )
+
+    assert outcome.status == expected_status
 
 
 def test_phase2_config_matches_project_source_and_tokenizer_pins() -> None:

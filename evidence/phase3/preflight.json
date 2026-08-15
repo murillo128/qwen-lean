@@ -1,0 +1,76 @@
+{
+  "adapter_parameter_changed": true,
+  "adapter_parameter_checked": "base_model.model.model.layers.0.self_attn.q_proj.lora_B.default.weight",
+  "all_gradients_finite": true,
+  "batch": {
+    "completion_tokens_excluding_eos": 18,
+    "gradient_accumulation_steps": 4,
+    "micro_batch_size": 1,
+    "prompt_tokens": 48,
+    "sequence_tokens": 67,
+    "supervised_tokens_including_eos": 19
+  },
+  "frozen_parameter_checked": "base_model.model.model.layers.0.self_attn.q_proj.base_layer.weight",
+  "frozen_parameter_unchanged": true,
+  "gradient_norm_before_clipping": 3.9927167892456055,
+  "lora": {
+    "artifact_id": "phase3-overfit64-v1-lora",
+    "bias": "none",
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "modules_to_save": null,
+    "r": 16,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "loss": 3.948789596557617,
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "packages": {
+    "accelerate": "1.10.1",
+    "bitsandbytes": "0.47.0",
+    "datasets": "4.0.0",
+    "peft": "0.17.1",
+    "torch": "2.8.0",
+    "transformers": "4.55.4",
+    "trl": "0.22.2"
+  },
+  "passed": true,
+  "quantization": {
+    "compute_dtype": "bfloat16",
+    "double_quantization": true,
+    "load_in_4bit": true,
+    "quantization_type": "nf4"
+  },
+  "quantized_linear_modules": 252,
+  "record_id": "d82c86dae0327212dfef64021c4e09e40daac521093965d46c3f7fb0997cd394",
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "inference_execution": "local_cuda",
+    "peak_cuda_allocated_bytes": 9986938368,
+    "peak_cuda_reserved_bytes": 13056868352,
+    "python": "3.12.14",
+    "torch_cuda_version": "12.8"
+  },
+  "schema_version": "phase3-preflight-v1",
+  "tokenizer_id": "Qwen/Qwen3-8B-Base",
+  "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "total_parameter_count": 4761498624,
+  "trainable_parameter_count": 43646976,
+  "trainable_parameter_fraction": 0.009166646773770023,
+  "workload_id": "phase3-overfit64-v1"
+}

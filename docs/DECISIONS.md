@@ -170,3 +170,18 @@ If binary GRPO produces insufficient positive reward density or useful within-gr
 Only after the independent comparison may a later experiment compose the methods, for example verifier-filtered self-training followed by GRPO, to test whether their gains are complementary.
 
 **Exact candidate counts, theorem pool, training budgets, GRPO group size, sparse-reward stopping rule, and any shaped-reward formula:** OPEN
+
+## D014 — First-SFT serialization and loss mask
+
+**Status:** ACCEPTED
+
+`mathlib-sft-v1` trains the plain `whole-proof-v1` proof-request suffix without
+the source-file preamble: the shared instruction, retained canonical declaration,
+and `:= by\n  ` prefix are followed by the exact retained Phase 2 completion and
+one tokenizer EOS token. No chat template or other hidden prompt transformation
+is applied.
+
+The causal-LM objective supervises only the completion and terminal EOS. Prompt
+tokens, padding, and batch-fill tokens have label `-100`; examples are not packed
+or silently truncated. Phase-local sanity hyperparameters do not belong to this
+durable serialization and masking contract.
