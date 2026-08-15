@@ -150,4 +150,30 @@ The project needs enough metadata to understand what was run and make fair compa
 
 For material comparisons, record the model/tokenizer, dataset/split, relevant training or generation configuration, Lean/evaluation contract, hardware details that affect interpretation, and produced metrics. Deterministic seeds, repeated runs, immutable hashes, and extensive provenance are used when they matter to the question being answered, not as universal requirements.
 
-Future-phase details such as verifier-filtered self-training policy, RL reward shaping, and tactic-level search architecture are intentionally deferred until their phase becomes active rather than recorded as premature decisions here.
+Tactic-level search architecture and other later-milestone details remain deferred until their phase becomes active rather than being recorded prematurely.
+
+## D013 — Isolate self-training and RL before composing them
+
+**Status:** ACCEPTED
+
+After the first full SFT experiment is evaluated, select one common SFT checkpoint as the control and starting point for the first two post-SFT experiments.
+
+Run verifier-filtered self-training and verifier-reward RL as independent sibling branches from that same SFT checkpoint:
+
+- branch A applies verifier-filtered self-training;
+- branch B applies GRPO/RLVR;
+- branch B must not start from branch A, and branch A must not consume an RL checkpoint.
+
+Where practical, use the same or deliberately comparable theorem pool and keep the held-out evaluation contract identical so differences can be attributed to the post-training method rather than to a different starting model or benchmark.
+
+Evaluate the common SFT control, branch A, and branch B directly before attempting a composed `self-training -> RL` pipeline. Composition is a later experiment justified by the independent comparison, not part of either primary branch.
+
+## D014 — First GRPO experiment uses verifier-only outcome reward
+
+**Status:** ACCEPTED
+
+The primary branch-B GRPO/RLVR experiment starts with the objective Lean verifier outcome as the reward signal: completed proofs accepted under the declared evaluator receive the positive outcome reward; unsuccessful candidates do not.
+
+Do not silently introduce syntax, elaboration, tactic-progress, or other shaped rewards into that primary run. If the binary verifier reward is empirically too sparse to train meaningfully, a shaped-reward variant may be designed as a separate named experiment and compared independently.
+
+This preserves a clean answer to whether verifier-only RL works after SFT while leaving reward shaping available as an explicit follow-up when evidence shows it is needed.
