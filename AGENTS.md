@@ -101,7 +101,7 @@ Large checkpoints, model weights, datasets, caches, and bulky logs belong outsid
 
 ## Inference execution
 
-All model inference and generation for this project must execute on project-controlled local GPU compute. Use the available NVIDIA Ada GPU unless a controlling issue explicitly identifies another project-controlled local device.
+All model inference and generation for this project must execute on project-controlled local GPU compute. The current default inference device is the available NVIDIA Ada GPU; a controlling issue may identify another project-controlled local device when needed.
 
 Artifact distribution is separate from inference execution. Hugging Face Hub or another artifact store may be used to download or cache models, tokenizers, adapters, or datasets, but model forward passes and generation must not be delegated to Hugging Face Jobs, Inference API/Endpoints, Spaces compute, or another hosted inference/GPU-job service.
 
