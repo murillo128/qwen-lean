@@ -57,7 +57,20 @@ def test_summary_uses_distinct_per_task_candidate_indices() -> None:
     assert summary["finish_reason_counts"] == {"eos": 8, "token_limit": 0}
 
 
-def test_infrastructure_error_makes_summary_incomplete_without_headline_metrics() -> None:
+def test_summary_omits_pass_at_k_larger_than_the_candidate_budget() -> None:
+    summary = summarize_results(
+        [_result("task-a", 0, "lean_rejected")],
+        expected_task_ids=["task-a"],
+        candidates_per_task=1,
+    )
+
+    assert summary["complete"] is True
+    assert summary["pass_at_k"] == {"pass@1": 0.0}
+
+
+def test_infrastructure_error_makes_summary_incomplete_without_headline_metrics() -> (
+    None
+):
     results = [
         _result("task-a", index, "generation_error" if index == 3 else "lean_rejected")
         for index in range(8)

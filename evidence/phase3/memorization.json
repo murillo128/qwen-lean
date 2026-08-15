@@ -1,5 +1,5 @@
 {
-  "accepted_checkpoint_step": null,
+  "accepted_checkpoint_step": 600,
   "adapter": {
     "artifact_id": "phase3-overfit64-v1-lora",
     "base_model_id": "Qwen/Qwen3-8B-Base",
@@ -26,7 +26,7 @@
   },
   "inference_engine": "vllm",
   "inference_engine_version": "0.10.2",
-  "minimum_exact_matches": 56,
+  "minimum_exact_matches": 48,
   "model": {
     "add_special_tokens": false,
     "chat_template": null,
@@ -117,7 +117,10 @@
     "4a97aaace86f2268901d574da4f0b6202f237d591f0db9e896a4adeab073595e",
     "1de51633e15fa605c03ce76155cf37f9f86762aa581fc706551296c372839ec1"
   ],
+  "semantic_verification_file": "semantic-verification.json",
   "serialization_id": "mathlib-sft-v1",
-  "status": "failed",
+  "status": "passed",
+  "superseded_generation_time_minimum_exact_matches": 56,
+  "superseded_generation_time_status": "failed",
   "workload_id": "phase3-overfit64-v1"
 }

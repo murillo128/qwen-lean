@@ -1,29 +1,17 @@
 {
-  "schema_version": "phase3-config-v1",
-  "model": {
-    "model_id": "Qwen/Qwen3-8B-Base",
-    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
-    "tokenizer_id": "Qwen/Qwen3-8B-Base",
-    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
-    "add_special_tokens": false,
-    "chat_template": null
+  "created_at": "2026-08-15T19:16:01.454860+00:00",
+  "eligibility": {
+    "maximum_target_cross_entropy": 0.05,
+    "mean_target_token_cross_entropy": 0.023710844909042007,
+    "minimum_target_accuracy": 0.995,
+    "minimum_vllm_exact_matches": 48,
+    "optimizer_step": 600,
+    "target_token_next_token_accuracy": 0.9967672413793104,
+    "vllm_exact_matches": 49
   },
-  "dataset": {
-    "schema_version": "mathlib-whole-proof-v1",
-    "split": "train"
-  },
-  "serialization": {
-    "id": "mathlib-sft-v1",
-    "supervise_prompt": false,
-    "supervise_eos": true
-  },
-  "workload": {
-    "id": "phase3-overfit64-v1",
-    "selection_hash_prefix": "phase3-overfit64-v1\u0000",
-    "expected_examples": 64,
-    "maximum_sequence_tokens": 512,
-    "minimum_completion_tokens": 8,
-    "maximum_completion_tokens": 128,
+  "inputs": {
+    "memorization_sha256": "5e2b1955377d6de954da81c42ae108c353a632c64c0208512e17539174ce9b06",
+    "optimizer_step": 600,
     "selected_record_ids": [
       "d82c86dae0327212dfef64021c4e09e40daac521093965d46c3f7fb0997cd394",
       "e8397e2dba214695e2ebfc0f488655d7dce2da3faf4c45ab4f1b73697f6e2688",
@@ -89,74 +77,35 @@
       "8b527fb57395b82e34cf74ea72d173a8882c597f3cee86d065d233be59f3db73",
       "4a97aaace86f2268901d574da4f0b6202f237d591f0db9e896a4adeab073595e",
       "1de51633e15fa605c03ce76155cf37f9f86762aa581fc706551296c372839ec1"
-    ]
-  },
-  "quantization": {
-    "load_in_4bit": true,
-    "quantization_type": "nf4",
-    "double_quantization": true,
-    "compute_dtype": "bfloat16"
-  },
-  "lora": {
-    "artifact_id": "phase3-overfit64-v1-lora",
-    "task_type": "CAUSAL_LM",
-    "r": 16,
-    "lora_alpha": 32,
-    "lora_dropout": 0.0,
-    "bias": "none",
-    "target_modules": [
-      "q_proj",
-      "k_proj",
-      "v_proj",
-      "o_proj",
-      "gate_proj",
-      "up_proj",
-      "down_proj"
     ],
-    "modules_to_save": null
+    "training_sha256": "9dc4b77ca0e3fc8d4670363cf865aacd4708a5f64f38582e44bae9c2620e5ad8"
   },
-  "training": {
-    "trainer": "trl-sft",
-    "per_device_micro_batch_size": 1,
-    "gradient_accumulation_steps": 4,
-    "maximum_sequence_tokens": 512,
-    "optimizer": "paged_adamw_8bit",
-    "learning_rate": 0.0002,
-    "weight_decay": 0.0,
-    "maximum_gradient_norm": 1.0,
-    "lr_schedule": "constant",
-    "warmup_steps": 0,
-    "seed": 0,
-    "packing": false,
-    "gradient_checkpointing": true,
-    "maximum_optimizer_steps": 600,
-    "memorization_probe_interval_steps": 100,
-    "target_cross_entropy_threshold": 0.2,
-    "target_accuracy_threshold": 0.97
+  "per_record_results_retained_outside_git": true,
+  "pipeline_interpretation": "training-workload semantic verification, not held-out generalization",
+  "reconstruction_contract": {
+    "candidate_extraction_or_repair": false,
+    "lean_command": "lake env lean -E hasSorry Reconstructed.lean",
+    "replacement": "by\\n  + normalize_transport(raw_candidate)",
+    "source_context": "pinned original Phase 2 mathlib file"
   },
-  "memorization_generation": {
-    "candidates_per_prompt": 1,
-    "do_sample": false,
-    "temperature": 0.0,
-    "max_new_tokens": 160,
-    "minimum_exact_matches": 48
+  "schema_version": "phase3-training-set-lean-verification-v1",
+  "source": {
+    "dataset_schema_version": "mathlib-whole-proof-v1",
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997"
   },
-  "semantic_verification": {
+  "status": "passed",
+  "summary": {
+    "attempted": 64,
+    "exact_and_lean_accepted": 48,
+    "infrastructure_errors": 0,
+    "lean_accepted": 49,
+    "lean_rejected": 15,
     "minimum_lean_accepted": 48,
-    "maximum_target_cross_entropy": 0.05,
-    "minimum_target_accuracy": 0.995,
-    "workers": 8,
-    "timeout_seconds": 300.0
-  },
-  "minif2f_smoke": {
-    "phase1_config": "config/phase1-minif2f.json",
-    "workload_id": "minif2f-valid-dev16-v1",
-    "candidates_per_task": 1,
-    "do_sample": false,
-    "temperature": 0.0,
-    "top_p": 1.0,
-    "top_k": -1,
-    "max_new_tokens": 256,
-    "seed": 0
+    "non_exact_and_lean_accepted": 1,
+    "normalized_exact_matches": 49,
+    "passed": true,
+    "timeouts": 0
   }
 }

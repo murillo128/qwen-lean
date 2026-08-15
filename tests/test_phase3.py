@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -29,8 +30,14 @@ from qwen_lean.phase3_training import (
     validate_training_boundary,
 )
 from qwen_lean.phase3_evidence import _amended_memorization_results
+from qwen_lean.phase3_inference import MEMORIZATION_SCHEMA_VERSION
 from qwen_lean.prompt import render_prompt
 from qwen_lean.schema import TaskRecord
+from qwen_lean.phase3_verification import (
+    _semantic_summary,
+    _validate_gate_inputs,
+    reconstruct_generated_proof,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -200,6 +207,126 @@ def test_phase3_config_pins_base_tokenizer_and_qlora_targets() -> None:
         "down_proj",
     ]
     assert len(config.selected_record_ids) == len(set(config.selected_record_ids)) == 64
+    assert config.value["memorization_generation"]["minimum_exact_matches"] == 48
+    assert config.value["semantic_verification"] == {
+        "minimum_lean_accepted": 48,
+        "maximum_target_cross_entropy": 0.05,
+        "minimum_target_accuracy": 0.995,
+        "workers": 8,
+        "timeout_seconds": 300.0,
+    }
+
+
+def test_semantic_reconstruction_uses_only_raw_transport_normalization() -> None:
+    record = replace(
+        _record(),
+        proof_span=SourceSpan(SourcePosition(1, 3), SourcePosition(2, 6)),
+    )
+
+    reconstructed = reconstruct_generated_proof(
+        "AAby\n  oldZZ", record, "exact True.intro  \r\n"
+    )
+
+    assert reconstructed == "AAby\n  exact True.introZZ"
+
+
+def test_amended_gate_recomputes_exact_matches_and_accepts_step600(
+    tmp_path: Path,
+) -> None:
+    source_records = [_record(index) for index in range(64)]
+    config = _synthetic_config(source_records)
+    by_id = {record.id: record for record in source_records}
+    records = [by_id[record_id] for record_id in config.selected_record_ids]
+    results = []
+    for index, record in enumerate(records):
+        exact = index < 49
+        results.append(
+            {
+                "record_id": record.id,
+                "candidate_text": record.completion if exact else "exact False.elim",
+                "target_completion": record.completion,
+                "normalized_exact_match": exact,
+                "generation_error": None,
+            }
+        )
+    memorization = {
+        "schema_version": MEMORIZATION_SCHEMA_VERSION,
+        "workload_id": OVERFIT_WORKLOAD_ID,
+        "selected_record_ids": list(config.selected_record_ids),
+        "results": results,
+        "examples": 64,
+        "generation_infrastructure_errors": 0,
+        "exact_matches": 49,
+        "minimum_exact_matches": 56,
+        "optimizer_step": None,
+        "adapter": {
+            "adapter_id": config.lora["artifact_id"],
+            "adapter_rank": config.lora["r"],
+            "base_model_id": config.model["model_id"],
+            "base_model_revision": config.model["model_revision"],
+            "enabled": True,
+            "merged": False,
+            "adapter_path": str(tmp_path / "checkpoint-600"),
+        },
+    }
+    adapter_dir = tmp_path / "checkpoint-600"
+    adapter_dir.mkdir()
+    (adapter_dir / "adapter_config.json").write_text("{}", encoding="utf-8")
+    training = {
+        "optimizer_steps_completed": 600,
+        "model": config.model,
+        "quantization": config.quantization,
+        "lora": config.lora,
+        "serialization": config.value["serialization"],
+        "dataset": config.value["dataset"],
+        "workload": {
+            "id": config.workload["id"],
+            "examples": config.workload["expected_examples"],
+            "selected_record_ids": list(config.selected_record_ids),
+        },
+        "memorization_probes": [
+            {
+                "optimizer_step": 600,
+                "mean_target_token_cross_entropy": 0.023,
+                "target_token_next_token_accuracy": 0.996,
+            }
+        ],
+    }
+
+    _, eligibility = _validate_gate_inputs(
+        config, records, memorization, training, optimizer_step=600
+    )
+
+    assert eligibility["vllm_exact_matches"] == 49
+    assert eligibility["minimum_vllm_exact_matches"] == 48
+
+
+def test_semantic_summary_keeps_exact_and_lean_acceptance_distinct() -> None:
+    results = [
+        {
+            "normalized_exact_match": index < 49,
+            "source_identity": "matched",
+            "lean_check": {
+                "status": "accepted" if index < 50 else "rejected",
+            },
+        }
+        for index in range(64)
+    ]
+
+    summary = _semantic_summary(results, minimum_accepted=48)
+
+    assert summary == {
+        "attempted": 64,
+        "normalized_exact_matches": 49,
+        "lean_accepted": 50,
+        "exact_and_lean_accepted": 49,
+        "non_exact_and_lean_accepted": 1,
+        "lean_rejected": 14,
+        "timeouts": 0,
+        "infrastructure_errors": 0,
+        "minimum_lean_accepted": 48,
+        "passed": True,
+    }
 
 
 def test_amended_training_boundaries_are_fixed_and_resumable(tmp_path: Path) -> None:

@@ -33,6 +33,7 @@ from .phase3_training import (
     run_overfit_training,
     run_training_preflight,
 )
+from .phase3_verification import run_phase3_semantic_verification
 
 
 def _project_root() -> Path:
@@ -185,6 +186,25 @@ def _parser() -> argparse.ArgumentParser:
     phase3_smoke.add_argument("--output-dir", type=Path, required=True)
     phase3_smoke.add_argument("--timeout", type=float, default=30.0)
     phase3_smoke.add_argument("--verification-workers", type=int, default=8)
+
+    phase3_semantic = subparsers.add_parser(
+        "phase3-semantic-verify",
+        help="verify the raw step-600 continuations in original mathlib contexts",
+    )
+    phase3_semantic.add_argument("--dataset-dir", type=Path, required=True)
+    phase3_semantic.add_argument("--mathlib-root", type=Path, required=True)
+    phase3_semantic.add_argument("--memorization", type=Path, required=True)
+    phase3_semantic.add_argument("--training", type=Path, required=True)
+    phase3_semantic.add_argument("--output", type=Path, required=True)
+    phase3_semantic.add_argument("--optimizer-step", type=int, default=600)
+    phase3_semantic.add_argument("--workers", type=int)
+    phase3_semantic.add_argument("--timeout", type=float)
+    phase3_semantic.add_argument(
+        "--config", type=Path, default=root / "config/phase3-overfit.json"
+    )
+    phase3_semantic.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
 
     phase3_evidence = subparsers.add_parser(
         "phase3-evidence", help="write compact evidence from local Phase 3 artifacts"
@@ -384,6 +404,22 @@ def main(argv: list[str] | None = None) -> int:
             verification_workers=args.verification_workers,
         )
         print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase3-semantic-verify":
+        evidence = run_phase3_semantic_verification(
+            Phase3Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.memorization,
+            args.training,
+            args.output,
+            optimizer_step=args.optimizer_step,
+            workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(evidence["summary"], indent=2, sort_keys=True))
         return 0
 
     if args.command == "phase3-evidence":

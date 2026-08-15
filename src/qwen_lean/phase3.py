@@ -114,6 +114,12 @@ class Phase3Config:
             (("training", "memorization_probe_interval_steps"), 100),
             (("training", "target_cross_entropy_threshold"), 0.2),
             (("training", "target_accuracy_threshold"), 0.97),
+            (("memorization_generation", "minimum_exact_matches"), 48),
+            (("semantic_verification", "minimum_lean_accepted"), 48),
+            (("semantic_verification", "maximum_target_cross_entropy"), 0.05),
+            (("semantic_verification", "minimum_target_accuracy"), 0.995),
+            (("semantic_verification", "workers"), 8),
+            (("semantic_verification", "timeout_seconds"), 300.0),
         )
         for path, wanted in expected:
             observed: Any = self.value

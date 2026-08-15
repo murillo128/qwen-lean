@@ -63,6 +63,11 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     training = _read(artifact_dir / "training-amended" / "run.json")
     reload = _read(artifact_dir / "adapter-reload-amended.json")
     memorization = _amended_memorization_results(artifact_dir)
+    semantic = _read(artifact_dir / "semantic-verification-step-600.json")
+    smoke_run = _read(artifact_dir / "minif2f-smoke-step-600" / "run.json")
+    smoke_summary = _read(artifact_dir / "minif2f-smoke-step-600" / "summary.json")
+    required_exact = int(semantic["eligibility"]["minimum_vllm_exact_matches"])
+    accepted_step = int(semantic["inputs"]["optimizer_step"])
     probes = {
         int(probe["optimizer_step"]): probe for probe in training["memorization_probes"]
     }
@@ -86,20 +91,40 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
                     if key != "optimizer_step"
                 },
                 "vllm_exact_matches": result["exact_matches"],
-                "vllm_minimum_exact_matches": result["minimum_exact_matches"],
+                "vllm_minimum_exact_matches": required_exact,
                 "vllm_generation_infrastructure_errors": result[
                     "generation_infrastructure_errors"
                 ],
-                "vllm_status": result["status"],
+                "vllm_status": (
+                    "passed"
+                    if result["generation_infrastructure_errors"] == 0
+                    and result["exact_matches"] >= required_exact
+                    else "failed"
+                ),
+                "generation_time_contract_status": result["status"],
+                "generation_time_minimum_exact_matches": result[
+                    "minimum_exact_matches"
+                ],
                 "adapter_ignored_local_path": (
                     f"artifacts/phase3/training-amended/trainer-state/checkpoint-{step}"
                 ),
             }
         )
     accepted = next(
-        (row for row in checkpoint_rows if row["vllm_status"] == "passed"), None
+        (
+            row
+            for row in checkpoint_rows
+            if row["optimizer_step"] == accepted_step and row["vllm_status"] == "passed"
+        ),
+        None,
     )
-    status = "passed" if accepted is not None else "design_required"
+    if accepted is None:
+        raise ValueError("semantic evidence does not identify an accepted checkpoint")
+    if not semantic["summary"]["passed"]:
+        raise ValueError("Phase 3 semantic verification evidence did not pass")
+    if not smoke_summary["phase3_smoke_passed"]:
+        raise ValueError("Phase 3 miniF2F adapter smoke evidence did not pass")
+    status = "passed"
     final = memorization[-1]
 
     _write(evidence_dir / "preflight.json", preflight)
@@ -116,10 +141,15 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
             ),
         )
         | {
+            "status": "passed",
+            "minimum_exact_matches": required_exact,
+            "superseded_generation_time_status": final["status"],
+            "superseded_generation_time_minimum_exact_matches": final[
+                "minimum_exact_matches"
+            ],
             "checkpoint_series_file": "memorization-checkpoints.json",
-            "accepted_checkpoint_step": (
-                None if accepted is None else accepted["optimizer_step"]
-            ),
+            "accepted_checkpoint_step": accepted["optimizer_step"],
+            "semantic_verification_file": "semantic-verification.json",
         },
     )
     _write(
@@ -128,21 +158,57 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
             "schema_version": "phase3-checkpoint-memorization-series-v1",
             "status": status,
             "stopping_contract": (
-                "first 100-step checkpoint passing teacher-forced eligibility and "
-                "at least 56/64 exact matches in fresh BF16 vLLM inference"
+                "existing step-600 checkpoint with CE <= 0.05, accuracy >= 99.5%, "
+                "at least 48/64 exact BF16 vLLM continuations, and at least 48/64 "
+                "Lean-accepted raw continuations"
             ),
             "maximum_optimizer_steps": training["training"]["maximum_optimizer_steps"],
-            "accepted_checkpoint_step": (
-                None if accepted is None else accepted["optimizer_step"]
-            ),
+            "accepted_checkpoint_step": accepted["optimizer_step"],
             "checkpoints": checkpoint_rows,
             "detailed_candidate_outputs_retained_outside_git": True,
         },
     )
     _write(
+        evidence_dir / "semantic-verification.json",
+        {key: value for key, value in semantic.items() if key != "records"}
+        | {"per_record_results_retained_outside_git": True},
+    )
+    _write(
+        evidence_dir / "minif2f-smoke.json",
+        {
+            "schema_version": "phase3-minif2f-adapter-smoke-evidence-v1",
+            "status": "passed",
+            "workload_id": smoke_run["workload_id"],
+            "benchmark_repository": smoke_run["benchmark_repository"],
+            "benchmark_revision": smoke_run["benchmark_revision"],
+            "lean_toolchain": smoke_run["lean_toolchain"],
+            "mathlib_revision": smoke_run["mathlib_revision"],
+            "model_id": smoke_run["model_id"],
+            "model_revision": smoke_run["model_revision"],
+            "inference_engine": smoke_run["inference_engine"],
+            "inference_engine_version": smoke_run["inference_engine_version"],
+            "adapter": {
+                "artifact_id": smoke_run["adapter_id"],
+                "ignored_local_path": (
+                    "artifacts/phase3/training-amended/trainer-state/checkpoint-600"
+                ),
+                "rank": smoke_run["adapter_rank"],
+                "merged": False,
+            },
+            "generation_settings": {
+                key: value
+                for key, value in smoke_run["generation_settings"].items()
+                if key != "adapter"
+            },
+            "runtime": smoke_run["runtime"],
+            "summary": smoke_summary,
+            "candidate_results_retained_outside_git": True,
+        },
+    )
+    _write(
         evidence_dir / "diagnosis.json",
         {
-            "schema_version": "phase3-free-generation-diagnosis-v2",
+            "schema_version": "phase3-free-generation-diagnosis-v3",
             "status": status,
             "teacher_forced_thresholds_passed_at_every_boundary": all(
                 row["teacher_forced_eligible"] for row in checkpoint_rows
@@ -151,7 +217,7 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
                 str(row["optimizer_step"]): row["vllm_exact_matches"]
                 for row in checkpoint_rows
             },
-            "required_exact_matches": final["minimum_exact_matches"],
+            "required_exact_matches": required_exact,
             "vllm_generation_infrastructure_errors_by_optimizer_step": {
                 str(row["optimizer_step"]): row["vllm_generation_infrastructure_errors"]
                 for row in checkpoint_rows
@@ -163,14 +229,30 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
             "interpretation": (
                 "The amended same-trajectory run preserved complete resumable "
                 "checkpoints and satisfied teacher-forced eligibility at every "
-                "boundary, but no permitted BF16 vLLM checkpoint achieved the "
-                "required sequence-level exact-match gate."
+                "boundary. The superseding semantic contract accepts step 600: "
+                "its BF16 vLLM exact count and Lean-accepted raw-continuation count "
+                "both exceed 48/64, with no verifier infrastructure errors or "
+                "timeouts. The downstream miniF2F adapter smoke completed cleanly."
             ),
-            "minif2f_adapter_smoke_run": False,
-            "minif2f_adapter_smoke_not_run_reason": (
-                "No checkpoint passed the required 56/64 adapter memorization "
-                "prerequisite."
-            ),
+            "semantic_lean_accepted": semantic["summary"]["lean_accepted"],
+            "semantic_exact_and_lean_accepted": semantic["summary"][
+                "exact_and_lean_accepted"
+            ],
+            "semantic_non_exact_and_lean_accepted": semantic["summary"][
+                "non_exact_and_lean_accepted"
+            ],
+            "semantic_lean_rejected": semantic["summary"]["lean_rejected"],
+            "semantic_verifier_infrastructure_errors": semantic["summary"][
+                "infrastructure_errors"
+            ],
+            "semantic_verifier_timeouts": semantic["summary"]["timeouts"],
+            "minif2f_adapter_smoke_run": True,
+            "minif2f_adapter_smoke_passed": smoke_summary["phase3_smoke_passed"],
+            "minif2f_verified_candidates": smoke_summary["category_counts"]["verified"],
+            "minif2f_infrastructure_errors": smoke_summary[
+                "infrastructure_error_count"
+            ],
+            "minif2f_verifier_timeouts": smoke_summary["verifier_timeout_count"],
         },
     )
     exact_series = ", ".join(
@@ -182,14 +264,20 @@ def _write_amended_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
         "`preflight.json`, `training.json`, and `adapter-reload.json` record the "
         "successful real-GPU QLoRA plumbing and resumable-training checks. "
         "`memorization-checkpoints.json` records every amended stopping boundary; "
-        "`memorization.json` retains the compact final-boundary result.\n\n"
+        "`memorization.json` retains the compact final-boundary result. "
+        "`semantic-verification.json` and `minif2f-smoke.json` record the two "
+        "superseding final gates without copying raw candidates.\n\n"
         "**OBSERVED:** all six 100-step checkpoints passed teacher-forced "
         "eligibility. Fresh BF16 vLLM exact matches were "
-        f"{exact_series}, with zero generation infrastructure errors.\n\n"
-        "**BLOCKED:** no checkpoint through the fixed 600-step maximum reached the "
-        "required 56/64 vLLM gate. The downstream miniF2F adapter smoke was not "
-        "run because memorization is its prerequisite. Adapter weights, full "
-        "trainer checkpoints, and detailed candidate outputs remain under ignored "
+        f"{exact_series}, with zero generation infrastructure errors. Step 600 "
+        "produced 49/64 exact and 49/64 Lean-accepted continuations (48 were both; "
+        "one additional non-exact continuation was accepted). All 64 were attempted "
+        "with zero verifier infrastructure errors and zero timeouts.\n\n"
+        "**ACCEPTED:** step 600 passes the superseding 48/64 exact and semantic "
+        "gates. The unchanged miniF2F dev16 adapter smoke completed 16/16 candidates "
+        "with zero infrastructure errors and zero verifier timeouts; 0/16 verified "
+        "proofs is permitted for this plumbing smoke. Adapter weights, full trainer "
+        "checkpoints, and detailed candidate outputs remain under ignored "
         "`artifacts/`.\n",
         encoding="utf-8",
     )

@@ -30,6 +30,11 @@ def summarize_results(
     candidates_per_task: int,
     ks: tuple[int, ...] = (1, 4, 8),
 ) -> dict[str, Any]:
+    if candidates_per_task < 1:
+        raise ValueError("candidates_per_task must be positive")
+    if any(k < 1 for k in ks):
+        raise ValueError("pass@k values must be positive")
+    applicable_ks = tuple(k for k in ks if k <= candidates_per_task)
     materialized = list(results)
     by_task: dict[str, list[CandidateResult]] = defaultdict(list)
     for result in materialized:
@@ -88,17 +93,21 @@ def summarize_results(
                 )
                 for item in per_task
             )
-            for k in ks
+            for k in applicable_ks
         }
 
     candidate_count = len(materialized)
     tasks_with_success = sum(item["verified_candidate_count"] > 0 for item in per_task)
     observed_finish_reason_counts = Counter(
-        result.finish_reason for result in materialized if result.finish_reason is not None
+        result.finish_reason
+        for result in materialized
+        if result.finish_reason is not None
     )
     finish_reason_counts = {
         reason: observed_finish_reason_counts[reason]
-        for reason in sorted({"eos", "token_limit"} | set(observed_finish_reason_counts))
+        for reason in sorted(
+            {"eos", "token_limit"} | set(observed_finish_reason_counts)
+        )
     }
 
     return {
