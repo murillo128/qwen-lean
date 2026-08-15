@@ -7,6 +7,9 @@ requires-python = ">=3.11,<3.14"
 dependencies = []
 
 [project.optional-dependencies]
+baseline = [
+  "vllm==0.10.2",
+]
 model = [
   "accelerate==1.10.1",
   "torch==2.8.0",

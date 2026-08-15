@@ -114,6 +114,8 @@ Use a structural grouping boundary such as file, namespace, source unit, or a st
 
 Use the Lean version of miniF2F as the first external theorem-proving benchmark because it is compact, interpretable, and widely used enough to make results easier to contextualize.
 
+The first Lean 4 evaluation cycle uses the Google DeepMind miniF2F fork in its own upstream Lean project; phase configuration pins the exact benchmark revision.
+
 Use its development/validation portion during iteration. Treat the test split as a held-out benchmark for checkpoints selected without tuning against those test results.
 
 A second, harder/current Lean benchmark should be added after the first evaluation path is working.

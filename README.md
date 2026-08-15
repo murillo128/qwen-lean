@@ -96,6 +96,43 @@ The smoke is a plumbing check, not a model-quality baseline. Its continuation is
 sent unmodified, aside from transport whitespace normalization, through the same
 Lean verifier used by fixture candidates.
 
+## Phase 1 miniF2F baseline
+
+Phase 1 evaluates the pinned Google DeepMind miniF2F validation workload in the
+benchmark's own Lean 4.27.0 Lake environment. The committed configuration fixes
+the 244-task primary manifest, deterministic dev16 workload, Qwen model revision,
+eight-sample profile, and local-vLLM engine settings. Derived benchmark identifiers
+retain the upstream Apache-2.0 attribution in the manifest and configuration.
+
+Prepare the external benchmark outside this Git checkout and its pinned Lake cache:
+
+```bash
+git clone --filter=blob:none --no-checkout https://github.com/google-deepmind/miniF2F.git /tmp/qwen-lean-minif2f
+git -C /tmp/qwen-lean-minif2f fetch --depth=1 origin f0a20e14c1eeccd859d51bb4c2b3ee487889c303
+git -C /tmp/qwen-lean-minif2f checkout --detach f0a20e14c1eeccd859d51bb4c2b3ee487889c303
+(cd /tmp/qwen-lean-minif2f && lake exe cache get)
+uv run qwen-lean minif2f-validate --benchmark-root /tmp/qwen-lean-minif2f
+```
+
+On the project Ada GPU, install the frozen baseline/model extras, run dev16 first,
+then run the complete validation baseline:
+
+```bash
+uv sync --frozen --extra baseline --extra model
+uv run --extra baseline --extra model qwen-lean phase1-baseline \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/phase1-dev16
+uv run --extra baseline --extra model qwen-lean phase1-baseline \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/phase1-full
+```
+
+Each model run writes versioned `run.json`, raw `results.jsonl`, and `summary.json`.
+Only compact accepted baseline evidence belongs under `evidence/`; raw continuations
+and external benchmark/model caches remain local and ignored.
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

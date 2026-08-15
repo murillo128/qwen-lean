@@ -1,0 +1,131 @@
+{
+  "candidate_count": 128,
+  "candidates_per_task": 8,
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 128,
+    "verified": 0,
+    "verifier_error": 0,
+    "verifier_timeout": 0
+  },
+  "category_fractions": {
+    "empty_candidate": 0.0,
+    "generation_error": 0.0,
+    "lean_rejected": 1.0,
+    "verified": 0.0,
+    "verifier_error": 0.0,
+    "verifier_timeout": 0.0
+  },
+  "complete": true,
+  "completeness_errors": [],
+  "finish_reason_counts": {
+    "eos": 90,
+    "token_limit": 38
+  },
+  "infrastructure_error_count": 0,
+  "pass_at_k": {
+    "pass@1": 0.0,
+    "pass@4": 0.0,
+    "pass@8": 0.0
+  },
+  "per_task": [
+    {
+      "candidate_count": 8,
+      "task_id": "aimeII_2001_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aimeII_2020_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aimeI_2000_p7",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1983_p9",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1984_p15",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1984_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1987_p8",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1988_p3",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1988_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1990_p2",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1991_p1",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1991_p6",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1994_p4",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1996_p5",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "aime_1997_p11",
+      "verified_candidate_count": 0
+    },
+    {
+      "candidate_count": 8,
+      "task_id": "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i",
+      "verified_candidate_count": 0
+    }
+  ],
+  "run_wall_time_seconds": 291.46793748699565,
+  "schema_version": "phase1-summary-v1",
+  "task_count": 16,
+  "tasks_with_verified_candidate": {
+    "count": 0,
+    "fraction": 0.0
+  },
+  "timing_seconds": {
+    "candidate_total_latency_mean": 17.654012998578253,
+    "candidate_total_latency_sum": 2259.7136638180164,
+    "generation_candidate_latency_mean": 9.484421572937435,
+    "generation_candidate_latency_sum": 1214.0059613359917,
+    "verification_latency_mean": 8.169591425640817,
+    "verification_latency_sum": 1045.7077024820246
+  },
+  "verifier_timeout_count": 0,
+  "workload_id": "minif2f-valid-dev16-v1"
+}
