@@ -1,0 +1,718 @@
+{
+  "created_at": "2026-08-15T15:47:04.144326+00:00",
+  "dataset_schema_version": "mathlib-whole-proof-v1",
+  "lean_toolchain": "leanprover/lean4:v4.32.0",
+  "negative_substitution": {
+    "proof": "by\n  exact __qwen_lean_phase2_controlled_invalid_proof__",
+    "requested": 3
+  },
+  "records": [
+    {
+      "declaration_name": "Subfield.relrank_map_map",
+      "file_path": "Mathlib/FieldTheory/Relrank.lean",
+      "id": "586cdd7511339a9b351f0ba170631bc6ed4989364d9c178472111bb033d25b58",
+      "negative_substitution": {
+        "diagnostic": "\nReconstructed.lean:143:8: error(lean.unknownIdentifier): Unknown identifier `__qwen_lean_phase2_controlled_invalid_proof__`\n",
+        "exit_code": 1,
+        "latency_seconds": 10.325267257001542,
+        "status": "rejected"
+      },
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 9.469569373002741,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Polynomial.degree_sub_C",
+      "file_path": "Mathlib/Algebra/Polynomial/Degree/Operations.lean",
+      "id": "faef12e327b4579229c33687f3fd3d560af1799ea9ab5a663f706c25b5a7833e",
+      "negative_substitution": {
+        "diagnostic": "\nReconstructed.lean:549:8: error(lean.unknownIdentifier): Unknown identifier `__qwen_lean_phase2_controlled_invalid_proof__`\n",
+        "exit_code": 1,
+        "latency_seconds": 5.69037510099588,
+        "status": "rejected"
+      },
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.196270271000685,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "AlgebraicGeometry.PresheafedSpace.IsOpenImmersion.pullback_snd_isIso_of_range_subset",
+      "file_path": "Mathlib/Geometry/RingedSpace/OpenImmersion.lean",
+      "id": "139cda253f0d94ca48abb97b5624efaa83bd4fe82c0bb9e1878608e62a0815ef",
+      "negative_substitution": {
+        "diagnostic": "\nReconstructed.lean:502:8: error(lean.unknownIdentifier): Unknown identifier `__qwen_lean_phase2_controlled_invalid_proof__`\n",
+        "exit_code": 1,
+        "latency_seconds": 26.271791934996145,
+        "status": "rejected"
+      },
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 27.456692676001694,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Fin.card_range_le",
+      "file_path": "Mathlib/Data/Fin/Pigeonhole.lean",
+      "id": "db6fadaddb663f3db1de1cf3008e5a320dd8ee8237e0f42d381553b20c4c9160",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 2.3346267090018955,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "UpperHalfPlane.SlashInvariantFormClass.ModularFormClass.UpperHalfPlane.hasSum_qExpansion_of_norm_lt",
+      "file_path": "Mathlib/NumberTheory/ModularForms/QExpansion.lean",
+      "id": "89d29417d6d591fc943d2964104fbf04ca22db7cb0bbd01e9e5d5056e0db0dd4",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 9.66188974599936,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Multiset.card_product",
+      "file_path": "Mathlib/Data/Multiset/Bind.lean",
+      "id": "ec820a749d30ad5c5397e083ff264aaec14608e904d07eb33cdd3d2d4a1bd52d",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 3.3426861800035113,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "BoundedContinuousFunction.exists_extension_norm_eq_of_isClosedEmbedding",
+      "file_path": "Mathlib/Topology/TietzeExtension.lean",
+      "id": "cc76316b0257151044fd9438d98484993a0ba75f2d1423563f6b64d0bd74ff96",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 7.059254874002363,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Homotopy.dNext_cochainComplex",
+      "file_path": "Mathlib/Algebra/Homology/Homotopy.lean",
+      "id": "1c77f00490393414364b672eeacd4e1ceaffd6755526022aafceea8e469b9ed8",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 15.743644916001358,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Squarefree.UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors",
+      "file_path": "Mathlib/Algebra/Squarefree/Basic.lean",
+      "id": "3093911a0afa347d57e3da6525ab19fcdf5f4f14df8a02b55df619e7c5d97899",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.422662151999248,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "PreErgodic.measure_self_or_compl_eq_zero",
+      "file_path": "Mathlib/Dynamics/Ergodic/Ergodic.lean",
+      "id": "5831866b56369f05d16876a3d7dc9efa1b69becdb9d5befac7e05634397ae4ac",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.43041763400106,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "LocalizedModule.liftOn_mk",
+      "file_path": "Mathlib/Algebra/Module/LocalizedModule/Basic.lean",
+      "id": "dcad93bb21c9de5de7990c93e1f8e525a21e6f91161cef9ec464586564f2a84e",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 24.69074558200373,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Set.Function.Injective.image_injective",
+      "file_path": "Mathlib/Data/Set/Image.lean",
+      "id": "88e4eb7e7ee51ff7f18805c757dd557789a9c82ac409bc9221678f24b556ff43",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 7.789066088000254,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "AddMonoidAlgebra.MonoidAlgebra.coeff_mul_apply_left",
+      "file_path": "Mathlib/Algebra/MonoidAlgebra/Defs.lean",
+      "id": "2d5bc78fd3c54771a0992747d2d20722b01e7dbc7b4c0ce059c3bc979e22df9b",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 15.83721091800544,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "CliffordAlgebra.CliffordAlgebra.mul_\u03b9_mul_\u03b9_of_isOrtho",
+      "file_path": "Mathlib/LinearAlgebra/CliffordAlgebra/Basic.lean",
+      "id": "d567d99b4aeb1770f3786be08257bba5177100ec6dde0a660e473c7312fa716b",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 10.402573575003771,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "contMDiff_prod_module_iff",
+      "file_path": "Mathlib/Geometry/Manifold/ContMDiff/Constructions.lean",
+      "id": "fd292d996093ee547cac42c486e5c5537a7782f35321e14de505f2d1f73be881",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 10.545649665000383,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Finset.lineMap_affineCombination",
+      "file_path": "Mathlib/LinearAlgebra/AffineSpace/Combination.lean",
+      "id": "c21062bcecaa6cc379dee04c48358246c26eba6fa87a80288c4c14d572016d88",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 9.539610678999452,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "le_collapse_of_mem",
+      "file_path": "Mathlib/Combinatorics/SetFamily/FourFunctions.lean",
+      "id": "a2bd0a363923d62d7771aca095f5186453986b7f59aaa4040a517cfa6c75ebd4",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 7.2654071299984935,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "CategoryTheory.Functor.\u03b9_colimitIsoOfIsLeftKanExtension_inv",
+      "file_path": "Mathlib/CategoryTheory/Functor/KanExtension/Basic.lean",
+      "id": "1d0ee8b0b00e544f434667c2c9cbcfe37ab0bcda33a60b0486dcdbd2d56e4353",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 12.221603193000192,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "LinearMap.toMatrix_map_left",
+      "file_path": "Mathlib/LinearAlgebra/Matrix/ToLin.lean",
+      "id": "b5ecf75ecb3de228a7a1c1c058c8bc7a127ed2c67b400076b52335da7e4eefa9",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 22.89450555000076,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "ValueDistribution.proximity_congr_codiscreteWithin",
+      "file_path": "Mathlib/Analysis/Complex/ValueDistribution/Proximity/Basic.lean",
+      "id": "6154a6cb80ee7d890e6daa5f653490a468097484848b5f91d186dc628eddd179",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 4.992781000000832,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "IsEllipticNet.rel_eq",
+      "file_path": "Mathlib/NumberTheory/EllipticDivisibilitySequence.lean",
+      "id": "d07bcba574b86f7d9b41162ac75006a696dd16bd690f2950e67a4f3673697bab",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 10.403489880001871,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Submodule.IsPrincipal.IsBezout.IsPrime.PrincipalIdealRing.exists_associated_pow_of_associated_pow_mul",
+      "file_path": "Mathlib/RingTheory/PrincipalIdealDomain.lean",
+      "id": "336dfb1e7112f677d1bd7f77e44ce2787e453a540c83b0f44264f7bcfc8cd73b",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.222325512993848,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "HNNExtension.NormalWord.of_smul_eq_smul",
+      "file_path": "Mathlib/GroupTheory/HNNExtension.lean",
+      "id": "071234ee8b4888b78eea7cadcbf3797d96e4a692918cb36d9a7a40a3cd4d5d11",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 10.946708729003149,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Chebyshev.theta_eq_sum_primesLE",
+      "file_path": "Mathlib/NumberTheory/Chebyshev.lean",
+      "id": "49180efb4a9a14a3f1097f81d13cf76e451afda1c64c6e4e6995bc3d99ebe5d4",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 14.521867550000024,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "train"
+    },
+    {
+      "declaration_name": "Set.Ioo_union_Ioo'",
+      "file_path": "Mathlib/Order/Interval/Set/LinearOrder.lean",
+      "id": "e8e99cb1591de74cd1827cc1f1c005dd93d5d357b4e9d8c7573df58fd7386abe",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 8.979027916997438,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "OrderDual.smul_add_smul_lt_smul_add_smul'",
+      "file_path": "Mathlib/Algebra/Order/Module/Defs.lean",
+      "id": "7adf964a18074ac66dc8559a634de48280b06cc3c440d203b420ac2ae18fd553",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 13.46214914599841,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "MDifferentiableWithinAt.differentiableWithinAt_mpullbackWithin_vectorField",
+      "file_path": "Mathlib/Geometry/Manifold/VectorField/LieBracket.lean",
+      "id": "a9cb5fb30858f3bf966758a847d4eaecdb662ac9b68257ecfec2c3e520b1e851",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 18.913680076002493,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "Matrix.Norms.Elementwise.Norms.Operator.frobenius_norm_replicateCol",
+      "file_path": "Mathlib/Analysis/Matrix/Normed.lean",
+      "id": "9bc70a74270e490e00a3c354beadb3fcbfb5d868209ef1f6ae7c3321f1ebb27c",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 12.2778470129997,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "MeasureTheory.NullMeasurableSet.measure_preimage_snd_singleton_eq_sum",
+      "file_path": "Mathlib/MeasureTheory/Measure/NullMeasurable.lean",
+      "id": "95e22a6d1844b0d9274ded4f6afe6a1068c96d926b4dce5d79567360d8ed5e80",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 6.479518988002383,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "SimpleGraph.ConnectedComponent.Iso.ConnectedComponent.iUnion_connectedComponentSupp",
+      "file_path": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean",
+      "id": "a8f413c2ac0df97cb7b8ea374ce062beec5db037f11a11bed3374190f5435b32",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 6.033020135000697,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "ZLattice.covolume_ne_zero",
+      "file_path": "Mathlib/Algebra/Module/ZLattice/Covolume.lean",
+      "id": "54d47d3ebdd4d70002738c13004df495de619102f5141dc7527619e0e73e505e",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 12.904913970996859,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "SimpleGraph.ComponentCompl.hom_trans",
+      "file_path": "Mathlib/Combinatorics/SimpleGraph/Ends/Defs.lean",
+      "id": "d729faf655954a94f965412abef4c2675c685472a7c68670ec50aae1abadfbff",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 3.625372412003344,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "Int.negOnePow_eq_one_iff",
+      "file_path": "Mathlib/Algebra/Ring/NegOnePow.lean",
+      "id": "bba31770a97ff3752e624083edc3b8e3cae2ad68c880b56a5fd7812668e87ebf",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 3.3382742760004476,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "Polynomial.coeff_mul_monomial",
+      "file_path": "Mathlib/Algebra/Polynomial/Coeff.lean",
+      "id": "9a2631efdd72aa563b8bde5aa686718b356a4fe84a4bec4af9e7d781fbb4cde1",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 4.542128989000048,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "PreQuasiregular.Unitization.Unitization.NonnegSpectrumClass.QuasispectrumRestricts.image",
+      "file_path": "Mathlib/Algebra/Algebra/Spectrum/Quasispectrum.lean",
+      "id": "4e57640c7885405895219f7e9b2b499fcaa0e13e377dc19b9eeb4a41a65c5987",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 11.184493590000784,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "locallyConnectedSpace_iff_connected_basis",
+      "file_path": "Mathlib/Topology/Connected/LocallyConnected.lean",
+      "id": "c43c50f5df1b814840a3e2fb4c87464c7376a53b21e1f4d8092abb14f85658cc",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 3.019690407003509,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "validation"
+    },
+    {
+      "declaration_name": "lt_inv_of_neg",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "id": "e98967896ee768b2bb6cf8550aa2288375d7c31b0ccdae65b16906a0065863ff",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 9.264129139002762,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "CategoryTheory.Functor.IsDense.comp_left_iff_of_isEquivalence",
+      "file_path": "Mathlib/CategoryTheory/Functor/KanExtension/Dense.lean",
+      "id": "b65991b9ef40b3364978f7a8d648eedf0c4392b85d2c4bfa2c478b5f56011d2e",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 4.675259629999346,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "ProbabilityTheory.geometricPMFReal_pos",
+      "file_path": "Mathlib/Probability/Distributions/Geometric.lean",
+      "id": "74f9cf46614306d5461a71736b7e41ee4b01f5da32d1caf762fc549e8f5168b8",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 6.049862430001667,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "Submodule.Ideal.IsTwoSided.pow_eq_top_iff",
+      "file_path": "Mathlib/RingTheory/Ideal/Operations.lean",
+      "id": "731c45bfc2de996fed2334911a8e7af77749c63e038415efe924b2f9fce4779c",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 12.961391934994026,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "PadicSeq.PadicSeq.Padic.padicNormE.Padic.Padic.norm_intCast_lt_one_iff",
+      "file_path": "Mathlib/NumberTheory/Padics/PadicNumbers.lean",
+      "id": "f76427aa452d5e67c0472e02024fa1583dd165b237ba6e155089e9fad71d29c2",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 11.7671244650046,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "AlgebraicIndependent.exists_isTranscendenceBasis_subset",
+      "file_path": "Mathlib/RingTheory/AlgebraicIndependent/TranscendenceBasis.lean",
+      "id": "b930f1741e685f322dc6b097e05d9faa2a3d5cc10a099db29582fece3dcd3c17",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 11.656342960995971,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "Set.smul_sdiv_smul_cancel_left",
+      "file_path": "Mathlib/Algebra/Torsor/Basic.lean",
+      "id": "546970424706076b02894fde4b1e7d29849a598e16e1d4c733ed5d62efb81e20",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 6.442050133999146,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "MvQPF.wEquiv.symm",
+      "file_path": "Mathlib/Data/QPF/Multivariate/Constructions/Fix.lean",
+      "id": "daa574a86a17736f53f8935cd7b0e2cef6e714388296a893028190bb09212c89",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 3.9822671479996643,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "Tactic.ComputeAsymptotics.MultiseriesExpansion.IsZero.not_cons",
+      "file_path": "Mathlib/Tactic/ComputeAsymptotics/Multiseries/Trimming.lean",
+      "id": "4712ebc5ee79034437ea29999ba2906b8e4fd476c1cdfb26066fe986436054d2",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.077500054001575,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "MvPowerSeries.coeff_ne_zero_of_lexOrder",
+      "file_path": "Mathlib/RingTheory/MvPowerSeries/LexOrder.lean",
+      "id": "f06b6a571819c625d786c0948c4406337522e70e40c366cd22eee354cb169cf7",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 4.9897637690010015,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "Set.Definable.image_comp_sumInl_fin",
+      "file_path": "Mathlib/ModelTheory/Definability.lean",
+      "id": "b28aab62e4056efdea3992584f604ddd4739e4f99adbce6db45509477d02b546",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 4.995457976001489,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    },
+    {
+      "declaration_name": "jacobiSym.ZMod.jacobiSym.even_odd",
+      "file_path": "Mathlib/NumberTheory/LegendreSymbol/JacobiSymbol.lean",
+      "id": "62cc49f9e786356921a0add6078d7ec854c9dab0d324b6553a4c32ecae70de18",
+      "negative_substitution": null,
+      "original_proof": {
+        "diagnostic": "",
+        "exit_code": 0,
+        "latency_seconds": 5.0168782979963,
+        "status": "accepted"
+      },
+      "source_identity": "matched",
+      "split": "heldout"
+    }
+  ],
+  "sample_policy": {
+    "distinct_source_files_where_practical": true,
+    "requested_by_split": {
+      "heldout": 12,
+      "train": 24,
+      "validation": 12
+    },
+    "seed": "mathlib-whole-proof-v1-file-components-verification"
+  },
+  "schema_version": "phase2-verification-v1",
+  "source_repository": "https://github.com/leanprover-community/mathlib4",
+  "source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+  "summary": {
+    "infrastructure_failures": 0,
+    "negative_substitutions_rejected": 3,
+    "original_proofs_accepted": 48,
+    "sampled": 48,
+    "source_identity_matched": 48,
+    "timeouts": 0
+  }
+}

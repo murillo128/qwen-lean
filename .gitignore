@@ -4,5 +4,5 @@ __pycache__/
 *.py[cod]
 .lake/
 
-# Local evaluator output; reviewed compact evidence lives under evidence/phase0.
+# Local evaluation and dataset output; reviewed compact evidence lives under evidence/.
 artifacts/

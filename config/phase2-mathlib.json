@@ -1,0 +1,63 @@
+{
+  "schema_version": "phase2-config-v1",
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1",
+    "artifact_subdirectory": "phase2/mathlib-whole-proof-v1"
+  },
+  "source": {
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "input_revision": "v4.32.0",
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "scope": "Mathlib/**/*.lean",
+    "license": "Apache-2.0"
+  },
+  "extractor": {
+    "repository": "https://github.com/lean-dojo/LeanDojo-v2",
+    "revision": "baed5eae6e87a65a446d9f54af07aab2154e7599",
+    "license": "MIT",
+    "build_dependencies": false
+  },
+  "benchmark_contamination_reference": {
+    "repository": "https://github.com/google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "license": "Apache-2.0",
+    "source_paths": [
+      "MiniF2F/Valid.lean",
+      "MiniF2F/Test.lean"
+    ],
+    "expected_primary_statement_counts": {
+      "MiniF2F/Valid.lean": 244,
+      "MiniF2F/Test.lean": 242
+    }
+  },
+  "tokenizer": {
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "add_special_tokens": false,
+    "use_chat_template": false
+  },
+  "split": {
+    "seed": "mathlib-whole-proof-v1-file-components",
+    "proportions": {
+      "train": 0.9,
+      "validation": 0.05,
+      "heldout": 0.05
+    }
+  },
+  "pilot_files": [
+    "Mathlib/AlgebraicGeometry/Morphisms/IsIso.lean",
+    "Mathlib/AlgebraicGeometry/PointsPi.lean",
+    "Mathlib/Condensed/Basic.lean"
+  ],
+  "verification": {
+    "sample_counts": {
+      "train": 24,
+      "validation": 12,
+      "heldout": 12
+    },
+    "negative_substitutions": 3,
+    "timeout_seconds": 300.0,
+    "workers": 8
+  }
+}

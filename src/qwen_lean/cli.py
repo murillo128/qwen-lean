@@ -13,6 +13,9 @@ from .baseline import (
 from .evaluator import load_fixture_set, run_fixture_evaluation
 from .generation import run_model_smoke
 from .minif2f import Phase1Config
+from .phase2_corpus import load_phase2_dataset
+from .phase2_extraction import Phase2Config, write_compact_evidence
+from .phase2_verification import verify_phase2_sample
 
 
 def _project_root() -> Path:
@@ -33,7 +36,9 @@ def _parser() -> argparse.ArgumentParser:
     smoke = subparsers.add_parser("model-smoke", help="run one real Qwen generation")
     smoke.add_argument("--fixtures", type=Path, default=root / "fixtures/phase0.json")
     smoke.add_argument("--task-id", default="core-identity")
-    smoke.add_argument("--output-dir", type=Path, default=root / "artifacts/model-smoke")
+    smoke.add_argument(
+        "--output-dir", type=Path, default=root / "artifacts/model-smoke"
+    )
     smoke.add_argument("--project-root", type=Path, default=root)
     smoke.add_argument("--timeout", type=float, default=30.0)
     smoke.add_argument("--max-new-tokens", type=int, default=128)
@@ -75,6 +80,31 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    phase2_loader = subparsers.add_parser(
+        "phase2-loader-smoke", help="load and validate local Phase 2 JSONL splits"
+    )
+    phase2_loader.add_argument("--artifact-dir", type=Path, required=True)
+
+    phase2_verify = subparsers.add_parser(
+        "phase2-verify", help="reconstruct and verify the Phase 2 stratified sample"
+    )
+    phase2_verify.add_argument("--artifact-dir", type=Path, required=True)
+    phase2_verify.add_argument("--mathlib-root", type=Path, required=True)
+    phase2_verify.add_argument(
+        "--config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+    phase2_verify.add_argument("--output", type=Path, required=True)
+    phase2_verify.add_argument("--workers", type=int)
+    phase2_verify.add_argument("--timeout", type=float)
+
+    phase2_evidence = subparsers.add_parser(
+        "phase2-evidence",
+        help="write compact review evidence from local Phase 2 artifacts",
+    )
+    phase2_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    phase2_evidence.add_argument("--verification", type=Path)
+    phase2_evidence.add_argument("--evidence-dir", type=Path, required=True)
     return parser
 
 
@@ -152,6 +182,34 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
+
+    if args.command == "phase2-loader-smoke":
+        dataset = load_phase2_dataset(args.artifact_dir)
+        counts = {split: len(dataset[split]) for split in dataset}
+        print(json.dumps(counts, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "phase2-verify":
+        config = Phase2Config.load(args.config)
+        evidence = verify_phase2_sample(
+            config,
+            args.artifact_dir,
+            args.mathlib_root,
+            args.output,
+            workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(evidence["summary"], indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "phase2-evidence":
+        write_compact_evidence(
+            args.artifact_dir,
+            args.evidence_dir,
+            verification_path=args.verification,
+        )
+        print(str(args.evidence_dir))
+        return 0
 
     fixture_id, tasks, _ = load_fixture_set(args.fixtures)
     try:
