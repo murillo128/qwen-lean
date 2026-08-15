@@ -1,6 +1,6 @@
 ---
 name: spec-driven-codex-loop
-description: Execute an approved controlling issue through bounded implementation, repository-native validation, publication, independent review, and concise handoff.
+description: Execute an approved controlling issue through bounded implementation, repository-native validation, publication, independent review, and a ready-for-review handoff.
 ---
 
 # Spec-Driven Codex Loop
@@ -9,7 +9,9 @@ description: Execute an approved controlling issue through bounded implementatio
 
 Use this skill for non-trivial implementation under an approved controlling issue. The issue is the complete phase-specific contract; repository documents define durable architecture; branches and PRs preserve implementation; tests and evaluation outputs preserve evidence.
 
-The executor owns implementation, validation, commits, progression, and handoff. Delegate GitHub mutations to `codex-github-operations` and checkpoint/final review to `codex-independent-review`. The executor may not review its own work independently.
+The executor owns implementation, validation, commits, progression through technical review, and handoff. Delegate GitHub mutations to `codex-github-operations` and checkpoint/final review to `codex-independent-review`. The executor may not review its own work independently.
+
+The executor's terminal delivery state is a PR that is **ready for review**, not merged. It must not merge the PR, enable auto-merge, or treat a technical review verdict as merge authorization. Merge acceptance belongs to a later explicit user/ChatGPT review-and-merge interaction.
 
 ## Context and authority
 
@@ -35,12 +37,13 @@ Before editing, confirm:
 
 Before the first implementation edit, use `codex-github-operations` to replace `execution-ready` with `in-progress`. Do not post a comment solely for this transition.
 
-Use label replacements for later transitions:
+Use label replacements for execution-time returns:
 
 - missing material design decision: `design-required`;
 - evidence needed before design: `investigation-required`;
-- genuinely unavailable external capability: `blocked`;
-- accepted terminal outcome: `completed` and close the issue.
+- genuinely unavailable external capability: `blocked`.
+
+`completed` is a post-merge state. The Codex executor must not set `completed` or close the controlling issue as part of implementation delivery. After an explicit user/ChatGPT review accepts and merges the ready PR, the user-facing merge workflow may set `completed` and close the issue after observing the merge.
 
 Add comments only when a material reason, technical finding, contract amendment, exact checkpoint target/verdict, blocker capability, or final handoff must be preserved.
 
@@ -98,7 +101,7 @@ Comment only when:
 Use:
 
 ```markdown
-## <Checkpoint ready | Contract amendment | Design required | Investigation required | Blocked | Complete>
+## <Checkpoint ready | Contract amendment | Design required | Investigation required | Blocked | Ready for review>
 
 **Delivered or confirmed:** <one to three bullets>
 **Validation:** <result or evidence>
@@ -117,12 +120,12 @@ At a declared checkpoint:
 3. invoke one fresh independent review;
 4. continue only after `PASS` or non-blocking `PASS_WITH_NOTES`.
 
-A checkpoint may serve as final review when it covers the complete final diff and all remaining acceptance criteria. Any later technical change invalidates that verdict; workflow-only changes do not.
+A checkpoint may serve as final technical review when it covers the complete final diff and all remaining acceptance criteria. Any later technical change invalidates that verdict; workflow-only changes do not. A final technical verdict never authorizes merge by itself.
 
 Progression:
 
-- `PASS`: continue with `in-progress`;
-- `PASS_WITH_NOTES`: continue unless a note violates an exit gate;
+- `PASS`: continue with `in-progress`; if this was the final-capable review and all implementation work is complete, prepare the PR for user-facing review;
+- `PASS_WITH_NOTES`: continue unless a note violates an exit gate; if final-capable and non-blocking, prepare the PR for user-facing review;
 - `FAIL`: choose a bounded correction, `design-required`, or `investigation-required`;
 - `BLOCKED`: set `blocked` only when required evidence/review capability has no safe alternative;
 - transport failure: use another route or leave a precise handoff; it is not an implementation verdict.
@@ -135,15 +138,26 @@ After two consecutive failures in substantially the same validation or bookkeepi
 
 ## Pull request discipline
 
-Use one PR per controlling issue unless the issue explicitly decomposes delivery. Keep it draft until required implementation and review are complete.
+Use one PR per controlling issue unless the issue explicitly decomposes delivery. Keep it draft while required implementation, validation, or independent technical review remains incomplete.
+
+When the complete final diff has passed the required validation and final-capable independent review, update the PR description with the final technical state and mark the PR **ready for review**. Then stop execution and hand it off.
+
+The Codex executor must never:
+
+- merge the PR;
+- enable auto-merge;
+- interpret `PASS` / `PASS_WITH_NOTES`, issue acceptance criteria, or a final-capable checkpoint as merge authorization;
+- close the controlling issue or set it to `completed` before an explicit user/ChatGPT review accepts and merges the PR.
 
 ## Handoff
 
 Include only what the next actor cannot derive cheaply:
 
 - issue and current bounded outcome;
-- branch or PR;
+- ready-for-review PR and exact final reviewed target when useful;
 - last accepted checkpoint;
 - material evidence;
-- unresolved finding;
-- one immediate next action.
+- unresolved non-blocking note or finding;
+- immediate next action: user/ChatGPT review and merge decision.
+
+Do not continue past this handoff unless a later explicit user-facing instruction requests review, correction, or merge.
