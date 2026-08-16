@@ -683,6 +683,7 @@ def run_phase4_adapter_reload(
         "base_model_revision": config.model["model_revision"],
         "adapter_artifact_id": config.lora["artifact_id"],
         "selected_optimizer_step": binding.selected_optimizer_step,
+        "selected_adapter_binding": binding.to_dict(),
         "adapter_training_relative_path": binding.training_relative_path,
         "training_artifact_sha256": binding.training_artifact_sha256,
         "selection_metric": selection["metric"],

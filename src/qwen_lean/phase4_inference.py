@@ -4,6 +4,7 @@ import json
 import platform
 import time
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from pathlib import Path
 from statistics import fmean
 from typing import Any, Sequence
@@ -49,15 +50,15 @@ def phase4_heldout_integrity_passed(summary: dict[str, Any]) -> bool:
 
 
 def _sanitized_adapter_metadata(
-    value: dict[str, Any] | None, binding: SelectedAdapterBinding
+    value: dict[str, Any] | None, selected_binding: dict[str, Any]
 ) -> dict[str, Any] | None:
     if value is None:
         return None
     compact = {key: item for key, item in value.items() if key != "adapter_path"}
-    compact["training_relative_path"] = binding.training_relative_path
-    compact["training_artifact_sha256"] = binding.training_artifact_sha256
+    compact["training_relative_path"] = selected_binding["training_relative_path"]
+    compact["training_artifact_sha256"] = selected_binding["training_artifact_sha256"]
     compact["ignored_local_path"] = (
-        f"artifacts/phase4/training/{binding.training_relative_path}"
+        f"artifacts/phase4/training/{selected_binding['training_relative_path']}"
     )
     return compact
 
@@ -446,6 +447,13 @@ def compare_phase4_heldout_runs(
     adapter_summary = json.loads(
         (adapter_dir / "summary.json").read_text(encoding="utf-8")
     )
+    expected_binding = binding.to_dict()
+    for role, run in (("base", base_run), ("adapter", adapter_run)):
+        if run.get("selected_adapter_binding") != expected_binding:
+            raise ValueError(
+                f"Phase 4 heldout {role} run does not match the "
+                "training-selected adapter binding"
+            )
     for key in (
         "model",
         "selected_optimizer_step",
@@ -473,6 +481,8 @@ def compare_phase4_heldout_runs(
         raise ValueError("Phase 4 adapter run did not enable the selected adapter")
     if base_run.get("model") != training.get("model"):
         raise ValueError("Phase 4 heldout model differs from the training trajectory")
+    if base_run.get("selected_optimizer_step") != binding.selected_optimizer_step:
+        raise ValueError("Phase 4 heldout selected step differs from training")
     adapter_metadata = adapter_run["adapter"]
     if adapter_metadata.get("adapter_id") != binding.artifact_id:
         raise ValueError("Phase 4 heldout adapter identity differs from training")
@@ -501,7 +511,7 @@ def compare_phase4_heldout_runs(
         "workload_id": base_run["workload_id"],
         "selected_record_ids": base_run["selected_record_ids"],
         "selected_optimizer_step": base_run["selected_optimizer_step"],
-        "selected_adapter": binding.to_dict(),
+        "selected_adapter": dict(base_run["selected_adapter_binding"]),
         "evaluation_contract": {
             "model": base_run["model"],
             "dataset_schema_version": base_run["dataset_schema_version"],
@@ -526,7 +536,9 @@ def compare_phase4_heldout_runs(
                 "runtime": base_runtime,
             },
             "adapter": {
-                "adapter": _sanitized_adapter_metadata(adapter_run["adapter"], binding),
+                "adapter": _sanitized_adapter_metadata(
+                    adapter_run["adapter"], base_run["selected_adapter_binding"]
+                ),
                 "runtime": adapter_runtime,
             },
         },
@@ -575,6 +587,8 @@ def run_phase4_minif2f(
         verification_workers=worker_count,
         adapter=phase4_adapter_spec(config, adapter_dir),
     )
+    metadata = replace(metadata, selected_adapter_binding=binding.to_dict())
+    _write_json(output_dir / "run.json", metadata.to_dict())
     expected_candidates = 16 * int(phase1.sampling["candidates_per_task"])
     passed = bool(
         summary["complete"]
@@ -596,6 +610,7 @@ def run_phase4_minif2f(
             "phase4_minif2f_comparison": True,
             "phase1_quality_comparable": True,
             "selected_optimizer_step": binding.selected_optimizer_step,
+            "selected_adapter_binding": binding.to_dict(),
             "adapter_training_relative_path": binding.training_relative_path,
             "training_artifact_sha256": binding.training_artifact_sha256,
             "checkpoint_selection_influenced_by_minif2f": False,

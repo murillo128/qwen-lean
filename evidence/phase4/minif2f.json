@@ -1,6 +1,7 @@
 {
   "adapter": {
     "artifact_id": "phase4-train4096-v1-lora",
+    "format": "peft-lora",
     "ignored_local_path": "artifacts/phase4/training/trainer-state/checkpoint-512",
     "merged": false,
     "rank": 16,
@@ -44,12 +45,12 @@
     ],
     "cuda_device_index": 0,
     "cuda_device_total_memory_bytes": 20989804544,
-    "generation_wall_time_seconds": 239.2440949770098,
+    "generation_wall_time_seconds": 249.62324987999455,
     "inference_execution": "local_cuda",
     "python": "3.12.14",
     "torch": "2.8.0+cu128",
     "torch_cuda_version": "12.8",
-    "verification_wall_time_seconds": 142.607748866998,
+    "verification_wall_time_seconds": 146.64977368499967,
     "verification_workers": 8
   },
   "schema_version": "phase4-minif2f-evidence-v1",
@@ -90,8 +91,8 @@
     "completeness_errors": [],
     "expected_candidates": 128,
     "finish_reason_counts": {
-      "eos": 72,
-      "token_limit": 56
+      "eos": 64,
+      "token_limit": 64
     },
     "infrastructure_error_count": 0,
     "observed_candidates": 128,
@@ -185,8 +186,16 @@
     "phase1_quality_comparable": true,
     "phase4_minif2f_comparison": true,
     "phase4_minif2f_passed": true,
-    "run_wall_time_seconds": 381.8518438440078,
+    "run_wall_time_seconds": 396.2730235649942,
     "schema_version": "phase1-summary-v1",
+    "selected_adapter_binding": {
+      "artifact_id": "phase4-train4096-v1-lora",
+      "format": "peft-lora",
+      "merged": false,
+      "selected_optimizer_step": 512,
+      "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+      "training_relative_path": "trainer-state/checkpoint-512"
+    },
     "selected_optimizer_step": 512,
     "task_count": 16,
     "tasks_with_verified_candidate": {
@@ -194,12 +203,12 @@
       "fraction": 0.0
     },
     "timing_seconds": {
-      "candidate_total_latency_mean": 23.335559160358684,
-      "candidate_total_latency_sum": 2986.9515725259116,
-      "generation_candidate_latency_mean": 14.612903804687448,
-      "generation_candidate_latency_sum": 1870.4516869999934,
-      "verification_latency_mean": 8.722655355671236,
-      "verification_latency_sum": 1116.4998855259182
+      "candidate_total_latency_mean": 24.19681933814877,
+      "candidate_total_latency_sum": 3097.1928752830427,
+      "generation_candidate_latency_mean": 15.20468313325,
+      "generation_candidate_latency_sum": 1946.199441056,
+      "verification_latency_mean": 8.99213620489877,
+      "verification_latency_sum": 1150.9934342270426
     },
     "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
     "verifier_timeout_count": 0,

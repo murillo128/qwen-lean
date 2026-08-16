@@ -5,37 +5,37 @@
     "category_counts": {
       "empty_candidate": 0,
       "generation_error": 0,
-      "lean_rejected": 252,
-      "verified": 4,
+      "lean_rejected": 254,
+      "verified": 2,
       "verifier_error": 0,
       "verifier_timeout": 0
     },
     "category_fractions": {
       "empty_candidate": 0.0,
       "generation_error": 0.0,
-      "lean_rejected": 0.984375,
-      "verified": 0.015625,
+      "lean_rejected": 0.9921875,
+      "verified": 0.0078125,
       "verifier_error": 0.0,
       "verifier_timeout": 0.0
     },
     "complete": true,
     "completeness_errors": [],
     "finish_reason_counts": {
-      "eos": 251,
-      "token_limit": 5
+      "eos": 248,
+      "token_limit": 8
     },
     "generated_token_counts": {
       "maximum": 1024,
-      "mean": 76.25,
+      "mean": 82.73828125,
       "minimum": 2,
-      "total": 19520
+      "total": 21181
     },
-    "generation_wall_time_seconds": 116.98823225799424,
+    "generation_wall_time_seconds": 126.44646649900824,
     "infrastructure_error_count": 0,
     "model_role": "adapter",
     "pass_at_k": {
-      "pass@1": 0.015625,
-      "pass@4": 0.0625
+      "pass@1": 0.0078125,
+      "pass@4": 0.03125
     },
     "per_task": [
       {
@@ -131,7 +131,7 @@
       {
         "candidate_count": 4,
         "task_id": "2fd09c357c96edf0df9cbb60718928c9b6f48e8ea12779e59778ac06ed526d32",
-        "verified_candidate_count": 1
+        "verified_candidate_count": 0
       },
       {
         "candidate_count": 4,
@@ -271,7 +271,7 @@
       {
         "candidate_count": 4,
         "task_id": "9f65bc105d2b342b3bd867749bcfba2793b3c1050575e6e36546d2b82f48583f",
-        "verified_candidate_count": 1
+        "verified_candidate_count": 0
       },
       {
         "candidate_count": 4,
@@ -360,22 +360,22 @@
       }
     ],
     "phase4_heldout_integrity_passed": true,
-    "run_wall_time_seconds": 454.2165455069917,
+    "run_wall_time_seconds": 470.9987991590169,
     "schema_version": "phase1-summary-v1",
     "task_count": 64,
     "tasks_with_verified_candidate": {
-      "count": 4,
-      "fraction": 0.0625
+      "count": 2,
+      "fraction": 0.03125
     },
     "timing_seconds": {
-      "candidate_total_latency_mean": 12.275855110129328,
-      "candidate_total_latency_sum": 3142.618908193108,
-      "generation_candidate_latency_mean": 1.753583386187529,
-      "generation_candidate_latency_sum": 448.9173468640074,
-      "verification_latency_mean": 10.522271723941799,
-      "verification_latency_sum": 2693.7015613291005
+      "candidate_total_latency_mean": 12.636544590144581,
+      "candidate_total_latency_sum": 3234.9554150770127,
+      "generation_candidate_latency_mean": 1.8783228132813292,
+      "generation_candidate_latency_sum": 480.8506402000203,
+      "verification_latency_mean": 10.758221776863252,
+      "verification_latency_sum": 2754.1047748769925
     },
-    "verification_wall_time_seconds": 337.22831324899744,
+    "verification_wall_time_seconds": 344.5523326600087,
     "verifier_timeout_count": 0,
     "workload_id": "phase4-heldout64-v1"
   },
@@ -402,16 +402,16 @@
     "complete": true,
     "completeness_errors": [],
     "finish_reason_counts": {
-      "eos": 191,
-      "token_limit": 65
+      "eos": 180,
+      "token_limit": 76
     },
     "generated_token_counts": {
       "maximum": 1024,
-      "mean": 357.48046875,
+      "mean": 407.4765625,
       "minimum": 2,
-      "total": 91515
+      "total": 104314
     },
-    "generation_wall_time_seconds": 239.42496959099662,
+    "generation_wall_time_seconds": 287.7433831359958,
     "infrastructure_error_count": 0,
     "model_role": "base",
     "pass_at_k": {
@@ -741,7 +741,7 @@
       }
     ],
     "phase4_heldout_integrity_passed": true,
-    "run_wall_time_seconds": 577.3514663219976,
+    "run_wall_time_seconds": 630.6893244660023,
     "schema_version": "phase1-summary-v1",
     "task_count": 64,
     "tasks_with_verified_candidate": {
@@ -749,21 +749,21 @@
       "fraction": 0.03125
     },
     "timing_seconds": {
-      "candidate_total_latency_mean": 14.202245304461542,
-      "candidate_total_latency_sum": 3635.7747979421547,
-      "generation_candidate_latency_mean": 3.6658371309063114,
-      "generation_candidate_latency_sum": 938.4543055120157,
-      "verification_latency_mean": 10.53640817355523,
-      "verification_latency_sum": 2697.320492430139
+      "candidate_total_latency_mean": 15.073198431800336,
+      "candidate_total_latency_sum": 3858.738798540886,
+      "generation_candidate_latency_mean": 4.401285458124903,
+      "generation_candidate_latency_sum": 1126.7290772799752,
+      "verification_latency_mean": 10.671912973675433,
+      "verification_latency_sum": 2732.0097212609107
     },
-    "verification_wall_time_seconds": 337.92649673100095,
+    "verification_wall_time_seconds": 342.94594133000646,
     "verifier_timeout_count": 0,
     "workload_id": "phase4-heldout64-v1"
   },
   "comparison_integrity_passed": true,
   "delta_adapter_minus_base": {
-    "pass@1": 0.0078125,
-    "pass@4": 0.03125
+    "pass@1": 0.0,
+    "pass@4": 0.0
   },
   "evaluation_contract": {
     "dataset_schema_version": "mathlib-whole-proof-v1",

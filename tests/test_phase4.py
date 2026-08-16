@@ -494,6 +494,9 @@ def test_phase4_comparison_preserves_sanitized_observed_run_contract(
         "verifier_timeout_count": 0,
         "pass_at_k": {"pass@1": 0.0, "pass@4": 0.0},
     }
+    _, binding = load_selected_adapter_binding(training_path)
+    base_run["selected_adapter_binding"] = binding.to_dict()
+    adapter_run["selected_adapter_binding"] = binding.to_dict()
     for directory, run in ((base_dir, base_run), (adapter_dir, adapter_run)):
         (directory / "run.json").write_text(json.dumps(run), encoding="utf-8")
         (directory / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
@@ -522,6 +525,26 @@ def test_phase4_comparison_preserves_sanitized_observed_run_contract(
             training_path, base_dir, adapter_dir, tmp_path / "foreign.json"
         )
 
+    stale_binding_run = copy.deepcopy(adapter_run)
+    stale_binding_run["selected_adapter_binding"]["training_artifact_sha256"] = "0" * 64
+    (adapter_dir / "run.json").write_text(
+        json.dumps(stale_binding_run), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="adapter binding"):
+        compare_phase4_heldout_runs(
+            training_path, base_dir, adapter_dir, tmp_path / "stale-binding.json"
+        )
+
+    missing_binding_run = copy.deepcopy(adapter_run)
+    missing_binding_run.pop("selected_adapter_binding")
+    (adapter_dir / "run.json").write_text(
+        json.dumps(missing_binding_run), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="adapter binding"):
+        compare_phase4_heldout_runs(
+            training_path, base_dir, adapter_dir, tmp_path / "missing-binding.json"
+        )
+
 
 def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
     tmp_path: Path,
@@ -529,6 +552,7 @@ def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
     training_path, expected_adapter = _write_training_artifact(tmp_path)
     _, binding = load_selected_adapter_binding(training_path)
     adapter_reload = {
+        "selected_adapter_binding": binding.to_dict(),
         "selected_optimizer_step": 512,
         "adapter_artifact_id": binding.artifact_id,
         "adapter_training_relative_path": binding.training_relative_path,
@@ -551,15 +575,17 @@ def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
         },
     }
     minif2f_run = {
+        "selected_adapter_binding": binding.to_dict(),
         "generation_settings": {
             "adapter": {
                 "adapter_id": binding.artifact_id,
                 "adapter_path": str(expected_adapter),
                 "merged": False,
             }
-        }
+        },
     }
     minif2f_summary = {
+        "selected_adapter_binding": binding.to_dict(),
         "selected_optimizer_step": 512,
         "adapter_id": binding.artifact_id,
         "adapter_enabled": True,
@@ -573,6 +599,17 @@ def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
     with pytest.raises(ValueError, match="adapter reload"):
         _validate_selected_adapter_evidence(
             binding, stale_reload, heldout, minif2f_run, minif2f_summary
+        )
+
+    missing_reload_binding = copy.deepcopy(adapter_reload)
+    missing_reload_binding.pop("selected_adapter_binding")
+    with pytest.raises(ValueError, match="adapter reload"):
+        _validate_selected_adapter_evidence(
+            binding,
+            missing_reload_binding,
+            heldout,
+            minif2f_run,
+            minif2f_summary,
         )
 
     mismatched_heldout = copy.deepcopy(heldout)
@@ -597,4 +634,28 @@ def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
             heldout,
             foreign_minif2f,
             minif2f_summary,
+        )
+
+    missing_minif2f_binding = copy.deepcopy(minif2f_run)
+    missing_minif2f_binding.pop("selected_adapter_binding")
+    with pytest.raises(ValueError, match="miniF2F evidence"):
+        _validate_selected_adapter_evidence(
+            binding,
+            adapter_reload,
+            heldout,
+            missing_minif2f_binding,
+            minif2f_summary,
+        )
+
+    stale_minif2f_summary = copy.deepcopy(minif2f_summary)
+    stale_minif2f_summary["selected_adapter_binding"]["training_artifact_sha256"] = (
+        "f" * 64
+    )
+    with pytest.raises(ValueError, match="miniF2F evidence"):
+        _validate_selected_adapter_evidence(
+            binding,
+            adapter_reload,
+            heldout,
+            minif2f_run,
+            stale_minif2f_summary,
         )

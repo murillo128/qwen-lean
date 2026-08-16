@@ -84,14 +84,11 @@ def _compact_training(value: dict[str, Any]) -> dict[str, Any]:
     return compact
 
 
-def _compact_minif2f(
-    run: dict[str, Any], summary: dict[str, Any], binding: SelectedAdapterBinding
-) -> dict[str, Any]:
+def _compact_minif2f(run: dict[str, Any], summary: dict[str, Any]) -> dict[str, Any]:
     generation_settings = dict(run["generation_settings"])
     adapter = generation_settings.pop("adapter")
     compact_summary = deepcopy(summary)
-    compact_summary["adapter_training_relative_path"] = binding.training_relative_path
-    compact_summary["training_artifact_sha256"] = binding.training_artifact_sha256
+    selected_binding = deepcopy(run["selected_adapter_binding"])
     return {
         "schema_version": "phase4-minif2f-evidence-v1",
         "status": "passed" if summary["phase4_minif2f_passed"] else "failed",
@@ -100,15 +97,17 @@ def _compact_minif2f(
         "tokenizer_id": run["tokenizer_id"],
         "tokenizer_revision": run["tokenizer_revision"],
         "adapter": {
-            "artifact_id": binding.artifact_id,
-            "selected_optimizer_step": binding.selected_optimizer_step,
-            "training_relative_path": binding.training_relative_path,
-            "training_artifact_sha256": binding.training_artifact_sha256,
+            "artifact_id": selected_binding["artifact_id"],
+            "selected_optimizer_step": selected_binding["selected_optimizer_step"],
+            "training_relative_path": selected_binding["training_relative_path"],
+            "training_artifact_sha256": selected_binding["training_artifact_sha256"],
             "ignored_local_path": (
-                f"artifacts/phase4/training/{binding.training_relative_path}"
+                "artifacts/phase4/training/"
+                f"{selected_binding['training_relative_path']}"
             ),
             "rank": adapter["adapter_rank"],
-            "merged": adapter["merged"],
+            "format": selected_binding["format"],
+            "merged": selected_binding["merged"],
         },
         "workload_id": run["workload_id"],
         "benchmark_repository": run["benchmark_repository"],
@@ -135,7 +134,8 @@ def _validate_selected_adapter_evidence(
     expected_id = binding.artifact_id
     expected_relative_path = binding.training_relative_path
     if (
-        int(adapter_reload.get("selected_optimizer_step", -1)) != expected_step
+        adapter_reload.get("selected_adapter_binding") != binding.to_dict()
+        or int(adapter_reload.get("selected_optimizer_step", -1)) != expected_step
         or adapter_reload.get("adapter_artifact_id") != expected_id
         or adapter_reload.get("adapter_training_relative_path")
         != expected_relative_path
@@ -166,7 +166,9 @@ def _validate_selected_adapter_evidence(
     mini_adapter = minif2f_run.get("generation_settings", {}).get("adapter", {})
     mini_adapter_path = Path(str(mini_adapter.get("adapter_path", ""))).resolve()
     if (
-        int(minif2f_summary.get("selected_optimizer_step", -1)) != expected_step
+        minif2f_run.get("selected_adapter_binding") != binding.to_dict()
+        or minif2f_summary.get("selected_adapter_binding") != binding.to_dict()
+        or int(minif2f_summary.get("selected_optimizer_step", -1)) != expected_step
         or minif2f_summary.get("adapter_id") != expected_id
         or minif2f_summary.get("adapter_enabled") is not True
         or mini_adapter.get("adapter_id") != expected_id
@@ -244,7 +246,7 @@ def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     if not compact_workloads["cross_split_record_ids_disjoint"]:
         raise ValueError("Phase 4 evidence contains workload leakage")
     selected_step = binding.selected_optimizer_step
-    compact_minif2f = _compact_minif2f(minif2f_run, minif2f_summary, binding)
+    compact_minif2f = _compact_minif2f(minif2f_run, minif2f_summary)
 
     _write(evidence_dir / "workloads.json", compact_workloads)
     _write(evidence_dir / "preflight.json", preflight)

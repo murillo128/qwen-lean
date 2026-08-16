@@ -35,6 +35,14 @@
     "torch_cuda_version": "12.8"
   },
   "schema_version": "phase4-adapter-reload-v1",
+  "selected_adapter_binding": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 512,
+    "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+    "training_relative_path": "trainer-state/checkpoint-512"
+  },
   "selected_optimizer_step": 512,
   "selection_metric": "validation_mean_target_token_cross_entropy",
   "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8"
