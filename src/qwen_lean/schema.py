@@ -78,6 +78,7 @@ class RunMetadata:
     adapter_path: str | None = None
     adapter_rank: int | None = None
     generation_settings: dict[str, Any] | None = None
+    selected_adapter_binding: dict[str, Any] | None = None
     runtime: dict[str, Any] = field(default_factory=dict)
 
     @classmethod

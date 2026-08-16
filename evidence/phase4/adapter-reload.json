@@ -1,0 +1,49 @@
+{
+  "adapter_artifact_id": "phase4-train4096-v1-lora",
+  "adapter_base_model_name_or_path": "Qwen/Qwen3-8B-Base",
+  "adapter_base_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "adapter_format": "peft-lora",
+  "adapter_merged": false,
+  "adapter_rank": 16,
+  "adapter_training_relative_path": "trainer-state/checkpoint-512",
+  "base_model_id": "Qwen/Qwen3-8B-Base",
+  "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "finite_logits": true,
+  "forward_record_id": "f6147482c405cb42f49181ecebcb8ce36d9d9e4898caf643d1642c0c1bdb0fea",
+  "packages": {
+    "accelerate": "1.10.1",
+    "bitsandbytes": "0.47.0",
+    "datasets": "4.0.0",
+    "peft": "0.17.1",
+    "torch": "2.8.0",
+    "transformers": "4.55.4",
+    "trl": "0.22.2"
+  },
+  "passed": true,
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "inference_execution": "local_cuda",
+    "peak_cuda_allocated_bytes": 7568621568,
+    "peak_cuda_reserved_bytes": 8029995008,
+    "python": "3.12.14",
+    "torch_cuda_version": "12.8"
+  },
+  "schema_version": "phase4-adapter-reload-v1",
+  "selected_adapter_binding": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 512,
+    "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+    "training_relative_path": "trainer-state/checkpoint-512"
+  },
+  "selected_optimizer_step": 512,
+  "selection_metric": "validation_mean_target_token_cross_entropy",
+  "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8"
+}

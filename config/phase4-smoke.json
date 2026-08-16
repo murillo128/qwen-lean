@@ -1,0 +1,105 @@
+{
+  "schema_version": "phase4-config-v1",
+  "model": {
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "add_special_tokens": false,
+    "chat_template": null
+  },
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1"
+  },
+  "serialization": {
+    "id": "mathlib-sft-v1",
+    "supervise_prompt": false,
+    "supervise_eos": true
+  },
+  "workloads": {
+    "train": {
+      "id": "phase4-train4096-v1",
+      "split": "train",
+      "selection_hash_prefix": "phase4-train4096-v1\u0000",
+      "expected_examples": 4096,
+      "maximum_sequence_tokens": 1024
+    },
+    "validation": {
+      "id": "phase4-validation512-v1",
+      "split": "validation",
+      "selection_hash_prefix": "phase4-validation512-v1\u0000",
+      "expected_examples": 512,
+      "maximum_sequence_tokens": 1024
+    },
+    "heldout": {
+      "id": "phase4-heldout64-v1",
+      "split": "heldout",
+      "selection_hash_prefix": "phase4-heldout64-v1\u0000",
+      "expected_examples": 64,
+      "maximum_prompt_and_generation_tokens": 2048
+    }
+  },
+  "quantization": {
+    "load_in_4bit": true,
+    "quantization_type": "nf4",
+    "double_quantization": true,
+    "compute_dtype": "bfloat16"
+  },
+  "lora": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "task_type": "CAUSAL_LM",
+    "r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "bias": "none",
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "modules_to_save": null
+  },
+  "training": {
+    "trainer": "trl-sft",
+    "per_device_micro_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "maximum_sequence_tokens": 1024,
+    "optimizer": "paged_adamw_8bit",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 1.0,
+    "lr_schedule": "cosine",
+    "warmup_steps": 16,
+    "seed": 0,
+    "packing": false,
+    "gradient_checkpointing": true,
+    "maximum_optimizer_steps": 512,
+    "checkpoint_interval_steps": 128,
+    "mandatory_process_stop_step": 256,
+    "checkpoint_candidates": [128, 256, 384, 512],
+    "memory_ceiling_bytes": 25769803776
+  },
+  "heldout_generation": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "minif2f": {
+    "phase1_config": "config/phase1-minif2f.json",
+    "workload_id": "minif2f-valid-dev16-v1"
+  },
+  "verification": {
+    "workers": 8,
+    "heldout_timeout_seconds": 300.0,
+    "minif2f_timeout_seconds": 30.0
+  }
+}

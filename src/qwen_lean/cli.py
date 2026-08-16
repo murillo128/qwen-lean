@@ -34,6 +34,22 @@ from .phase3_training import (
     run_training_preflight,
 )
 from .phase3_verification import run_phase3_semantic_verification
+from .phase4 import (
+    Phase4Config,
+    materialize_phase4_workloads,
+    write_phase4_workloads,
+)
+from .phase4_evidence import write_phase4_evidence
+from .phase4_inference import (
+    compare_phase4_heldout_runs,
+    run_phase4_heldout,
+    run_phase4_minif2f,
+)
+from .phase4_training import (
+    run_phase4_adapter_reload,
+    run_phase4_preflight,
+    run_phase4_training,
+)
 
 
 def _project_root() -> Path:
@@ -211,6 +227,94 @@ def _parser() -> argparse.ArgumentParser:
     )
     phase3_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase3_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    phase4_materialize = subparsers.add_parser(
+        "phase4-materialize",
+        help="materialize deterministic Phase 4 train/validation/heldout workloads",
+    )
+    phase4_materialize.add_argument("--artifact-dir", type=Path, required=True)
+    phase4_materialize.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+    phase4_materialize.add_argument("--output", type=Path, required=True)
+
+    phase4_preflight = subparsers.add_parser(
+        "phase4-preflight", help="run the near-maximum 1024-token QLoRA preflight"
+    )
+    phase4_preflight.add_argument("--workload", type=Path, required=True)
+    phase4_preflight.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+    phase4_preflight.add_argument("--output", type=Path, required=True)
+
+    phase4_train = subparsers.add_parser(
+        "phase4-train", help="run or resume the fixed Phase 4 smoke trajectory"
+    )
+    phase4_train.add_argument("--workload", type=Path, required=True)
+    phase4_train.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+    phase4_train.add_argument("--output-dir", type=Path, required=True)
+    phase4_train.add_argument("--resume-from-checkpoint", type=Path)
+
+    phase4_reload = subparsers.add_parser(
+        "phase4-adapter-reload",
+        help="reload the validation-selected Phase 4 PEFT adapter",
+    )
+    phase4_reload.add_argument("--workload", type=Path, required=True)
+    phase4_reload.add_argument("--training", type=Path, required=True)
+    phase4_reload.add_argument("--adapter-dir", type=Path, required=True)
+    phase4_reload.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+    phase4_reload.add_argument("--output", type=Path, required=True)
+
+    phase4_heldout = subparsers.add_parser(
+        "phase4-heldout",
+        help="run a base or selected-adapter Phase 2 heldout evaluation",
+    )
+    phase4_heldout.add_argument("--dataset-dir", type=Path, required=True)
+    phase4_heldout.add_argument("--mathlib-root", type=Path, required=True)
+    phase4_heldout.add_argument("--workload", type=Path, required=True)
+    phase4_heldout.add_argument("--training", type=Path, required=True)
+    phase4_heldout.add_argument("--mode", choices=("base", "adapter"), required=True)
+    phase4_heldout.add_argument("--adapter-dir", type=Path)
+    phase4_heldout.add_argument("--output-dir", type=Path, required=True)
+    phase4_heldout.add_argument("--workers", type=int)
+    phase4_heldout.add_argument("--timeout", type=float)
+    phase4_heldout.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+    phase4_heldout.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    phase4_compare = subparsers.add_parser(
+        "phase4-heldout-compare", help="validate and summarize heldout comparability"
+    )
+    phase4_compare.add_argument("--training", type=Path, required=True)
+    phase4_compare.add_argument("--base-dir", type=Path, required=True)
+    phase4_compare.add_argument("--adapter-dir", type=Path, required=True)
+    phase4_compare.add_argument("--output", type=Path, required=True)
+
+    phase4_minif2f = subparsers.add_parser(
+        "phase4-minif2f", help="evaluate the selected adapter on miniF2F dev16"
+    )
+    phase4_minif2f.add_argument("--benchmark-root", type=Path, required=True)
+    phase4_minif2f.add_argument("--training", type=Path, required=True)
+    phase4_minif2f.add_argument("--adapter-dir", type=Path, required=True)
+    phase4_minif2f.add_argument("--output-dir", type=Path, required=True)
+    phase4_minif2f.add_argument("--workers", type=int)
+    phase4_minif2f.add_argument("--timeout", type=float)
+    phase4_minif2f.add_argument(
+        "--config", type=Path, default=root / "config/phase4-smoke.json"
+    )
+
+    phase4_evidence = subparsers.add_parser(
+        "phase4-evidence", help="write compact Phase 4 review evidence"
+    )
+    phase4_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    phase4_evidence.add_argument("--evidence-dir", type=Path, required=True)
     return parser
 
 
@@ -424,6 +528,101 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "phase3-evidence":
         write_phase3_evidence(args.artifact_dir, args.evidence_dir)
+        print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "phase4-materialize":
+        config = Phase4Config.load(args.config)
+        workloads = materialize_phase4_workloads(args.artifact_dir, config)
+        write_phase4_workloads(args.output, config, workloads)
+        print(
+            json.dumps(
+                {
+                    "eligible_examples": workloads.eligible_counts,
+                    "selected_examples": {
+                        "train": len(workloads.train),
+                        "validation": len(workloads.validation),
+                        "heldout": len(workloads.heldout),
+                    },
+                    "output": str(args.output),
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.command == "phase4-preflight":
+        value = run_phase4_preflight(
+            Phase4Config.load(args.config), args.workload, args.output
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase4-train":
+        value = run_phase4_training(
+            Phase4Config.load(args.config),
+            args.workload,
+            args.output_dir,
+            resume_from_checkpoint=args.resume_from_checkpoint,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase4-adapter-reload":
+        value = run_phase4_adapter_reload(
+            Phase4Config.load(args.config),
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase4-heldout":
+        if args.mode == "base" and args.adapter_dir is not None:
+            print("--adapter-dir is forbidden in base mode")
+            return 2
+        if args.mode == "adapter" and args.adapter_dir is None:
+            print("--adapter-dir is required in adapter mode")
+            return 2
+        _, _, summary = run_phase4_heldout(
+            Phase4Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.training,
+            args.output_dir,
+            adapter_dir=args.adapter_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase4-heldout-compare":
+        value = compare_phase4_heldout_runs(
+            args.training, args.base_dir, args.adapter_dir, args.output
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase4-minif2f":
+        _, _, summary = run_phase4_minif2f(
+            Phase4Config.load(args.config),
+            args.benchmark_root,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase4-evidence":
+        write_phase4_evidence(args.artifact_dir, args.evidence_dir)
         print(str(args.evidence_dir))
         return 0
 
