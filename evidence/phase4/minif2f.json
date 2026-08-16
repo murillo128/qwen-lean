@@ -3,7 +3,10 @@
     "artifact_id": "phase4-train4096-v1-lora",
     "ignored_local_path": "artifacts/phase4/training/trainer-state/checkpoint-512",
     "merged": false,
-    "rank": 16
+    "rank": 16,
+    "selected_optimizer_step": 512,
+    "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+    "training_relative_path": "trainer-state/checkpoint-512"
   },
   "benchmark_repository": "google-deepmind/miniF2F",
   "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
@@ -63,6 +66,7 @@
     },
     "adapter_enabled": true,
     "adapter_id": "phase4-train4096-v1-lora",
+    "adapter_training_relative_path": "trainer-state/checkpoint-512",
     "candidate_count": 128,
     "candidates_per_task": 8,
     "category_counts": {
@@ -197,6 +201,7 @@
       "verification_latency_mean": 8.722655355671236,
       "verification_latency_sum": 1116.4998855259182
     },
+    "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
     "verifier_timeout_count": 0,
     "workload_id": "minif2f-valid-dev16-v1"
   },

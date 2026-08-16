@@ -203,6 +203,75 @@ class Phase4Workloads:
     eos_token_id: int
 
 
+@dataclass(frozen=True)
+class SelectedAdapterBinding:
+    selected_optimizer_step: int
+    artifact_id: str
+    training_relative_path: str
+    checkpoint_path: Path
+    training_artifact_sha256: str
+    format: str
+    merged: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "selected_optimizer_step": self.selected_optimizer_step,
+            "artifact_id": self.artifact_id,
+            "training_relative_path": self.training_relative_path,
+            "training_artifact_sha256": self.training_artifact_sha256,
+            "format": self.format,
+            "merged": self.merged,
+        }
+
+
+def load_selected_adapter_binding(
+    training_path: Path,
+    *,
+    expected_artifact_id: str | None = None,
+    adapter_dir: Path | None = None,
+) -> tuple[dict[str, Any], SelectedAdapterBinding]:
+    training_bytes = training_path.read_bytes()
+    training = json.loads(training_bytes)
+    if training.get("status") != "passed":
+        raise ValueError("Phase 4 selected adapter requires passed training")
+    selection = training.get("checkpoint_selection") or {}
+    selected_step = int(selection.get("selected_optimizer_step", -1))
+    if selected_step < 0:
+        raise ValueError("Phase 4 training has no validation-selected checkpoint")
+    if bool(selection.get("heldout_or_minif2f_consulted", True)):
+        raise ValueError("Phase 4 checkpoint selection used post-selection evidence")
+
+    adapter = training.get("adapter") or {}
+    artifact_id = str(adapter.get("artifact_id", ""))
+    expected_relative_path = f"trainer-state/checkpoint-{selected_step}"
+    if adapter.get("relative_path") != expected_relative_path:
+        raise ValueError(
+            "Phase 4 training adapter path does not match its selected checkpoint"
+        )
+    if expected_artifact_id is not None and artifact_id != expected_artifact_id:
+        raise ValueError("Phase 4 training selected a different adapter identity")
+    if adapter.get("format") != "peft-lora" or adapter.get("merged") is not False:
+        raise ValueError("Phase 4 training selected adapter is not unmerged PEFT LoRA")
+
+    checkpoint_path = (
+        training_path.resolve().parent / expected_relative_path
+    ).resolve()
+    if adapter_dir is not None and adapter_dir.resolve() != checkpoint_path:
+        raise ValueError(
+            "adapter directory does not match the training-selected checkpoint path"
+        )
+    binding = SelectedAdapterBinding(
+        selected_optimizer_step=selected_step,
+        artifact_id=artifact_id,
+        training_relative_path=expected_relative_path,
+        checkpoint_path=checkpoint_path,
+        training_artifact_sha256=hashlib.sha256(training_bytes).hexdigest(),
+        format="peft-lora",
+        merged=False,
+    )
+    return training, binding
+
+
 def _digest(prefix: str, record_id: str) -> bytes:
     return hashlib.sha256(prefix.encode("utf-8") + record_id.encode("utf-8")).digest()
 

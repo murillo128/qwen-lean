@@ -5,6 +5,7 @@
   "adapter_format": "peft-lora",
   "adapter_merged": false,
   "adapter_rank": 16,
+  "adapter_training_relative_path": "trainer-state/checkpoint-512",
   "base_model_id": "Qwen/Qwen3-8B-Base",
   "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
   "finite_logits": true,
@@ -35,5 +36,6 @@
   },
   "schema_version": "phase4-adapter-reload-v1",
   "selected_optimizer_step": 512,
-  "selection_metric": "validation_mean_target_token_cross_entropy"
+  "selection_metric": "validation_mean_target_token_cross_entropy",
+  "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8"
 }

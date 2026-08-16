@@ -292,6 +292,7 @@ def _parser() -> argparse.ArgumentParser:
     phase4_compare = subparsers.add_parser(
         "phase4-heldout-compare", help="validate and summarize heldout comparability"
     )
+    phase4_compare.add_argument("--training", type=Path, required=True)
     phase4_compare.add_argument("--base-dir", type=Path, required=True)
     phase4_compare.add_argument("--adapter-dir", type=Path, required=True)
     phase4_compare.add_argument("--output", type=Path, required=True)
@@ -602,7 +603,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "phase4-heldout-compare":
         value = compare_phase4_heldout_runs(
-            args.base_dir, args.adapter_dir, args.output
+            args.training, args.base_dir, args.adapter_dir, args.output
         )
         print(json.dumps(value, indent=2))
         return 0

@@ -6,6 +6,8 @@ from pathlib import Path
 from statistics import fmean
 from typing import Any
 
+from .phase4 import SelectedAdapterBinding, load_selected_adapter_binding
+
 
 def _read(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -83,10 +85,13 @@ def _compact_training(value: dict[str, Any]) -> dict[str, Any]:
 
 
 def _compact_minif2f(
-    run: dict[str, Any], summary: dict[str, Any], selected_step: int
+    run: dict[str, Any], summary: dict[str, Any], binding: SelectedAdapterBinding
 ) -> dict[str, Any]:
     generation_settings = dict(run["generation_settings"])
     adapter = generation_settings.pop("adapter")
+    compact_summary = deepcopy(summary)
+    compact_summary["adapter_training_relative_path"] = binding.training_relative_path
+    compact_summary["training_artifact_sha256"] = binding.training_artifact_sha256
     return {
         "schema_version": "phase4-minif2f-evidence-v1",
         "status": "passed" if summary["phase4_minif2f_passed"] else "failed",
@@ -95,9 +100,12 @@ def _compact_minif2f(
         "tokenizer_id": run["tokenizer_id"],
         "tokenizer_revision": run["tokenizer_revision"],
         "adapter": {
-            "artifact_id": adapter["adapter_id"],
+            "artifact_id": binding.artifact_id,
+            "selected_optimizer_step": binding.selected_optimizer_step,
+            "training_relative_path": binding.training_relative_path,
+            "training_artifact_sha256": binding.training_artifact_sha256,
             "ignored_local_path": (
-                f"artifacts/phase4/training/trainer-state/checkpoint-{selected_step}"
+                f"artifacts/phase4/training/{binding.training_relative_path}"
             ),
             "rank": adapter["adapter_rank"],
             "merged": adapter["merged"],
@@ -111,9 +119,63 @@ def _compact_minif2f(
         "inference_engine": run["inference_engine"],
         "inference_engine_version": run["inference_engine_version"],
         "runtime": run["runtime"],
-        "summary": summary,
+        "summary": compact_summary,
         "candidate_results_retained_outside_git": True,
     }
+
+
+def _validate_selected_adapter_evidence(
+    binding: SelectedAdapterBinding,
+    adapter_reload: dict[str, Any],
+    heldout: dict[str, Any],
+    minif2f_run: dict[str, Any],
+    minif2f_summary: dict[str, Any],
+) -> None:
+    expected_step = binding.selected_optimizer_step
+    expected_id = binding.artifact_id
+    expected_relative_path = binding.training_relative_path
+    if (
+        int(adapter_reload.get("selected_optimizer_step", -1)) != expected_step
+        or adapter_reload.get("adapter_artifact_id") != expected_id
+        or adapter_reload.get("adapter_training_relative_path")
+        != expected_relative_path
+        or adapter_reload.get("training_artifact_sha256")
+        != binding.training_artifact_sha256
+        or adapter_reload.get("adapter_format") != binding.format
+        or adapter_reload.get("adapter_merged") is not binding.merged
+    ):
+        raise ValueError(
+            "Phase 4 adapter reload does not match the training-selected checkpoint"
+        )
+
+    heldout_binding = heldout.get("selected_adapter", {})
+    heldout_adapter = heldout.get("runs", {}).get("adapter", {}).get("adapter", {})
+    if (
+        int(heldout.get("selected_optimizer_step", -1)) != expected_step
+        or heldout_binding != binding.to_dict()
+        or heldout_adapter.get("adapter_id") != expected_id
+        or heldout_adapter.get("training_relative_path") != expected_relative_path
+        or heldout_adapter.get("training_artifact_sha256")
+        != binding.training_artifact_sha256
+        or heldout_adapter.get("merged") is not binding.merged
+    ):
+        raise ValueError(
+            "Phase 4 heldout evidence does not match the training-selected checkpoint"
+        )
+
+    mini_adapter = minif2f_run.get("generation_settings", {}).get("adapter", {})
+    mini_adapter_path = Path(str(mini_adapter.get("adapter_path", ""))).resolve()
+    if (
+        int(minif2f_summary.get("selected_optimizer_step", -1)) != expected_step
+        or minif2f_summary.get("adapter_id") != expected_id
+        or minif2f_summary.get("adapter_enabled") is not True
+        or mini_adapter.get("adapter_id") != expected_id
+        or mini_adapter_path != binding.checkpoint_path
+        or mini_adapter.get("merged") is not binding.merged
+    ):
+        raise ValueError(
+            "Phase 4 miniF2F evidence does not match the training-selected checkpoint"
+        )
 
 
 def _heldout_integrity_passed(value: dict[str, Any]) -> bool:
@@ -157,6 +219,14 @@ def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     heldout = _read(artifact_dir / "heldout-comparison.json")
     minif2f_run = _read(artifact_dir / "minif2f/run.json")
     minif2f_summary = _read(artifact_dir / "minif2f/summary.json")
+    _, binding = load_selected_adapter_binding(artifact_dir / "training/run.json")
+    _validate_selected_adapter_evidence(
+        binding,
+        adapter_reload,
+        heldout,
+        minif2f_run,
+        minif2f_summary,
+    )
     required_passes = {
         "preflight": bool(preflight.get("passed")),
         "training": training.get("status") == "passed",
@@ -173,12 +243,14 @@ def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     compact_workloads = _compact_workloads(workloads)
     if not compact_workloads["cross_split_record_ids_disjoint"]:
         raise ValueError("Phase 4 evidence contains workload leakage")
-    selected_step = int(training["checkpoint_selection"]["selected_optimizer_step"])
-    compact_minif2f = _compact_minif2f(minif2f_run, minif2f_summary, selected_step)
+    selected_step = binding.selected_optimizer_step
+    compact_minif2f = _compact_minif2f(minif2f_run, minif2f_summary, binding)
 
     _write(evidence_dir / "workloads.json", compact_workloads)
     _write(evidence_dir / "preflight.json", preflight)
-    _write(evidence_dir / "training.json", _compact_training(training))
+    compact_training = _compact_training(training)
+    compact_training["selected_adapter_binding"] = binding.to_dict()
+    _write(evidence_dir / "training.json", compact_training)
     _write(evidence_dir / "adapter-reload.json", adapter_reload)
     _write(evidence_dir / "heldout-comparison.json", heldout)
     _write(evidence_dir / "minif2f.json", compact_minif2f)
@@ -192,7 +264,7 @@ def write_phase4_evidence(artifact_dir: Path, evidence_dir: Path) -> None:
     mini_metrics = minif2f_summary["pass_at_k"]
     readme = f"""# Phase 4 evidence
 
-`workloads.json` records every ordered record ID and eligibility count without committing tokenized dataset rows. The remaining files retain the compact production preflight, full-state two-process training trajectory, selected-adapter reload, heldout comparison, and Phase 1-comparable miniF2F result. Checkpoints, adapter weights, raw generations, and detailed candidates remain under ignored `artifacts/phase4/`.
+`workloads.json` records every ordered record ID and eligibility count without committing tokenized dataset rows. The remaining files retain the compact production preflight, full-state two-process training trajectory, selected-adapter reload, heldout comparison, and Phase 1-comparable miniF2F result. Every post-selection artifact is bound to the training-selected adapter by optimizer step, logical identity, canonical training-relative path, and the SHA-256 of the raw training artifact. Checkpoints, adapter weights, raw generations, and detailed candidates remain under ignored `artifacts/phase4/`.
 
 **OBSERVED:** the fixed 4,096-example QLoRA trajectory stopped at optimizer step 256 and resumed in a fresh process to step 512 with optimizer, scheduler, RNG, and derived data position preserved. Validation target-token cross-entropy moved from {training["pre_training_validation"]["mean_target_token_cross_entropy"]:.6f} at step 0 through {probes[128]:.6f}, {probes[256]:.6f}, {probes[384]:.6f}, and {probes[512]:.6f}; validation-only selection chose step {selected_step}. Peak CUDA reserved memory was {training["runtime"]["peak_cuda_reserved_bytes"] / 1024**3:.2f} GiB, below the 24 GiB design ceiling.
 

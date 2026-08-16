@@ -26,7 +26,12 @@ from .phase3_verification import (
     _validate_phase2_environment,
     reconstruct_generated_proof,
 )
-from .phase4 import Phase4Config, load_phase4_workloads
+from .phase4 import (
+    Phase4Config,
+    SelectedAdapterBinding,
+    load_phase4_workloads,
+    load_selected_adapter_binding,
+)
 from .schema import CandidateResult, TaskRecord
 from .prompt import PROMPT_FORMAT_ID, normalize_transport
 
@@ -44,13 +49,15 @@ def phase4_heldout_integrity_passed(summary: dict[str, Any]) -> bool:
 
 
 def _sanitized_adapter_metadata(
-    value: dict[str, Any] | None, selected_step: int
+    value: dict[str, Any] | None, binding: SelectedAdapterBinding
 ) -> dict[str, Any] | None:
     if value is None:
         return None
     compact = {key: item for key, item in value.items() if key != "adapter_path"}
+    compact["training_relative_path"] = binding.training_relative_path
+    compact["training_artifact_sha256"] = binding.training_artifact_sha256
     compact["ignored_local_path"] = (
-        f"artifacts/phase4/training/trainer-state/checkpoint-{selected_step}"
+        f"artifacts/phase4/training/{binding.training_relative_path}"
     )
     return compact
 
@@ -139,20 +146,14 @@ def heldout_generation_request(
 
 def _validate_selected_adapter(
     config: Phase4Config, training_path: Path, adapter_dir: Path
-) -> int:
-    training = json.loads(training_path.read_text(encoding="utf-8"))
-    if training.get("status") != "passed":
-        raise ValueError("Phase 4 post-selection evaluation requires passed training")
-    selection = training.get("checkpoint_selection") or {}
-    selected_step = int(selection.get("selected_optimizer_step", -1))
-    if adapter_dir.name != f"checkpoint-{selected_step}":
-        raise ValueError("evaluation adapter is not the validation-selected checkpoint")
-    if bool(selection.get("heldout_or_minif2f_consulted", True)):
-        raise ValueError(
-            "Phase 4 checkpoint selection consulted post-selection results"
-        )
+) -> SelectedAdapterBinding:
+    _, binding = load_selected_adapter_binding(
+        training_path,
+        expected_artifact_id=str(config.lora["artifact_id"]),
+        adapter_dir=adapter_dir,
+    )
     phase4_adapter_spec(config, adapter_dir).validate(_phase1_config(config))
-    return selected_step
+    return binding
 
 
 def _load_heldout_records(
@@ -270,12 +271,14 @@ def run_phase4_heldout(
     timeout_seconds: float | None = None,
 ) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
     mode = "base" if adapter_dir is None else "adapter"
-    training = json.loads(training_path.read_text(encoding="utf-8"))
-    selection = training.get("checkpoint_selection") or {}
-    if training.get("status") != "passed" or not selection:
-        raise ValueError("Phase 4 heldout evaluation requires frozen selection")
+    training, binding = load_selected_adapter_binding(
+        training_path,
+        expected_artifact_id=str(config.lora["artifact_id"]),
+        adapter_dir=adapter_dir,
+    )
+    selection = training["checkpoint_selection"]
     if adapter_dir is not None:
-        _validate_selected_adapter(config, training_path, adapter_dir)
+        phase4_adapter_spec(config, adapter_dir).validate(_phase1_config(config))
     _validate_phase2_environment(phase2_config, dataset_dir, mathlib_root)
     workloads = load_phase4_workloads(workload_path, config)
     selected_ids = [item.record_id for item in workloads.heldout]
@@ -378,7 +381,8 @@ def run_phase4_heldout(
         "model_role": mode,
         "model": config.model,
         "adapter": None if adapter is None else adapter.metadata(),
-        "selected_optimizer_step": int(selection["selected_optimizer_step"]),
+        "selected_optimizer_step": binding.selected_optimizer_step,
+        "selected_adapter_binding": binding.to_dict(),
         "checkpoint_selection_metric": selection["metric"],
         "post_selection_evaluation": True,
         "dataset_schema_version": config.value["dataset"]["schema_version"],
@@ -433,8 +437,9 @@ def run_phase4_heldout(
 
 
 def compare_phase4_heldout_runs(
-    base_dir: Path, adapter_dir: Path, output: Path
+    training_path: Path, base_dir: Path, adapter_dir: Path, output: Path
 ) -> dict[str, Any]:
+    training, binding = load_selected_adapter_binding(training_path)
     base_run = json.loads((base_dir / "run.json").read_text(encoding="utf-8"))
     adapter_run = json.loads((adapter_dir / "run.json").read_text(encoding="utf-8"))
     base_summary = json.loads((base_dir / "summary.json").read_text(encoding="utf-8"))
@@ -466,6 +471,15 @@ def compare_phase4_heldout_runs(
         "adapter", {}
     ).get("enabled"):
         raise ValueError("Phase 4 adapter run did not enable the selected adapter")
+    if base_run.get("model") != training.get("model"):
+        raise ValueError("Phase 4 heldout model differs from the training trajectory")
+    adapter_metadata = adapter_run["adapter"]
+    if adapter_metadata.get("adapter_id") != binding.artifact_id:
+        raise ValueError("Phase 4 heldout adapter identity differs from training")
+    if Path(str(adapter_metadata.get("adapter_path", ""))).resolve() != (
+        binding.checkpoint_path
+    ):
+        raise ValueError("Phase 4 heldout adapter path differs from training selection")
     base_runtime = _runtime_identity(base_run["runtime"])
     adapter_runtime = _runtime_identity(adapter_run["runtime"])
     if base_runtime != adapter_runtime:
@@ -487,6 +501,7 @@ def compare_phase4_heldout_runs(
         "workload_id": base_run["workload_id"],
         "selected_record_ids": base_run["selected_record_ids"],
         "selected_optimizer_step": base_run["selected_optimizer_step"],
+        "selected_adapter": binding.to_dict(),
         "evaluation_contract": {
             "model": base_run["model"],
             "dataset_schema_version": base_run["dataset_schema_version"],
@@ -511,9 +526,7 @@ def compare_phase4_heldout_runs(
                 "runtime": base_runtime,
             },
             "adapter": {
-                "adapter": _sanitized_adapter_metadata(
-                    adapter_run["adapter"], int(base_run["selected_optimizer_step"])
-                ),
+                "adapter": _sanitized_adapter_metadata(adapter_run["adapter"], binding),
                 "runtime": adapter_runtime,
             },
         },
@@ -539,7 +552,7 @@ def run_phase4_minif2f(
     verification_workers: int | None = None,
     timeout_seconds: float | None = None,
 ) -> tuple[Any, Sequence[Any], dict[str, Any]]:
-    selected_step = _validate_selected_adapter(config, training_path, adapter_dir)
+    binding = _validate_selected_adapter(config, training_path, adapter_dir)
     phase1 = _phase1_config(config)
     worker_count = int(
         config.value["verification"]["workers"]
@@ -582,7 +595,9 @@ def run_phase4_minif2f(
         {
             "phase4_minif2f_comparison": True,
             "phase1_quality_comparable": True,
-            "selected_optimizer_step": selected_step,
+            "selected_optimizer_step": binding.selected_optimizer_step,
+            "adapter_training_relative_path": binding.training_relative_path,
+            "training_artifact_sha256": binding.training_artifact_sha256,
             "checkpoint_selection_influenced_by_minif2f": False,
             "adapter_enabled": True,
             "adapter_id": config.lora["artifact_id"],

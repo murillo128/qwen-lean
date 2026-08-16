@@ -19,10 +19,15 @@ from qwen_lean.phase4 import (
     TRAIN_WORKLOAD_ID,
     VALIDATION_WORKLOAD_ID,
     Phase4Config,
+    load_selected_adapter_binding,
     select_heldout_workload,
     select_sft_workload,
 )
-from qwen_lean.phase4_evidence import _compact_training, _heldout_integrity_passed
+from qwen_lean.phase4_evidence import (
+    _compact_training,
+    _heldout_integrity_passed,
+    _validate_selected_adapter_evidence,
+)
 from qwen_lean.phase4_inference import (
     _phase1_config,
     compare_phase4_heldout_runs,
@@ -92,6 +97,36 @@ def _small_config() -> Phase4Config:
     value["workloads"]["heldout"]["maximum_prompt_and_generation_tokens"] = 80
     value["heldout_generation"]["max_new_tokens"] = 20
     return Phase4Config(path=source.path, value=value)
+
+
+def _write_training_artifact(root: Path) -> tuple[Path, Path]:
+    training_dir = root / "training"
+    training_dir.mkdir()
+    training_path = training_dir / "run.json"
+    expected_adapter = training_dir / "trainer-state/checkpoint-512"
+    training_path.write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "model": {
+                    "model_id": "Qwen/Qwen3-8B-Base",
+                    "model_revision": "rev",
+                },
+                "checkpoint_selection": {
+                    "selected_optimizer_step": 512,
+                    "heldout_or_minif2f_consulted": False,
+                },
+                "adapter": {
+                    "artifact_id": "phase4-train4096-v1-lora",
+                    "relative_path": "trainer-state/checkpoint-512",
+                    "format": "peft-lora",
+                    "merged": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return training_path, expected_adapter
 
 
 def test_phase4_config_pins_fixed_qlora_and_evaluation_contracts() -> None:
@@ -266,6 +301,28 @@ def test_phase4_resume_requires_full_state_and_step256_data_position(
         validate_phase4_resume_checkpoint(config, checkpoint)
 
 
+def test_phase4_selected_adapter_rejects_foreign_same_named_checkpoint(
+    tmp_path: Path,
+) -> None:
+    training_path, expected_adapter = _write_training_artifact(tmp_path)
+    foreign_adapter = tmp_path / "foreign/checkpoint-512"
+    foreign_adapter.mkdir(parents=True)
+
+    _, binding = load_selected_adapter_binding(
+        training_path,
+        expected_artifact_id="phase4-train4096-v1-lora",
+        adapter_dir=expected_adapter,
+    )
+
+    assert binding.checkpoint_path == expected_adapter.resolve()
+    with pytest.raises(ValueError, match="training-selected checkpoint path"):
+        load_selected_adapter_binding(
+            training_path,
+            expected_artifact_id="phase4-train4096-v1-lora",
+            adapter_dir=foreign_adapter,
+        )
+
+
 def test_phase4_base_and_adapter_requests_differ_only_by_adapter_enablement(
     tmp_path: Path,
 ) -> None:
@@ -381,6 +438,7 @@ def test_phase4_heldout_integrity_rejects_timeouts_even_when_complete() -> None:
 def test_phase4_comparison_preserves_sanitized_observed_run_contract(
     tmp_path: Path,
 ) -> None:
+    training_path, expected_adapter = _write_training_artifact(tmp_path)
     base_dir = tmp_path / "base"
     adapter_dir = tmp_path / "adapter"
     base_dir.mkdir()
@@ -424,7 +482,7 @@ def test_phase4_comparison_preserves_sanitized_observed_run_contract(
             "enabled": True,
             "merged": False,
             "adapter_id": "phase4-train4096-v1-lora",
-            "adapter_path": "/ignored/checkpoint-512",
+            "adapter_path": str(expected_adapter),
             "adapter_rank": 16,
             "base_model_id": "Qwen/Qwen3-8B-Base",
             "base_model_revision": "rev",
@@ -441,7 +499,7 @@ def test_phase4_comparison_preserves_sanitized_observed_run_contract(
         (directory / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
 
     comparison = compare_phase4_heldout_runs(
-        base_dir, adapter_dir, tmp_path / "comparison.json"
+        training_path, base_dir, adapter_dir, tmp_path / "comparison.json"
     )
 
     assert comparison["evaluation_contract"]["inference_engine"] == {
@@ -449,6 +507,94 @@ def test_phase4_comparison_preserves_sanitized_observed_run_contract(
         "version": "0.10.2",
     }
     assert comparison["runs"]["base"]["runtime"] == runtime
+    assert comparison["selected_adapter"]["training_relative_path"] == (
+        "trainer-state/checkpoint-512"
+    )
     adapter_metadata = comparison["runs"]["adapter"]["adapter"]
     assert "adapter_path" not in adapter_metadata
     assert adapter_metadata["ignored_local_path"].endswith("checkpoint-512")
+
+    foreign_run = copy.deepcopy(adapter_run)
+    foreign_run["adapter"]["adapter_path"] = str(tmp_path / "foreign/checkpoint-512")
+    (adapter_dir / "run.json").write_text(json.dumps(foreign_run), encoding="utf-8")
+    with pytest.raises(ValueError, match="adapter path differs"):
+        compare_phase4_heldout_runs(
+            training_path, base_dir, adapter_dir, tmp_path / "foreign.json"
+        )
+
+
+def test_phase4_evidence_rejects_stale_or_mismatched_adapter_artifacts(
+    tmp_path: Path,
+) -> None:
+    training_path, expected_adapter = _write_training_artifact(tmp_path)
+    _, binding = load_selected_adapter_binding(training_path)
+    adapter_reload = {
+        "selected_optimizer_step": 512,
+        "adapter_artifact_id": binding.artifact_id,
+        "adapter_training_relative_path": binding.training_relative_path,
+        "training_artifact_sha256": binding.training_artifact_sha256,
+        "adapter_format": "peft-lora",
+        "adapter_merged": False,
+    }
+    heldout = {
+        "selected_optimizer_step": 512,
+        "selected_adapter": binding.to_dict(),
+        "runs": {
+            "adapter": {
+                "adapter": {
+                    "adapter_id": binding.artifact_id,
+                    "training_relative_path": binding.training_relative_path,
+                    "training_artifact_sha256": binding.training_artifact_sha256,
+                    "merged": False,
+                }
+            }
+        },
+    }
+    minif2f_run = {
+        "generation_settings": {
+            "adapter": {
+                "adapter_id": binding.artifact_id,
+                "adapter_path": str(expected_adapter),
+                "merged": False,
+            }
+        }
+    }
+    minif2f_summary = {
+        "selected_optimizer_step": 512,
+        "adapter_id": binding.artifact_id,
+        "adapter_enabled": True,
+    }
+
+    _validate_selected_adapter_evidence(
+        binding, adapter_reload, heldout, minif2f_run, minif2f_summary
+    )
+
+    stale_reload = {**adapter_reload, "selected_optimizer_step": 384}
+    with pytest.raises(ValueError, match="adapter reload"):
+        _validate_selected_adapter_evidence(
+            binding, stale_reload, heldout, minif2f_run, minif2f_summary
+        )
+
+    mismatched_heldout = copy.deepcopy(heldout)
+    mismatched_heldout["runs"]["adapter"]["adapter"]["adapter_id"] = "foreign"
+    with pytest.raises(ValueError, match="heldout evidence"):
+        _validate_selected_adapter_evidence(
+            binding,
+            adapter_reload,
+            mismatched_heldout,
+            minif2f_run,
+            minif2f_summary,
+        )
+
+    foreign_minif2f = copy.deepcopy(minif2f_run)
+    foreign_minif2f["generation_settings"]["adapter"]["adapter_path"] = str(
+        tmp_path / "foreign/checkpoint-512"
+    )
+    with pytest.raises(ValueError, match="miniF2F evidence"):
+        _validate_selected_adapter_evidence(
+            binding,
+            adapter_reload,
+            heldout,
+            foreign_minif2f,
+            minif2f_summary,
+        )

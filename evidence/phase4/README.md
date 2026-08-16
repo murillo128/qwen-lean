@@ -1,6 +1,6 @@
 # Phase 4 evidence
 
-`workloads.json` records every ordered record ID and eligibility count without committing tokenized dataset rows. The remaining files retain the compact production preflight, full-state two-process training trajectory, selected-adapter reload, heldout comparison, and Phase 1-comparable miniF2F result. Checkpoints, adapter weights, raw generations, and detailed candidates remain under ignored `artifacts/phase4/`.
+`workloads.json` records every ordered record ID and eligibility count without committing tokenized dataset rows. The remaining files retain the compact production preflight, full-state two-process training trajectory, selected-adapter reload, heldout comparison, and Phase 1-comparable miniF2F result. Every post-selection artifact is bound to the training-selected adapter by optimizer step, logical identity, canonical training-relative path, and the SHA-256 of the raw training artifact. Checkpoints, adapter weights, raw generations, and detailed candidates remain under ignored `artifacts/phase4/`.
 
 **OBSERVED:** the fixed 4,096-example QLoRA trajectory stopped at optimizer step 256 and resumed in a fresh process to step 512 with optimizer, scheduler, RNG, and derived data position preserved. Validation target-token cross-entropy moved from 1.865807 at step 0 through 1.506306, 1.461882, 1.437467, and 1.430901; validation-only selection chose step 512. Peak CUDA reserved memory was 12.12 GiB, below the 24 GiB design ceiling.
 

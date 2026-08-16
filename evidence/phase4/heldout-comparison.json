@@ -820,7 +820,9 @@
         "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
         "enabled": true,
         "ignored_local_path": "artifacts/phase4/training/trainer-state/checkpoint-512",
-        "merged": false
+        "merged": false,
+        "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+        "training_relative_path": "trainer-state/checkpoint-512"
       },
       "runtime": {
         "cuda_device": "NVIDIA RTX 4000 Ada Generation",
@@ -854,6 +856,14 @@
     }
   },
   "schema_version": "phase4-heldout-comparison-v1",
+  "selected_adapter": {
+    "artifact_id": "phase4-train4096-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 512,
+    "training_artifact_sha256": "039492178af14c0a6188165ea60f1e8b554cea257179e79709eaf94fb90290b8",
+    "training_relative_path": "trainer-state/checkpoint-512"
+  },
   "selected_optimizer_step": 512,
   "selected_record_ids": [
     "66b102517ec32ed65fd0921e3fb94742fa8ef18782ae8ecc11a3e934bc6b4f60",

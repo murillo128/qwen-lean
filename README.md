@@ -307,6 +307,7 @@ uv run --frozen --extra baseline qwen-lean phase4-heldout \
   --adapter-dir artifacts/phase4/training/trainer-state/checkpoint-512 \
   --output-dir artifacts/phase4/heldout/adapter
 uv run --frozen qwen-lean phase4-heldout-compare \
+  --training artifacts/phase4/training/run.json \
   --base-dir artifacts/phase4/heldout/base \
   --adapter-dir artifacts/phase4/heldout/adapter \
   --output artifacts/phase4/heldout-comparison.json

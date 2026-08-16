@@ -24,7 +24,11 @@ from .phase3_training import (
     load_qlora_runtime,
     teacher_forced_metrics,
 )
-from .phase4 import Phase4Config, load_phase4_workloads
+from .phase4 import (
+    Phase4Config,
+    load_phase4_workloads,
+    load_selected_adapter_binding,
+)
 
 
 PHASE4_PREFLIGHT_SCHEMA_VERSION = "phase4-preflight-v1"
@@ -622,16 +626,15 @@ def run_phase4_adapter_reload(
     adapter_dir: Path,
     output: Path,
 ) -> dict[str, Any]:
+    training, binding = load_selected_adapter_binding(
+        training_path,
+        expected_artifact_id=str(config.lora["artifact_id"]),
+        adapter_dir=adapter_dir,
+    )
     torch, device_index, properties = _require_local_cuda()
     torch.cuda.reset_peak_memory_stats(device_index)
     workloads = load_phase4_workloads(workload_path, config)
-    training = json.loads(training_path.read_text(encoding="utf-8"))
     selection = training.get("checkpoint_selection") or {}
-    selected_step = int(selection.get("selected_optimizer_step", -1))
-    if adapter_dir.name != f"checkpoint-{selected_step}":
-        raise ValueError(
-            "Phase 4 adapter path is not the validation-selected checkpoint"
-        )
     try:
         from peft import PeftConfig, PeftModel
         from transformers import AutoModelForCausalLM, BitsAndBytesConfig
@@ -679,7 +682,9 @@ def run_phase4_adapter_reload(
         "base_model_id": config.model["model_id"],
         "base_model_revision": config.model["model_revision"],
         "adapter_artifact_id": config.lora["artifact_id"],
-        "selected_optimizer_step": selected_step,
+        "selected_optimizer_step": binding.selected_optimizer_step,
+        "adapter_training_relative_path": binding.training_relative_path,
+        "training_artifact_sha256": binding.training_artifact_sha256,
         "selection_metric": selection["metric"],
         "adapter_base_model_name_or_path": adapter_config.base_model_name_or_path,
         "adapter_base_revision": adapter_config.revision,
