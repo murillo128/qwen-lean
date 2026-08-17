@@ -1,0 +1,472 @@
+{
+  "external_lean_ingestion": [
+    {
+      "declaration_name": "ZetaDerivUpperBnd",
+      "rank": 1,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "d55fa0e8ba2cf71b389d6ce60b8adb99da264f5acdd72f78ae6d3d0dc39ab640",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "ZetaNoZerosInBox",
+      "rank": 2,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "e8ae2815ca9a0bbe687e0b5416c8ea8466ff37d63212bfa531bf4730202777df",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "ZetaUpperBnd",
+      "rank": 3,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "ad47c59c131e97093bb96298529b2ab224b1454022e908fde2cf721021c5cf5d",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "ZetaZeroFree",
+      "rank": 4,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "aed91bfed777dfe37a4e0d5ac89fe3bba0aa865f43d10a7f00585e75fd2514c5",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "dirichlet_thm",
+      "rank": 5,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "c3bcb17ec355c774a3b616b478eac63b849eac969afc5049a6e053b53419feb3",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "LogDerivZetaBndUnif",
+      "rank": 6,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "6cbf88b5090de764eea6285fbc8c9bff9e9047a9bd75b14391cbc642418be0dc",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "MellinConvolutionTransform",
+      "rank": 7,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "fc8e446494eb84217185282514e0736400fa4f116880494387c23a7379ab3cfe",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "MellinOfDeltaSpike",
+      "rank": 8,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "75edcfb36bb236a1e19f24aa3391c02b1cfb87a022d8ec016ac9a8357b4484e4",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "riemannZetaLogDerivResidue",
+      "rank": 9,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "677e2cfffdad0557e343cbc90ff7b05ebcee10f402a31a1d063ea4b6adde0bfc",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "BrunTitchmarsh.card_range_filter_prime_isBigO",
+      "rank": 10,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "335838d7c3514764e47d79a21d051760613f6b0dd1887c5723772ec4996dafe5",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "BrunTitchmarsh.primesBetween_le",
+      "rank": 11,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "47766a98a3298976a605165916c502401a6e0bff6da900b3995fddbc943d4529",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "MediumPNT",
+      "rank": 12,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "1442774c322e6aade1a49ff1c9bf5af1b03ab97bb865bdafea13b24532f80c86",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "WeakPNT'",
+      "rank": 13,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "86038dcc0e6098c10c1bfc0a0100ef406b43b5c539407e587ac3477e65e289f6",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "WeakPNT''",
+      "rank": 14,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "344ed3f200e943b9ab7fe1ff9a35d30569d1810a07ecfdc01fa3e681137dfaab",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "ZetaNoZerosOn1Line",
+      "rank": 15,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "12801e801b04416f883f68ab7f07a521c0f4659b6c64864973e3d076245a5fb9",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "nth_prime_asymp",
+      "rank": 16,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "5202e742e30d249c9f1aa638e7d94cabfcd59987cec8d7d52fac0b36aef529e7",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "prime_between",
+      "rank": 17,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "444103e048c672262ae4a806e55c2ade838e62ecb6e38624b969ee93e2d43c8f",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "Backlund.zetaCounting_crude_majorant",
+      "rank": 18,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "94357c63e0a14859ec8c6b7e7d64bc369ae878afe854265e95496b2bba965778",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "Backlund.zetaSurrogate_zeros_in_closedBall₀_count",
+      "rank": 19,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "8a06b845df87723d77f4eadcb3df3df575c21a45e223ce565d0add92be01ae7f",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt",
+      "rank": 20,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "ab654a1e3a6c8a2adee03fa6761c6f5ba2a75d5acbc40b9684ba02019a4fb612",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt",
+      "rank": 21,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "f213ef7839aaca0d9ef6734ed3797902ed4c1c41fffafb16fb966c7e3a1d2aac",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    {
+      "declaration_name": "ZetaNear1BndExact",
+      "rank": 22,
+      "reason": "Native-verified, licensed, source-complete external Lean declaration.",
+      "record_id": "9d7a3084583f2f9dc8a0e7b0b24bf5bfbe55521194f7fad7e80a2b401d9efd62",
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    }
+  ],
+  "future_clean_evaluation_targets": [
+    {
+      "declaration_name": "ArithmeticFunction.vonMangoldt.summable_residueClass_non_primes_div",
+      "file_path": "Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+      "rank": 1,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "016aae98da2da14bd5d399e0e706bcb06e0fd9362d5f28cc43b1f7ebd0be4f51"
+    },
+    {
+      "declaration_name": "one_le_zpow_of_nonpos₀",
+      "file_path": "Mathlib/Algebra/Order/GroupWithZero/Basic.lean",
+      "rank": 2,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "01fc98b7efaf2d94c3a016a138b2b5127f5295a9236f750e7fe907115c310cc0"
+    },
+    {
+      "declaration_name": "one_lt_zpow_iff_right_of_lt_one₀",
+      "file_path": "Mathlib/Algebra/Order/GroupWithZero/Basic.lean",
+      "rank": 3,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "02025eb70574d59f6524f8c7d35cb0e74bc7e0d4319b358348e6e33e427e0977"
+    },
+    {
+      "declaration_name": "ArithmeticFunction.vonMangoldt.continuousOn_LFunctionResidueClassAux'",
+      "file_path": "Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+      "rank": 4,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "026777f551cc98fd20bda2c53c7d9dcdc8422083476bfdc6aa4a46f25699c541"
+    },
+    {
+      "declaration_name": "ArithmeticFunction.IsMultiplicative.cardFactors_apply_prime_pow",
+      "file_path": "Mathlib/NumberTheory/ArithmeticFunction/Misc.lean",
+      "rank": 5,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "03d3f0559284955ae58155ba267022c6df55b4838682be70a3f9c1b1da6e668b"
+    },
+    {
+      "declaration_name": "inv_nonpos'",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 6,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "051d731a9a10fee064b49bd7ce69652c6c4a13b0d78cffc0e574ccac1daefdf9"
+    },
+    {
+      "declaration_name": "ArithmeticFunction.vonMangoldt.residueClass_apply",
+      "file_path": "Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+      "rank": 7,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "05a275bc0b4971b593b3ca37d7f9a9a2cb5cb8b67808dd70fc94e477af8939ad"
+    },
+    {
+      "declaration_name": "div_nonpos_iff",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 8,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "06cc5fbf7b852ade46751c0e905ab8d6cf5ef1181db6667b610af8a448ba6d2b"
+    },
+    {
+      "declaration_name": "ArithmeticFunction.vonMangoldt.LSeries_residueClass_eq",
+      "file_path": "Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+      "rank": 9,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "06da4146809679080b9c2cfde028fe3a0272cffe0b6855ea6ec141be51f7f211"
+    },
+    {
+      "declaration_name": "one_div_le",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 10,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "06e76743aa90a2f86d37d40c068d9256025c8703f68012f15dca59da2bce6fad"
+    },
+    {
+      "declaration_name": "two_mul_le_add_mul_sq",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 11,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0734dc1f4a2909e037f596376d474cb36d478529e04a0e97a9ecb520d2bb9098"
+    },
+    {
+      "declaration_name": "le_one_div_of_neg",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 12,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0818885d6f9cc58116c75d793d3af477f3799454ccb18bbc3ea22c49189594aa"
+    },
+    {
+      "declaration_name": "inv_lt_zero'",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 13,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "08afc766cd2c3b3a79a907b0f9c1511ec2d85f88145df7f2caf790cb361f6394"
+    },
+    {
+      "declaration_name": "mul_pos_iff_of_pos_left",
+      "file_path": "Mathlib/Algebra/Order/GroupWithZero/Basic.lean",
+      "rank": 14,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "096beda019ec7b1c8d6738429d7231964315ba705e867787fd000f8cc5f7147b"
+    },
+    {
+      "declaration_name": "div_lt_one_iff",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 15,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0a0610b8883ce016b07765cd75ce0c998e1e10476f9e59baec17495196dbec47"
+    },
+    {
+      "declaration_name": "ArithmeticFunction.IsMultiplicative.Nat.Coprime.sum_divisors_mul",
+      "file_path": "Mathlib/NumberTheory/ArithmeticFunction/Misc.lean",
+      "rank": 16,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0a6242bb29608bc6da0dc84c9e2cd70c57d0fbd1d7c0fc12c0c60d07a0edc64e"
+    },
+    {
+      "declaration_name": "Nat.divisors_card_eq_one_iff",
+      "file_path": "Mathlib/NumberTheory/ArithmeticFunction/Misc.lean",
+      "rank": 17,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0a9fa8faee95345ef7aa4cf2a33c8173713698f6c023f7f6d16eebbd08499316"
+    },
+    {
+      "declaration_name": "div_le_one_of_ge",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 18,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0bbb317e08a1cfc387a9314b766f2ad1b03128ce421f34f9c9865d3b63749bdd"
+    },
+    {
+      "declaration_name": "one_lt_zpow₀",
+      "file_path": "Mathlib/Algebra/Order/GroupWithZero/Basic.lean",
+      "rank": 19,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0c60514806a1c165ae369e55dff6565919048ba5923c5e234a7c168bd34511d0"
+    },
+    {
+      "declaration_name": "div_le_div_right_of_neg",
+      "file_path": "Mathlib/Algebra/Order/Field/Basic.lean",
+      "rank": 20,
+      "reason": "Pinned verified high-relevance Phase 2 heldout theorem.",
+      "record_id": "0d80666ddf9460ebebcd37ea3a7743240f88cb15abec38a4b88ffed87302a063"
+    }
+  ],
+  "knowledge_only_anchors": [
+    {
+      "atlas_id": "debruijn-newman",
+      "name": "De Bruijn-Newman criterion",
+      "rank": 1,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "dedekind-zeta-grh",
+      "name": "Riemann hypothesis for Dedekind zeta functions",
+      "rank": 2,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "finite-height-verification",
+      "name": "RH verified up to height 3 times 10^12",
+      "rank": 3,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "generalized-riemann-hypothesis",
+      "name": "Generalized Riemann hypothesis",
+      "rank": 4,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "hol-light-prime-number-theorem",
+      "name": "Prime Number Theorem in HOL Light",
+      "rank": 5,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "isabelle-prime-number-theorem",
+      "name": "Prime Number Theorem in Isabelle/HOL",
+      "rank": 6,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "lindelof-hypothesis",
+      "name": "Lindelof hypothesis for zeta",
+      "rank": 7,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "mertens-conjecture",
+      "name": "Mertens conjecture",
+      "rank": 8,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "metamath-prime-number-theorem",
+      "name": "Prime Number Theorem in Metamath",
+      "rank": 9,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "montgomery-pair-correlation",
+      "name": "Pair correlation of zeta zeros",
+      "rank": 10,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "riemann-hypothesis",
+      "name": "Riemann hypothesis",
+      "rank": 11,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    },
+    {
+      "atlas_id": "riemann-zeta-function",
+      "name": "Riemann zeta function and meromorphic continuation",
+      "rank": 12,
+      "reason": "Conjectural, heuristic, or unproved anchor; never a Lean SFT target."
+    }
+  ],
+  "missing_lean_formalizations": [
+    {
+      "atlas_id": "baez-duarte-criterion",
+      "name": "Baez-Duarte sequence criterion",
+      "rank": 1,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "lagarias-criterion",
+      "name": "Lagarias elementary RH criterion",
+      "rank": 2,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "li-criterion",
+      "name": "Li positivity criterion",
+      "rank": 3,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "nyman-beurling-criterion",
+      "name": "Nyman-Beurling functional-analytic criterion",
+      "rank": 4,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "psi-error-criterion",
+      "name": "RH criterion via Chebyshev psi",
+      "rank": 5,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "riesz-criterion",
+      "name": "Riesz criterion for RH",
+      "rank": 6,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "robin-criterion",
+      "name": "Robin divisor-sum criterion",
+      "rank": 7,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "speiser-criterion",
+      "name": "Speiser derivative-zero criterion",
+      "rank": 8,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "von-koch-prime-error",
+      "name": "von Koch RH criterion for pi(x)",
+      "rank": 9,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "explicit-formula",
+      "name": "Explicit formula for prime-counting functions",
+      "rank": 10,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "riemann-von-mangoldt-zero-count",
+      "name": "Riemann-von Mangoldt zero-counting formula",
+      "rank": 11,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
+      "atlas_id": "schoenfeld-conditional-bounds",
+      "name": "Explicit prime estimates conditional on RH",
+      "rank": 12,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    }
+  ],
+  "non_binding": true,
+  "schema_version": "riemann-opportunity-ranking-v1"
+}

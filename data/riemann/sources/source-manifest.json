@@ -1,0 +1,442 @@
+{
+  "accepted_external_records": 22,
+  "accepted_projects": [
+    "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd"
+  ],
+  "discovery_scope": "GitHub Lean project search plus the mandatory PNT+ project, bounded to the pinned projects recorded here. Forks and unlicensed candidates were inspected but not accepted.",
+  "projects": [
+    {
+      "default_branch": "main",
+      "discovery_status": "pinned-built-and-curated",
+      "lean_toolchain": "leanprover/lean4:v4.32.2",
+      "license": "Apache-2.0",
+      "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+      "module_inventory": [
+        {
+          "path": "PrimeNumberTheoremAnd/MediumPNT.lean",
+          "status": "accepted-records",
+          "topics": [
+            "PNT",
+            "Mellin",
+            "zero-free-region"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "status": "accepted-records",
+          "topics": [
+            "zeta-bounds",
+            "zero-free-region",
+            "log-derivative"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean",
+          "status": "accepted-records",
+          "topics": [
+            "zero-counting"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/MellinCalculus.lean",
+          "status": "accepted-records",
+          "topics": [
+            "Mellin"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/PerronFormula.lean",
+          "status": "inspected-no-accepted-record",
+          "topics": [
+            "Perron"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/HadamardFactorization.lean",
+          "status": "inspected-no-accepted-record",
+          "topics": [
+            "Hadamard-factorization"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/StrongPNT.lean",
+          "status": "excluded-direct-sorry",
+          "topics": [
+            "strong-PNT"
+          ]
+        },
+        {
+          "path": "PrimeNumberTheoremAnd/IEANTN",
+          "status": "mixed-many-sorry-declarations-excluded",
+          "topics": [
+            "explicit-prime-estimates"
+          ]
+        }
+      ],
+      "native_verification": {
+        "axiom_audit_command": "lake env lean AxiomAudit.lean",
+        "build_command": "lake build",
+        "build_jobs": 4343,
+        "checked_on": "2026-08-17",
+        "note": "The full project built, but direct/transitive sorry lanes were excluded by per-declaration axiom audit.",
+        "project_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+        "status": "passed"
+      },
+      "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+      "require_git_revision": true,
+      "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+      "selected_declarations": [
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/MediumPNT.lean",
+          "full_name": "MediumPNT",
+          "local_name": "MediumPNT",
+          "topic_tags": [
+            "PNT",
+            "error-term"
+          ]
+        },
+        {
+          "atlas_target": "classical-zero-free-region",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaUpperBnd",
+          "local_name": "ZetaUpperBnd",
+          "topic_tags": [
+            "zeta-bounds"
+          ]
+        },
+        {
+          "atlas_target": "classical-zero-free-region",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaDerivUpperBnd",
+          "local_name": "ZetaDerivUpperBnd",
+          "topic_tags": [
+            "zeta-derivative",
+            "zeta-bounds"
+          ]
+        },
+        {
+          "atlas_target": "classical-zero-free-region",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaZeroFree",
+          "local_name": "ZetaZeroFree",
+          "topic_tags": [
+            "zero-free-region"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaNoZerosOn1Line",
+          "local_name": "ZetaNoZerosOn1Line",
+          "topic_tags": [
+            "nonvanishing",
+            "PNT"
+          ]
+        },
+        {
+          "atlas_target": "classical-zero-free-region",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaNoZerosInBox",
+          "local_name": "ZetaNoZerosInBox",
+          "topic_tags": [
+            "zero-free-region"
+          ]
+        },
+        {
+          "atlas_target": "explicit-formula",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "LogDerivZetaBndUnif",
+          "local_name": "LogDerivZetaBndUnif",
+          "topic_tags": [
+            "log-derivative",
+            "zeta-bounds"
+          ]
+        },
+        {
+          "atlas_target": "riemann-zeta-function",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "ZetaNear1BndExact",
+          "local_name": "ZetaNear1BndExact",
+          "topic_tags": [
+            "zeta-bounds",
+            "pole-at-one"
+          ]
+        },
+        {
+          "atlas_target": "explicit-formula",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean",
+          "full_name": "riemannZetaLogDerivResidue",
+          "local_name": "riemannZetaLogDerivResidue",
+          "topic_tags": [
+            "log-derivative",
+            "residue"
+          ]
+        },
+        {
+          "atlas_target": "riemann-von-mangoldt-zero-count",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean",
+          "full_name": "Backlund.zetaCounting_crude_majorant",
+          "local_name": "zetaCounting_crude_majorant",
+          "topic_tags": [
+            "zero-counting"
+          ]
+        },
+        {
+          "atlas_target": "riemann-von-mangoldt-zero-count",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean",
+          "full_name": "Backlund.zetaSurrogate_zeros_in_closedBall₀_count",
+          "local_name": "zetaSurrogate_zeros_in_closedBall₀_count",
+          "topic_tags": [
+            "zero-counting",
+            "Hadamard-factorization"
+          ]
+        },
+        {
+          "atlas_target": "explicit-formula",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/MellinCalculus.lean",
+          "full_name": "MellinConvolutionTransform",
+          "local_name": "MellinConvolutionTransform",
+          "topic_tags": [
+            "Mellin",
+            "convolution"
+          ]
+        },
+        {
+          "atlas_target": "explicit-formula",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/MellinCalculus.lean",
+          "full_name": "MellinOfDeltaSpike",
+          "local_name": "MellinOfDeltaSpike",
+          "topic_tags": [
+            "Mellin",
+            "smoothing"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/BrunTitchmarsh.lean",
+          "full_name": "BrunTitchmarsh.primesBetween_le",
+          "local_name": "primesBetween_le",
+          "topic_tags": [
+            "prime-estimates",
+            "sieve"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/BrunTitchmarsh.lean",
+          "full_name": "BrunTitchmarsh.card_range_filter_prime_isBigO",
+          "local_name": "card_range_filter_prime_isBigO",
+          "topic_tags": [
+            "prime-estimates",
+            "sieve"
+          ]
+        },
+        {
+          "atlas_target": "riemann-von-mangoldt-zero-count",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/RectangleArgumentPrinciple.lean",
+          "full_name": "rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt",
+          "local_name": "rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt",
+          "topic_tags": [
+            "argument-principle",
+            "zero-counting"
+          ]
+        },
+        {
+          "atlas_target": "riemann-von-mangoldt-zero-count",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/RectangleArgumentPrinciple.lean",
+          "full_name": "rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt",
+          "local_name": "rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt",
+          "topic_tags": [
+            "argument-principle",
+            "zero-counting"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Consequences.lean",
+          "full_name": "WeakPNT'",
+          "local_name": "WeakPNT'",
+          "topic_tags": [
+            "PNT",
+            "Chebyshev-psi"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Consequences.lean",
+          "full_name": "WeakPNT''",
+          "local_name": "WeakPNT''",
+          "topic_tags": [
+            "PNT",
+            "Chebyshev-psi"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Consequences.lean",
+          "full_name": "nth_prime_asymp",
+          "local_name": "nth_prime_asymp",
+          "topic_tags": [
+            "PNT",
+            "nth-prime"
+          ]
+        },
+        {
+          "atlas_target": "prime-number-theorem",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Consequences.lean",
+          "full_name": "prime_between",
+          "local_name": "prime_between",
+          "topic_tags": [
+            "prime-gaps",
+            "PNT"
+          ]
+        },
+        {
+          "atlas_target": "dirichlet-primes-arithmetic-progressions",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "file_path": "PrimeNumberTheoremAnd/Consequences.lean",
+          "full_name": "dirichlet_thm",
+          "local_name": "dirichlet_thm",
+          "topic_tags": [
+            "Dirichlet",
+            "primes-in-progressions"
+          ]
+        }
+      ],
+      "status": "accepted"
+    },
+    {
+      "discovery_status": "fork-duplicate-of-mandatory-source",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/AxiomMath/PrimeNumberTheoremAnd",
+      "revision": "2667e414c38e5a5dc9aa1946f16f13001e5cd3ed",
+      "status": "inspected-not-accepted"
+    },
+    {
+      "discovery_status": "relevant-project-no-repository-license-and-no-native-verification",
+      "license": null,
+      "repository": "https://github.com/dobronx1325/Daboussi_Pnt",
+      "revision": "c10f135ef4314f77fa33219d6b990e4178802500",
+      "status": "inspected-not-accepted"
+    },
+    {
+      "discovery_status": "legacy-Lean-project-no-repository-license-and-no-native-verification",
+      "license": null,
+      "repository": "https://github.com/xinhjBrant/prime-number-theorem",
+      "revision": "e23408949a2d158070a2dc1dcf69da1f4a5c50be",
+      "status": "inspected-not-accepted"
+    }
+  ],
+  "schema_version": "riemann-source-manifest-v1",
+  "snapshot_date": "2026-08-17"
+}

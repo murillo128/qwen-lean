@@ -1,0 +1,191 @@
+[
+  {
+    "authors": [
+      "Luis Baez-Duarte"
+    ],
+    "id": "baez-duarte-2002",
+    "kind": "primary-paper",
+    "title": "A strengthening of the Nyman-Beurling criterion for the Riemann Hypothesis",
+    "url": "https://arxiv.org/abs/math/0202141",
+    "year": 2002
+  },
+  {
+    "authors": [
+      "Luis Baez-Duarte"
+    ],
+    "id": "baez-duarte-2003",
+    "kind": "primary-paper",
+    "title": "A new necessary and sufficient condition for the Riemann hypothesis",
+    "url": "https://arxiv.org/abs/math/0307215",
+    "year": 2003
+  },
+  {
+    "authors": [
+      "Enrico Bombieri"
+    ],
+    "id": "bombieri-rh",
+    "kind": "official-survey",
+    "title": "Problems of the Millennium: The Riemann Hypothesis",
+    "url": "https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf",
+    "year": 2000
+  },
+  {
+    "authors": [
+      "Harold Davenport",
+      "Hugh Montgomery"
+    ],
+    "id": "davenport-mnt",
+    "kind": "book",
+    "title": "Multiplicative Number Theory, third edition",
+    "url": "https://link.springer.com/book/10.1007/978-1-4757-5927-3",
+    "year": 2000
+  },
+  {
+    "authors": [
+      "John Harrison"
+    ],
+    "id": "hol-light-pnt",
+    "kind": "formal-source",
+    "license": "BSD-2-Clause",
+    "revision": "433477862bb90b328a593e012e09390e99b2439b",
+    "title": "HOL Light prime number theorem source",
+    "url": "https://github.com/jrh13/hol-light/blob/433477862bb90b328a593e012e09390e99b2439b/100/pnt.ml",
+    "year": 2009
+  },
+  {
+    "authors": [
+      "Manuel Eberl",
+      "Lawrence Paulson"
+    ],
+    "id": "isabelle-pnt",
+    "kind": "formal-source",
+    "license": "BSD-3-Clause",
+    "revision": "AFP/7496a7261145",
+    "title": "The Prime Number Theorem - Archive of Formal Proofs",
+    "url": "https://www.isa-afp.org/entries/Prime_Number_Theorem.html",
+    "year": 2018
+  },
+  {
+    "authors": [
+      "Jeffrey Lagarias"
+    ],
+    "id": "lagarias-2002",
+    "kind": "primary-paper",
+    "title": "An elementary problem equivalent to the Riemann hypothesis",
+    "url": "https://doi.org/10.2307/2695443",
+    "year": 2002
+  },
+  {
+    "authors": [
+      "Xian-Jin Li"
+    ],
+    "id": "li-1997",
+    "kind": "primary-paper",
+    "title": "The positivity of a sequence of numbers and the Riemann hypothesis",
+    "url": "https://doi.org/10.1006/jnth.1997.2137",
+    "year": 1997
+  },
+  {
+    "authors": [],
+    "id": "mathlib-phase2",
+    "kind": "formal-source",
+    "title": "qwen-lean accepted Phase 2 pinned mathlib corpus",
+    "url": "https://github.com/leanprover-community/mathlib4/tree/81a5d257c8e410db227a6665ed08f64fea08e997",
+    "year": 2026
+  },
+  {
+    "authors": [
+      "Mario Carneiro"
+    ],
+    "id": "metamath-pnt",
+    "kind": "formal-source",
+    "license": "CC0-1.0",
+    "revision": "79deb54bd953b859ce07f1407b77f8c9cc09aae5",
+    "title": "Metamath Proof Explorer prime number theorem",
+    "url": "https://us.metamath.org/mpeuni/pnt.html",
+    "year": 2016
+  },
+  {
+    "authors": [
+      "Hugh Montgomery"
+    ],
+    "id": "montgomery-1973",
+    "kind": "primary-paper",
+    "title": "The pair correlation of zeros of the zeta function",
+    "url": "https://www.ams.org/books/pspum/024/",
+    "year": 1973
+  },
+  {
+    "authors": [
+      "David Platt",
+      "Tim Trudgian"
+    ],
+    "id": "platt-trudgian-2021",
+    "kind": "primary-paper",
+    "title": "The Riemann hypothesis is true up to 3 times 10^12",
+    "url": "https://doi.org/10.1112/blms.12460",
+    "year": 2021
+  },
+  {
+    "authors": [
+      "PNT+ contributors"
+    ],
+    "id": "pnt-plus",
+    "kind": "formal-source",
+    "title": "PrimeNumberTheoremAnd",
+    "url": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd/tree/7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "year": 2026
+  },
+  {
+    "authors": [
+      "Bernhard Riemann"
+    ],
+    "id": "riemann-1859",
+    "kind": "primary-paper",
+    "title": "On the Number of Primes Less Than a Given Magnitude",
+    "url": "https://www.claymath.org/library/historical/riemann/english/1.pdf",
+    "year": 1859
+  },
+  {
+    "authors": [
+      "Guy Robin"
+    ],
+    "id": "robin-1984",
+    "kind": "primary-paper",
+    "title": "Grandes valeurs de la fonction somme des diviseurs et hypothese de Riemann",
+    "url": "https://doi.org/10.1051/ita/198418203121",
+    "year": 1984
+  },
+  {
+    "authors": [
+      "Brad Rodgers",
+      "Terence Tao"
+    ],
+    "id": "rodgers-tao-2018",
+    "kind": "primary-paper",
+    "title": "The De Bruijn-Newman constant is non-negative",
+    "url": "https://arxiv.org/abs/1801.05914",
+    "year": 2018
+  },
+  {
+    "authors": [
+      "Lowell Schoenfeld"
+    ],
+    "id": "schoenfeld-1976",
+    "kind": "primary-paper",
+    "title": "Sharper bounds for the Chebyshev functions theta(x) and psi(x). II",
+    "url": "https://doi.org/10.1090/S0025-5718-1976-0457374-X",
+    "year": 1976
+  },
+  {
+    "authors": [
+      "E. C. Titchmarsh",
+      "D. R. Heath-Brown"
+    ],
+    "id": "titchmarsh-zeta",
+    "kind": "book",
+    "title": "The Theory of the Riemann Zeta-Function, second edition",
+    "url": "https://global.oup.com/academic/product/the-theory-of-the-riemann-zeta-function-9780198533696",
+    "year": 1986
+  }
+]
