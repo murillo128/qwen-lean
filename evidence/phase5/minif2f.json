@@ -1,0 +1,142 @@
+{
+  "adapter": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "format": "peft-lora",
+    "ignored_local_path": "artifacts/phase5/training/trainer-state/checkpoint-9962",
+    "merged": false,
+    "rank": 16,
+    "selected_optimizer_step": 9962,
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+    "training_relative_path": "trainer-state/checkpoint-9962"
+  },
+  "benchmark_repository": "google-deepmind/miniF2F",
+  "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+  "candidate_results_retained_outside_git": true,
+  "generation_settings": {
+    "candidates_per_task": 8,
+    "chat_template": null,
+    "do_sample": true,
+    "dtype": "bfloat16",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_new_tokens": 1024,
+    "max_num_seqs": 32,
+    "prompt_transformation": null,
+    "quantization": null,
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit",
+    "temperature": 0.8,
+    "tensor_parallel_size": 1,
+    "top_k": -1,
+    "top_p": 0.95
+  },
+  "inference_engine": "vllm",
+  "inference_engine_version": "0.10.2",
+  "lean_toolchain": "leanprover/lean4:v4.27.0",
+  "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "generation_wall_time_seconds": 1298.9087075240095,
+    "inference_execution": "local_cuda",
+    "python": "3.12.14",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8",
+    "verification_wall_time_seconds": 2613.5402372170065,
+    "verification_workers": 4
+  },
+  "schema_version": "phase5-minif2f-evidence-v1",
+  "status": "passed",
+  "summary": {
+    "accepted_phase1_base_reference": {
+      "pass_at_k": {
+        "pass@1": 0.012807377049180328,
+        "pass@4": 0.04771662763466042,
+        "pass@8": 0.0860655737704918
+      },
+      "regenerated": false,
+      "run_path": "evidence/phase1/baseline/run.json",
+      "summary_path": "evidence/phase1/baseline/summary.json"
+    },
+    "adapter_enabled": true,
+    "adapter_id": "phase5-train-full-v1-lora",
+    "adapter_training_relative_path": "trainer-state/checkpoint-9962",
+    "candidate_count": 1952,
+    "candidates_per_task": 8,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 1875,
+      "verified": 77,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.9605532786885246,
+      "verified": 0.03944672131147541,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "checkpoint_selection_influenced_by_minif2f": false,
+    "complete": true,
+    "completeness_errors": [],
+    "expected_candidates": 1952,
+    "expected_tasks": 244,
+    "finish_reason_counts": {
+      "eos": 1596,
+      "token_limit": 356
+    },
+    "infrastructure_error_count": 0,
+    "miniF2F_test_evaluated": false,
+    "observed_candidates": 1952,
+    "observed_tasks": 244,
+    "pass_at_k": {
+      "pass@1": 0.03944672131147541,
+      "pass@4": 0.1031615925058548,
+      "pass@8": 0.14344262295081966
+    },
+    "phase1_quality_comparable": true,
+    "phase5_minif2f_comparison": true,
+    "phase5_minif2f_passed": true,
+    "run_wall_time_seconds": 3912.448944741016,
+    "schema_version": "phase1-summary-v1",
+    "selected_adapter_binding": {
+      "artifact_id": "phase5-train-full-v1-lora",
+      "format": "peft-lora",
+      "merged": false,
+      "selected_optimizer_step": 9962,
+      "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+      "training_relative_path": "trainer-state/checkpoint-9962"
+    },
+    "selected_optimizer_step": 9962,
+    "task_count": 244,
+    "tasks_with_verified_candidate": {
+      "count": 35,
+      "fraction": 0.14344262295081966
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 10.65824774042544,
+      "candidate_total_latency_sum": 20804.89958931046,
+      "generation_candidate_latency_mean": 5.306762870786889,
+      "generation_candidate_latency_sum": 10358.801123776007,
+      "verification_latency_mean": 5.351484869638551,
+      "verification_latency_sum": 10446.098465534451
+    },
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+    "verifier_timeout_count": 0,
+    "workload_id": "minif2f-valid-v1"
+  },
+  "tokenizer_id": "Qwen/Qwen3-8B-Base",
+  "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "workload_id": "minif2f-valid-v1"
+}

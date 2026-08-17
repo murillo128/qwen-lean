@@ -50,6 +50,22 @@ from .phase4_training import (
     run_phase4_preflight,
     run_phase4_training,
 )
+from .phase5 import (
+    Phase5Config,
+    materialize_phase5_workloads,
+    write_phase5_workloads,
+)
+from .phase5_evidence import write_phase5_evidence
+from .phase5_inference import (
+    compare_phase5_heldout_runs,
+    run_phase5_heldout,
+    run_phase5_minif2f,
+)
+from .phase5_training import (
+    run_phase5_adapter_reload,
+    run_phase5_preflight,
+    run_phase5_training,
+)
 
 
 def _project_root() -> Path:
@@ -315,6 +331,94 @@ def _parser() -> argparse.ArgumentParser:
     )
     phase4_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase4_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    phase5_materialize = subparsers.add_parser(
+        "phase5-materialize",
+        help="materialize full eligible Phase 5 train/validation workloads and heldout512",
+    )
+    phase5_materialize.add_argument("--artifact-dir", type=Path, required=True)
+    phase5_materialize.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+    phase5_materialize.add_argument("--output", type=Path, required=True)
+
+    phase5_preflight = subparsers.add_parser(
+        "phase5-preflight", help="run the full-corpus Phase 5 production preflight"
+    )
+    phase5_preflight.add_argument("--workload", type=Path, required=True)
+    phase5_preflight.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+    phase5_preflight.add_argument("--output", type=Path, required=True)
+
+    phase5_train = subparsers.add_parser(
+        "phase5-train", help="run or resume the one-pass Phase 5 trajectory"
+    )
+    phase5_train.add_argument("--workload", type=Path, required=True)
+    phase5_train.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+    phase5_train.add_argument("--output-dir", type=Path, required=True)
+    phase5_train.add_argument("--resume-from-checkpoint", type=Path)
+
+    phase5_reload = subparsers.add_parser(
+        "phase5-adapter-reload",
+        help="reload the validation-selected Phase 5 PEFT adapter",
+    )
+    phase5_reload.add_argument("--workload", type=Path, required=True)
+    phase5_reload.add_argument("--training", type=Path, required=True)
+    phase5_reload.add_argument("--adapter-dir", type=Path, required=True)
+    phase5_reload.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+    phase5_reload.add_argument("--output", type=Path, required=True)
+
+    phase5_heldout = subparsers.add_parser(
+        "phase5-heldout",
+        help="run a base or selected-adapter Phase 5 heldout512 evaluation",
+    )
+    phase5_heldout.add_argument("--dataset-dir", type=Path, required=True)
+    phase5_heldout.add_argument("--mathlib-root", type=Path, required=True)
+    phase5_heldout.add_argument("--workload", type=Path, required=True)
+    phase5_heldout.add_argument("--training", type=Path, required=True)
+    phase5_heldout.add_argument("--mode", choices=("base", "adapter"), required=True)
+    phase5_heldout.add_argument("--adapter-dir", type=Path)
+    phase5_heldout.add_argument("--output-dir", type=Path, required=True)
+    phase5_heldout.add_argument("--workers", type=int)
+    phase5_heldout.add_argument("--timeout", type=float)
+    phase5_heldout.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+    phase5_heldout.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    phase5_compare = subparsers.add_parser(
+        "phase5-heldout-compare", help="validate and summarize heldout512 comparability"
+    )
+    phase5_compare.add_argument("--training", type=Path, required=True)
+    phase5_compare.add_argument("--base-dir", type=Path, required=True)
+    phase5_compare.add_argument("--adapter-dir", type=Path, required=True)
+    phase5_compare.add_argument("--output", type=Path, required=True)
+
+    phase5_minif2f = subparsers.add_parser(
+        "phase5-minif2f", help="evaluate the selected adapter on full miniF2F validation"
+    )
+    phase5_minif2f.add_argument("--benchmark-root", type=Path, required=True)
+    phase5_minif2f.add_argument("--training", type=Path, required=True)
+    phase5_minif2f.add_argument("--adapter-dir", type=Path, required=True)
+    phase5_minif2f.add_argument("--output-dir", type=Path, required=True)
+    phase5_minif2f.add_argument("--workers", type=int)
+    phase5_minif2f.add_argument("--timeout", type=float)
+    phase5_minif2f.add_argument(
+        "--config", type=Path, default=root / "config/phase5-full.json"
+    )
+
+    phase5_evidence = subparsers.add_parser(
+        "phase5-evidence", help="write compact Phase 5 review evidence"
+    )
+    phase5_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    phase5_evidence.add_argument("--evidence-dir", type=Path, required=True)
     return parser
 
 
@@ -623,6 +727,106 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "phase4-evidence":
         write_phase4_evidence(args.artifact_dir, args.evidence_dir)
+        print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "phase5-materialize":
+        config = Phase5Config.load(args.config)
+        workloads = materialize_phase5_workloads(args.artifact_dir, config)
+        write_phase5_workloads(args.output, config, workloads)
+        print(
+            json.dumps(
+                {
+                    "input_examples": workloads.input_counts,
+                    "eligible_examples": workloads.eligible_counts,
+                    "overlength_examples": {
+                        name: len(items) for name, items in workloads.overlength.items()
+                    },
+                    "selected_examples": {
+                        "train": len(workloads.train),
+                        "validation": len(workloads.validation),
+                        "heldout": len(workloads.heldout),
+                    },
+                    "trajectory": workloads.trajectory.to_dict(),
+                    "output": str(args.output),
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.command == "phase5-preflight":
+        value = run_phase5_preflight(
+            Phase5Config.load(args.config), args.workload, args.output
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase5-train":
+        value = run_phase5_training(
+            Phase5Config.load(args.config),
+            args.workload,
+            args.output_dir,
+            resume_from_checkpoint=args.resume_from_checkpoint,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase5-adapter-reload":
+        value = run_phase5_adapter_reload(
+            Phase5Config.load(args.config),
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase5-heldout":
+        if args.mode == "base" and args.adapter_dir is not None:
+            print("--adapter-dir is forbidden in base mode")
+            return 2
+        if args.mode == "adapter" and args.adapter_dir is None:
+            print("--adapter-dir is required in adapter mode")
+            return 2
+        _, _, summary = run_phase5_heldout(
+            Phase5Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.training,
+            args.output_dir,
+            adapter_dir=args.adapter_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase5-heldout-compare":
+        value = compare_phase5_heldout_runs(
+            args.training, args.base_dir, args.adapter_dir, args.output
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase5-minif2f":
+        _, _, summary = run_phase5_minif2f(
+            Phase5Config.load(args.config),
+            args.benchmark_root,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase5-evidence":
+        write_phase5_evidence(args.artifact_dir, args.evidence_dir)
         print(str(args.evidence_dir))
         return 0
 

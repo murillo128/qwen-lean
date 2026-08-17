@@ -54,7 +54,14 @@ SFT trains the model on known input/output examples. LoRA keeps the base model f
 
 The initial intent is 4-bit base-model quantization with trainable LoRA adapters. Full-parameter fine-tuning is not part of the first experiment.
 
-**Exact quantization settings, LoRA rank/alpha, sequence length, optimizer parameters, and training schedule:** OPEN
+**First full-cycle configuration:** ACCEPTED — the first full SFT cycle uses a
+4-bit NF4 base with double quantization and BF16 compute; LoRA rank 16, alpha 32,
+and dropout 0 over `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`,
+and `down_proj`; the 1,024-token, no-packing, no-truncation `mathlib-sft-v1`
+serialization; micro-batch 1 with gradient accumulation 8; paged 8-bit AdamW;
+a `1e-4` cosine learning rate with a 1/32 warmup fraction; and one full eligible
+training epoch. These settings define the first full cycle, not a claim of global
+optimality or a requirement for unrelated future experiments.
 
 ## D005 — ML and inference stack
 
