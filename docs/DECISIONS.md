@@ -192,3 +192,24 @@ The causal-LM objective supervises only the completion and terminal EOS. Prompt
 tokens, padding, and batch-fill tokens have label `-100`; examples are not packed
 or silently truncated. Phase-local sanity hyperparameters do not belong to this
 durable serialization and masking contract.
+
+## D015 — Reference SFT checkpoint for independent post-training branches
+
+**Status:** ACCEPTED
+
+The logical checkpoint `reference-sft-v1` is the controlled common initialization
+and retained SFT control for the independent post-training branches defined by the
+current durable roadmap. It consists of:
+
+- base model `Qwen/Qwen3-8B-Base` at revision
+  `49e3418fbbbca6ecbdf9608b4d22e5a407081db4`;
+- unmerged PEFT adapter `murillo2000/qwen3-8b-base-lean-sft-qlora` at Hub
+  revision `5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5`;
+- origin Phase 5 validation-selected step `9962` from
+  `phase5-train-full-v1-lora`.
+
+This checkpoint was selected and its identity frozen before Phase 6 training-set
+generation and miniF2F-test outputs. Those later evaluation results characterize
+the checkpoint but do not retroactively select it. `reference-sft-v1` is the
+controlled parent chosen for this project experiment; it is not claimed to be a
+globally optimal SFT checkpoint.

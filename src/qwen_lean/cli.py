@@ -23,11 +23,11 @@ from .phase3 import (
     select_overfit_workload,
     write_phase3_workload,
 )
+from .phase3_evidence import write_phase3_evidence
 from .phase3_inference import (
     run_adapter_minif2f_smoke,
     run_vllm_memorization,
 )
-from .phase3_evidence import write_phase3_evidence
 from .phase3_training import (
     run_adapter_reload_check,
     run_overfit_training,
@@ -66,6 +66,17 @@ from .phase5_training import (
     run_phase5_preflight,
     run_phase5_training,
 )
+from .phase6 import (
+    Phase6Config,
+    freeze_reference_candidate,
+    materialize_phase6_train_workload,
+    write_phase6_train_workload,
+)
+from .phase6_evidence import (
+    write_phase6_checkpoint_a_evidence,
+    write_phase6_final_evidence,
+)
+from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
 
 
 def _project_root() -> Path:
@@ -402,7 +413,8 @@ def _parser() -> argparse.ArgumentParser:
     phase5_compare.add_argument("--output", type=Path, required=True)
 
     phase5_minif2f = subparsers.add_parser(
-        "phase5-minif2f", help="evaluate the selected adapter on full miniF2F validation"
+        "phase5-minif2f",
+        help="evaluate the selected adapter on full miniF2F validation",
     )
     phase5_minif2f.add_argument("--benchmark-root", type=Path, required=True)
     phase5_minif2f.add_argument("--training", type=Path, required=True)
@@ -419,6 +431,116 @@ def _parser() -> argparse.ArgumentParser:
     )
     phase5_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase5_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    phase6_freeze = subparsers.add_parser(
+        "phase6-freeze", help="freeze and validate the Phase 6 reference SFT candidate"
+    )
+    phase6_freeze.add_argument("--adapter-dir", type=Path, required=True)
+    phase6_freeze.add_argument(
+        "--phase5-training-evidence",
+        type=Path,
+        default=root / "evidence/phase5/training.json",
+    )
+    phase6_freeze.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+    phase6_freeze.add_argument("--output", type=Path, required=True)
+
+    phase6_materialize = subparsers.add_parser(
+        "phase6-materialize", help="materialize deterministic phase6-train512-v1"
+    )
+    phase6_materialize.add_argument("--dataset-dir", type=Path, required=True)
+    phase6_materialize.add_argument(
+        "--phase5-workload-evidence",
+        type=Path,
+        default=root / "evidence/phase5/workloads.json",
+    )
+    phase6_materialize.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+    phase6_materialize.add_argument("--output", type=Path, required=True)
+
+    phase6_checkpoint = subparsers.add_parser(
+        "phase6-checkpoint-a-evidence",
+        help="write compact pre-generation Phase 6 integrity evidence",
+    )
+    phase6_checkpoint.add_argument("--candidate", type=Path, required=True)
+    phase6_checkpoint.add_argument("--train-workload", type=Path, required=True)
+    phase6_checkpoint.add_argument("--benchmark-root", type=Path, required=True)
+    phase6_checkpoint.add_argument("--evidence-dir", type=Path, required=True)
+    phase6_checkpoint.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+
+    phase6_train = subparsers.add_parser(
+        "phase6-train", help="evaluate base or reference SFT on phase6-train512-v1"
+    )
+    phase6_train.add_argument("--dataset-dir", type=Path, required=True)
+    phase6_train.add_argument("--mathlib-root", type=Path, required=True)
+    phase6_train.add_argument("--workload", type=Path, required=True)
+    phase6_train.add_argument("--candidate", type=Path, required=True)
+    phase6_train.add_argument("--adapter-dir", type=Path, required=True)
+    phase6_train.add_argument("--mode", choices=("base", "adapter"), required=True)
+    phase6_train.add_argument("--output-dir", type=Path, required=True)
+    phase6_train.add_argument("--workers", type=int)
+    phase6_train.add_argument("--timeout", type=float)
+    phase6_train.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+    phase6_train.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    phase6_test = subparsers.add_parser(
+        "phase6-minif2f-test",
+        help="evaluate base or reference SFT on the complete miniF2F test split",
+    )
+    phase6_test.add_argument("--benchmark-root", type=Path, required=True)
+    phase6_test.add_argument("--candidate", type=Path, required=True)
+    phase6_test.add_argument("--adapter-dir", type=Path, required=True)
+    phase6_test.add_argument("--mode", choices=("base", "adapter"), required=True)
+    phase6_test.add_argument("--output-dir", type=Path, required=True)
+    phase6_test.add_argument("--workers", type=int)
+    phase6_test.add_argument("--timeout", type=float)
+    phase6_test.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+
+    phase6_evidence = subparsers.add_parser(
+        "phase6-evidence", help="write final compact Phase 6 comparison evidence"
+    )
+    phase6_evidence.add_argument(
+        "--artifact-dir", type=Path, default=root / "artifacts/phase6"
+    )
+    phase6_evidence.add_argument(
+        "--phase5-heldout-comparison",
+        type=Path,
+        default=root / "artifacts/phase5/heldout-comparison.json",
+    )
+    phase6_evidence.add_argument(
+        "--phase5-heldout-base-dir",
+        type=Path,
+        default=root / "artifacts/phase5/heldout/base",
+    )
+    phase6_evidence.add_argument(
+        "--phase5-heldout-adapter-dir",
+        type=Path,
+        default=root / "artifacts/phase5/heldout/adapter",
+    )
+    phase6_evidence.add_argument(
+        "--phase1-validation-base-summary",
+        type=Path,
+        default=root / "evidence/phase1/baseline/summary.json",
+    )
+    phase6_evidence.add_argument(
+        "--phase5-validation-adapter-evidence",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    phase6_evidence.add_argument("--evidence-dir", type=Path, required=True)
+    phase6_evidence.add_argument(
+        "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
     return parser
 
 
@@ -828,6 +950,95 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "phase5-evidence":
         write_phase5_evidence(args.artifact_dir, args.evidence_dir)
         print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "phase6-freeze":
+        value = freeze_reference_candidate(
+            Phase6Config.load(args.config),
+            args.adapter_dir,
+            args.phase5_training_evidence,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "phase6-materialize":
+        config = Phase6Config.load(args.config)
+        tokenizer = load_pinned_tokenizer(config)  # type: ignore[arg-type]
+        value = materialize_phase6_train_workload(
+            config,
+            args.dataset_dir,
+            args.phase5_workload_evidence,
+            tokenizer,
+        )
+        write_phase6_train_workload(args.output, value)
+        print(
+            json.dumps(
+                {
+                    "workload_id": value["workload_id"],
+                    "selected_examples": len(value["selected_record_ids"]),
+                    "selected_record_ids_sha256": value["selected_record_ids_sha256"],
+                    "output": str(args.output),
+                },
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.command == "phase6-checkpoint-a-evidence":
+        write_phase6_checkpoint_a_evidence(
+            Phase6Config.load(args.config),
+            args.candidate,
+            args.train_workload,
+            args.benchmark_root,
+            args.evidence_dir,
+        )
+        print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "phase6-train":
+        _, _, summary = run_phase6_train(
+            Phase6Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.candidate,
+            args.adapter_dir,
+            args.output_dir,
+            mode=args.mode,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase6-minif2f-test":
+        _, _, summary = run_phase6_minif2f_test(
+            Phase6Config.load(args.config),
+            args.benchmark_root,
+            args.candidate,
+            args.adapter_dir,
+            args.output_dir,
+            mode=args.mode,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "phase6-evidence":
+        value = write_phase6_final_evidence(
+            Phase6Config.load(args.config),
+            args.artifact_dir,
+            args.phase5_heldout_comparison,
+            args.phase5_heldout_base_dir,
+            args.phase5_heldout_adapter_dir,
+            args.phase1_validation_base_summary,
+            args.phase5_validation_adapter_evidence,
+            args.evidence_dir,
+        )
+        print(json.dumps(value, indent=2))
         return 0
 
     fixture_id, tasks, _ = load_fixture_set(args.fixtures)

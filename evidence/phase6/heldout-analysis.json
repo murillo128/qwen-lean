@@ -1,0 +1,5410 @@
+{
+  "accepted_phase5_result_reused_without_regeneration": true,
+  "adapter": {
+    "candidate_count": 2048,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 2014,
+      "verified": 34,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.9833984375,
+      "verified": 0.0166015625,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "completeness_errors": [],
+    "finish_reason_counts": {
+      "eos": 2022,
+      "token_limit": 26
+    },
+    "generated_token_counts": {
+      "maximum": 1024,
+      "mean": 71.48291015625,
+      "minimum": 2,
+      "total": 146397
+    },
+    "generation_wall_time_seconds": 343.954669875995,
+    "infrastructure_error_count": 0,
+    "model_role": "adapter",
+    "pass_at_k": {
+      "pass@1": 0.0166015625,
+      "pass@4": 0.048828125
+    },
+    "per_task": [
+      {
+        "candidate_count": 4,
+        "task_id": "c5b647bc642bf8374eac484cf570a30c6448b1f1b2cb00bc472f6f293530c2da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd044664631f4573fff6dc5497120e0a7352d0521e407179be004466c3ac5a94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c514a3b4868b693b0296df15a115473fef205c5a8fc5aa4dd1d752437d1d6db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7cf53d8b37b530a8d4089b3ab25a46fc101236d17a4c72969a95326173b3a37a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "37c7a3a37517949a74cfd03cc8d47046aed1efab2bae1fb34906debd1df01979",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "39d3d8ef0145fdb2fb84ad4bde8b47342f7aff1c8c0a959d48b1d70f908cadeb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d5fa574c9a208d802dc39a31c0df1a39cfb40b239aeff202fe1df35691b0836",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "665c1cc832cc95f86a2f4296f82e721cab0a8c6912d4f05ed708730d67cae904",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9dcc17e7dd1c9f3502e9c182606595722c3086b6494b0a08348404423cf5cd7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7696a15218754e5a864ede54d92afd0df6cddfb0a09b45fd2d7dd9257a6f4681",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b8611b23ac82104a726674cf3c8a91c7b0f52c30e3d252663db73f0d3608e968",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4228ebfa59629bf6c931707e960a3a18887960f9aa41892cc2e28147e410fcf5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a1ee88feb2f417429a1383eeda25043e9642273167a9aeec9a6b77a6d5c12ba",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "598daf5104bae3f81110d668d6c23545f109966880d1f0909ab99557ce2c994c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cf675e8a74514e0613e299e995f79b668885532ee545a81d3847f357761629db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ade3287608ebf115707f909c52a20cb0c648b4b63372f4dbbf77fca5a0fcb6ab",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "76a93047d0469e798e11b644c65d3fc518b9fe5a2a13ca3d0ccb8be464c0338e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "195836cdb6007bffe680860d742c3b1e4ece1e80a11289e3b057e6db19cfcb64",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cec443630bf4de285d42035506e2196e998da6db08ebaeafbbcbafba0818e684",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3cea8ea59582a84c066a740cf5a5f1037f7114caf2004cb2831f164ba0d37bcf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00f50ebca85f972441681b8e48c81e93150d795a3059720ce417028c0f7f4c55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "af97fcde116772d9f90cc20e65253623e4dcd8dbc91b0ccc8868a9564901633f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f02e6d28ac50ffa77d1d5ca5415705e9a3e07a40e2d365caeeda8cb369b77a6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c3bb7f3c28653db8ad4ad8c65e7ecf58aba184822e6ba0f55b3db5c0e7d394b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2676c45043a624ffccb60af937884c6a741e74b6bd7c4bfc88ce04df2dcf58fa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7cfac00cf1cdb401bfe37a017db61000139ef4422ffd5a257aab1795d134686",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e2cc43dd66b16bfec0f0cfdb68fded7c9dfbcb5b844dc43a4fd44c99e6fdfbb3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e4da4094955e4e246c39b4d4be89cfd6e3e47dbd44d4bb2c0bcf93c53d450267",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a0bd7133df836535e9741281695cefa093c3d973949d919ad1aa35d5aa74a64",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8b037505260417106119b198cdc8891a68fb161e3362bcb23b3b948f377ca20f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "71d744c2ecd02e9a85a8bd060d2e15cdc1c43694ff3dc0c557265275e1b52a11",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0e7a4e03aff3c2fe0e146979ce2aed804fbe8aebaa72675b1015fb106ba50596",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "542e1df1c7faef21ac99087824f4b90a129584df86b2a66924e3639850078414",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40142a73807f28b1bce23b82212cb9f4722c88cffb3afb9dd851b9efeda147fd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "69efb5354e1c4daa72ad81242e684e4a9c98bbdf399bce233ba4591acd60dc55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d3f059e7860ef9f93c7ef5764250c7983694caa40f652f8e61c6579df1fd471",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9aea1a37d9c6aba9efdfb4dc0d0c11ab0e539417b9d2529cecf7af3251e982c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e66bf00cc4e6848aef919e7b2ab4db7ede6e915091b1aa0158af0d104344270b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2e6b841d0e71ae5b9c7b4f92c6b585f6a4e38a42a8a449a1425c571b68091234",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03df7beb99391ca457fe08fcc06958de3553b9b05e4b2a1d552156b3563b2c6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3c9ab548b386aa3a26af2023a63370e15580802f3e1eafde5659ae8270437de0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2eb332dd44d257888cb09b01de83efbbc88bd406f2950ad3e4f355f29ca1ec4c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aedce0929510fa14f262735a4ab0035d909b1305762635534f97b2d2be75554e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10713686aafbfc23770541747187593d2183ce32643de590dc82cd0e7f760224",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a135d9000ccfb058a0f781c1b607a7876fd861e48cacab7b25f55a06f134840",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "88dc7be433ad394eeb2ca7bf86bc855965c896835cd37e52c5d395b83fc386b4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fbf0cf016909037482890d3a47e9ed42d5f65ff673ad98478c7a95acd7247d6e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9c694b5d87891149b0693ddd2c9b29a260a0932210d2fa3d46fa0665c99dda55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "de20bf4a50e153da34fd6371c567ad9b054e23610f214e7a7a371db86412e0e5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "401c3a72b2a77f78bfb855ef823b5783972e61061badb09b2ee08bcdddfd7f33",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03a07399d47b11ee6d5cad985373a02e0afbd7c2db42a42b991743427b541a25",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "82ed17f3959dac1c1c1b3e71afa9421e2809ae362611230eb848b70691035309",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d926ee9f0f09b5f21f0eea00603b2114c95303b23494c763c25808d95a1dd76f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b296b9cd2dc3fced582f067ba1e368cf91f16c2ef52914086a3802a7577a7b34",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d093c8b23bc88de0db72380140bdeff8b5bdfb3b8adec1427f1e3e6332f863a5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ecf4b8df7ba66933f66574cad7fa25eda7fb70d50400efd4ef4a119b5ff8d32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd1395846bac45a375977bb3fa30edc065764be9433d362199ca032f4aced011",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "60271310b99c98c6cca74c893133164cb86b6c9aa8e39426cc520f5274e44d7f",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4c7a8f33b69134e58f42fc69415a74782ca429a121b3b5725520e5a479951789",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d12feb4013ee844d132616ad6d0defc97dc5ac52ee762a13c31298c287ea9bff",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2f81867aa261f94cd4c8eb79347ba1db2fa12eecb8116943e3d57edc2d8221e1",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b6b775398a6c766b414e69deaab6a117594b78929f032f103562ef23439d6aa7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b9086fad6bfa93aa2649f5c26b8263a6aa2279d67524fcb247e2aff20023b1f3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03d3f0559284955ae58155ba267022c6df55b4838682be70a3f9c1b1da6e668b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a6d874d3be471f680b2bdd60a0dbf56fb666908b7c9a9808ef56ee094761f9a3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "85dac62286def0cc219b73f7cd7bec9d843ea90496cc5cd62ce14b4f9ce1845f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0a13a9a01dad9d183b3e961bd5cf41c932b9263c9b643c63be4b022489c41504",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e1b217aa7fcde2444004a679b3280ffbc28a9713c7b70efcfd14b4af35abc59c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a954999f9736fafc468a3476b5e3ec959338c61a272bfaf503595394bc0d544d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b11dab89d931d12ceddeb7b491f5cb5c449b377b4df830130bc0ac583f5d1325",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be496237feda7ed17ffcfceeed9c073b215fc78bb599f9f868cf222d0bc1a2bb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fada770082edbac5e0d2cae814e5affdde8781d52329027d05cde245898d5cca",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "489ba45adc3e94437debc9a6d66112c20da70f09d2da40e3bcc98bd700237f29",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "87f800bc45223ec3da1af135c52ec21d0f6be400d401d9744c4b4da66e95ed63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1dd4934d0ca2109eb365271e011128f78041b545971e6442a1a6187ac0140de8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bc08ad84a4b9efba7e114b24304273958a1f6a197eec8dad3e24fb80748cc7e7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6ba7a976d51a9d145fb184cceac69c50eb168c46e6f0bad7f1a05405a733d80a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "62228419c762680d2f683322e6eb894877d2f3c319afd5da3aea385a10e2f7f0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8384654034f98189bb3ea965a0d99438f976ba32e106c0c3d801820575918b2f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1a475f2a1147dfbdc0c80a977765a314d38f66f6caff8f3919cb5e6e0458522f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "810b4605512e88cebe5d3d2c061572bdfbf158eb7000c99616d261db1eecc356",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f23b71aad844c92a14a552c48b1bb50cdbffc6de2c31d137bc1d825e0bc3d10",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f2767ecd2626a4459c537a29f17769e6b21f2c29b3b2b0b780f9ce70fb0b242e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "11a276df28e203bcb2ff97f983cab99a0d46e403efe27b531c496c7681616fbf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6dfd62825f457fad93d8dd0cb5dc2d35deb9e80a1cf81430dc834309171d9ab9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a9f70ade71e73c0d98291af99c983180c2e2a48d3c6711ea18a498374ad5e1f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3ad6cba4a9aaa4ccfe222b1ae4e21a92463d66714903c080dd55cbcc9d63a0a2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5bd39ff25dc65063d42f56fd5003bb22ace16820bc9fa54c5fe7ccfbdd177385",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ca4d7b897c44dc133130f9ca145edf3b56c439b2a9740bc457d42cc90b017011",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "18564c1f46a7311b3478c89d81ee003a83ed9289fcd28b4c3530047eabb64a8c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1f56bec4a66f895db999a6e1c82388cae6603916f76d0da5c8d8900e970bcf13",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d6ca6678d6e7949761e3fa867d06ea7bcd3314eefb144313b5b4348acb19494d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2fc1660906e8c11b68ad1250a06d88bbce4fd96f910b0ab755462b61cbf77470",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a32cb8c6fe605f1f408e2f0912fa5a5e56f65cfdeb012749fe0f4fef75f1aa4d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a5d2cfc107137c0bfe6dff71fc4b438be73b71f17614d8e67491a929b634fefb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b172013f1ab86d0e350b6afc7ecc6ec762eb7262cc7b9a9f41cc4f1b44d42fb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ced554db62d6f8d1b0ce063681aec9f4157ddd2cf0ddcb9497c31a0b3700da3a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "97ccc1e652aa413df16c4585a0412d658f89410e44f583d2854cec855c0ca919",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "abd177f7681aaff49e521fee502691214c29211e038f97afe6bf45a13a91481c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cf7b1b84ba789cb6ff1c08a182e65b1f2bc30f0a9d470bc3339e164825f658cb",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c0947a1d7259cce57f2aab06402fa8890d28c5744bea45a297a16bce2172a8cc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b172e0842a3847b0ad4c6df216dbcc8aa903723976ef5b709163988ec802ed9d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be6c0daa4c2ab37f8619523735ad73f4d57ecadb6f9d9985e80a9187a1415195",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f38410b17d9762a5a4030de0e600cedeffa5c89ba9bc5541673c42cd17d0fe3e",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0022b296181f68acb44299ba0b6a57cafd17258f94c8879199dced93db227e7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6907e78ffe855c2fbb3ba29440be2d34dd2da2b3c04bf81715f0edb5ea5bb6ba",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8d627927c18ed913067b04c954e0b5f8752bd150299f77e7dfb059c833dbd103",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "636927d6e86c8d7a1b1be822e6a3cdd459db4913cbdf5e364fe347d6c725401c",
+        "verified_candidate_count": 3
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ec4615a8d54087d0caac39f46146c5e54b3946a8024b4ca26ae10a1fedca7645",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a2a349aa355fa9012dfa3e4a9f21c742d751f7186ad629fca12c543a83376845",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "017dc08351c656fd885cdf2bf1f0007898e0eaad46f9b12ca4d9a534af962754",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4d44fd06393e34f100b9f50e4d1a19bf88f3f039d955692aa4ef42f31a73f1b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7b33d42d28247604e25cbf74e8b53fdf8e503993c8790faf9e3f66b055d84672",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24cc2ebcb53a3b4bd839809ada22bb0f734c616687e453e4c5c07d4a7a476514",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "45fc96912de18e0386227827083d2a94a5c63ced29430f262e5a1d9d550d15d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3963ffc4bae974c37bfe031cd5bb09a50aeaa6adc54182ec6397eb14665d3e5f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ecf152e4b3e2b3272204dc3006c9662056f91b78d2417517187479aba266b3a0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eed9f6713e90f2524c4e9df5d2a3d0a2c49c26d2be8016278fffd255cce8c13d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "79f1b0df02326681c51ed0dad89fe0ba699f6bba88e3e76d42a658b01c0d9cc0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5282fa4b3ea1e8679f071f3dd8104a23e287f4afe2151a2676688bfb90eb249",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e9fdfeb1e1f27b10efce5e36afb7a3546d48d7c391a352ceacdd3b7e95958960",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "46004c1c492cde4595662c8ba135a69cc329aa3094124644863a40d323a89580",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ed0650c3e14372a881e3627d5665a3b95f030ce0d350fa4c1b9d970f4e067d56",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "251a8c316f2eaa38dea6e31bbc5c0420e1572d9161edbd992662184826369646",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dc254f8e50ec2375471566913a6a48d65ddb95049e1383c6bd62f498e58618c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bb30bd63fb263941a0a906742f5151121f6b95bfde65a8268b64ecc7c5bda882",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "123a1aa7599ec571ec167095611eab2c51d6c603887ea909ac65d7048d641e7b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f02ac212e7048896fb411269ce957b4afcfa34989a3d079e74e05bc9d30d4fc6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "726c11630299745881bd850fd22170f71f47f2179e0c47b7ea01c41e919724e3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0735920b0c60ebf5062bfd25b217f66d7bc2dd1c58fe639f3a9995f3c2d2b7c4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cb6ded49011f41b13d74fedfe324b92786faab873de10a445f6dac21e2ab28f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7c7f169b840bab486bbdffbec8473524ec54c05ab742863ac467c59ef2111d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ff8514b5204481c38f62aa7f80d0cfc744211243532266f31071cd1020f4d82",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10f520ad8273b8385b8adbbb44361ae17652f17be3bb7f099dd4050e7d2f2c01",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ac8cfd28d0a26d8d26a631bbc7a5704850b7ad4eaee3c17405d67207a02c4f94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "756aa9f658bb14fb513b53111c218c15430f2f290ef61c5f9418ee0f872c6c60",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7057b534ae959bcded567cd97e0cc2391971b268b362c799fb37ace1b00ceaa8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ca90de179fa6a0e792b4ed438ad4403d5ea53e7121b0e9ed96b73293b1f765b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3b3ecb912f51dafa137fb57c5c02800fac6a3ada01523a2d5e7338377ed3633b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "510845244551aa1977fbbe07fc5c726616dbdbc699a11af010c6947ace3ab95a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ac1c0e3dba2c6065f36114e94e9b47cac70fbb68cd95a0179f8c7b73d8e11442",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9e0d4e0e4527a430fb1afa47ab1f9aa791f881c888e273afe57668fcc788804c",
+        "verified_candidate_count": 2
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f247239dbc0efd28640ff8c1188ef5ae1583f3e5675e0e054691c00cb1087473",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "168213046491f6e1be2ae8cf26cc07089fe2330b1a6ee6e72d3a2fb89dc3cd41",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aee9ef709b9e4923f18137262172291406b7e9d80d83e90cac49adb965bfe35d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f71b59d9ff4eca9b27de6a48bc2b0476ccdc252f44d7310031c7ea66288f5850",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4f571f03a30539848f8cbb205dc25096b4f3dbad5b3ed675e23abf64e7ea6401",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5a031679ad7a52255ca076cce81534d7422d4868c2770f08eb6398825312726b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "785aee5e9d39dd34f662b418a69291d5e15a42547ae6c1f28ad37480c6a118fb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee494586d1aabe3067c966eb0d7416f26a835d579bbfee4efa56a935e2cb6c92",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d1fd50f1b73247e99df31c9141e7c59c8adcfa84cc8f0c86cd6b6746bcc7c35",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5d8ec08426acaa56749708f36b61c98c1fe45d6a79f32c5d46ac0b11fb1c3a4b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee96152f862e294c45a8ac0c57352e64a751bb4be9a118c3855fe76c1e915db0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d04b6f03ea2ad800b3b68fbb6d74864afb46fd66ca99d59c7c1c5e39d55bc16a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "76f931bd9b0674fd5f39a68e1d53f0fc300f18fd7c3940d846fa2d3aa03c903f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8b745c3ba0945d20203208c6f1e64dc8dbc1ea9b353ccd3ab7a664651cbbc7eb",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ec3921737e820df3f506688af9fa1a9947bd747aede68148a4a37c42910385f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "056c7827eebd7bc0171a3e2020689937d954228092ad90bf01cc753bb31cbdac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b75ddfeb11d0955ba04512e472b0c3594c4d7405784c9af511bac2ac7db50da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fc2c513decca3449041aaeb05128351c4f543282861b8056574fcd045e9aa866",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6594bfb3dc94a3ca475911aa66756dcb6c4602837de65335645707516bf641db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8f4297452386e7266cba80b61d270e249fe3f363a1704bdbb64a8362f6487c39",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d528e32970ba07d4ef60303e7ddd3217882f6ce475b968c4a621eee3dd53083",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "81e694fa40610d7de8c2286d479bd7dc37fac72859a527d84b7b7f9ee1e87569",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6282db96feb0a97b68fdc587ffee4496abc0ed564feff88d42a601de964cc641",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1f5a150a92bf477b1d12da4fb636bb2717ce5e6087c40305ee5c9710c831e04d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6758f429b2fba75c0e3a36736d0d9d1d16c68888e3d513b51347800d9c1ec3d5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d90a4d243c58758d051a448f17bb2ab2c18fa3e1ab8ce2fc12603b8e4b6c919",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9bbe327d025591faac23c7b00e963ed586e4d2f98bdfb69a776399ab97cbaac5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8d1fa3e9c568d04b318e7b70c30ab37d2f0864c642ad5ec2ca4ced80c5b11b46",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "774bd06f44d1b2eb3e1d6b345a10328b2d1d403ab1a7a55544fd7e2fc0a430b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0d04b3b41f818863f4a52dfdff9eb973216d0a668f8e6307e6b972cc36c927d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c64c9d780f42fe27b9e4a658f0612f190080f8a809addd19fb3301a2614130d2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "90d23b3d0cbe14d7653f67e878138b81b16a831bc2d73ef3d7edda1e72d1daaa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0258a0258dd3bd31b5ab3406c4e21530a76e98a0d8e92e5db6c3cae0dbe01176",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b9fd0b76253c37c4fd12f6aebe7adbbd7bcf8825fff2a5ae5b6e225635061baa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e6cec4481506d67f0886586edb8bdfbba870d5dfa0f8685fa003290b031624e2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40a032d561edf15cabd96ba1704e0e8eb1cdbf26ea5ec1713b687b3801a9a5ec",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95308004bacc30739482b34aa522aaf3388ddcd92048ab4f88f1af16bb9519b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c84fa0403dc8112aee782cce11d4012e480574e1b3004db5fdae2243ab232da9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4e048301dba01f93fdc25aceaf2a829acd42b44d38c605694836850320e06b09",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7deb7c4461976b9d27bac003281728966f3d725228ac376fb173f03129e305a2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14ecaa4f25bef84565d068b1e337fc1b3d5cc2b56d0b54cad9f42064c5eee5c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f70989c6819ef075ffe6a1c8627aa1d92fc1da4b63604a421db0b719bb13889a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd2bf18033551930860b1277729ce21860bd2285232a50f51ef7dec41ef26075",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eeb05d2b81a5fe30f32a810ae3e6cf2f23381756187ceb7279f72904fa8159d3",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1e66364a89cad484c8c7413063136a9a3a21a5f4728bf425040a021ec2025ccf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "189c0cc81e1ca5e012682dd85e8bdc933fcebdfdb584af497f08fa45ecfd0ca8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40485970bad2a6d28dc5c9ed55924ebd4125aa87ed2c9f67c3bd37233ea05fbc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00e904bc4422abab981386cae14d22a8e389920deb1f2198b8cd5eef56b6b7ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "74125800af541845d93880105ff8c85960a2ee725992406d5de98bdeca6341f1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "db247aea8f59f945a5ba1e9478ddf895064c68588b6bdc0b104e24b3c408b9ce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aabc3126b1612a2c41af60f14e7b64e90a1cbac5ccedcf71ac6f1333e49613fe",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "18f9ad311be84100be7f933ce7cbf21205f99e5a58ca158d1272acaf99d3d90a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4200c6789f6517bc7ff3859179c1d292c752a751b41f105857071d14f23a54fa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9b9dbdeb6c2ed7acd44867adfb041e552d41c0389165dc16f3455dc4b6112361",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40ebb195e153ff23c48f25533bcfea6a8df2ddf62522f9c7fb02117d870bfbb0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00274e4367f673ff1c5669ecec47f3c3f5e86418b0bfb9ae651e0d0e05c1ea15",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f4cf85b56559008c3eec0f40fc2cd25767e6aa07f3db432cf75df0df3a999d6c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c5d3b993c2387804967ab786f795f9eab3c4d2b6d73443c1bd7e67ea404118ae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "51a0f67056b824f788c9e7905f7b790830e72470712e1deb60347808fae91783",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14b486e40bb65115747f9cb89db36d93b940c610e626e4a02c902ea4512ad398",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1bbff30f288f54fd4d6ffff572be763dd7d83d5055aeb6e3d8fa6dc62cd58eac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ff86515e117273c545979eab1e4766b76cb3fd70d81d6e476ccdfe462c5e5c4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "885fdecfa9f322ccced53a523539dbc5ba444f3f3c32001313f89f9f86f61810",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c2faa4c15b9a46594277ab3720227877c40d7bc8e468226240b0ebd9b7b12ab5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b653682b02677e9a0119cf4ad2ec32ce5a5b137828b7d8b5cd41d0e95fb60c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b070094ce5a2358bb7bbc684bbafe843f0a93159781477c444590fae99de4db8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6ad8a255ca25f6f84ae1119738ddab719f0ba21e08e97059bc0ac3a008d08a02",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14b534a460bd26a8deb3b782155dc6d9a99f2d2653855bc74922c5e4ca6a67f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7dc213408a937a63fdfe10670e5382ff355debf29110df8cb4490e51a7d587c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5bd20bbe734e392a23064edecee7d875a2b2d54321b6110a7b2d6136a9cadf6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1660ff0e1a949e0e2eee3408dd92757062736b7754f36492256a82955c83bdfd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8247dbbeb27a02c2c7d8cad2dea5a0421faa30a9baa688dd7b7ba89d8785e96d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "180e2cfbe4df7c9dbbce844f799d70f32ed41c66289679c4f698493d2d32acc4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b33afaab64aba3fe9bed49a3d76c97ef189176692a90905e92284dfae0c2674e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "276cd6d62963f7989ab0c87ec9c0a962f155fd3fa0196c4a05d24b33c70e533e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cea25c2f0dbd1ed9df0fdb9f965bcb9fefff0cb6eac75450ae91cb28fcfa1180",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "50d80ad4a6f2cdf7fd04cc5f179b6c954967b35dac615c5a238eaa439eb4754f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2795526ec969d9abb6d2c1d31125323e2b4a99571b1549721dd4b75572dd97e6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c5a8d2aeccbfe722961ea10dac2ef21bd56be891165974217c330b0439be0ff4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b3942279c9271285596cf093597db8070c770cf32af02dc08cd5314e0515c8eb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "38f117c019f2546bbb4c2c30b145643c1d941efa4731047317bec8e1a8408f86",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d71a0b697158fdaa9907b2cdded4d745da3eed0df66fc0c3bced8137da1b35ee",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eebf81ff9828a24c3b2e698f934ea6eb3721d7794076c53d1fb0bb95900f0455",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d490bfe3ff6be1181f8453f30a0f4ba4d49ff74078f32e05502e1e0a43a902ff",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "36ded52658013f7eb27362ba574043e6a4dca4dad17c2f5450891c72812b2d42",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b1cb94722d98db45cca2d27489ce50628189ca388a9ee993f8ba7d321684db4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98e192beab5eff4c9bedd86cd389a055f329e42808a44189ecb7ba69830c691a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1449d68039087d13009ca1a8ca44c28be5ace5485e32e448abd21d234fbfe7bc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9939711822843e3f5350d296e7bd602f80d0f8fd04ea6df873d400d7e4607cdb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6404b17184fb44329264b6bcf8790fc2e531e7963aa5a17cf5c06a510476b05d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7874dae5a8c057a91ccd79dce0a38417ef5bcb575bbf72c7f88f884f0232b6f8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4228fb467cf8bdcb124db934519e341c6a645402d5beab3a7146449474518669",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f40e8863119b6d05dfc71dc507408632128d3ee746cd39d6b46dcb6d2d46ebd9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "37a4037ade1cf8d6cced06779a346ec20c436339982b72486d6b28061912c710",
+        "verified_candidate_count": 2
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b01f8ee95a44dbb18ec60c4e20b45cf043e9bb4ceb4a5cde858af032263fa649",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4349fca5e648b364963d059c306f9bb4c2e02bac17351735c7c1e77b5e23ac90",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "51e0524421f6f8a72efe1728f97cd24f477d6d3a47827ce2f2f23ad25e47bca5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "430ed68eeeec3fddb9d6588cd29b8388f1b10e416dff40bbcdbf86b30a5298bc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7037f1ba5cdbf467b8b530aced4ea8dce3431d77c08fd0601e51342439ae9f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f21d98363744e9f3ef10838873f7b923ce4d7a9d430955d218f7d24b943c888",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1a16404d9ab05fa7add00ee9cc888ed063cbd5a2a7cb2e057bb08e5de65394f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b79e5f45a3b59cf5396d1042a3749cf8685a4183bc630bff771ec250da4f3678",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dcf5d653d99b2adf21b95ccda9a357b41a037b201c4b52641cec9cd580abc8ef",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7aae8505bf52e75f226ea8c863b3e43b9f9727964dd94aeb513229a1be0505ac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "517ae9996e09be19412b809b5e10bd42842c326a1d7586a1f928fabab8f5d353",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "861ed8ae4ce74cf6ef6daff1ee2ad8f20b69a17c3bfc5c800e11ecfc970cc9e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "939a120aa6692c3dacb24f7e1d3b9e7140ad299bb5355f82cf835815040f3e55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f8f9881ae5696d6e9ed96efa3bdd9709f0327b12b13009d4bd6e983ab61dd4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "16241f661f5cb9a1a151636e6fa15917ac3826175323a46805a0e77806b32486",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4275d2d0a863d49fdc6f65888a9ffcea033a6decb8289484d0de23f39a2e7bd0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ad1d6c96e4d2da8701fa1c2c8c3614b3c46e5e76d90af99e0b23944f5faaff96",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d8c88375d69e6e7540240b424f618d92fcc1a2fde67d7865132802f3130c540f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98fa6e8a459b44807d3a91c4d0486c7e2caae251eceeefd93bf5c90f9ad87c27",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e9e6a66c9873fbe2a739eaebc75396412dd416b3b2f003ff952aa3581b9cd84a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19c1fe9a064a109e2170f64f65ad747fb2fda2990b0943beb0b12870ea534e8f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44fb1f83824b0794a33d0ec95718b202602ebcf05ddb05f0e5a95d8a587cc5d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "27388978922b523e8f50c177a8d3a68b5e1c98be50191c88fcc4138a994f6069",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3915283b9bbe350eaabf3ce48382251ea77ddad071dca22ca93e08b74c5f5962",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "997fc55c894113aecf465db4f9a0034f082ca35311d7529ebeb2166fb7cbf559",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b57085043fd4b9dce30669cf8cace22f7ff1407206d27378933d02da0f865577",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f39fa418e7f70fc407d5d8e281e740e8b56c34ba2a1bd2b3cce45311df69f1e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3f23bc879e2e105900ff4e24ca75d7059684859d2184ec485189f840c3d3e935",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e3f2786b5c185207eab14bf36babba244a28cfa056283be735c8e06d35a8b579",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3e5b9f0aea11f2f282816fbc561815605cf944483fb78ccc1331d726da478e05",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6857d5830c807f4dda27a006ae32371142127a8e39f88b26d101baa43c05afc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f7fa4ba5af13a2aef3f4aa072ddeb803c7ac93ef16e03d81e00d1c5f4efa169d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f98f95e2dfe5b67e4b1d9209aab9e41edf62c4144542c4df1b6350e0ebe2fe38",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "73412e7063ae927ac407d862fc8720944bee6ed8dfdba349677cf04513a87b73",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d5671fbcff4ef91a91f8a46cb860df2fa0bc564cd832dc90bc1304dceb2349f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be0b3c73803f670541ffe3468812a9b012eddb8dc135bdc990af7e1339cebc41",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b1a3066b5beacf31be4368e2488db97c5d571da2b1f9bfeedce1c73f0aa07902",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a5712ad1749733b7ca981ec3fcf5cab6b8e3a9e8bc760018ec34d759827c705f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8e5e6307ac241f4ebb44a3e6074857a9de10838bd2efbfa7f4c5b9b7da094479",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c3abe51862bcce8d6644bf2dd8b099c5dfe279c3c13c0c89e8d6d67fec420625",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a249c50fe89f56c5777689dc5d013f87739bb39bca050592cdc7aa2b0fdf84c6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "227d8b9673fd1737e031efc8d6ebeb831657c68f7d7b05240d35586f14d4933c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "506efd848eac146dcba74a182d8872c0fad1f3f676aca917bc2cb6c0f48b85b5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "133f89605dba7c7a0a8c02a4ee38ab96d48b28bee814046505a1d03a2e7b959a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "07b11af70539f4cb5eda546ae0a97e45c63736998e3cf26266162f1c99cd9a20",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ca45c82d5564b703dc0dd06b8c716792dacc5802a969dcd38eecf27c7be4f97",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4c62e086b78f0ff351303d9a757233836cdac6a735e142ca892486d23c319043",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1dd2d8ba2611ebb49b73d3d91599ccb2d792239a9465d11cd63a92604dd20c38",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d592b2592574491e5a68dd7b9f3b2b1ec6efaa5ab6a516c77611b5059ff8ed17",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "28398d939f7ea30c9013081ffd8664b50cba5d1f7c37722c9d7067ab5b9a74a1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cffa8477752bcdb5d304852aa944a602a6cf63dc34a85cdea62be55982714d4b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "12136be207fcb603c6ab752ab6fa31ed38821c6912b1b58212b1c0c4a3c298c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "387962e0e1c2cd94e405a55b142f98c63e9089981b50080ef3acd76dc46cc4c9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c98a3c5a675c209ea7ea4979c216994aaa93cb739696ce80036b668334cb2f08",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "801d7b7b4b9b45862fe3b00baf2cb3a0af205640474d3e7adf8c280ac7a37040",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f56b7120bf552ee252ca88db493aeeccfd038c0c01430e204b22e6d2b42ac447",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5e406cb24422378e0503c73e1a0ea45cb08e380df4634576decc64124163f283",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f54aee54d9b4cc2ecda3435f0b08b867d85f5a7c54cad93123e6e0ea9d97a2ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4191e00fef8cd7a6ab66064926267745a9294d108a75a5db6a22ee3db0e39d95",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e93b7f615f82139d51428e3d3152f7f1f4c44f61b133d9e6f780775a3068a46f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "630defd5aefe0448ca93e2eccdfbaad39c61494003551c91cb0d19bf77c93d6f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f1f665bd5f4d43b08dc1c469ab89e9174fd326ffa475503e1acf1b2a1924c67",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f65ea4b77e24c748db50b5e3273e8e364e098748a9cdd5a0943fd3fd3f72d3c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3c6bba2d34e86e74b43d21f74df6c83d38a89acd04d937c83310945bef2b389d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4793c528135de4907a8a8d94cc3631880d04dee29a1adfddda7cc83b9fe3fb71",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0b5d2ce6bcfa7f88a9bcf190b5f9cf9db0e73077b08080e43a0000e52d410bdc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fcb4045db3864b2f8997360df72adae3d6e5c61e25fb883a455cb092a63e3bc8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a7dedc599ba3c2887dd66290ce0d8cf7a41b5a87a9ca396ea46c1a67db88907e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4927833a8f58b42750152d7139014ac8c4270ad43b63c4be4e028ba001bd2785",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e0ee13ff8d2715a11e86f31276317c14c94de9989d84e142c736d5383805b3d7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "906f1070ca04f772d843d2d992db69b77a60ce3614b14c5bf5eb21dc8cdb8fc1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "26eee737fd63873b940e9a14ef0fd6b132ce0525f2befa6b9e4033ae35b79bc6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6371bae60409a093663f093cf424acbe5485590511d4307fef2ea4371a936d17",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "29e2fd5abfc254086dc3a2ffde7ea1f15f9642380462ae4ca7148741be717a48",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44072642c3b8b48666cce68d10a96b076037385bfd7e14278c83ccc545458a11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95124678902dc7185a290d6b568120f8f1115b74a5b9693aa6c80a5185f02236",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "033412d758d2c507d35b4ae246bbe64db9838113fcf652ee81c332e42e0f1b32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "135e2f51b6fe858d93b253268c33713cc965416dcdff5d0750bd9ae581876c78",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "380ed1ac95c237dcea8021c016cb4604c71163ef46b97ac159063fe1cbcaf745",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "17bad2197c2f7753bae3351e68183ff1ab22aae8d6a34b31f344dfb78fa8c682",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7e67d92cd06f742815822190f464ae960b1b5cebf013ed5efb06e714fc51602b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a03fc40dfa58283f6edb27f9a1c76e7daa1d83778216b99e66312ebbc8ba13bb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e6c5c4d54a0edb55acb33b832ffaa630d044c841112c8e99d833884ed2ea6910",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e3521ce2a7e1bb51cd324a68c0ff65dd806457075677a374e07cc9d143bd768d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e4b59ac293008d407132057dced658b1a42d1410ea5b0dea6b53ef8f5fb65933",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24653e76b37cdf3d6989b277ce2b3e1f398b9ea40e9d3bbf4e102a50f33671c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "af02e5a2572f8798a94bf5a69f8871eca1bff6a0f296d2c39bccef6668154b5f",
+        "verified_candidate_count": 2
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d39dca3b301d62de44d0adfbed810b226dbcb313d1abc491c68195e4e98bdc2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6c8cc6a44a0891470aad2266b279eec7af6119da49ca9b7514c268e954ad034",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10fa23007e5f5811473398ce72c1484b7ec2ee224b727af2793ced162fc29f7c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cffeb6d573b4035db4915e53b4152b1ebea7fa363ec82087d4faadd486ce0a65",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d3929b1929550300e5a9551b67ca5e7b58bcd766119a4f3f17120e149686641d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "66df36252b62089b3f52c95179db43c1e04275394622b3ddfad0cc4b0972fdb0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6a5ae09c8dd4e1502954e5dd7b4666b9382b744db987b0b3ac619b92207b9b95",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "490abfd5807c252559070990b8c714bcdcea9d39cd8fddfe4f9f914b5680a5d8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "17d1219fa35a48678b10bfaa9abd9cf87eeee150481555e75f7632f8f9a9667d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9a73ad72ea22bc2c3bba792b79e0f7dcf46914138a887c5ea08ec39df1ff3ab3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d0e019f0b1ae5d789d812637804de202e2841e4c1442e73602397d621389cf0",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "21a180b37abeb0af1cee6f917bdc0188f270533803762928fddb69544cc0e784",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e56832acaae80265f01b4b1eac15d026c28cc440756d1de87b40878457b51b81",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f9fe0392a67b41abcc98d50c60649755caf2c5d6808bdb3f90f29718ddf3dec6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "479de1e395da8de44ac7fa4b7f5c25700f37fb5c694d49ca9b2495bcc93e9b03",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a3ea35deb37d3660044dc4cd3a7cca17466e3cb2b864d6e4ccd3d67f0be19e5d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "316cd8f83827cde07cce2e238ea9cd9354869b08e230790b3be056c5d1ad6bda",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dfe72e46568b1b860eaad754893fe4b3e15cbe50f93d8b9ac5bfe5c758c764c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "478a67c86b6957f3fcedbdfd203434fe00182f92867245c2ed31e5b97d61e5af",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1d6a8b50949e43644f3cf5dba617750a4fe0ff620f92be530bbf3550fef7da6b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5475a2daee02dce055bb4eae1f1a6c2a5b5bdb83c8645ed24874de98d224a623",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "42c7127b0c785d262941434a5a75c81afbfc56d1a06ca4a0cdbfc4c3eff035ad",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bcc5952048d1a4f216189f68ffe5429d3d16e555f0937e5a4a4798a436188349",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "437548c4395f29159533b8266396c731e6da51f136574a3c9baa1c981ed42a35",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40fb0a85adea347937c179ac52066cf7695d02430b3fd566ffeb985d3e324647",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3ad2dfb06450154f7623385022481543ea0896314c340b2fc6c5ae03ed9c1733",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d7b854b4c5386313515139730bec3e72fd651534fc72dc0201774fec7ff5f95f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ca16a0e05a241a9e820e436d5166ac33cb31d92aeed621bee6f49d51a5795ff5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9db61d80db52314e83addee2d556253ee17ad710d1a597725a0a6390d2009073",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7f4dde59996373ec1de9789ccddca716928de22eb4d42c88f8087dace087a465",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9bc71a1232002fb854e2113714eb2761adefa48ca689219317d62a950fab22b8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4a2c163cb50ee2173dcc3ed9824f76b643f4a5cd9047e3c8a044270bf2225367",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2d9b0390ec44f7d52bcf02befd34a06fa230e9dd7b4eeda9f3a11f6aa5db3f63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d9efe0a4b24b7c8085bf35ae0862985ad49589e479e1710ff37d7b73b92e5353",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be378028139298cf593253b86db0861cb6283bf6501e0197635b2d24e9ce72b3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c6b71a496b062cf2bd2cf9e3d51bf3514bfa3f1a14e28d8b74e9101dec7f6e6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cd796adb02e1dd0cdfe88accc6fdaeaf6fcfb58b987894299da8da5a30e7dd99",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f11f306972c3196f23aff161d5a34c72c6f5e4c97fc669490767b245e076511a",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "82faeb66442d64a6fff5391eeb1812909bd1bb9579acabd95c83177d3e03efbf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5646b60c1b7002e5d80722e03a19c06c8c328f42dd4543360d111359a0b57376",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f753044f5f55ecf543ca93acaf3a3360cb868a0727c5002b7603bfb88d96f20",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6377e338d2839a154da311fe6d658d66052a918cff67bf24bda0ee539680db35",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8951ee25a0d3fac8f6a17e73e37e54685c2e7950c4125c68cf1d4f5a7c319c3d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b4c5aeec32ddaa3d3b0777580147cfe09cc4eb44a39809d218b37b6d1d9a8ff5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8a2b55d822fd6f1ee8dbcd502f88a7741d93438d495b70d015acec213039d99f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "223f5319141317a10d444f78087f5bcdc55e632bcc0fb48589c61367bdb30b91",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1772a705d31d2c7aebbae6524739b85d7469b4e6e5a7ba2c79a7698a9c705e7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0173ba43c11a02e6e2cdf3d8ef8ee45f12e4692d1adbb351974f3bcfa5b2593",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24fa698672bffb7e5bc5d95eaf4c4e47cf1ad218188e433b29731afa663f844d",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8a9daaceef4ec475d6dcce62e80256026b33285c3b438bd85fcc7b14d5cdac02",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19b07a259be949dbd64ac5e179011b3a56a8c03060a28f12809c2e2cc83b24cd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2f4fbeec5b07e1d1ac9580e87c29a164a8eccf02daa8a933570feb6017e53728",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98db077814936a7071d40afee954ac7184eee5c1bbf1d728a5c60ff246d0bbf0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6eaedc65df8507a9fe6b2e370d24a2351f8c40113e3035d82499feb780f398b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2394348bbbfc6cd22be771a8694822f4cb7b1295d1f4ffdc4747737f36fa3b19",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3df1f9a28b62f858f6e2fe2d01511d129ed62555028531900c21eb4d6d06b957",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bb5ab1ab1442b91fcba7f40cf5ce5ee1e7f35018f016894d57ece0cb03207660",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ab786de002776a59ed7f9056dbb0d8ace161de9b83f73523ad978dbaa7fc7c44",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c045222ee8ee834a1b8a4e88ef79d9d38fd3e895ac9c0b0f184b3a6fdcd87815",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2344851615fcdfdb0f9972845356830501cf506c563c5f34e6a68dcbeec6b26e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "da13b8842662764d8aaa20d633e6c6a7f653c57412cc33e94b373b13009ca702",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2869cca2ff442b733bcb40851cef656bf347bd600c18f7620c7868b219eeaaa0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f1ca41bb7815aa75723d2ae60bd0f9829436e83e748e654d4c48a41a6dc052df",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6e0a62aed721baf7c6af6926968e666e42d39156d6cf8297c774730835208687",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fac1d25b7f1bb239dff43f45689341cf2a2eaa5ead5a0493ddd4b45bd078b5f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "73875156edcafd9195ac6bdf2b60513bee4a67e6c054f82e7c9e85a79cee4219",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2e0358780afb87b32b5f13e265c44d332a95a8130ac9810c519d413186e16c51",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a6320c9e013aa17375b2d32b0292d337790d195252c068a16973ffecb9129445",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "291c180f4806d9bcef4634eaa304934b00c9b803e25dbaf834ca0509348cf770",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2612feac0fe4e3cb59ebc1780306f8c3866b3d51d07e5e007c89cd75cafb2dd8",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5c19f926a55747918bd6ff45bc2bee8679b9ccc469792864db84cc71977ea464",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "83ddfa1544a620a2ae9cdf4b777769cf56ebe53f2d8903dffe5514de8b799fe2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a5cea9cfc2a3925877288cbbae6c2d1c4ea3952307bf414c678f174a6342311",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7fb2416dc1ef3c33b6ab8c549c6b7346ac3c660a10e191b82e3b8c482c14754",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5d7d6d92f1d4093752ce5f1d088816062d832b12190a4ee54c057e37914426d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "063ddf2c208c2922a1c8c54adbd5b2053e5ea83e28b3f8e69f33b8e59c6e02a7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "08a6f738ef35c3df73f2b0cb33806afd0c9af8ee0b0a48ed747ed2bf77a74ced",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ce177743775383e6d80b27b7e0ec9804054991a257552c0b3dfe57bcf8c69d9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f050e74ddc0d1c3aefb27273907aacf71bdbb67e678c616617552d80e9e67d50",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d3fc7571d2731e34a0828b9c4a4e8dffeb4359674a12264e8d756d38f40bb0cb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b571528098e3997517f9802a78de231afe3fe1f5f8c7fb65aba370a2cd1757da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "87a3d3e0add5cdc996e4f9c8a1df18accdd7b86e9071c0548eb11cf97ecd803e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f94d579cd4adfeaa54efdba4b28d2fce6384520637ba83ce1c84ce37e54e0ae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a007e3b5cc2b26ef6436c88152949e0c7f56ecf43597f8533830fb1be98daf34",
+        "verified_candidate_count": 2
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a46a4e78b29a7f8dec83a8ddb3f57b909b92fbcb3d2da8e09a7e3f6672df7341",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0ae1376fd7f99e684bfb27e0c7222d491aa4048e1ec067e5062f534ea3773f2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "13e2c606734b02b4b722b69d7a29d87c8fa6ec2d9cb8ed7278d04d997a9c5bb5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "32fddb2e0a0ae527aba4ade3dcdcad8feb4c1b9d3a2b6cba38a41ae925c4b9ce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ba7f1a037dd6a74526318b736dea2bb1d253cb58da20cae23e5b0b9cf9137bf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c924528f929cad4cdc4b822d02ebb708de636dd19add5970471fc0c8bdd1efd4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d837c5827f07fc0ff6352bc029c3299e3100cf3f5094d34117cfbd63b088c84a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c4bf847d7cf21d751d3ee2a1588711750e490ca54a4a7522a47f137bb719f789",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd928a6ae55d50e082a8874614d4eded30c01528bd36ab6ca20ac8ab1ccf91d1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1c29d548254683ee6aafbc0c4ee4c9ce6e2ba0855a9db96de61b08f4c178b133",
+        "verified_candidate_count": 3
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b38b6e953ba8f88bc9ec4332084de4229a23f167dffbc53dd58207cfa1fe3d1b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "de3332410b1c4f9d5e154d848586237a0231cd0cac8546f4e304e3c5e865f0f2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d0534f5be036060d9447726ffe7bf182f125ec63bf4e948a6279e4df21f087b5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dd879dde5a8447a4bf82f92f239b90661194c5a6e62834e6b10a27ae2a61e68b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1b1ced63557ffa007941f5f8887d2fc7d90cdd0d143b3e17c205d29d0b499a49",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c180a45fadf6f3a16229931b4a3983dcb7e799c4732231f79c9a7df34589a4f7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "878983c522beb2d89dfb249fe4b46c5d4bf04d2eede3f0f45aead14467dd4f11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d2727eed9b0478486eca19b034c18f7be4a3b4a29323a1f8a60b0da765b75b1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0c53b939350d39c2176acdf38041b0bf89ee12d301c64008ddac05e33a44b931",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "71d37663bd189a1e21cce209e94b379fef0bdc7622328f48d8a0cb99b775dc68",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "04e8e93d72af346a407c1a623d27eafa3b6362e63843cb8d7a41ed9c81782703",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95bdc49c278bb0aa27c24c69e1c73e549e2b668226a1a753105b1a69e8978f4e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "540b9cd4a56b37b5264193c28d10ff3b9658bc14b2329e307017102ca8556528",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "187f4376286a117c52f0a7ace91cdc101e24395de7b01ce35f412f7be086ad2f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03ba758e0632f2c25a51fc3c8bff6ba26c48b3c88909b5b4bc0238191b095a55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a62515cd184b0798547053c28e630d6ed65f9f28d9436b36fa53cb20759ae6bc",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d82f839326730759c4298e257a991198794bf49be30806aa1a21120e142609f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fa11b336ba417767286aaae389fa30a389facdd1a249c666ad8e72a8e696fa32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "da91308c55e3ab300d4c21d7b03512d7a278e57a3ddfd5d5bca3da1c198a9541",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "84a6d12d7abc066936eb0e8e8d7b5a263585934459c55b480010a150d787e459",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "08136584afc9bbdb3abb678f2f04a5fc9e68693784474d0ec0cf027bb6caf637",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4ea34ec4cbca7bea7f5a48a215c268930b89adca6c8bbcd76889734020132de5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f42187101423a6aaf54c18ef3854186c3e4426105b3fb80ca1e1310df4643f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a1047490257f0b99d61955c418402fcad137743606e8823cabca5f8028673057",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f46f6a925ad9b003443ac00a413043c9c86f75efd4260cf2f1de02c8f9359bc0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a45874955ed992ae323d5b7b9e04c68296937b7bfbfedc894281ff927707b6e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4e81f68c9d240121edfbcfd517608165fee3ece8f1acf4cfc380080758fcf009",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c0c65199bcf3a75c29ee4ac13e8beaf12f8e9ea6bc319af5f5a6b8d0bd24fb80",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a1fb1710175b0309268a60695db6f910b6b60de2ba7974a5759080524ade918e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4fe307277788bf098d763fb6389ccb6b8b4b9d5d50195031b0915c635c32744a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dedca13fd226a76c1addc2dd38287b29f22cb234a9dbeb539a6ed2ee8752f8b2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b6a655f4fe3bcf67cfdb65ed05911804689bb6ddb0b906cfe54dda0cc8a16f92",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7348d3123c2eed614cb843fdb0d37df817d86b1730035ddbaf02ab448ef8bf6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2fc3aedd56ab73568e06453a81a7d25e82e61093b1865bac6d6f81738b03f25a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cdcbc9703bb16a504586f0c55da248488d0191727f79effbb67aca9f77849a0e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "378e6ad1d887febb6e4c1103ee288827eb8fd18cbb82663764e9f36e01423ef6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "58d0df98f4ee6385ffe77f00ed63c4889a04bf76940fe0f597fd84b00e3017e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6633688d2fdcbedf9326c77b8d58c64e711185efdb5b12146936e07bbef5661e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5a558c22743eca8befe3831bad8985d2a78efed8fa8dcbc45429d8d4ba6c015c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fa293041308b41bb19e23ea2d3c175b1a18c31c1cd20f61ab80b3cc314e8596a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0757d34d6b1d1b8416c0f850c6f5d7bb7b5acab8e4e48201b3aa48dfcd4738b6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a837f1b6f28c57cb331c1db043ef9d5223bd296710c05324c2ef1defc689423b",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c6c5a817771250ee31bafd5d5dfb690853ccf835e53c75a66bc893301e5e1e94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b38a50a52ac4556a6ab3a953eaeacc0f0c3f189ad487566e0d84984252b64e66",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "75b07209d5a03785aa95088b189c4ea88455082ac3e29763ca9ca6192dedf1dc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cc0ce649b4b095fc712335f15fd7096e6e18e70165780a54cf5205cdf31cd26f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c881b65c844972f6b2853234eb88002a14389d0776d3aaab9a2a82cb2381d904",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "29e8a237ee73a419a524fc1a086b55a21b50d29f80063a95d0bd6ad2b359fe73",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "43ff82ee6d6678eb1d281d491a7e29a7736f04177d67079ac3c6fc9462118c0f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d3cfcc40555b082b5cf5bc782dd8c9b5746395722dfe1bfc4324f6599063ee3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5e564f0b59821fd027453edb45a14e30439edd4f10fb50fe1e5364ccb1ae65e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "815559878e1216cf9fdee9906f45357ac1ae4e7a87c7b0984d476b9831ed6e63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "961319ea9b2081643329ae842d29387bed8a45a19fdd2cf6d46c07b4863138f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c9ea7dc356909eb5ef540c53ec015323dc91d0127299d79442f04cac04fcd225",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e1fe9c1fadfcde3f9f1d2f0773fbf24abd4508686229fade285d14891461cd7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee597458127a1e757b8d5e30a3d4f288418d5d26a6a542236673c7e961b24adb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b366ede2e844a8de6567f181d241d7f5017903bc9d756685bf3b135343f2cd74",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95cd8dfd84cc4e37f08f2f45098b01c4cf7ae3a00bc8f13a583b1945781e7029",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c657e4fa0f0f96f2752cb1e34c24334b3c5d9a5e31fb2d84a06ccfc4196393c2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e2a4cb18db7779e5c11e4921954a28ad3ade9184ca8a94bdaeaeb037cb73c955",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b6cf6cbfe53972f9e01f684484fd97c0ea95f99d8e179a754624ad2bef8f8a0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee3420bd712898afb558c4894c22b5e8e114934a745bfe79c172908513cfcff2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b489e5d64d14f2e349ecf9934eb72e30a0af94ecf2d178afc9b9787da898effa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "53923c1db7060e1871b34441b01140606b330a055b2f5a5a1fbfddcb960a1203",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4db59d850499620fdbebb9daac5b9152fe3edf6328ae0c6ae499c8c2680bc090",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "39940c4a6e785a4777eeacc418fdad74a0285b94ef0f14665213a033b27bffd4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a43ec205b6d14b4c2c96e726bc4356011b534a76f4dda8856dd7f83b17c2689",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6db64313438858cdce0c1ba782a2a49f428aa196f313359d51c4f85a4b64ce8c",
+        "verified_candidate_count": 2
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8e7d84157134c05b96955d239e889527c43c9dccaefac1c907fcf07ea2024822",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e412225730d0eb1570c4fb40657ef42f4e7abaa3a4e9c64f225e5e76ee40e690",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1bbc60e1d1cfca1d1d10bf185c8e4a63fdfcbb7cd43ea78d00f7b9c8f2779b3b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "47b51eec12bd201b82fea1ac14111ae6dd4b52a3525da735b9af5700b1fee7ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19f05c673d871224c125eed4022c7ec61a0a78983ef5df800a24124d9e8407a7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "662287be42d9b839fc0b325eb923e093818e4133a64af00d88e9468760bfd9af",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cc2ac657e6e9037e03da0bbdef6991199c0b120960e49726731b8910876816a3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0cd9c14413363bc9b39bf5427ca0a79e6d69aa8db092ae130d33e3e80b176720",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "06da4146809679080b9c2cfde028fe3a0272cffe0b6855ea6ec141be51f7f211",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a03dce7073ecf199788ef734909b9a7055d5fee4ac45b889432d8b1da2968bae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd42cf1a5d0cc7be582b66f832716221b0f665c50595dd960f878cd574fa133c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d4e239cc8c265666eeddf009d59b09de41c0631c73487b4e427829d39aa375d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7a132304ad19221936154075f7b90e53a1d72ab5b91377f5b7e23554316a220c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c52e054b679f6efdf7c0950e8ed9e8e729cadb85fc4974c04ae7d6f46cb2401b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8400ebc8c6dfcd68b2e010732f09b35275fbbf364c70c282680d2ed754252f42",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b5c6bc416f5c7fb6c1fd38420b394b0302fb3bff362075f9a5dbe7aaf2c3c0b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0fe98539fbf7e724c4dca12615f0b85955f383860193019b96a4df7fc0f40e58",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bd0a1d205b63cb4c064585178894fc1f9a7f86ec4d8bce8cc3b2324059cf77c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bee01b4e3e6e71e09513f8dfe8ddd7f27cf0ad3c0441ae8586fa750e856d2dce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a922c53badd78b504ad6777aa89b80ca1fe9b199c584b7466edc42511d8ac143",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "30dd3d5acbb97dbfdb60b13b2c3eaee8b0fe7d444d763c31e45fe83d801a5848",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a2d0b204c0e54b3c480d1aa9a20e7c727bad54fbd541af84fe8ba2a90069bb99",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4b527eee9707e96bb68bb44fa04902042f07b01a87928eb98c9a8599019dd1be",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be05576b0981ba33aaf48d8bdb4668416158326c582a0060c3f9dada9409b0e3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44d77a8898159eb7dead331adbd5effbb522527ff478980d307d2572227a09fd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ba20a95bf09b6e6949b2dc94f07a598fbbbb125017c84755ebf0692086fc223",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "141cdf1cc5afcdc7edb295b61fc153061f381d310e0ac37892c1428b489b509d",
+        "verified_candidate_count": 0
+      }
+    ],
+    "phase5_heldout_integrity_passed": true,
+    "run_wall_time_seconds": 3097.6784464600205,
+    "schema_version": "phase1-summary-v1",
+    "task_count": 512,
+    "tasks_with_verified_candidate": {
+      "count": 25,
+      "fraction": 0.048828125
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 6.033131360111824,
+      "candidate_total_latency_sum": 12355.853025509015,
+      "generation_candidate_latency_mean": 0.6641081934707245,
+      "generation_candidate_latency_sum": 1360.0935802280437,
+      "verification_latency_mean": 5.3690231666410995,
+      "verification_latency_sum": 10995.759445280972
+    },
+    "verification_wall_time_seconds": 2753.7237765840255,
+    "verifier_timeout_count": 0,
+    "workload_id": "phase5-heldout512-v1"
+  },
+  "adapter_improvement_required": false,
+  "base": {
+    "candidate_count": 2048,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 2044,
+      "verified": 4,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.998046875,
+      "verified": 0.001953125,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "completeness_errors": [],
+    "finish_reason_counts": {
+      "eos": 1466,
+      "token_limit": 582
+    },
+    "generated_token_counts": {
+      "maximum": 1024,
+      "mean": 391.015625,
+      "minimum": 2,
+      "total": 800800
+    },
+    "generation_wall_time_seconds": 1667.3146039769927,
+    "infrastructure_error_count": 0,
+    "model_role": "base",
+    "pass_at_k": {
+      "pass@1": 0.001953125,
+      "pass@4": 0.0078125
+    },
+    "per_task": [
+      {
+        "candidate_count": 4,
+        "task_id": "c5b647bc642bf8374eac484cf570a30c6448b1f1b2cb00bc472f6f293530c2da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd044664631f4573fff6dc5497120e0a7352d0521e407179be004466c3ac5a94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c514a3b4868b693b0296df15a115473fef205c5a8fc5aa4dd1d752437d1d6db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7cf53d8b37b530a8d4089b3ab25a46fc101236d17a4c72969a95326173b3a37a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "37c7a3a37517949a74cfd03cc8d47046aed1efab2bae1fb34906debd1df01979",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "39d3d8ef0145fdb2fb84ad4bde8b47342f7aff1c8c0a959d48b1d70f908cadeb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d5fa574c9a208d802dc39a31c0df1a39cfb40b239aeff202fe1df35691b0836",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "665c1cc832cc95f86a2f4296f82e721cab0a8c6912d4f05ed708730d67cae904",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9dcc17e7dd1c9f3502e9c182606595722c3086b6494b0a08348404423cf5cd7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7696a15218754e5a864ede54d92afd0df6cddfb0a09b45fd2d7dd9257a6f4681",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b8611b23ac82104a726674cf3c8a91c7b0f52c30e3d252663db73f0d3608e968",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4228ebfa59629bf6c931707e960a3a18887960f9aa41892cc2e28147e410fcf5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a1ee88feb2f417429a1383eeda25043e9642273167a9aeec9a6b77a6d5c12ba",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "598daf5104bae3f81110d668d6c23545f109966880d1f0909ab99557ce2c994c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cf675e8a74514e0613e299e995f79b668885532ee545a81d3847f357761629db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ade3287608ebf115707f909c52a20cb0c648b4b63372f4dbbf77fca5a0fcb6ab",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "76a93047d0469e798e11b644c65d3fc518b9fe5a2a13ca3d0ccb8be464c0338e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "195836cdb6007bffe680860d742c3b1e4ece1e80a11289e3b057e6db19cfcb64",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cec443630bf4de285d42035506e2196e998da6db08ebaeafbbcbafba0818e684",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3cea8ea59582a84c066a740cf5a5f1037f7114caf2004cb2831f164ba0d37bcf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00f50ebca85f972441681b8e48c81e93150d795a3059720ce417028c0f7f4c55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "af97fcde116772d9f90cc20e65253623e4dcd8dbc91b0ccc8868a9564901633f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f02e6d28ac50ffa77d1d5ca5415705e9a3e07a40e2d365caeeda8cb369b77a6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c3bb7f3c28653db8ad4ad8c65e7ecf58aba184822e6ba0f55b3db5c0e7d394b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2676c45043a624ffccb60af937884c6a741e74b6bd7c4bfc88ce04df2dcf58fa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7cfac00cf1cdb401bfe37a017db61000139ef4422ffd5a257aab1795d134686",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e2cc43dd66b16bfec0f0cfdb68fded7c9dfbcb5b844dc43a4fd44c99e6fdfbb3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e4da4094955e4e246c39b4d4be89cfd6e3e47dbd44d4bb2c0bcf93c53d450267",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a0bd7133df836535e9741281695cefa093c3d973949d919ad1aa35d5aa74a64",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8b037505260417106119b198cdc8891a68fb161e3362bcb23b3b948f377ca20f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "71d744c2ecd02e9a85a8bd060d2e15cdc1c43694ff3dc0c557265275e1b52a11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0e7a4e03aff3c2fe0e146979ce2aed804fbe8aebaa72675b1015fb106ba50596",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "542e1df1c7faef21ac99087824f4b90a129584df86b2a66924e3639850078414",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40142a73807f28b1bce23b82212cb9f4722c88cffb3afb9dd851b9efeda147fd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "69efb5354e1c4daa72ad81242e684e4a9c98bbdf399bce233ba4591acd60dc55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d3f059e7860ef9f93c7ef5764250c7983694caa40f652f8e61c6579df1fd471",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9aea1a37d9c6aba9efdfb4dc0d0c11ab0e539417b9d2529cecf7af3251e982c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e66bf00cc4e6848aef919e7b2ab4db7ede6e915091b1aa0158af0d104344270b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2e6b841d0e71ae5b9c7b4f92c6b585f6a4e38a42a8a449a1425c571b68091234",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03df7beb99391ca457fe08fcc06958de3553b9b05e4b2a1d552156b3563b2c6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3c9ab548b386aa3a26af2023a63370e15580802f3e1eafde5659ae8270437de0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2eb332dd44d257888cb09b01de83efbbc88bd406f2950ad3e4f355f29ca1ec4c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aedce0929510fa14f262735a4ab0035d909b1305762635534f97b2d2be75554e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10713686aafbfc23770541747187593d2183ce32643de590dc82cd0e7f760224",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a135d9000ccfb058a0f781c1b607a7876fd861e48cacab7b25f55a06f134840",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "88dc7be433ad394eeb2ca7bf86bc855965c896835cd37e52c5d395b83fc386b4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fbf0cf016909037482890d3a47e9ed42d5f65ff673ad98478c7a95acd7247d6e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9c694b5d87891149b0693ddd2c9b29a260a0932210d2fa3d46fa0665c99dda55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "de20bf4a50e153da34fd6371c567ad9b054e23610f214e7a7a371db86412e0e5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "401c3a72b2a77f78bfb855ef823b5783972e61061badb09b2ee08bcdddfd7f33",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03a07399d47b11ee6d5cad985373a02e0afbd7c2db42a42b991743427b541a25",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "82ed17f3959dac1c1c1b3e71afa9421e2809ae362611230eb848b70691035309",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d926ee9f0f09b5f21f0eea00603b2114c95303b23494c763c25808d95a1dd76f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b296b9cd2dc3fced582f067ba1e368cf91f16c2ef52914086a3802a7577a7b34",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d093c8b23bc88de0db72380140bdeff8b5bdfb3b8adec1427f1e3e6332f863a5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ecf4b8df7ba66933f66574cad7fa25eda7fb70d50400efd4ef4a119b5ff8d32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd1395846bac45a375977bb3fa30edc065764be9433d362199ca032f4aced011",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "60271310b99c98c6cca74c893133164cb86b6c9aa8e39426cc520f5274e44d7f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4c7a8f33b69134e58f42fc69415a74782ca429a121b3b5725520e5a479951789",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d12feb4013ee844d132616ad6d0defc97dc5ac52ee762a13c31298c287ea9bff",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2f81867aa261f94cd4c8eb79347ba1db2fa12eecb8116943e3d57edc2d8221e1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b6b775398a6c766b414e69deaab6a117594b78929f032f103562ef23439d6aa7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b9086fad6bfa93aa2649f5c26b8263a6aa2279d67524fcb247e2aff20023b1f3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03d3f0559284955ae58155ba267022c6df55b4838682be70a3f9c1b1da6e668b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a6d874d3be471f680b2bdd60a0dbf56fb666908b7c9a9808ef56ee094761f9a3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "85dac62286def0cc219b73f7cd7bec9d843ea90496cc5cd62ce14b4f9ce1845f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0a13a9a01dad9d183b3e961bd5cf41c932b9263c9b643c63be4b022489c41504",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e1b217aa7fcde2444004a679b3280ffbc28a9713c7b70efcfd14b4af35abc59c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a954999f9736fafc468a3476b5e3ec959338c61a272bfaf503595394bc0d544d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b11dab89d931d12ceddeb7b491f5cb5c449b377b4df830130bc0ac583f5d1325",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be496237feda7ed17ffcfceeed9c073b215fc78bb599f9f868cf222d0bc1a2bb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fada770082edbac5e0d2cae814e5affdde8781d52329027d05cde245898d5cca",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "489ba45adc3e94437debc9a6d66112c20da70f09d2da40e3bcc98bd700237f29",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "87f800bc45223ec3da1af135c52ec21d0f6be400d401d9744c4b4da66e95ed63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1dd4934d0ca2109eb365271e011128f78041b545971e6442a1a6187ac0140de8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bc08ad84a4b9efba7e114b24304273958a1f6a197eec8dad3e24fb80748cc7e7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6ba7a976d51a9d145fb184cceac69c50eb168c46e6f0bad7f1a05405a733d80a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "62228419c762680d2f683322e6eb894877d2f3c319afd5da3aea385a10e2f7f0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8384654034f98189bb3ea965a0d99438f976ba32e106c0c3d801820575918b2f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1a475f2a1147dfbdc0c80a977765a314d38f66f6caff8f3919cb5e6e0458522f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "810b4605512e88cebe5d3d2c061572bdfbf158eb7000c99616d261db1eecc356",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f23b71aad844c92a14a552c48b1bb50cdbffc6de2c31d137bc1d825e0bc3d10",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f2767ecd2626a4459c537a29f17769e6b21f2c29b3b2b0b780f9ce70fb0b242e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "11a276df28e203bcb2ff97f983cab99a0d46e403efe27b531c496c7681616fbf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6dfd62825f457fad93d8dd0cb5dc2d35deb9e80a1cf81430dc834309171d9ab9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a9f70ade71e73c0d98291af99c983180c2e2a48d3c6711ea18a498374ad5e1f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3ad6cba4a9aaa4ccfe222b1ae4e21a92463d66714903c080dd55cbcc9d63a0a2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5bd39ff25dc65063d42f56fd5003bb22ace16820bc9fa54c5fe7ccfbdd177385",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ca4d7b897c44dc133130f9ca145edf3b56c439b2a9740bc457d42cc90b017011",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "18564c1f46a7311b3478c89d81ee003a83ed9289fcd28b4c3530047eabb64a8c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1f56bec4a66f895db999a6e1c82388cae6603916f76d0da5c8d8900e970bcf13",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d6ca6678d6e7949761e3fa867d06ea7bcd3314eefb144313b5b4348acb19494d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2fc1660906e8c11b68ad1250a06d88bbce4fd96f910b0ab755462b61cbf77470",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a32cb8c6fe605f1f408e2f0912fa5a5e56f65cfdeb012749fe0f4fef75f1aa4d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a5d2cfc107137c0bfe6dff71fc4b438be73b71f17614d8e67491a929b634fefb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b172013f1ab86d0e350b6afc7ecc6ec762eb7262cc7b9a9f41cc4f1b44d42fb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ced554db62d6f8d1b0ce063681aec9f4157ddd2cf0ddcb9497c31a0b3700da3a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "97ccc1e652aa413df16c4585a0412d658f89410e44f583d2854cec855c0ca919",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "abd177f7681aaff49e521fee502691214c29211e038f97afe6bf45a13a91481c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cf7b1b84ba789cb6ff1c08a182e65b1f2bc30f0a9d470bc3339e164825f658cb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c0947a1d7259cce57f2aab06402fa8890d28c5744bea45a297a16bce2172a8cc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b172e0842a3847b0ad4c6df216dbcc8aa903723976ef5b709163988ec802ed9d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be6c0daa4c2ab37f8619523735ad73f4d57ecadb6f9d9985e80a9187a1415195",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f38410b17d9762a5a4030de0e600cedeffa5c89ba9bc5541673c42cd17d0fe3e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0022b296181f68acb44299ba0b6a57cafd17258f94c8879199dced93db227e7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6907e78ffe855c2fbb3ba29440be2d34dd2da2b3c04bf81715f0edb5ea5bb6ba",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8d627927c18ed913067b04c954e0b5f8752bd150299f77e7dfb059c833dbd103",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "636927d6e86c8d7a1b1be822e6a3cdd459db4913cbdf5e364fe347d6c725401c",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ec4615a8d54087d0caac39f46146c5e54b3946a8024b4ca26ae10a1fedca7645",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a2a349aa355fa9012dfa3e4a9f21c742d751f7186ad629fca12c543a83376845",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "017dc08351c656fd885cdf2bf1f0007898e0eaad46f9b12ca4d9a534af962754",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4d44fd06393e34f100b9f50e4d1a19bf88f3f039d955692aa4ef42f31a73f1b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7b33d42d28247604e25cbf74e8b53fdf8e503993c8790faf9e3f66b055d84672",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24cc2ebcb53a3b4bd839809ada22bb0f734c616687e453e4c5c07d4a7a476514",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "45fc96912de18e0386227827083d2a94a5c63ced29430f262e5a1d9d550d15d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3963ffc4bae974c37bfe031cd5bb09a50aeaa6adc54182ec6397eb14665d3e5f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ecf152e4b3e2b3272204dc3006c9662056f91b78d2417517187479aba266b3a0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eed9f6713e90f2524c4e9df5d2a3d0a2c49c26d2be8016278fffd255cce8c13d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "79f1b0df02326681c51ed0dad89fe0ba699f6bba88e3e76d42a658b01c0d9cc0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5282fa4b3ea1e8679f071f3dd8104a23e287f4afe2151a2676688bfb90eb249",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e9fdfeb1e1f27b10efce5e36afb7a3546d48d7c391a352ceacdd3b7e95958960",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "46004c1c492cde4595662c8ba135a69cc329aa3094124644863a40d323a89580",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ed0650c3e14372a881e3627d5665a3b95f030ce0d350fa4c1b9d970f4e067d56",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "251a8c316f2eaa38dea6e31bbc5c0420e1572d9161edbd992662184826369646",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dc254f8e50ec2375471566913a6a48d65ddb95049e1383c6bd62f498e58618c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bb30bd63fb263941a0a906742f5151121f6b95bfde65a8268b64ecc7c5bda882",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "123a1aa7599ec571ec167095611eab2c51d6c603887ea909ac65d7048d641e7b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f02ac212e7048896fb411269ce957b4afcfa34989a3d079e74e05bc9d30d4fc6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "726c11630299745881bd850fd22170f71f47f2179e0c47b7ea01c41e919724e3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0735920b0c60ebf5062bfd25b217f66d7bc2dd1c58fe639f3a9995f3c2d2b7c4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cb6ded49011f41b13d74fedfe324b92786faab873de10a445f6dac21e2ab28f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7c7f169b840bab486bbdffbec8473524ec54c05ab742863ac467c59ef2111d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ff8514b5204481c38f62aa7f80d0cfc744211243532266f31071cd1020f4d82",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10f520ad8273b8385b8adbbb44361ae17652f17be3bb7f099dd4050e7d2f2c01",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ac8cfd28d0a26d8d26a631bbc7a5704850b7ad4eaee3c17405d67207a02c4f94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "756aa9f658bb14fb513b53111c218c15430f2f290ef61c5f9418ee0f872c6c60",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7057b534ae959bcded567cd97e0cc2391971b268b362c799fb37ace1b00ceaa8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ca90de179fa6a0e792b4ed438ad4403d5ea53e7121b0e9ed96b73293b1f765b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3b3ecb912f51dafa137fb57c5c02800fac6a3ada01523a2d5e7338377ed3633b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "510845244551aa1977fbbe07fc5c726616dbdbc699a11af010c6947ace3ab95a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ac1c0e3dba2c6065f36114e94e9b47cac70fbb68cd95a0179f8c7b73d8e11442",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9e0d4e0e4527a430fb1afa47ab1f9aa791f881c888e273afe57668fcc788804c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f247239dbc0efd28640ff8c1188ef5ae1583f3e5675e0e054691c00cb1087473",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "168213046491f6e1be2ae8cf26cc07089fe2330b1a6ee6e72d3a2fb89dc3cd41",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aee9ef709b9e4923f18137262172291406b7e9d80d83e90cac49adb965bfe35d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f71b59d9ff4eca9b27de6a48bc2b0476ccdc252f44d7310031c7ea66288f5850",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4f571f03a30539848f8cbb205dc25096b4f3dbad5b3ed675e23abf64e7ea6401",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5a031679ad7a52255ca076cce81534d7422d4868c2770f08eb6398825312726b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "785aee5e9d39dd34f662b418a69291d5e15a42547ae6c1f28ad37480c6a118fb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee494586d1aabe3067c966eb0d7416f26a835d579bbfee4efa56a935e2cb6c92",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d1fd50f1b73247e99df31c9141e7c59c8adcfa84cc8f0c86cd6b6746bcc7c35",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5d8ec08426acaa56749708f36b61c98c1fe45d6a79f32c5d46ac0b11fb1c3a4b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee96152f862e294c45a8ac0c57352e64a751bb4be9a118c3855fe76c1e915db0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d04b6f03ea2ad800b3b68fbb6d74864afb46fd66ca99d59c7c1c5e39d55bc16a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "76f931bd9b0674fd5f39a68e1d53f0fc300f18fd7c3940d846fa2d3aa03c903f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8b745c3ba0945d20203208c6f1e64dc8dbc1ea9b353ccd3ab7a664651cbbc7eb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ec3921737e820df3f506688af9fa1a9947bd747aede68148a4a37c42910385f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "056c7827eebd7bc0171a3e2020689937d954228092ad90bf01cc753bb31cbdac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b75ddfeb11d0955ba04512e472b0c3594c4d7405784c9af511bac2ac7db50da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fc2c513decca3449041aaeb05128351c4f543282861b8056574fcd045e9aa866",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6594bfb3dc94a3ca475911aa66756dcb6c4602837de65335645707516bf641db",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8f4297452386e7266cba80b61d270e249fe3f363a1704bdbb64a8362f6487c39",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d528e32970ba07d4ef60303e7ddd3217882f6ce475b968c4a621eee3dd53083",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "81e694fa40610d7de8c2286d479bd7dc37fac72859a527d84b7b7f9ee1e87569",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6282db96feb0a97b68fdc587ffee4496abc0ed564feff88d42a601de964cc641",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1f5a150a92bf477b1d12da4fb636bb2717ce5e6087c40305ee5c9710c831e04d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6758f429b2fba75c0e3a36736d0d9d1d16c68888e3d513b51347800d9c1ec3d5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d90a4d243c58758d051a448f17bb2ab2c18fa3e1ab8ce2fc12603b8e4b6c919",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9bbe327d025591faac23c7b00e963ed586e4d2f98bdfb69a776399ab97cbaac5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8d1fa3e9c568d04b318e7b70c30ab37d2f0864c642ad5ec2ca4ced80c5b11b46",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "774bd06f44d1b2eb3e1d6b345a10328b2d1d403ab1a7a55544fd7e2fc0a430b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0d04b3b41f818863f4a52dfdff9eb973216d0a668f8e6307e6b972cc36c927d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c64c9d780f42fe27b9e4a658f0612f190080f8a809addd19fb3301a2614130d2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "90d23b3d0cbe14d7653f67e878138b81b16a831bc2d73ef3d7edda1e72d1daaa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0258a0258dd3bd31b5ab3406c4e21530a76e98a0d8e92e5db6c3cae0dbe01176",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b9fd0b76253c37c4fd12f6aebe7adbbd7bcf8825fff2a5ae5b6e225635061baa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e6cec4481506d67f0886586edb8bdfbba870d5dfa0f8685fa003290b031624e2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40a032d561edf15cabd96ba1704e0e8eb1cdbf26ea5ec1713b687b3801a9a5ec",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95308004bacc30739482b34aa522aaf3388ddcd92048ab4f88f1af16bb9519b7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c84fa0403dc8112aee782cce11d4012e480574e1b3004db5fdae2243ab232da9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4e048301dba01f93fdc25aceaf2a829acd42b44d38c605694836850320e06b09",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7deb7c4461976b9d27bac003281728966f3d725228ac376fb173f03129e305a2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14ecaa4f25bef84565d068b1e337fc1b3d5cc2b56d0b54cad9f42064c5eee5c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f70989c6819ef075ffe6a1c8627aa1d92fc1da4b63604a421db0b719bb13889a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd2bf18033551930860b1277729ce21860bd2285232a50f51ef7dec41ef26075",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eeb05d2b81a5fe30f32a810ae3e6cf2f23381756187ceb7279f72904fa8159d3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1e66364a89cad484c8c7413063136a9a3a21a5f4728bf425040a021ec2025ccf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "189c0cc81e1ca5e012682dd85e8bdc933fcebdfdb584af497f08fa45ecfd0ca8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40485970bad2a6d28dc5c9ed55924ebd4125aa87ed2c9f67c3bd37233ea05fbc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00e904bc4422abab981386cae14d22a8e389920deb1f2198b8cd5eef56b6b7ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "74125800af541845d93880105ff8c85960a2ee725992406d5de98bdeca6341f1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "db247aea8f59f945a5ba1e9478ddf895064c68588b6bdc0b104e24b3c408b9ce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "aabc3126b1612a2c41af60f14e7b64e90a1cbac5ccedcf71ac6f1333e49613fe",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "18f9ad311be84100be7f933ce7cbf21205f99e5a58ca158d1272acaf99d3d90a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4200c6789f6517bc7ff3859179c1d292c752a751b41f105857071d14f23a54fa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9b9dbdeb6c2ed7acd44867adfb041e552d41c0389165dc16f3455dc4b6112361",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40ebb195e153ff23c48f25533bcfea6a8df2ddf62522f9c7fb02117d870bfbb0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "00274e4367f673ff1c5669ecec47f3c3f5e86418b0bfb9ae651e0d0e05c1ea15",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f4cf85b56559008c3eec0f40fc2cd25767e6aa07f3db432cf75df0df3a999d6c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c5d3b993c2387804967ab786f795f9eab3c4d2b6d73443c1bd7e67ea404118ae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "51a0f67056b824f788c9e7905f7b790830e72470712e1deb60347808fae91783",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14b486e40bb65115747f9cb89db36d93b940c610e626e4a02c902ea4512ad398",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1bbff30f288f54fd4d6ffff572be763dd7d83d5055aeb6e3d8fa6dc62cd58eac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ff86515e117273c545979eab1e4766b76cb3fd70d81d6e476ccdfe462c5e5c4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "885fdecfa9f322ccced53a523539dbc5ba444f3f3c32001313f89f9f86f61810",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c2faa4c15b9a46594277ab3720227877c40d7bc8e468226240b0ebd9b7b12ab5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b653682b02677e9a0119cf4ad2ec32ce5a5b137828b7d8b5cd41d0e95fb60c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b070094ce5a2358bb7bbc684bbafe843f0a93159781477c444590fae99de4db8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6ad8a255ca25f6f84ae1119738ddab719f0ba21e08e97059bc0ac3a008d08a02",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "14b534a460bd26a8deb3b782155dc6d9a99f2d2653855bc74922c5e4ca6a67f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7dc213408a937a63fdfe10670e5382ff355debf29110df8cb4490e51a7d587c8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5bd20bbe734e392a23064edecee7d875a2b2d54321b6110a7b2d6136a9cadf6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1660ff0e1a949e0e2eee3408dd92757062736b7754f36492256a82955c83bdfd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8247dbbeb27a02c2c7d8cad2dea5a0421faa30a9baa688dd7b7ba89d8785e96d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "180e2cfbe4df7c9dbbce844f799d70f32ed41c66289679c4f698493d2d32acc4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b33afaab64aba3fe9bed49a3d76c97ef189176692a90905e92284dfae0c2674e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "276cd6d62963f7989ab0c87ec9c0a962f155fd3fa0196c4a05d24b33c70e533e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cea25c2f0dbd1ed9df0fdb9f965bcb9fefff0cb6eac75450ae91cb28fcfa1180",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "50d80ad4a6f2cdf7fd04cc5f179b6c954967b35dac615c5a238eaa439eb4754f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2795526ec969d9abb6d2c1d31125323e2b4a99571b1549721dd4b75572dd97e6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c5a8d2aeccbfe722961ea10dac2ef21bd56be891165974217c330b0439be0ff4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b3942279c9271285596cf093597db8070c770cf32af02dc08cd5314e0515c8eb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "38f117c019f2546bbb4c2c30b145643c1d941efa4731047317bec8e1a8408f86",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d71a0b697158fdaa9907b2cdded4d745da3eed0df66fc0c3bced8137da1b35ee",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "eebf81ff9828a24c3b2e698f934ea6eb3721d7794076c53d1fb0bb95900f0455",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d490bfe3ff6be1181f8453f30a0f4ba4d49ff74078f32e05502e1e0a43a902ff",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "36ded52658013f7eb27362ba574043e6a4dca4dad17c2f5450891c72812b2d42",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b1cb94722d98db45cca2d27489ce50628189ca388a9ee993f8ba7d321684db4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98e192beab5eff4c9bedd86cd389a055f329e42808a44189ecb7ba69830c691a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1449d68039087d13009ca1a8ca44c28be5ace5485e32e448abd21d234fbfe7bc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9939711822843e3f5350d296e7bd602f80d0f8fd04ea6df873d400d7e4607cdb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6404b17184fb44329264b6bcf8790fc2e531e7963aa5a17cf5c06a510476b05d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7874dae5a8c057a91ccd79dce0a38417ef5bcb575bbf72c7f88f884f0232b6f8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4228fb467cf8bdcb124db934519e341c6a645402d5beab3a7146449474518669",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f40e8863119b6d05dfc71dc507408632128d3ee746cd39d6b46dcb6d2d46ebd9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "37a4037ade1cf8d6cced06779a346ec20c436339982b72486d6b28061912c710",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b01f8ee95a44dbb18ec60c4e20b45cf043e9bb4ceb4a5cde858af032263fa649",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4349fca5e648b364963d059c306f9bb4c2e02bac17351735c7c1e77b5e23ac90",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "51e0524421f6f8a72efe1728f97cd24f477d6d3a47827ce2f2f23ad25e47bca5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "430ed68eeeec3fddb9d6588cd29b8388f1b10e416dff40bbcdbf86b30a5298bc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7037f1ba5cdbf467b8b530aced4ea8dce3431d77c08fd0601e51342439ae9f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f21d98363744e9f3ef10838873f7b923ce4d7a9d430955d218f7d24b943c888",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1a16404d9ab05fa7add00ee9cc888ed063cbd5a2a7cb2e057bb08e5de65394f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b79e5f45a3b59cf5396d1042a3749cf8685a4183bc630bff771ec250da4f3678",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dcf5d653d99b2adf21b95ccda9a357b41a037b201c4b52641cec9cd580abc8ef",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7aae8505bf52e75f226ea8c863b3e43b9f9727964dd94aeb513229a1be0505ac",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "517ae9996e09be19412b809b5e10bd42842c326a1d7586a1f928fabab8f5d353",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "861ed8ae4ce74cf6ef6daff1ee2ad8f20b69a17c3bfc5c800e11ecfc970cc9e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "939a120aa6692c3dacb24f7e1d3b9e7140ad299bb5355f82cf835815040f3e55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f8f9881ae5696d6e9ed96efa3bdd9709f0327b12b13009d4bd6e983ab61dd4a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "16241f661f5cb9a1a151636e6fa15917ac3826175323a46805a0e77806b32486",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4275d2d0a863d49fdc6f65888a9ffcea033a6decb8289484d0de23f39a2e7bd0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ad1d6c96e4d2da8701fa1c2c8c3614b3c46e5e76d90af99e0b23944f5faaff96",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d8c88375d69e6e7540240b424f618d92fcc1a2fde67d7865132802f3130c540f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98fa6e8a459b44807d3a91c4d0486c7e2caae251eceeefd93bf5c90f9ad87c27",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e9e6a66c9873fbe2a739eaebc75396412dd416b3b2f003ff952aa3581b9cd84a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19c1fe9a064a109e2170f64f65ad747fb2fda2990b0943beb0b12870ea534e8f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44fb1f83824b0794a33d0ec95718b202602ebcf05ddb05f0e5a95d8a587cc5d4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "27388978922b523e8f50c177a8d3a68b5e1c98be50191c88fcc4138a994f6069",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3915283b9bbe350eaabf3ce48382251ea77ddad071dca22ca93e08b74c5f5962",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "997fc55c894113aecf465db4f9a0034f082ca35311d7529ebeb2166fb7cbf559",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b57085043fd4b9dce30669cf8cace22f7ff1407206d27378933d02da0f865577",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f39fa418e7f70fc407d5d8e281e740e8b56c34ba2a1bd2b3cce45311df69f1e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3f23bc879e2e105900ff4e24ca75d7059684859d2184ec485189f840c3d3e935",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e3f2786b5c185207eab14bf36babba244a28cfa056283be735c8e06d35a8b579",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3e5b9f0aea11f2f282816fbc561815605cf944483fb78ccc1331d726da478e05",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6857d5830c807f4dda27a006ae32371142127a8e39f88b26d101baa43c05afc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f7fa4ba5af13a2aef3f4aa072ddeb803c7ac93ef16e03d81e00d1c5f4efa169d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f98f95e2dfe5b67e4b1d9209aab9e41edf62c4144542c4df1b6350e0ebe2fe38",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "73412e7063ae927ac407d862fc8720944bee6ed8dfdba349677cf04513a87b73",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d5671fbcff4ef91a91f8a46cb860df2fa0bc564cd832dc90bc1304dceb2349f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be0b3c73803f670541ffe3468812a9b012eddb8dc135bdc990af7e1339cebc41",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b1a3066b5beacf31be4368e2488db97c5d571da2b1f9bfeedce1c73f0aa07902",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a5712ad1749733b7ca981ec3fcf5cab6b8e3a9e8bc760018ec34d759827c705f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8e5e6307ac241f4ebb44a3e6074857a9de10838bd2efbfa7f4c5b9b7da094479",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c3abe51862bcce8d6644bf2dd8b099c5dfe279c3c13c0c89e8d6d67fec420625",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a249c50fe89f56c5777689dc5d013f87739bb39bca050592cdc7aa2b0fdf84c6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "227d8b9673fd1737e031efc8d6ebeb831657c68f7d7b05240d35586f14d4933c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "506efd848eac146dcba74a182d8872c0fad1f3f676aca917bc2cb6c0f48b85b5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "133f89605dba7c7a0a8c02a4ee38ab96d48b28bee814046505a1d03a2e7b959a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "07b11af70539f4cb5eda546ae0a97e45c63736998e3cf26266162f1c99cd9a20",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ca45c82d5564b703dc0dd06b8c716792dacc5802a969dcd38eecf27c7be4f97",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4c62e086b78f0ff351303d9a757233836cdac6a735e142ca892486d23c319043",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1dd2d8ba2611ebb49b73d3d91599ccb2d792239a9465d11cd63a92604dd20c38",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d592b2592574491e5a68dd7b9f3b2b1ec6efaa5ab6a516c77611b5059ff8ed17",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "28398d939f7ea30c9013081ffd8664b50cba5d1f7c37722c9d7067ab5b9a74a1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cffa8477752bcdb5d304852aa944a602a6cf63dc34a85cdea62be55982714d4b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "12136be207fcb603c6ab752ab6fa31ed38821c6912b1b58212b1c0c4a3c298c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "387962e0e1c2cd94e405a55b142f98c63e9089981b50080ef3acd76dc46cc4c9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c98a3c5a675c209ea7ea4979c216994aaa93cb739696ce80036b668334cb2f08",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "801d7b7b4b9b45862fe3b00baf2cb3a0af205640474d3e7adf8c280ac7a37040",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f56b7120bf552ee252ca88db493aeeccfd038c0c01430e204b22e6d2b42ac447",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5e406cb24422378e0503c73e1a0ea45cb08e380df4634576decc64124163f283",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f54aee54d9b4cc2ecda3435f0b08b867d85f5a7c54cad93123e6e0ea9d97a2ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4191e00fef8cd7a6ab66064926267745a9294d108a75a5db6a22ee3db0e39d95",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e93b7f615f82139d51428e3d3152f7f1f4c44f61b133d9e6f780775a3068a46f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "630defd5aefe0448ca93e2eccdfbaad39c61494003551c91cb0d19bf77c93d6f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f1f665bd5f4d43b08dc1c469ab89e9174fd326ffa475503e1acf1b2a1924c67",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f65ea4b77e24c748db50b5e3273e8e364e098748a9cdd5a0943fd3fd3f72d3c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3c6bba2d34e86e74b43d21f74df6c83d38a89acd04d937c83310945bef2b389d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4793c528135de4907a8a8d94cc3631880d04dee29a1adfddda7cc83b9fe3fb71",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0b5d2ce6bcfa7f88a9bcf190b5f9cf9db0e73077b08080e43a0000e52d410bdc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fcb4045db3864b2f8997360df72adae3d6e5c61e25fb883a455cb092a63e3bc8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a7dedc599ba3c2887dd66290ce0d8cf7a41b5a87a9ca396ea46c1a67db88907e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4927833a8f58b42750152d7139014ac8c4270ad43b63c4be4e028ba001bd2785",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e0ee13ff8d2715a11e86f31276317c14c94de9989d84e142c736d5383805b3d7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "906f1070ca04f772d843d2d992db69b77a60ce3614b14c5bf5eb21dc8cdb8fc1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "26eee737fd63873b940e9a14ef0fd6b132ce0525f2befa6b9e4033ae35b79bc6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6371bae60409a093663f093cf424acbe5485590511d4307fef2ea4371a936d17",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "29e2fd5abfc254086dc3a2ffde7ea1f15f9642380462ae4ca7148741be717a48",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44072642c3b8b48666cce68d10a96b076037385bfd7e14278c83ccc545458a11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95124678902dc7185a290d6b568120f8f1115b74a5b9693aa6c80a5185f02236",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "033412d758d2c507d35b4ae246bbe64db9838113fcf652ee81c332e42e0f1b32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "135e2f51b6fe858d93b253268c33713cc965416dcdff5d0750bd9ae581876c78",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "380ed1ac95c237dcea8021c016cb4604c71163ef46b97ac159063fe1cbcaf745",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "17bad2197c2f7753bae3351e68183ff1ab22aae8d6a34b31f344dfb78fa8c682",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7e67d92cd06f742815822190f464ae960b1b5cebf013ed5efb06e714fc51602b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a03fc40dfa58283f6edb27f9a1c76e7daa1d83778216b99e66312ebbc8ba13bb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e6c5c4d54a0edb55acb33b832ffaa630d044c841112c8e99d833884ed2ea6910",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e3521ce2a7e1bb51cd324a68c0ff65dd806457075677a374e07cc9d143bd768d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e4b59ac293008d407132057dced658b1a42d1410ea5b0dea6b53ef8f5fb65933",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24653e76b37cdf3d6989b277ce2b3e1f398b9ea40e9d3bbf4e102a50f33671c0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "af02e5a2572f8798a94bf5a69f8871eca1bff6a0f296d2c39bccef6668154b5f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6d39dca3b301d62de44d0adfbed810b226dbcb313d1abc491c68195e4e98bdc2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6c8cc6a44a0891470aad2266b279eec7af6119da49ca9b7514c268e954ad034",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "10fa23007e5f5811473398ce72c1484b7ec2ee224b727af2793ced162fc29f7c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cffeb6d573b4035db4915e53b4152b1ebea7fa363ec82087d4faadd486ce0a65",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d3929b1929550300e5a9551b67ca5e7b58bcd766119a4f3f17120e149686641d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "66df36252b62089b3f52c95179db43c1e04275394622b3ddfad0cc4b0972fdb0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6a5ae09c8dd4e1502954e5dd7b4666b9382b744db987b0b3ac619b92207b9b95",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "490abfd5807c252559070990b8c714bcdcea9d39cd8fddfe4f9f914b5680a5d8",
+        "verified_candidate_count": 1
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "17d1219fa35a48678b10bfaa9abd9cf87eeee150481555e75f7632f8f9a9667d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9a73ad72ea22bc2c3bba792b79e0f7dcf46914138a887c5ea08ec39df1ff3ab3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d0e019f0b1ae5d789d812637804de202e2841e4c1442e73602397d621389cf0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "21a180b37abeb0af1cee6f917bdc0188f270533803762928fddb69544cc0e784",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e56832acaae80265f01b4b1eac15d026c28cc440756d1de87b40878457b51b81",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f9fe0392a67b41abcc98d50c60649755caf2c5d6808bdb3f90f29718ddf3dec6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "479de1e395da8de44ac7fa4b7f5c25700f37fb5c694d49ca9b2495bcc93e9b03",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a3ea35deb37d3660044dc4cd3a7cca17466e3cb2b864d6e4ccd3d67f0be19e5d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "316cd8f83827cde07cce2e238ea9cd9354869b08e230790b3be056c5d1ad6bda",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dfe72e46568b1b860eaad754893fe4b3e15cbe50f93d8b9ac5bfe5c758c764c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "478a67c86b6957f3fcedbdfd203434fe00182f92867245c2ed31e5b97d61e5af",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1d6a8b50949e43644f3cf5dba617750a4fe0ff620f92be530bbf3550fef7da6b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5475a2daee02dce055bb4eae1f1a6c2a5b5bdb83c8645ed24874de98d224a623",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "42c7127b0c785d262941434a5a75c81afbfc56d1a06ca4a0cdbfc4c3eff035ad",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bcc5952048d1a4f216189f68ffe5429d3d16e555f0937e5a4a4798a436188349",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "437548c4395f29159533b8266396c731e6da51f136574a3c9baa1c981ed42a35",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "40fb0a85adea347937c179ac52066cf7695d02430b3fd566ffeb985d3e324647",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3ad2dfb06450154f7623385022481543ea0896314c340b2fc6c5ae03ed9c1733",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d7b854b4c5386313515139730bec3e72fd651534fc72dc0201774fec7ff5f95f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ca16a0e05a241a9e820e436d5166ac33cb31d92aeed621bee6f49d51a5795ff5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9db61d80db52314e83addee2d556253ee17ad710d1a597725a0a6390d2009073",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7f4dde59996373ec1de9789ccddca716928de22eb4d42c88f8087dace087a465",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9bc71a1232002fb854e2113714eb2761adefa48ca689219317d62a950fab22b8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4a2c163cb50ee2173dcc3ed9824f76b643f4a5cd9047e3c8a044270bf2225367",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2d9b0390ec44f7d52bcf02befd34a06fa230e9dd7b4eeda9f3a11f6aa5db3f63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d9efe0a4b24b7c8085bf35ae0862985ad49589e479e1710ff37d7b73b92e5353",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be378028139298cf593253b86db0861cb6283bf6501e0197635b2d24e9ce72b3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8c6b71a496b062cf2bd2cf9e3d51bf3514bfa3f1a14e28d8b74e9101dec7f6e6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cd796adb02e1dd0cdfe88accc6fdaeaf6fcfb58b987894299da8da5a30e7dd99",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f11f306972c3196f23aff161d5a34c72c6f5e4c97fc669490767b245e076511a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "82faeb66442d64a6fff5391eeb1812909bd1bb9579acabd95c83177d3e03efbf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5646b60c1b7002e5d80722e03a19c06c8c328f42dd4543360d111359a0b57376",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6f753044f5f55ecf543ca93acaf3a3360cb868a0727c5002b7603bfb88d96f20",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6377e338d2839a154da311fe6d658d66052a918cff67bf24bda0ee539680db35",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8951ee25a0d3fac8f6a17e73e37e54685c2e7950c4125c68cf1d4f5a7c319c3d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b4c5aeec32ddaa3d3b0777580147cfe09cc4eb44a39809d218b37b6d1d9a8ff5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8a2b55d822fd6f1ee8dbcd502f88a7741d93438d495b70d015acec213039d99f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "223f5319141317a10d444f78087f5bcdc55e632bcc0fb48589c61367bdb30b91",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1772a705d31d2c7aebbae6524739b85d7469b4e6e5a7ba2c79a7698a9c705e7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0173ba43c11a02e6e2cdf3d8ef8ee45f12e4692d1adbb351974f3bcfa5b2593",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "24fa698672bffb7e5bc5d95eaf4c4e47cf1ad218188e433b29731afa663f844d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8a9daaceef4ec475d6dcce62e80256026b33285c3b438bd85fcc7b14d5cdac02",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19b07a259be949dbd64ac5e179011b3a56a8c03060a28f12809c2e2cc83b24cd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2f4fbeec5b07e1d1ac9580e87c29a164a8eccf02daa8a933570feb6017e53728",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "98db077814936a7071d40afee954ac7184eee5c1bbf1d728a5c60ff246d0bbf0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f6eaedc65df8507a9fe6b2e370d24a2351f8c40113e3035d82499feb780f398b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2394348bbbfc6cd22be771a8694822f4cb7b1295d1f4ffdc4747737f36fa3b19",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3df1f9a28b62f858f6e2fe2d01511d129ed62555028531900c21eb4d6d06b957",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bb5ab1ab1442b91fcba7f40cf5ce5ee1e7f35018f016894d57ece0cb03207660",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ab786de002776a59ed7f9056dbb0d8ace161de9b83f73523ad978dbaa7fc7c44",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c045222ee8ee834a1b8a4e88ef79d9d38fd3e895ac9c0b0f184b3a6fdcd87815",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2344851615fcdfdb0f9972845356830501cf506c563c5f34e6a68dcbeec6b26e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "da13b8842662764d8aaa20d633e6c6a7f653c57412cc33e94b373b13009ca702",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2869cca2ff442b733bcb40851cef656bf347bd600c18f7620c7868b219eeaaa0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f1ca41bb7815aa75723d2ae60bd0f9829436e83e748e654d4c48a41a6dc052df",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6e0a62aed721baf7c6af6926968e666e42d39156d6cf8297c774730835208687",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fac1d25b7f1bb239dff43f45689341cf2a2eaa5ead5a0493ddd4b45bd078b5f9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "73875156edcafd9195ac6bdf2b60513bee4a67e6c054f82e7c9e85a79cee4219",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2e0358780afb87b32b5f13e265c44d332a95a8130ac9810c519d413186e16c51",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a6320c9e013aa17375b2d32b0292d337790d195252c068a16973ffecb9129445",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "291c180f4806d9bcef4634eaa304934b00c9b803e25dbaf834ca0509348cf770",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2612feac0fe4e3cb59ebc1780306f8c3866b3d51d07e5e007c89cd75cafb2dd8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5c19f926a55747918bd6ff45bc2bee8679b9ccc469792864db84cc71977ea464",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "83ddfa1544a620a2ae9cdf4b777769cf56ebe53f2d8903dffe5514de8b799fe2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a5cea9cfc2a3925877288cbbae6c2d1c4ea3952307bf414c678f174a6342311",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e7fb2416dc1ef3c33b6ab8c549c6b7346ac3c660a10e191b82e3b8c482c14754",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5d7d6d92f1d4093752ce5f1d088816062d832b12190a4ee54c057e37914426d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "063ddf2c208c2922a1c8c54adbd5b2053e5ea83e28b3f8e69f33b8e59c6e02a7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "08a6f738ef35c3df73f2b0cb33806afd0c9af8ee0b0a48ed747ed2bf77a74ced",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ce177743775383e6d80b27b7e0ec9804054991a257552c0b3dfe57bcf8c69d9",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f050e74ddc0d1c3aefb27273907aacf71bdbb67e678c616617552d80e9e67d50",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d3fc7571d2731e34a0828b9c4a4e8dffeb4359674a12264e8d756d38f40bb0cb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b571528098e3997517f9802a78de231afe3fe1f5f8c7fb65aba370a2cd1757da",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "87a3d3e0add5cdc996e4f9c8a1df18accdd7b86e9071c0548eb11cf97ecd803e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5f94d579cd4adfeaa54efdba4b28d2fce6384520637ba83ce1c84ce37e54e0ae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a007e3b5cc2b26ef6436c88152949e0c7f56ecf43597f8533830fb1be98daf34",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a46a4e78b29a7f8dec83a8ddb3f57b909b92fbcb3d2da8e09a7e3f6672df7341",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b0ae1376fd7f99e684bfb27e0c7222d491aa4048e1ec067e5062f534ea3773f2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "13e2c606734b02b4b722b69d7a29d87c8fa6ec2d9cb8ed7278d04d997a9c5bb5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "32fddb2e0a0ae527aba4ade3dcdcad8feb4c1b9d3a2b6cba38a41ae925c4b9ce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2ba7f1a037dd6a74526318b736dea2bb1d253cb58da20cae23e5b0b9cf9137bf",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c924528f929cad4cdc4b822d02ebb708de636dd19add5970471fc0c8bdd1efd4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d837c5827f07fc0ff6352bc029c3299e3100cf3f5094d34117cfbd63b088c84a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c4bf847d7cf21d751d3ee2a1588711750e490ca54a4a7522a47f137bb719f789",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd928a6ae55d50e082a8874614d4eded30c01528bd36ab6ca20ac8ab1ccf91d1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1c29d548254683ee6aafbc0c4ee4c9ce6e2ba0855a9db96de61b08f4c178b133",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b38b6e953ba8f88bc9ec4332084de4229a23f167dffbc53dd58207cfa1fe3d1b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "de3332410b1c4f9d5e154d848586237a0231cd0cac8546f4e304e3c5e865f0f2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d0534f5be036060d9447726ffe7bf182f125ec63bf4e948a6279e4df21f087b5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dd879dde5a8447a4bf82f92f239b90661194c5a6e62834e6b10a27ae2a61e68b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1b1ced63557ffa007941f5f8887d2fc7d90cdd0d143b3e17c205d29d0b499a49",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c180a45fadf6f3a16229931b4a3983dcb7e799c4732231f79c9a7df34589a4f7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "878983c522beb2d89dfb249fe4b46c5d4bf04d2eede3f0f45aead14467dd4f11",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d2727eed9b0478486eca19b034c18f7be4a3b4a29323a1f8a60b0da765b75b1",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0c53b939350d39c2176acdf38041b0bf89ee12d301c64008ddac05e33a44b931",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "71d37663bd189a1e21cce209e94b379fef0bdc7622328f48d8a0cb99b775dc68",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "04e8e93d72af346a407c1a623d27eafa3b6362e63843cb8d7a41ed9c81782703",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95bdc49c278bb0aa27c24c69e1c73e549e2b668226a1a753105b1a69e8978f4e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "540b9cd4a56b37b5264193c28d10ff3b9658bc14b2329e307017102ca8556528",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "187f4376286a117c52f0a7ace91cdc101e24395de7b01ce35f412f7be086ad2f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "03ba758e0632f2c25a51fc3c8bff6ba26c48b3c88909b5b4bc0238191b095a55",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a62515cd184b0798547053c28e630d6ed65f9f28d9436b36fa53cb20759ae6bc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d82f839326730759c4298e257a991198794bf49be30806aa1a21120e142609f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fa11b336ba417767286aaae389fa30a389facdd1a249c666ad8e72a8e696fa32",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "da91308c55e3ab300d4c21d7b03512d7a278e57a3ddfd5d5bca3da1c198a9541",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "84a6d12d7abc066936eb0e8e8d7b5a263585934459c55b480010a150d787e459",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "08136584afc9bbdb3abb678f2f04a5fc9e68693784474d0ec0cf027bb6caf637",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4ea34ec4cbca7bea7f5a48a215c268930b89adca6c8bbcd76889734020132de5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9f42187101423a6aaf54c18ef3854186c3e4426105b3fb80ca1e1310df4643f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a1047490257f0b99d61955c418402fcad137743606e8823cabca5f8028673057",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "f46f6a925ad9b003443ac00a413043c9c86f75efd4260cf2f1de02c8f9359bc0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a45874955ed992ae323d5b7b9e04c68296937b7bfbfedc894281ff927707b6e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4e81f68c9d240121edfbcfd517608165fee3ece8f1acf4cfc380080758fcf009",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c0c65199bcf3a75c29ee4ac13e8beaf12f8e9ea6bc319af5f5a6b8d0bd24fb80",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a1fb1710175b0309268a60695db6f910b6b60de2ba7974a5759080524ade918e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4fe307277788bf098d763fb6389ccb6b8b4b9d5d50195031b0915c635c32744a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "dedca13fd226a76c1addc2dd38287b29f22cb234a9dbeb539a6ed2ee8752f8b2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b6a655f4fe3bcf67cfdb65ed05911804689bb6ddb0b906cfe54dda0cc8a16f92",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7348d3123c2eed614cb843fdb0d37df817d86b1730035ddbaf02ab448ef8bf6d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2fc3aedd56ab73568e06453a81a7d25e82e61093b1865bac6d6f81738b03f25a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cdcbc9703bb16a504586f0c55da248488d0191727f79effbb67aca9f77849a0e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "378e6ad1d887febb6e4c1103ee288827eb8fd18cbb82663764e9f36e01423ef6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "58d0df98f4ee6385ffe77f00ed63c4889a04bf76940fe0f597fd84b00e3017e8",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6633688d2fdcbedf9326c77b8d58c64e711185efdb5b12146936e07bbef5661e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5a558c22743eca8befe3831bad8985d2a78efed8fa8dcbc45429d8d4ba6c015c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fa293041308b41bb19e23ea2d3c175b1a18c31c1cd20f61ab80b3cc314e8596a",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0757d34d6b1d1b8416c0f850c6f5d7bb7b5acab8e4e48201b3aa48dfcd4738b6",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a837f1b6f28c57cb331c1db043ef9d5223bd296710c05324c2ef1defc689423b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c6c5a817771250ee31bafd5d5dfb690853ccf835e53c75a66bc893301e5e1e94",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b38a50a52ac4556a6ab3a953eaeacc0f0c3f189ad487566e0d84984252b64e66",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "75b07209d5a03785aa95088b189c4ea88455082ac3e29763ca9ca6192dedf1dc",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cc0ce649b4b095fc712335f15fd7096e6e18e70165780a54cf5205cdf31cd26f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c881b65c844972f6b2853234eb88002a14389d0776d3aaab9a2a82cb2381d904",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "29e8a237ee73a419a524fc1a086b55a21b50d29f80063a95d0bd6ad2b359fe73",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "43ff82ee6d6678eb1d281d491a7e29a7736f04177d67079ac3c6fc9462118c0f",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7d3cfcc40555b082b5cf5bc782dd8c9b5746395722dfe1bfc4324f6599063ee3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "d5e564f0b59821fd027453edb45a14e30439edd4f10fb50fe1e5364ccb1ae65e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "815559878e1216cf9fdee9906f45357ac1ae4e7a87c7b0984d476b9831ed6e63",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "961319ea9b2081643329ae842d29387bed8a45a19fdd2cf6d46c07b4863138f5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c9ea7dc356909eb5ef540c53ec015323dc91d0127299d79442f04cac04fcd225",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e1fe9c1fadfcde3f9f1d2f0773fbf24abd4508686229fade285d14891461cd7e",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee597458127a1e757b8d5e30a3d4f288418d5d26a6a542236673c7e961b24adb",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b366ede2e844a8de6567f181d241d7f5017903bc9d756685bf3b135343f2cd74",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "95cd8dfd84cc4e37f08f2f45098b01c4cf7ae3a00bc8f13a583b1945781e7029",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c657e4fa0f0f96f2752cb1e34c24334b3c5d9a5e31fb2d84a06ccfc4196393c2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e2a4cb18db7779e5c11e4921954a28ad3ade9184ca8a94bdaeaeb037cb73c955",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b6cf6cbfe53972f9e01f684484fd97c0ea95f99d8e179a754624ad2bef8f8a0",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "ee3420bd712898afb558c4894c22b5e8e114934a745bfe79c172908513cfcff2",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "b489e5d64d14f2e349ecf9934eb72e30a0af94ecf2d178afc9b9787da898effa",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "53923c1db7060e1871b34441b01140606b330a055b2f5a5a1fbfddcb960a1203",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4db59d850499620fdbebb9daac5b9152fe3edf6328ae0c6ae499c8c2680bc090",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "39940c4a6e785a4777eeacc418fdad74a0285b94ef0f14665213a033b27bffd4",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "2a43ec205b6d14b4c2c96e726bc4356011b534a76f4dda8856dd7f83b17c2689",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "6db64313438858cdce0c1ba782a2a49f428aa196f313359d51c4f85a4b64ce8c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8e7d84157134c05b96955d239e889527c43c9dccaefac1c907fcf07ea2024822",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "e412225730d0eb1570c4fb40657ef42f4e7abaa3a4e9c64f225e5e76ee40e690",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "1bbc60e1d1cfca1d1d10bf185c8e4a63fdfcbb7cd43ea78d00f7b9c8f2779b3b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "47b51eec12bd201b82fea1ac14111ae6dd4b52a3525da735b9af5700b1fee7ea",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "19f05c673d871224c125eed4022c7ec61a0a78983ef5df800a24124d9e8407a7",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "662287be42d9b839fc0b325eb923e093818e4133a64af00d88e9468760bfd9af",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "cc2ac657e6e9037e03da0bbdef6991199c0b120960e49726731b8910876816a3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0cd9c14413363bc9b39bf5427ca0a79e6d69aa8db092ae130d33e3e80b176720",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "06da4146809679080b9c2cfde028fe3a0272cffe0b6855ea6ec141be51f7f211",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a03dce7073ecf199788ef734909b9a7055d5fee4ac45b889432d8b1da2968bae",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "fd42cf1a5d0cc7be582b66f832716221b0f665c50595dd960f878cd574fa133c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "3d4e239cc8c265666eeddf009d59b09de41c0631c73487b4e427829d39aa375d",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "7a132304ad19221936154075f7b90e53a1d72ab5b91377f5b7e23554316a220c",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "c52e054b679f6efdf7c0950e8ed9e8e729cadb85fc4974c04ae7d6f46cb2401b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "8400ebc8c6dfcd68b2e010732f09b35275fbbf364c70c282680d2ed754252f42",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "5b5c6bc416f5c7fb6c1fd38420b394b0302fb3bff362075f9a5dbe7aaf2c3c0b",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "0fe98539fbf7e724c4dca12615f0b85955f383860193019b96a4df7fc0f40e58",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bd0a1d205b63cb4c064585178894fc1f9a7f86ec4d8bce8cc3b2324059cf77c5",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "bee01b4e3e6e71e09513f8dfe8ddd7f27cf0ad3c0441ae8586fa750e856d2dce",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a922c53badd78b504ad6777aa89b80ca1fe9b199c584b7466edc42511d8ac143",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "30dd3d5acbb97dbfdb60b13b2c3eaee8b0fe7d444d763c31e45fe83d801a5848",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "a2d0b204c0e54b3c480d1aa9a20e7c727bad54fbd541af84fe8ba2a90069bb99",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "4b527eee9707e96bb68bb44fa04902042f07b01a87928eb98c9a8599019dd1be",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "be05576b0981ba33aaf48d8bdb4668416158326c582a0060c3f9dada9409b0e3",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "44d77a8898159eb7dead331adbd5effbb522527ff478980d307d2572227a09fd",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "9ba20a95bf09b6e6949b2dc94f07a598fbbbb125017c84755ebf0692086fc223",
+        "verified_candidate_count": 0
+      },
+      {
+        "candidate_count": 4,
+        "task_id": "141cdf1cc5afcdc7edb295b61fc153061f381d310e0ac37892c1428b489b509d",
+        "verified_candidate_count": 0
+      }
+    ],
+    "phase5_heldout_integrity_passed": true,
+    "run_wall_time_seconds": 4355.653810316988,
+    "schema_version": "phase1-summary-v1",
+    "task_count": 512,
+    "tasks_with_verified_candidate": {
+      "count": 4,
+      "fraction": 0.0078125
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 8.493535837726313,
+      "candidate_total_latency_sum": 17394.76139566349,
+      "generation_candidate_latency_mean": 3.245428621720748,
+      "generation_candidate_latency_sum": 6646.637817284092,
+      "verification_latency_mean": 5.248107216005565,
+      "verification_latency_sum": 10748.123578379396
+    },
+    "verification_wall_time_seconds": 2688.339206339995,
+    "verifier_timeout_count": 0,
+    "workload_id": "phase5-heldout512-v1"
+  },
+  "bootstrap": {
+    "interval_percentiles": [
+      2.5,
+      97.5
+    ],
+    "method": "paired-task-percentile-bootstrap",
+    "metrics": {
+      "pass@1": {
+        "adapter": {
+          "ci95": [
+            0.01025390625,
+            0.02392578125
+          ],
+          "estimate": 0.0166015625
+        },
+        "base": {
+          "ci95": [
+            0.00048828125,
+            0.00390625
+          ],
+          "estimate": 0.001953125
+        },
+        "delta_adapter_minus_base": {
+          "ci95": [
+            0.00830078125,
+            0.02197265625
+          ],
+          "estimate": 0.0146484375
+        }
+      },
+      "pass@4": {
+        "adapter": {
+          "ci95": [
+            0.03125,
+            0.068359375
+          ],
+          "estimate": 0.048828125
+        },
+        "base": {
+          "ci95": [
+            0.001953125,
+            0.015625
+          ],
+          "estimate": 0.0078125
+        },
+        "delta_adapter_minus_base": {
+          "ci95": [
+            0.0234375,
+            0.060546875
+          ],
+          "estimate": 0.041015625
+        }
+      }
+    },
+    "resamples": 10000,
+    "seed": 0,
+    "task_count": 512
+  },
+  "comparison_integrity_passed": true,
+  "delta_adapter_minus_base": {
+    "pass@1": 0.0146484375,
+    "pass@4": 0.041015625
+  },
+  "evaluation_contract": {
+    "dataset_schema_version": "mathlib-whole-proof-v1",
+    "dataset_split": "heldout",
+    "generation_settings": {
+      "candidates_per_task": 4,
+      "chat_template": null,
+      "do_sample": true,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "gpu_memory_utilization": 0.95,
+      "max_model_len": 2048,
+      "max_new_tokens": 1024,
+      "max_num_seqs": 32,
+      "quantization": null,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "tensor_parallel_size": 1,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "inference_engine": {
+      "name": "vllm",
+      "version": "0.10.2"
+    },
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "model": {
+      "add_special_tokens": false,
+      "chat_template": null,
+      "model_id": "Qwen/Qwen3-8B-Base",
+      "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "tokenizer_id": "Qwen/Qwen3-8B-Base",
+      "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+    },
+    "prompt_format_id": "whole-proof-v1",
+    "serialization_or_prompt_transformation": null,
+    "source_repository": "https://github.com/leanprover-community/mathlib4",
+    "source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "verification": {
+      "original_source_span_reconstruction": true,
+      "raw_continuation_no_repair": true,
+      "timeout_seconds": 300.0,
+      "workers": 4
+    }
+  },
+  "raw_candidate_results_retained_outside_git": true,
+  "runs": {
+    "adapter": {
+      "adapter": {
+        "adapter_id": "phase5-train-full-v1-lora",
+        "adapter_rank": 16,
+        "base_model_id": "Qwen/Qwen3-8B-Base",
+        "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+        "enabled": true,
+        "ignored_local_path": "artifacts/phase5/training/trainer-state/checkpoint-9962",
+        "merged": false,
+        "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+        "training_relative_path": "trainer-state/checkpoint-9962"
+      },
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "inference_execution": "local_cuda",
+        "python": "3.12.14",
+        "torch": "2.8.0+cu128",
+        "torch_cuda_version": "12.8"
+      }
+    },
+    "base": {
+      "adapter": null,
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "inference_execution": "local_cuda",
+        "python": "3.12.14",
+        "torch": "2.8.0+cu128",
+        "torch_cuda_version": "12.8"
+      }
+    }
+  },
+  "schema_version": "phase6-heldout-reuse-v1",
+  "selected_adapter": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 9962,
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+    "training_relative_path": "trainer-state/checkpoint-9962"
+  },
+  "selected_optimizer_step": 9962,
+  "selected_record_ids_sha256": "936091af02d7c58dfe172c10b91376afd1e144cb1586a1f07a0a924f8e0b194b",
+  "status": "passed",
+  "workload_id": "phase5-heldout512-v1"
+}
