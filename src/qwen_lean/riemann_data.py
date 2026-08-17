@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import os
 import re
 import subprocess
 from collections import Counter, defaultdict
@@ -19,6 +20,7 @@ RIEMANN_ATLAS_CONFIG_SCHEMA_VERSION = "riemann-atlas-config-v1"
 RIEMANN_ATLAS_SCHEMA_VERSION = "riemann-theorem-atlas-v1"
 RIEMANN_GRAPH_SCHEMA_VERSION = "riemann-internal-graph-v1"
 RIEMANN_EXTERNAL_SCHEMA_VERSION = "riemann-external-lean-v1"
+PHASE2_SNAPSHOT_SCHEMA_VERSION = "mathlib-whole-proof-repository-snapshot-v1"
 
 RELEVANCE_CLASSES = (
     "core",
@@ -57,6 +59,7 @@ ATLAS_EDGE_TYPES = {
     "analogue-generalization-of",
     "formalization-of",
     "Lean-counterpart-of",
+    "Lean-component-of",
 }
 ALLOWED_EXTERNAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
@@ -179,9 +182,29 @@ def load_phase2_records(
         if source.get(key) != expected[key]:
             raise ValueError(f"Phase 2 source {key} differs from the Riemann source contract")
 
+    snapshot = manifest.get("canonical_snapshot")
+    if snapshot and snapshot.get("schema_version") != PHASE2_SNAPSHOT_SCHEMA_VERSION:
+        raise ValueError("unsupported canonical Phase 2 snapshot schema")
+
     records: list[dict[str, Any]] = []
+    actual_split_counts: dict[str, int] = {}
     for split in SPLIT_NAMES:
-        path = artifact_dir / f"{split}.jsonl"
+        if snapshot:
+            identity = snapshot.get("splits", {}).get(split, {})
+            path = artifact_dir / str(identity.get("path", ""))
+            if not path.is_file():
+                raise ValueError(f"canonical Phase 2 split is missing: {split}")
+            if path.stat().st_size != int(identity.get("bytes", -1)):
+                raise ValueError(f"canonical Phase 2 split size differs: {split}")
+            if _sha256_file(path) != identity.get("sha256"):
+                raise ValueError(f"canonical Phase 2 split hash differs: {split}")
+        else:
+            candidates = (
+                artifact_dir / f"{split}.jsonl.gz",
+                artifact_dir / f"{split}.jsonl",
+            )
+            path = next((candidate for candidate in candidates if candidate.is_file()), candidates[-1])
+        split_count = 0
         for value in _read_jsonl(path):
             record = MathlibProofRecord.from_dict(value)
             if record.split != split:
@@ -189,6 +212,13 @@ def load_phase2_records(
             if record.source_revision != expected["revision"]:
                 raise ValueError(f"Phase 2 record has a mixed source revision: {record.id}")
             records.append(value)
+            split_count += 1
+        actual_split_counts[split] = split_count
+        declared_split_count = manifest.get("splits", {}).get(split, {}).get("records")
+        if declared_split_count is not None and int(declared_split_count) != split_count:
+            raise ValueError(f"Phase 2 split count differs from its accepted manifest: {split}")
+        if snapshot and int(snapshot["splits"][split].get("records", -1)) != split_count:
+            raise ValueError(f"canonical Phase 2 split record count differs: {split}")
 
     declared_count = int(manifest.get("counts", {}).get("final_records", len(records)))
     if declared_count != len(records):
@@ -196,7 +226,61 @@ def load_phase2_records(
     ids = [str(record["id"]) for record in records]
     if len(ids) != len(set(ids)):
         raise ValueError("Phase 2 record identifiers are not unique")
+    expected_records = expected.get("expected_records")
+    if expected_records is not None and len(records) != int(expected_records):
+        raise ValueError("Phase 2 record count differs from the frozen Riemann contract")
+    expected_split_counts = expected.get("expected_split_counts", {})
+    for split, count in expected_split_counts.items():
+        if actual_split_counts.get(split) != int(count):
+            raise ValueError(f"Phase 2 split count differs from the frozen contract: {split}")
+    for key, value in expected.get("expected_split_hygiene", {}).items():
+        if manifest.get("split_hygiene", {}).get(key) != value:
+            raise ValueError(f"Phase 2 split hygiene differs from the frozen contract: {key}")
+    expected_overlap = expected.get("expected_remaining_exact_statement_matches")
+    if (
+        expected_overlap is not None
+        and manifest.get("contamination", {}).get("remaining_exact_statement_matches")
+        != expected_overlap
+    ):
+        raise ValueError("Phase 2 miniF2F contamination result differs from the frozen contract")
     return manifest, records
+
+
+def materialize_phase2_snapshot(
+    source_manifest: Mapping[str, Any],
+    records: Sequence[Mapping[str, Any]],
+    output_dir: Path,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    split_identities: dict[str, dict[str, Any]] = {}
+    for split in SPLIT_NAMES:
+        for stale_suffix in (".jsonl", ".jsonl.gz"):
+            (output_dir / f"{split}{stale_suffix}").unlink(missing_ok=True)
+        path = output_dir / f"{split}.jsonl.gz"
+        split_records = [record for record in records if record["split"] == split]
+        _write_gzip_jsonl(path, split_records)
+        split_identities[split] = {
+            "path": path.name,
+            "records": len(split_records),
+            "bytes": path.stat().st_size,
+            "sha256": _sha256_file(path),
+        }
+
+    manifest = json.loads(json.dumps(source_manifest))
+    manifest["publication"] = {
+        **manifest.get("publication", {}),
+        "distribution_license_review_performed": True,
+        "repository_snapshot_committed": True,
+        "distribution_license": manifest["source"]["license"],
+    }
+    manifest["canonical_snapshot"] = {
+        "schema_version": PHASE2_SNAPSHOT_SCHEMA_VERSION,
+        "compression": "gzip-mtime-0-canonical-jsonl",
+        "records": len(records),
+        "splits": split_identities,
+    }
+    _write_json(output_dir / "manifest.json", manifest)
+    return manifest
 
 
 def _matching_seed_families(
@@ -416,7 +500,7 @@ def build_internal_graph(
                 {
                     "seed_record_id": seed_id,
                     "seed_declaration": by_id[seed_id]["declaration_name"],
-                    "relation": "source-neighborhood",
+                    "relation": "same-source",
                     "distance": 1,
                 }
             )
@@ -449,7 +533,7 @@ def build_internal_graph(
                 "degrees": {
                     "premise": len(premise_adjacency.get(record_id, set())),
                     "user": len(user_adjacency.get(record_id, set())),
-                    "source-neighborhood": len(source_adjacency.get(record_id, set())),
+                    "same-source": len(source_adjacency.get(record_id, set())),
                 },
             }
         )
@@ -459,8 +543,8 @@ def build_internal_graph(
         edges.append(("premise", source_id, target_id))
         edges.append(("user", target_id, source_id))
     for source_id, target_id in sorted(source_edges):
-        edges.append(("source-neighborhood", source_id, target_id))
-        edges.append(("source-neighborhood", target_id, source_id))
+        edges.append(("same-source", source_id, target_id))
+        edges.append(("same-source", target_id, source_id))
     edges.sort()
 
     class_counts = Counter(classes.values())
@@ -476,13 +560,13 @@ def build_internal_graph(
         "edge_counts": {
             "premise": len(premise_edges),
             "user": len(premise_edges),
-            "source-neighborhood": len(source_edges) * 2,
+            "same-source": len(source_edges) * 2,
         },
         "class_counts": {value: class_counts.get(value, 0) for value in RELEVANCE_CLASSES},
         "degree_distributions": {
             "premise": _distribution([len(premise_adjacency.get(item, set())) for item in by_id]),
             "user": _distribution([len(user_adjacency.get(item, set())) for item in by_id]),
-            "source-neighborhood": _distribution(
+            "same-source": _distribution(
                 [len(source_adjacency.get(item, set())) for item in by_id]
             ),
         },
@@ -807,6 +891,15 @@ def build_atlas(
                 raise ValueError(f"atlas entry references an unknown source: {source_id}")
         entries.append(entry)
 
+    formalization_status_by_id = {
+        str(entry["id"]): str(entry["formalization_status"]) for entry in entries
+    }
+
+    def lean_relationship_type(target: str) -> str:
+        if formalization_status_by_id.get(target) == "literature-only":
+            return "Lean-component-of"
+        return "Lean-counterpart-of"
+
     by_record_id = {str(record["id"]): record for record in phase2_records}
     family_by_record: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for seed in graph["seed_manifest"]:
@@ -855,7 +948,7 @@ def build_atlas(
                 {
                     "source": entry_id,
                     "target": target,
-                    "type": "Lean-counterpart-of",
+                    "type": lean_relationship_type(target),
                     "source_ids": ["mathlib-phase2"],
                 }
             )
@@ -897,7 +990,7 @@ def build_atlas(
             {
                 "source": entry_id,
                 "target": record["atlas_target"],
-                "type": "Lean-counterpart-of",
+                "type": lean_relationship_type(str(record["atlas_target"])),
                 "source_ids": ["pnt-plus"],
             }
         )
@@ -915,6 +1008,11 @@ def build_atlas(
             raise ValueError(f"unknown atlas edge type: {relationship['type']}")
         if relationship["source"] not in entry_ids or relationship["target"] not in entry_ids:
             raise ValueError(f"atlas edge has an unknown endpoint: {relationship}")
+        if (
+            relationship["type"] == "Lean-counterpart-of"
+            and formalization_status_by_id[relationship["target"]] == "literature-only"
+        ):
+            raise ValueError("literature-only atlas entry has a Lean counterpart edge")
         if relationship["type"] in {"equivalent-to", "implies", "consequence-of"}:
             if not relationship.get("source_ids"):
                 raise ValueError(f"directed mathematical edge lacks attribution: {relationship}")
@@ -1119,8 +1217,11 @@ def materialize_riemann_data(
     atlas_config: RiemannAtlasConfig,
     *,
     external_root: Path | None,
+    phase2_snapshot_dir: Path,
 ) -> dict[str, Any]:
-    phase2_manifest, records = load_phase2_records(phase2_artifact_dir, config)
+    source_manifest, source_records = load_phase2_records(phase2_artifact_dir, config)
+    materialize_phase2_snapshot(source_manifest, source_records, phase2_snapshot_dir)
+    phase2_manifest, records = load_phase2_records(phase2_snapshot_dir, config)
     graph = build_internal_graph(records, config)
     partitions = build_specialist_partitions(records, graph, config)
     external_records, source_manifest = extract_external_lean_records(
@@ -1246,6 +1347,12 @@ def materialize_riemann_data(
         "schema_version": RIEMANN_MANIFEST_SCHEMA_VERSION,
         "snapshot_date": config.value["snapshot_date"],
         "phase2_source": config.value["phase2_source"],
+        "phase2_snapshot": {
+            "relative_path": Path(os.path.relpath(phase2_snapshot_dir, output_dir)).as_posix(),
+            "manifest_sha256": _sha256_file(phase2_snapshot_dir / "manifest.json"),
+            "record_count": len(records),
+            "split_counts": {split: sum(record["split"] == split for record in records) for split in SPLIT_NAMES},
+        },
         "corpus_counts": {
             **partitions["diagnostics"]["counts"],
             external_name: len(external_records),
@@ -1282,9 +1389,27 @@ def validate_materialized_riemann_data(output_dir: Path) -> dict[str, Any]:
         if _sha256_file(path) != identity["sha256"]:
             raise ValueError(f"materialized Riemann file hash differs: {relative}")
 
+    snapshot_identity = manifest.get("phase2_snapshot")
+    if not snapshot_identity:
+        raise ValueError("materialized Riemann data lacks a canonical Phase 2 snapshot")
+    phase2_snapshot_dir = (output_dir / snapshot_identity["relative_path"]).resolve()
+    phase2_manifest_path = phase2_snapshot_dir / "manifest.json"
+    if _sha256_file(phase2_manifest_path) != snapshot_identity["manifest_sha256"]:
+        raise ValueError("canonical Phase 2 manifest hash differs from the Riemann manifest")
+    phase2_config = RiemannDataConfig({"phase2_source": manifest["phase2_source"]})
+    _, phase2_records = load_phase2_records(phase2_snapshot_dir, phase2_config)
+    if len(phase2_records) != int(snapshot_identity["record_count"]):
+        raise ValueError("canonical Phase 2 record count differs from the Riemann manifest")
+    phase2_by_id = {str(record["id"]): record for record in phase2_records}
+
     internal_records = {
         str(record["id"]): record for record in _read_jsonl(output_dir / "corpora/records.jsonl.gz")
     }
+    for record_id, enriched_record in internal_records.items():
+        canonical_record = phase2_by_id.get(record_id)
+        base_record = {key: value for key, value in enriched_record.items() if key != "riemann"}
+        if canonical_record is None or base_record != canonical_record:
+            raise ValueError(f"specialist record differs from canonical Phase 2 identity: {record_id}")
     corpus_ids: dict[str, set[str]] = {}
     for name, expected_count in manifest["corpus_counts"].items():
         membership = output_dir / f"corpora/{name}/membership.jsonl"
@@ -1300,17 +1425,26 @@ def validate_materialized_riemann_data(output_dir: Path) -> dict[str, Any]:
             if required_split and any(internal_records[item]["split"] != required_split for item in members):
                 raise ValueError(f"evaluation data leaked into {name}")
 
-    atlas_entries = {str(entry["id"]) for entry in _read_jsonl(output_dir / "atlas/entries.jsonl")}
+    atlas_entry_statuses = {
+        str(entry["id"]): str(entry["formalization_status"])
+        for entry in _read_jsonl(output_dir / "atlas/entries.jsonl")
+    }
+    atlas_entries = set(atlas_entry_statuses)
     for relationship in _read_jsonl(output_dir / "atlas/relationships.jsonl"):
         if relationship["type"] not in ATLAS_EDGE_TYPES:
             raise ValueError("mathematical relationship graph has an invalid edge type")
         if relationship["source"] not in atlas_entries or relationship["target"] not in atlas_entries:
             raise ValueError("mathematical relationship graph has an unknown endpoint")
+        if (
+            relationship["type"] == "Lean-counterpart-of"
+            and atlas_entry_statuses[relationship["target"]] == "literature-only"
+        ):
+            raise ValueError("literature-only atlas entry has a Lean counterpart edge")
 
     internal_edge_types = {
         str(edge["type"]) for edge in _read_jsonl(output_dir / "internal/edges.jsonl.gz")
     }
-    if internal_edge_types - {"premise", "user", "source-neighborhood"}:
+    if internal_edge_types - {"premise", "user", "same-source"}:
         raise ValueError("internal Lean graph contains mathematical relation edge types")
 
     return {
@@ -1318,6 +1452,7 @@ def validate_materialized_riemann_data(output_dir: Path) -> dict[str, Any]:
         "files_verified": len(manifest["files"]),
         "corpus_counts": manifest["corpus_counts"],
         "internal_record_store_count": len(internal_records),
+        "phase2_snapshot_records": len(phase2_records),
         "atlas_entries": len(atlas_entries),
         "complete": True,
     }

@@ -29,12 +29,12 @@
       "sha256": "e0af5ee74dac80c4c06594b6a63eb9b9870686f71c16460c9b783ed74cbdf58c"
     },
     "atlas/entries.jsonl": {
-      "bytes": 256572,
-      "sha256": "efd88929dd64dbab837020826ad21c6ba616780ee6ee778ffb5df239ed8106e0"
+      "bytes": 256564,
+      "sha256": "831d51395acd98a1b0bcbee902cd5838f19d34968fe4aeb4f177836f3a11763c"
     },
     "atlas/relationships.jsonl": {
-      "bytes": 32494,
-      "sha256": "b927eb9cefe51c4a9a49e566e5decf26d30c53431d585c5f7a397d5085ffba3c"
+      "bytes": 32396,
+      "sha256": "8a0a09217ba0954f2a312f81dcc1403a7116baf5b8cdfc591a592b3836d33371"
     },
     "atlas/sources.json": {
       "bytes": 5167,
@@ -109,24 +109,24 @@
       "sha256": "8ca8073d327f82615e32cc56d1da2333ee0c865768a64e56591db479ffe1b1ba"
     },
     "evidence/summary.json": {
-      "bytes": 7485,
-      "sha256": "39c570ceb330007be3f9c28b4b4aed321f6e5dcac5b854deeb6e330304d2fa31"
+      "bytes": 7469,
+      "sha256": "ed058ca94a679c0a9f68fc465c3b5979b953fb0f8ba1a3682073e0706f6fe1fa"
     },
     "external/riemann-external-lean-v1.jsonl": {
       "bytes": 134452,
       "sha256": "25a12d3704e74a11e7cd2bee2dd9be848490abf287b7e1986973fe2cf46a1e05"
     },
     "internal/diagnostics.json": {
-      "bytes": 1790,
-      "sha256": "8a289fc102bb80a2797e0461348ff87f5ee520b265d7b8901a28b25540cd1196"
+      "bytes": 1774,
+      "sha256": "1787c57c83cdd9cbd266e719f3385e00763ee5abdf11fa83b2deea5483a2ad22"
     },
     "internal/edges.jsonl.gz": {
-      "bytes": 25762827,
-      "sha256": "b88c750fc614202b88394eb2af2f1b16e4121ba3213d4cc9f99af27c2540d0dd"
+      "bytes": 25737365,
+      "sha256": "8ae940474c60f77b7cfb1d44380a0089f0c62834e7e7b6a0a21546d071646925"
     },
     "internal/nodes.jsonl.gz": {
-      "bytes": 16798197,
-      "sha256": "d7907db5015e1a6248933859c82dcd35bc6b35214758ff2511bd9d9cb101835a"
+      "bytes": 16786313,
+      "sha256": "07969c412568c5ed32d4f8d926aac233259bc447a58ac767207bbcba8d14c941"
     },
     "internal/seed-manifest.jsonl": {
       "bytes": 127602,
@@ -139,8 +139,30 @@
   },
   "inference_performed": false,
   "internal_graph_schema_version": "riemann-internal-graph-v1",
+  "phase2_snapshot": {
+    "manifest_sha256": "5f01f6e90bc67ca34c34b8d5c9382f2070761f4d12545882846e27b0b7e11402",
+    "record_count": 88958,
+    "relative_path": "../mathlib-whole-proof-v1",
+    "split_counts": {
+      "heldout": 4448,
+      "train": 80062,
+      "validation": 4448
+    }
+  },
   "phase2_source": {
     "dataset_schema_version": "mathlib-whole-proof-v1",
+    "expected_records": 88958,
+    "expected_remaining_exact_statement_matches": 0,
+    "expected_split_counts": {
+      "heldout": 4448,
+      "train": 80062,
+      "validation": 4448
+    },
+    "expected_split_hygiene": {
+      "cross_split_components": 0,
+      "cross_split_files": 0,
+      "cross_split_statement_fingerprints": 0
+    },
     "lean_toolchain": "leanprover/lean4:v4.32.0",
     "repository": "https://github.com/leanprover-community/mathlib4",
     "revision": "81a5d257c8e410db227a6665ed08f64fea08e997"

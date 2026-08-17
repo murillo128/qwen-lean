@@ -1,0 +1,268 @@
+{
+  "canonical_snapshot": {
+    "compression": "gzip-mtime-0-canonical-jsonl",
+    "records": 88958,
+    "schema_version": "mathlib-whole-proof-repository-snapshot-v1",
+    "splits": {
+      "heldout": {
+        "bytes": 1271939,
+        "path": "heldout.jsonl.gz",
+        "records": 4448,
+        "sha256": "2237f28fc20bc1e93a7665d152b344abfa44538298f8af49ee3858d22cce84eb"
+      },
+      "train": {
+        "bytes": 22256927,
+        "path": "train.jsonl.gz",
+        "records": 80062,
+        "sha256": "02d4eca485cae7c202f42193e379107b5e256c74d83ff9b50fb8c2c25c7507f9"
+      },
+      "validation": {
+        "bytes": 1232732,
+        "path": "validation.jsonl.gz",
+        "records": 4448,
+        "sha256": "dcc3e9f6403fffd2555d2e05dff0b4ef478d851c746a006219be6b6aaa55d0db"
+      }
+    }
+  },
+  "contamination": {
+    "excluded_records": [],
+    "primary_statements_by_file": {
+      "MiniF2F/Test.lean": 242,
+      "MiniF2F/Valid.lean": 244
+    },
+    "reference": {
+      "expected_primary_statement_counts": {
+        "MiniF2F/Test.lean": 242,
+        "MiniF2F/Valid.lean": 244
+      },
+      "license": "Apache-2.0",
+      "repository": "https://github.com/google-deepmind/miniF2F",
+      "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+      "source_paths": [
+        "MiniF2F/Valid.lean",
+        "MiniF2F/Test.lean"
+      ]
+    },
+    "remaining_exact_statement_matches": 0,
+    "unique_primary_names": 486
+  },
+  "counts": {
+    "ambiguous_record_identities": 13,
+    "excluded_ambiguous_record_identity": 26,
+    "excluded_exact_minif2f_overlap": 0,
+    "extraction_diagnostic_details": 33,
+    "filter_reasons": {
+      "ambiguous_record_identity": 26,
+      "extraction_error": 6,
+      "non_tactic_proof": 95351,
+      "private": 1624,
+      "trace_parse_error": 1,
+      "unstable_name": 4
+    },
+    "final_records": 88958,
+    "retained_before_contamination": 88958,
+    "source_identities_validated": 88984,
+    "traced_source_files": 8264,
+    "traced_theorem_or_lemma_nodes": 185969
+  },
+  "created_at": "2026-08-15T15:45:53.455157+00:00",
+  "dataset_schema_version": "mathlib-whole-proof-v1",
+  "extractor": {
+    "build_dependencies": false,
+    "compatibility_note": "the pinned LeanDojo-v2 static version check warns above Lean 4.30.1; Phase 2 relies on the required pinned pilot and full extraction/verification evidence for Lean 4.32.0 compatibility",
+    "entrypoint": "uv run --frozen --project tools/phase2-extractor python tools/phase2_extract.py",
+    "installed_provenance": {
+      "package_version": "1.0.9",
+      "revision": "baed5eae6e87a65a446d9f54af07aab2154e7599",
+      "source_url": "https://github.com/lean-dojo/LeanDojo-v2.git"
+    },
+    "license": "MIT",
+    "package": "lean-dojo-v2",
+    "reader": "streamed LeanDojo-v2 TracedFile/TracedTheorem objects",
+    "repository": "https://github.com/lean-dojo/LeanDojo-v2",
+    "revision": "baed5eae6e87a65a446d9f54af07aab2154e7599",
+    "trace_build_dependencies": false,
+    "trace_provenance": {
+      "build_dependencies": false,
+      "extract_data_sha256": "b50bebdef8adde06d1f6948edc0ac52f67dd8b40045df72290a1f225049ffc50",
+      "extractor_revision": "baed5eae6e87a65a446d9f54af07aab2154e7599",
+      "schema_version": "phase2-trace-provenance-v1",
+      "source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997"
+    },
+    "traced_files_total": 8264
+  },
+  "fingerprint": {
+    "algorithm": "lean-lexical-statement-v1-sha256",
+    "normalization": "comment-free Lean lexical tokens with insignificant whitespace removed and only the declared theorem/lemma identifier replaced; the semantically equivalent theorem/lemma introducers share one token"
+  },
+  "long_examples_filtered": 0,
+  "mode": "full",
+  "publication": {
+    "distribution_license": "Apache-2.0",
+    "distribution_license_review_performed": true,
+    "full_dataset_uploaded": false,
+    "repository_snapshot_committed": true
+  },
+  "record_identity": "sha256(schema_version, source_revision, file_path, fully_qualified_name)",
+  "runtime": {
+    "packages": {
+      "datasets": "5.0.1",
+      "tokenizers": "0.22.2",
+      "transformers": "5.15.0"
+    },
+    "platform": "Linux-7.0.0-22-generic-x86_64-with-glibc2.43",
+    "python": "3.12.14"
+  },
+  "schema_version": "phase2-manifest-v1",
+  "source": {
+    "input_revision": "v4.32.0",
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "license": "Apache-2.0",
+    "observed_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "scope": "Mathlib/**/*.lean"
+  },
+  "source_positions": "one-indexed, end-exclusive LeanDojo-v2 source positions",
+  "split_deviation": {
+    "absolute": {
+      "heldout": 1.1241259920413693e-06,
+      "train": 2.2482519841382498e-06,
+      "validation": 1.1241259920413693e-06
+    },
+    "largest_component_proportion": 0.003844510892780863,
+    "largest_component_records": 342,
+    "normally_within_two_percentage_points": true
+  },
+  "split_hygiene": {
+    "cross_split_components": 0,
+    "cross_split_files": 0,
+    "cross_split_statement_fingerprints": 0,
+    "files_in_multiple_components": 0,
+    "statement_fingerprints_in_multiple_components": 0
+  },
+  "split_policy": {
+    "algorithm": "source-file-statement-components-v1-sha256",
+    "balance_unit": "retained record count",
+    "component_edge": "shared normalized statement fingerprint",
+    "primary_group": "source file",
+    "proportions": {
+      "heldout": 0.05,
+      "train": 0.9,
+      "validation": 0.05
+    },
+    "seed": "mathlib-whole-proof-v1-file-components",
+    "semantics": {
+      "heldout": "must not be used for fitting or model/hyperparameter selection",
+      "train": "may be used for SFT fitting",
+      "validation": "may be used for training diagnostics and model selection"
+    }
+  },
+  "splits": {
+    "heldout": {
+      "components": 316,
+      "files": 317,
+      "proportion": 0.050001124125992044,
+      "records": 4448,
+      "target_proportion": 0.05
+    },
+    "train": {
+      "components": 5743,
+      "files": 5847,
+      "proportion": 0.8999977517480159,
+      "records": 80062,
+      "target_proportion": 0.9
+    },
+    "validation": {
+      "components": 315,
+      "files": 326,
+      "proportion": 0.050001124125992044,
+      "records": 4448,
+      "target_proportion": 0.05
+    }
+  },
+  "token_length_statistics": {
+    "completion": {
+      "at_or_above": {
+        "1024": 277,
+        "2048": 27,
+        "4096": 1,
+        "8192": 0
+      },
+      "max": 4212,
+      "median": 33.0,
+      "min": 1,
+      "p90": 177,
+      "p95": 278,
+      "p99": 632
+    },
+    "declaration": {
+      "at_or_above": {
+        "1024": 0,
+        "2048": 0,
+        "4096": 0,
+        "8192": 0
+      },
+      "max": 652,
+      "median": 46.0,
+      "min": 6,
+      "p90": 91,
+      "p95": 112,
+      "p99": 169
+    },
+    "declaration_and_completion": {
+      "at_or_above": {
+        "1024": 367,
+        "2048": 38,
+        "4096": 1,
+        "8192": 0
+      },
+      "max": 4296,
+      "median": 89.0,
+      "min": 12,
+      "p90": 256,
+      "p95": 363,
+      "p99": 729
+    },
+    "declaration_and_proof": {
+      "at_or_above": {
+        "1024": 368,
+        "2048": 38,
+        "4096": 1,
+        "8192": 0
+      },
+      "max": 4297,
+      "median": 90.0,
+      "min": 10,
+      "p90": 256,
+      "p95": 364,
+      "p99": 730
+    },
+    "proof": {
+      "at_or_above": {
+        "1024": 280,
+        "2048": 27,
+        "4096": 1,
+        "8192": 0
+      },
+      "max": 4215,
+      "median": 36.0,
+      "min": 2,
+      "p90": 180,
+      "p95": 281,
+      "p99": 635
+    }
+  },
+  "tokenizer": {
+    "add_special_tokens": false,
+    "counting_convention": {
+      "chat_template_applied": false,
+      "declaration_and_completion": "tokenize `<declaration> := by\\n<completion>`",
+      "declaration_and_proof": "tokenize `<declaration> := <full by proof>`",
+      "special_tokens_added": false
+    },
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "use_chat_template": false
+  }
+}

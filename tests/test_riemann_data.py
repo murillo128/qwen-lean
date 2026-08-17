@@ -227,7 +227,7 @@ def _write_phase2_fixture(path: Path, records: list[dict]) -> None:
         json.dumps(
             {
                 "dataset_schema_version": "mathlib-whole-proof-v1",
-                "source": {"repository": "https://github.com/leanprover-community/mathlib4", "revision": "fixture-revision", "lean_toolchain": "fixture-toolchain"},
+                "source": {"repository": "https://github.com/leanprover-community/mathlib4", "revision": "fixture-revision", "lean_toolchain": "fixture-toolchain", "license": "Apache-2.0"},
                 "counts": {"final_records": len(records)},
                 "split_hygiene": {"cross_split_components": 0, "cross_split_statement_fingerprints": 0},
                 "contamination": {"remaining_exact_statement_matches": 0},
@@ -249,7 +249,7 @@ def test_graph_builds_deterministic_bounded_rings_and_separate_edge_types() -> N
     assert first["classes"]["record-004"] == "user-1"
     assert first["classes"]["record-005"] == "user-2"
     assert first["diagnostics"]["bounds"]["premise"]["max_depth"] == 2
-    assert {edge[0] for edge in first["edges"]} == {"premise", "user", "source-neighborhood"}
+    assert {edge[0] for edge in first["edges"]} == {"premise", "user", "same-source"}
 
 
 def test_partitions_preserve_phase2_identity_and_no_forbidden_leakage() -> None:
@@ -310,6 +310,21 @@ def test_atlas_is_deterministic_and_math_edges_are_not_premise_edges() -> None:
     assert len({entry["id"] for entry in first["entries"]}) == len(first["entries"])
 
 
+def test_literature_only_targets_receive_component_not_counterpart_edges() -> None:
+    records = _records()
+    config = _config()
+    config.value["graph"]["seed_families"][0]["atlas_target"] = "riemann-hypothesis"
+    graph = build_internal_graph(records, config)
+    atlas = build_atlas(_atlas_config(), graph, records, [], config)
+    target_edges = [
+        edge
+        for edge in atlas["relationships"]
+        if edge["target"] == "riemann-hypothesis" and edge["type"].startswith("Lean-")
+    ]
+    assert target_edges
+    assert {edge["type"] for edge in target_edges} == {"Lean-component-of"}
+
+
 def test_materialization_is_reproducible_and_generic_phase2_loader_unchanged(tmp_path: Path) -> None:
     records = _records()
     phase2 = tmp_path / "phase2"
@@ -322,21 +337,35 @@ def test_materialization_is_reproducible_and_generic_phase2_loader_unchanged(tmp
 
     first = tmp_path / "first"
     second = tmp_path / "second"
+    snapshot = tmp_path / "mathlib-whole-proof-v1"
     first_summary = materialize_riemann_data(
-        phase2, first, _config(), _atlas_config(), external_root=external
+        phase2,
+        first,
+        _config(),
+        _atlas_config(),
+        external_root=external,
+        phase2_snapshot_dir=snapshot,
     )
     second_summary = materialize_riemann_data(
-        phase2, second, _config(), _atlas_config(), external_root=external
+        phase2,
+        second,
+        _config(),
+        _atlas_config(),
+        external_root=external,
+        phase2_snapshot_dir=snapshot,
     )
     assert first_summary["complete"] is True
     assert second_summary["complete"] is True
     assert (first / "manifest.json").read_bytes() == (second / "manifest.json").read_bytes()
-    assert validate_materialized_riemann_data(first)["complete"] is True
+    assert first_summary["phase2_snapshot_records"] == len(records)
+    assert (snapshot / "train.jsonl.gz").is_file()
 
     loaded = read_jsonl_records(phase2 / "train.jsonl")
     assert [record.to_dict() for record in loaded] == [
         record for record in records if record["split"] == "train"
     ]
+    phase2.rename(tmp_path / "phase2-source-unavailable")
+    assert validate_materialized_riemann_data(first)["complete"] is True
 
     external_record = json.loads(
         (first / "external/riemann-external-lean-v1.jsonl").read_text(encoding="utf-8")

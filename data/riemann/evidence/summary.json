@@ -147,7 +147,7 @@
         "min": 0,
         "p95": 3
       },
-      "source-neighborhood": {
+      "same-source": {
         "count": 88958,
         "max": 4,
         "median": 4.0,
@@ -164,7 +164,7 @@
     },
     "edge_counts": {
       "premise": 79125,
-      "source-neighborhood": 318098,
+      "same-source": 318098,
       "user": 79125
     },
     "max_selected_proportion": 0.45,

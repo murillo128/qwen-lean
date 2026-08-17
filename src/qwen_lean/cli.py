@@ -178,6 +178,11 @@ def _parser() -> argparse.ArgumentParser:
         help="materialize the pinned Riemann graph, corpora, holdouts, and atlas",
     )
     riemann_materialize.add_argument("--phase2-artifact-dir", type=Path, required=True)
+    riemann_materialize.add_argument(
+        "--phase2-snapshot-dir",
+        type=Path,
+        default=root / "data/mathlib-whole-proof-v1",
+    )
     riemann_materialize.add_argument("--external-root", type=Path, required=True)
     riemann_materialize.add_argument(
         "--config", type=Path, default=root / "config/riemann-data.json"
@@ -683,6 +688,7 @@ def main(argv: list[str] | None = None) -> int:
             RiemannDataConfig.load(args.config),
             RiemannAtlasConfig.load(args.atlas_config),
             external_root=args.external_root,
+            phase2_snapshot_dir=args.phase2_snapshot_dir,
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
