@@ -1,0 +1,181 @@
+{
+  "schema_version": "riemann-data-config-v1",
+  "snapshot_date": "2026-08-17",
+  "phase2_source": {
+    "dataset_schema_version": "mathlib-whole-proof-v1",
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "expected_records": 88958,
+    "expected_split_counts": {"train": 80062, "validation": 4448, "heldout": 4448},
+    "expected_split_hygiene": {
+      "cross_split_files": 0,
+      "cross_split_components": 0,
+      "cross_split_statement_fingerprints": 0
+    },
+    "expected_remaining_exact_statement_matches": 0
+  },
+  "graph": {
+    "max_dependency_depth": 2,
+    "max_neighbors_per_frontier": 64,
+    "max_ring_nodes_per_direction": 12000,
+    "max_selected_proportion": 0.45,
+    "source_neighbor_window": 2,
+    "max_source_neighborhood_nodes": 4000,
+    "number_theory_control_prefix": "Mathlib/NumberTheory/",
+    "seed_families": [
+      {
+        "id": "prime-distribution",
+        "paths": [
+          "Mathlib/NumberTheory/PrimeCounting.lean",
+          "Mathlib/NumberTheory/Chebyshev.lean",
+          "Mathlib/NumberTheory/SumPrimeReciprocals.lean"
+        ],
+        "declaration_patterns": ["primeCounting", "Chebyshev\\.(theta|psi)", "isBigO_psi", "sum.*prime"],
+        "reason": "Prime-counting and Chebyshev-function declarations with direct PNT relevance.",
+        "atlas_target": "prime-number-theorem"
+      },
+      {
+        "id": "riemann-zeta",
+        "paths": [
+          "Mathlib/NumberTheory/LSeries/RiemannZeta.lean",
+          "Mathlib/NumberTheory/LSeries/ZetaZeros.lean",
+          "Mathlib/NumberTheory/LSeries/HurwitzZetaValues.lean",
+          "Mathlib/NumberTheory/ZetaValues.lean"
+        ],
+        "declaration_patterns": ["riemannZeta", "completedRiemannZeta", "zetaZeros", "zeta_nat", "zeta_eq"],
+        "reason": "Riemann zeta, completed zeta, zeros, and special-value declarations.",
+        "atlas_target": "riemann-zeta-function"
+      },
+      {
+        "id": "dirichlet-lseries",
+        "paths": [
+          "Mathlib/NumberTheory/LSeries/Nonvanishing.lean",
+          "Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+          "Mathlib/NumberTheory/LSeries/Dirichlet.lean",
+          "Mathlib/NumberTheory/LSeries/DirichletContinuation.lean",
+          "Mathlib/NumberTheory/EulerProduct/DirichletLSeries.lean"
+        ],
+        "declaration_patterns": ["LFunction", "LSeries", "riemannZeta_eulerProduct", "prime.*mod", "PrimesInAP"],
+        "reason": "Nonvanishing, Euler products, continuation, and primes-in-progressions machinery.",
+        "atlas_target": "dirichlet-primes-arithmetic-progressions"
+      },
+      {
+        "id": "arithmetic-functions",
+        "paths": [
+          "Mathlib/NumberTheory/ArithmeticFunction/Moebius.lean",
+          "Mathlib/NumberTheory/ArithmeticFunction/VonMangoldt.lean",
+          "Mathlib/NumberTheory/ArithmeticFunction/Zeta.lean"
+        ],
+        "declaration_patterns": ["moebius", "vonMangoldt", "zeta_mul", "mul_zeta"],
+        "reason": "Mobius, von Mangoldt, and arithmetic zeta identities used by RH criteria and explicit formulae.",
+        "atlas_target": "mobius-summatory-criterion"
+      },
+      {
+        "id": "analytic-machinery",
+        "paths": [
+          "Mathlib/NumberTheory/LSeries/AbstractFuncEq.lean",
+          "Mathlib/NumberTheory/LSeries/MellinEqDirichlet.lean",
+          "Mathlib/NumberTheory/LSeries/SumCoeff.lean",
+          "Mathlib/NumberTheory/LSeries/Convergence.lean",
+          "Mathlib/NumberTheory/EulerProduct/Basic.lean"
+        ],
+        "declaration_patterns": ["functional_equation", "hasMellin", "LSeries_tendsto", "eulerProduct", "abscissa"],
+        "reason": "Functional equation, Mellin, convergence, and Euler-product support reached by real formal dependencies.",
+        "atlas_target": "zeta-functional-equation"
+      }
+    ]
+  },
+  "corpora": {
+    "number_theory_wide": "number-theory-wide-v1",
+    "riemann_bubble": "riemann-bubble-v1",
+    "riemann_core": "riemann-core-v1",
+    "specialist_validation": "riemann-specialist-validation-v1",
+    "riemann_near_holdout": "riemann-near-holdout-v1",
+    "number_theory_far_holdout": "number-theory-far-holdout-v1",
+    "external_lean": "riemann-external-lean-v1"
+  },
+  "validation": {
+    "require_nonempty_corpora": true
+  },
+  "external_discovery": {
+    "scope_note": "GitHub Lean project search plus the mandatory PNT+ project, bounded to the pinned projects recorded here. Forks and unlicensed candidates were inspected but not accepted.",
+    "projects": [
+      {
+        "repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+        "revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+        "default_branch": "main",
+        "license": "Apache-2.0",
+        "lean_toolchain": "leanprover/lean4:v4.32.2",
+        "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+        "status": "accepted",
+        "discovery_status": "pinned-built-and-curated",
+        "require_git_revision": true,
+        "native_verification": {
+          "status": "passed",
+          "project_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+          "build_command": "lake build",
+          "build_jobs": 4343,
+          "checked_on": "2026-08-17",
+          "axiom_audit_command": "lake env lean AxiomAudit.lean",
+          "note": "The full project built, but direct/transitive sorry lanes were excluded by per-declaration axiom audit."
+        },
+        "module_inventory": [
+          {"path": "PrimeNumberTheoremAnd/MediumPNT.lean", "topics": ["PNT", "Mellin", "zero-free-region"], "status": "accepted-records"},
+          {"path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "topics": ["zeta-bounds", "zero-free-region", "log-derivative"], "status": "accepted-records"},
+          {"path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean", "topics": ["zero-counting"], "status": "accepted-records"},
+          {"path": "PrimeNumberTheoremAnd/MellinCalculus.lean", "topics": ["Mellin"], "status": "accepted-records"},
+          {"path": "PrimeNumberTheoremAnd/PerronFormula.lean", "topics": ["Perron"], "status": "inspected-no-accepted-record"},
+          {"path": "PrimeNumberTheoremAnd/HadamardFactorization.lean", "topics": ["Hadamard-factorization"], "status": "inspected-no-accepted-record"},
+          {"path": "PrimeNumberTheoremAnd/StrongPNT.lean", "topics": ["strong-PNT"], "status": "excluded-direct-sorry"},
+          {"path": "PrimeNumberTheoremAnd/IEANTN", "topics": ["explicit-prime-estimates"], "status": "mixed-many-sorry-declarations-excluded"}
+        ],
+        "selected_declarations": [
+          {"file_path": "PrimeNumberTheoremAnd/MediumPNT.lean", "local_name": "MediumPNT", "full_name": "MediumPNT", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["PNT", "error-term"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaUpperBnd", "full_name": "ZetaUpperBnd", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zeta-bounds"], "atlas_target": "classical-zero-free-region"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaDerivUpperBnd", "full_name": "ZetaDerivUpperBnd", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zeta-derivative", "zeta-bounds"], "atlas_target": "classical-zero-free-region"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaZeroFree", "full_name": "ZetaZeroFree", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zero-free-region"], "atlas_target": "classical-zero-free-region"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaNoZerosOn1Line", "full_name": "ZetaNoZerosOn1Line", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["nonvanishing", "PNT"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaNoZerosInBox", "full_name": "ZetaNoZerosInBox", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zero-free-region"], "atlas_target": "classical-zero-free-region"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "LogDerivZetaBndUnif", "full_name": "LogDerivZetaBndUnif", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["log-derivative", "zeta-bounds"], "atlas_target": "explicit-formula"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "ZetaNear1BndExact", "full_name": "ZetaNear1BndExact", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zeta-bounds", "pole-at-one"], "atlas_target": "riemann-zeta-function"},
+          {"file_path": "PrimeNumberTheoremAnd/ZetaBounds.lean", "local_name": "riemannZetaLogDerivResidue", "full_name": "riemannZetaLogDerivResidue", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["log-derivative", "residue"], "atlas_target": "explicit-formula"},
+          {"file_path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean", "local_name": "zetaCounting_crude_majorant", "full_name": "Backlund.zetaCounting_crude_majorant", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zero-counting"], "atlas_target": "riemann-von-mangoldt-zero-count"},
+          {"file_path": "PrimeNumberTheoremAnd/Backlund/ZeroCountCrude.lean", "local_name": "zetaSurrogate_zeros_in_closedBall₀_count", "full_name": "Backlund.zetaSurrogate_zeros_in_closedBall₀_count", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["zero-counting", "Hadamard-factorization"], "atlas_target": "riemann-von-mangoldt-zero-count"},
+          {"file_path": "PrimeNumberTheoremAnd/MellinCalculus.lean", "local_name": "MellinConvolutionTransform", "full_name": "MellinConvolutionTransform", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["Mellin", "convolution"], "atlas_target": "explicit-formula"},
+          {"file_path": "PrimeNumberTheoremAnd/MellinCalculus.lean", "local_name": "MellinOfDeltaSpike", "full_name": "MellinOfDeltaSpike", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["Mellin", "smoothing"], "atlas_target": "explicit-formula"},
+          {"file_path": "PrimeNumberTheoremAnd/BrunTitchmarsh.lean", "local_name": "primesBetween_le", "full_name": "BrunTitchmarsh.primesBetween_le", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["prime-estimates", "sieve"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/BrunTitchmarsh.lean", "local_name": "card_range_filter_prime_isBigO", "full_name": "BrunTitchmarsh.card_range_filter_prime_isBigO", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["prime-estimates", "sieve"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/RectangleArgumentPrinciple.lean", "local_name": "rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt", "full_name": "rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["argument-principle", "zero-counting"], "atlas_target": "riemann-von-mangoldt-zero-count"},
+          {"file_path": "PrimeNumberTheoremAnd/RectangleArgumentPrinciple.lean", "local_name": "rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt", "full_name": "rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["argument-principle", "zero-counting"], "atlas_target": "riemann-von-mangoldt-zero-count"},
+          {"file_path": "PrimeNumberTheoremAnd/Consequences.lean", "local_name": "WeakPNT'", "full_name": "WeakPNT'", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["PNT", "Chebyshev-psi"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/Consequences.lean", "local_name": "WeakPNT''", "full_name": "WeakPNT''", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["PNT", "Chebyshev-psi"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/Consequences.lean", "local_name": "nth_prime_asymp", "full_name": "nth_prime_asymp", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["PNT", "nth-prime"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/Consequences.lean", "local_name": "prime_between", "full_name": "prime_between", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["prime-gaps", "PNT"], "atlas_target": "prime-number-theorem"},
+          {"file_path": "PrimeNumberTheoremAnd/Consequences.lean", "local_name": "dirichlet_thm", "full_name": "dirichlet_thm", "axioms": ["propext", "Classical.choice", "Quot.sound"], "topic_tags": ["Dirichlet", "primes-in-progressions"], "atlas_target": "dirichlet-primes-arithmetic-progressions"}
+        ]
+      },
+      {
+        "repository": "https://github.com/AxiomMath/PrimeNumberTheoremAnd",
+        "revision": "2667e414c38e5a5dc9aa1946f16f13001e5cd3ed",
+        "license": "Apache-2.0",
+        "status": "inspected-not-accepted",
+        "discovery_status": "fork-duplicate-of-mandatory-source"
+      },
+      {
+        "repository": "https://github.com/dobronx1325/Daboussi_Pnt",
+        "revision": "c10f135ef4314f77fa33219d6b990e4178802500",
+        "license": null,
+        "status": "inspected-not-accepted",
+        "discovery_status": "relevant-project-no-repository-license-and-no-native-verification"
+      },
+      {
+        "repository": "https://github.com/xinhjBrant/prime-number-theorem",
+        "revision": "e23408949a2d158070a2dc1dcf69da1f4a5c50be",
+        "license": null,
+        "status": "inspected-not-accepted",
+        "discovery_status": "legacy-Lean-project-no-repository-license-and-no-native-verification"
+      }
+    ]
+  }
+}

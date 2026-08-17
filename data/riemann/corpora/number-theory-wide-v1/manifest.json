@@ -1,0 +1,19 @@
+{
+  "corpus_id": "number-theory-wide-v1",
+  "membership": "membership.jsonl",
+  "membership_frozen_on": "2026-08-17",
+  "membership_sha256": "6fbfd8de6e9c92e2a352eeca45dab72da37106275ae660e30bd16f344e4df977",
+  "phase2_source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+  "record_count": 3446,
+  "record_store": "../records.jsonl.gz",
+  "record_store_sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c",
+  "role": "training-source",
+  "schema_version": "riemann-corpus-manifest-v1",
+  "token_lengths_declaration_and_completion": {
+    "count": 3446,
+    "max": 2087,
+    "median": 107.0,
+    "min": 13,
+    "p95": 467
+  }
+}

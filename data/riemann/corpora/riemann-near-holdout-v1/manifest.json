@@ -1,0 +1,19 @@
+{
+  "corpus_id": "riemann-near-holdout-v1",
+  "membership": "membership.jsonl",
+  "membership_frozen_on": "2026-08-17",
+  "membership_sha256": "17be32c07f62dd95d6fe681d6414604674724ac76358275f61a5b9b2a0eea89d",
+  "phase2_source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+  "record_count": 356,
+  "record_store": "../records.jsonl.gz",
+  "record_store_sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c",
+  "role": "evaluation-target",
+  "schema_version": "riemann-corpus-manifest-v1",
+  "token_lengths_declaration_and_completion": {
+    "count": 356,
+    "max": 738,
+    "median": 56.0,
+    "min": 16,
+    "p95": 202
+  }
+}

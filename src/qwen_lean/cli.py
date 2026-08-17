@@ -77,6 +77,12 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .riemann_data import (
+    RiemannAtlasConfig,
+    RiemannDataConfig,
+    materialize_riemann_data,
+    validate_materialized_riemann_data,
+)
 
 
 def _project_root() -> Path:
@@ -166,6 +172,34 @@ def _parser() -> argparse.ArgumentParser:
     phase2_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase2_evidence.add_argument("--verification", type=Path)
     phase2_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    riemann_materialize = subparsers.add_parser(
+        "riemann-materialize",
+        help="materialize the pinned Riemann graph, corpora, holdouts, and atlas",
+    )
+    riemann_materialize.add_argument("--phase2-artifact-dir", type=Path, required=True)
+    riemann_materialize.add_argument(
+        "--phase2-snapshot-dir",
+        type=Path,
+        default=root / "data/mathlib-whole-proof-v1",
+    )
+    riemann_materialize.add_argument("--external-root", type=Path, required=True)
+    riemann_materialize.add_argument(
+        "--config", type=Path, default=root / "config/riemann-data.json"
+    )
+    riemann_materialize.add_argument(
+        "--atlas-config", type=Path, default=root / "config/riemann-atlas.json"
+    )
+    riemann_materialize.add_argument(
+        "--output-dir", type=Path, default=root / "data/riemann"
+    )
+
+    riemann_validate = subparsers.add_parser(
+        "riemann-validate", help="validate committed Riemann data and file hashes"
+    )
+    riemann_validate.add_argument(
+        "--data-dir", type=Path, default=root / "data/riemann"
+    )
 
     phase3_materialize = subparsers.add_parser(
         "phase3-materialize",
@@ -645,6 +679,23 @@ def main(argv: list[str] | None = None) -> int:
             verification_path=args.verification,
         )
         print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "riemann-materialize":
+        summary = materialize_riemann_data(
+            args.phase2_artifact_dir,
+            args.output_dir,
+            RiemannDataConfig.load(args.config),
+            RiemannAtlasConfig.load(args.atlas_config),
+            external_root=args.external_root,
+            phase2_snapshot_dir=args.phase2_snapshot_dir,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "riemann-validate":
+        summary = validate_materialized_riemann_data(args.data_dir)
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
 
     if args.command == "phase3-materialize":

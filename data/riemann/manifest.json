@@ -1,0 +1,172 @@
+{
+  "atlas_schema_version": "riemann-theorem-atlas-v1",
+  "authoritative_location": "repository",
+  "corpus_counts": {
+    "number-theory-far-holdout-v1": 136,
+    "number-theory-wide-v1": 3446,
+    "riemann-bubble-v1": 452,
+    "riemann-core-v1": 165,
+    "riemann-external-lean-v1": 22,
+    "riemann-near-holdout-v1": 356,
+    "riemann-specialist-validation-v1": 556
+  },
+  "corpus_roles": {
+    "number-theory-far-holdout-v1": "evaluation-target",
+    "number-theory-wide-v1": "training-source",
+    "riemann-bubble-v1": "training-source",
+    "riemann-core-v1": "training-source",
+    "riemann-external-lean-v1": "separate-training-source",
+    "riemann-near-holdout-v1": "evaluation-target",
+    "riemann-specialist-validation-v1": "evaluation-target"
+  },
+  "files": {
+    "REPORT.md": {
+      "bytes": 1465,
+      "sha256": "e65b7f43b3cc446bb196000423901b7ca340ff7e25b92fadd2f98438c0e47335"
+    },
+    "atlas/diagnostics.json": {
+      "bytes": 2456,
+      "sha256": "e0af5ee74dac80c4c06594b6a63eb9b9870686f71c16460c9b783ed74cbdf58c"
+    },
+    "atlas/entries.jsonl": {
+      "bytes": 256564,
+      "sha256": "831d51395acd98a1b0bcbee902cd5838f19d34968fe4aeb4f177836f3a11763c"
+    },
+    "atlas/relationships.jsonl": {
+      "bytes": 32396,
+      "sha256": "8a0a09217ba0954f2a312f81dcc1403a7116baf5b8cdfc591a592b3836d33371"
+    },
+    "atlas/sources.json": {
+      "bytes": 5167,
+      "sha256": "9669ea7383380f050139a97823afa97c708b456dc4c6313b72b611769838bd98"
+    },
+    "corpora/number-theory-far-holdout-v1/manifest.json": {
+      "bytes": 666,
+      "sha256": "1f287b80870c96ee4e3866807e84bd5ddd950d4e280ae8b529d7e6ecf3066c6e"
+    },
+    "corpora/number-theory-far-holdout-v1/membership.jsonl": {
+      "bytes": 61476,
+      "sha256": "7b2c3f13ca6b8ba0d9d5dc70f391ef0e3c37653b2d0ed4265746b8fc4d5ae466"
+    },
+    "corpora/number-theory-wide-v1/manifest.json": {
+      "bytes": 659,
+      "sha256": "e137203207a9bc9fc18ee35158fb1cd5fa670cd626e75e5e959e79b728080da2"
+    },
+    "corpora/number-theory-wide-v1/membership.jsonl": {
+      "bytes": 1541748,
+      "sha256": "6fbfd8de6e9c92e2a352eeca45dab72da37106275ae660e30bd16f344e4df977"
+    },
+    "corpora/records.jsonl.gz": {
+      "bytes": 1876845,
+      "sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c"
+    },
+    "corpora/riemann-bubble-v1/manifest.json": {
+      "bytes": 652,
+      "sha256": "8f9abf52750893ea7b982534cdab82c3bc8c9c98621bd66b0f8f4d6c0a311381"
+    },
+    "corpora/riemann-bubble-v1/membership.jsonl": {
+      "bytes": 191012,
+      "sha256": "5a03bc73fee5e3cff3926e1efd0490058bef495d219feadc5f968e0c699696bd"
+    },
+    "corpora/riemann-core-v1/manifest.json": {
+      "bytes": 648,
+      "sha256": "fc2fb2a88bcd460182fb12a8c70f01238c666e34218684e39853680b4dec169c"
+    },
+    "corpora/riemann-core-v1/membership.jsonl": {
+      "bytes": 71079,
+      "sha256": "a8d1d44dc7eea753cfb4dfb7c3191d8947094d1d18171752e54ae930d6e49cf5"
+    },
+    "corpora/riemann-external-lean-v1/manifest.json": {
+      "bytes": 517,
+      "sha256": "7d1e8c94501c277423032d2b4245d2a02236c04c755ebbbffe03619ce425702a"
+    },
+    "corpora/riemann-external-lean-v1/membership.jsonl": {
+      "bytes": 2786,
+      "sha256": "3c7335ef25b4092d6de61f94ca1481e515283596533fdf4338d19d0dd4260b6c"
+    },
+    "corpora/riemann-near-holdout-v1/manifest.json": {
+      "bytes": 659,
+      "sha256": "6caa95c5e7fcd0d2b145a7779be73c5cc5922f84669d1d13894d789a7b8d2bae"
+    },
+    "corpora/riemann-near-holdout-v1/membership.jsonl": {
+      "bytes": 147461,
+      "sha256": "17be32c07f62dd95d6fe681d6414604674724ac76358275f61a5b9b2a0eea89d"
+    },
+    "corpora/riemann-specialist-validation-v1/manifest.json": {
+      "bytes": 668,
+      "sha256": "19487439e93014dd48a86457d88e80f230009b804cc680aa9bc650dbad99e698"
+    },
+    "corpora/riemann-specialist-validation-v1/membership.jsonl": {
+      "bytes": 228873,
+      "sha256": "2f611cf4fe0b45d8aff904212a53666e52e7e6e0471843d8e2efd33dd1783ec2"
+    },
+    "evidence/duplicate-aliases.json": {
+      "bytes": 1826,
+      "sha256": "6651dde453fd43c020f208d91c9dccaffcfd292dc08d9244d09983318d32cffa"
+    },
+    "evidence/opportunities.json": {
+      "bytes": 20826,
+      "sha256": "8ca8073d327f82615e32cc56d1da2333ee0c865768a64e56591db479ffe1b1ba"
+    },
+    "evidence/summary.json": {
+      "bytes": 7469,
+      "sha256": "ed058ca94a679c0a9f68fc465c3b5979b953fb0f8ba1a3682073e0706f6fe1fa"
+    },
+    "external/riemann-external-lean-v1.jsonl": {
+      "bytes": 134452,
+      "sha256": "25a12d3704e74a11e7cd2bee2dd9be848490abf287b7e1986973fe2cf46a1e05"
+    },
+    "internal/diagnostics.json": {
+      "bytes": 1774,
+      "sha256": "1787c57c83cdd9cbd266e719f3385e00763ee5abdf11fa83b2deea5483a2ad22"
+    },
+    "internal/edges.jsonl.gz": {
+      "bytes": 25737365,
+      "sha256": "8ae940474c60f77b7cfb1d44380a0089f0c62834e7e7b6a0a21546d071646925"
+    },
+    "internal/nodes.jsonl.gz": {
+      "bytes": 16786313,
+      "sha256": "07969c412568c5ed32d4f8d926aac233259bc447a58ac767207bbcba8d14c941"
+    },
+    "internal/seed-manifest.jsonl": {
+      "bytes": 127602,
+      "sha256": "8a805a8dfc712ed9f4018df43e3e0ea97d277704b00aac2fd5628b1db4fdd3f4"
+    },
+    "sources/source-manifest.json": {
+      "bytes": 13670,
+      "sha256": "61c1c85438ed910b6ee313031ce5beae684bbf6437bb32d9d2fff7c08635df4d"
+    }
+  },
+  "inference_performed": false,
+  "internal_graph_schema_version": "riemann-internal-graph-v1",
+  "phase2_snapshot": {
+    "manifest_sha256": "5f01f6e90bc67ca34c34b8d5c9382f2070761f4d12545882846e27b0b7e11402",
+    "record_count": 88958,
+    "relative_path": "../mathlib-whole-proof-v1",
+    "split_counts": {
+      "heldout": 4448,
+      "train": 80062,
+      "validation": 4448
+    }
+  },
+  "phase2_source": {
+    "dataset_schema_version": "mathlib-whole-proof-v1",
+    "expected_records": 88958,
+    "expected_remaining_exact_statement_matches": 0,
+    "expected_split_counts": {
+      "heldout": 4448,
+      "train": 80062,
+      "validation": 4448
+    },
+    "expected_split_hygiene": {
+      "cross_split_components": 0,
+      "cross_split_files": 0,
+      "cross_split_statement_fingerprints": 0
+    },
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997"
+  },
+  "schema_version": "riemann-data-manifest-v1",
+  "snapshot_date": "2026-08-17"
+}

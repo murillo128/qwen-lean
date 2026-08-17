@@ -1,0 +1,72 @@
+[
+  {
+    "entry_ids": [
+      "mathlib-28b02343b48e3d0ffa6fb667",
+      "mathlib-d6b382b9f925744357dca72e"
+    ],
+    "normalized_alias": "arithmeticfunctionsumeqiffsumsmulmoebiuseqon"
+  },
+  {
+    "entry_ids": [
+      "mathlib-026777f551cc98fd20bda2c5",
+      "mathlib-1d82f07bdf7aaae95535e674"
+    ],
+    "normalized_alias": "arithmeticfunctionvonmangoldtcontinuousonlfunctionresidueclassaux"
+  },
+  {
+    "entry_ids": [
+      "mathlib-1c69da693162da6b669fd744",
+      "mathlib-99dd38b8db668e01608e04de"
+    ],
+    "normalized_alias": "chebyshevnatchebyshevpsige"
+  },
+  {
+    "entry_ids": [
+      "mathlib-4f3541bc15ac7fd90e84b2a6",
+      "mathlib-8e860a68a2b69cb615eb8962"
+    ],
+    "normalized_alias": "chebyshevnatchebyshevpsileprimecountingmullog"
+  },
+  {
+    "entry_ids": [
+      "mathlib-221b5e079890579ee7829199",
+      "mathlib-a926c6d1f6c19c24ac7dae51"
+    ],
+    "normalized_alias": "chebyshevnatchebyshevthetage"
+  },
+  {
+    "entry_ids": [
+      "mathlib-3e96712deb58e1222423936c",
+      "mathlib-9f79de7dca583ab7cdbdac91"
+    ],
+    "normalized_alias": "hurwitzzetariemannzetanegnateqbernoulli"
+  },
+  {
+    "entry_ids": [
+      "mathlib-7c803f3cd6aa7ff1efc56dd3",
+      "mathlib-9887804f24d193bb54e274b4"
+    ],
+    "normalized_alias": "hurwitzzetariemannzetatwomulnat"
+  },
+  {
+    "entry_ids": [
+      "mathlib-09dda6e2ed8a01c4dab14cfc",
+      "mathlib-d9391e26b418f38bc3581e0a"
+    ],
+    "normalized_alias": "lseriesabscissaofabsconvleofforallltlseriessummable"
+  },
+  {
+    "entry_ids": [
+      "mathlib-4fcaa9335f5770ebb974aaee",
+      "mathlib-c1853249e753dbbc1de41c39"
+    ],
+    "normalized_alias": "natprimecountingeqzeroiff"
+  },
+  {
+    "entry_ids": [
+      "external-lean-344ed3f200e943b9ab7fe1ff",
+      "external-lean-86038dcc0e6098c10c1bfc0a"
+    ],
+    "normalized_alias": "weakpnt"
+  }
+]
