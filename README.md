@@ -328,6 +328,77 @@ uv run --frozen qwen-lean phase4-evidence \
   --evidence-dir evidence/phase4
 ```
 
+## Phase 5 full-corpus SFT experiment
+
+Phase 5 retains every Phase 2 train and validation record whose complete
+`mathlib-sft-v1` serialization, including EOS, fits 1,024 tokens. It derives the
+one-pass optimizer count, quarter checkpoints, midpoint stop, and 1/32 warmup
+from the exact eligible training count. Materialize the workloads and run the
+production preflight before starting the two-process trajectory:
+
+```bash
+uv run --frozen --extra training qwen-lean phase5-materialize \
+  --artifact-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --output artifacts/phase5/workloads.json
+uv run --frozen --extra training qwen-lean phase5-preflight \
+  --workload artifacts/phase5/workloads.json \
+  --output artifacts/phase5/preflight.json
+uv run --frozen --extra training qwen-lean phase5-train \
+  --workload artifacts/phase5/workloads.json \
+  --output-dir artifacts/phase5/training
+uv run --frozen --extra training qwen-lean phase5-train \
+  --workload artifacts/phase5/workloads.json \
+  --output-dir artifacts/phase5/training \
+  --resume-from-checkpoint \
+    artifacts/phase5/training/trainer-state/checkpoint-<Q2-step>
+```
+
+After validation-only selection, substitute the selected checkpoint reported in
+`artifacts/phase5/training/run.json`, reload it, and run both heldout roles on the
+same deterministic 512-task workload:
+
+```bash
+uv run --frozen --extra training qwen-lean phase5-adapter-reload \
+  --workload artifacts/phase5/workloads.json \
+  --training artifacts/phase5/training/run.json \
+  --adapter-dir artifacts/phase5/training/trainer-state/checkpoint-<selected-step> \
+  --output artifacts/phase5/adapter-reload.json
+uv run --frozen --extra baseline qwen-lean phase5-heldout \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase5/workloads.json \
+  --training artifacts/phase5/training/run.json \
+  --mode base --output-dir artifacts/phase5/heldout/base
+uv run --frozen --extra baseline qwen-lean phase5-heldout \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase5/workloads.json \
+  --training artifacts/phase5/training/run.json \
+  --mode adapter \
+  --adapter-dir artifacts/phase5/training/trainer-state/checkpoint-<selected-step> \
+  --output-dir artifacts/phase5/heldout/adapter
+uv run --frozen qwen-lean phase5-heldout-compare \
+  --training artifacts/phase5/training/run.json \
+  --base-dir artifacts/phase5/heldout/base \
+  --adapter-dir artifacts/phase5/heldout/adapter \
+  --output artifacts/phase5/heldout-comparison.json
+```
+
+Finally, run the selected adapter on all 244 miniF2F validation tasks under the
+unchanged Phase 1 contract and write compact evidence. Raw tokenized workloads,
+checkpoints, weights, candidates, and logs remain ignored under `artifacts/`:
+
+```bash
+uv run --frozen --extra baseline qwen-lean phase5-minif2f \
+  --benchmark-root /tmp/qwen-lean-minif2f-f0a20e14 \
+  --training artifacts/phase5/training/run.json \
+  --adapter-dir artifacts/phase5/training/trainer-state/checkpoint-<selected-step> \
+  --output-dir artifacts/phase5/minif2f
+uv run --frozen qwen-lean phase5-evidence \
+  --artifact-dir artifacts/phase5 \
+  --evidence-dir evidence/phase5
+```
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

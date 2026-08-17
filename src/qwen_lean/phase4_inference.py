@@ -50,7 +50,10 @@ def phase4_heldout_integrity_passed(summary: dict[str, Any]) -> bool:
 
 
 def _sanitized_adapter_metadata(
-    value: dict[str, Any] | None, selected_binding: dict[str, Any]
+    value: dict[str, Any] | None,
+    selected_binding: dict[str, Any],
+    *,
+    artifact_prefix: str = "artifacts/phase4/training",
 ) -> dict[str, Any] | None:
     if value is None:
         return None
@@ -58,7 +61,7 @@ def _sanitized_adapter_metadata(
     compact["training_relative_path"] = selected_binding["training_relative_path"]
     compact["training_artifact_sha256"] = selected_binding["training_artifact_sha256"]
     compact["ignored_local_path"] = (
-        f"artifacts/phase4/training/{selected_binding['training_relative_path']}"
+        f"{artifact_prefix}/{selected_binding['training_relative_path']}"
     )
     return compact
 
@@ -270,9 +273,14 @@ def run_phase4_heldout(
     adapter_dir: Path | None,
     verification_workers: int | None = None,
     timeout_seconds: float | None = None,
+    workload_loader: Any = load_phase4_workloads,
+    binding_loader: Any = load_selected_adapter_binding,
+    schema_version: str = PHASE4_HELDOUT_RUN_SCHEMA_VERSION,
+    phase_name: str = "Phase 4",
+    integrity_summary_key: str = "phase4_heldout_integrity_passed",
 ) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
     mode = "base" if adapter_dir is None else "adapter"
-    training, binding = load_selected_adapter_binding(
+    training, binding = binding_loader(
         training_path,
         expected_artifact_id=str(config.lora["artifact_id"]),
         adapter_dir=adapter_dir,
@@ -281,7 +289,7 @@ def run_phase4_heldout(
     if adapter_dir is not None:
         phase4_adapter_spec(config, adapter_dir).validate(_phase1_config(config))
     _validate_phase2_environment(phase2_config, dataset_dir, mathlib_root)
-    workloads = load_phase4_workloads(workload_path, config)
+    workloads = workload_loader(workload_path, config)
     selected_ids = [item.record_id for item in workloads.heldout]
     records = _load_heldout_records(dataset_dir, selected_ids)
     for record, item in zip(records, workloads.heldout, strict=True):
@@ -319,7 +327,7 @@ def run_phase4_heldout(
     expected_candidates = len(records) * int(sampling["candidates_per_task"])
     if len(generated) != expected_candidates:
         raise RuntimeError(
-            f"Phase 4 vLLM returned {len(generated)} candidates, "
+            f"{phase_name} vLLM returned {len(generated)} candidates, "
             f"expected {expected_candidates}"
         )
     record_by_id = {record.id: record for record in records}
@@ -334,7 +342,7 @@ def run_phase4_heldout(
         else timeout_seconds
     )
     if worker_count < 1 or timeout <= 0:
-        raise ValueError("Phase 4 heldout verification settings must be positive")
+        raise ValueError(f"{phase_name} heldout verification settings must be positive")
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
         results = list(
@@ -375,9 +383,9 @@ def run_phase4_heldout(
         }
     )
     heldout_integrity_passed = phase4_heldout_integrity_passed(summary)
-    summary["phase4_heldout_integrity_passed"] = heldout_integrity_passed
+    summary[integrity_summary_key] = heldout_integrity_passed
     metadata = {
-        "schema_version": PHASE4_HELDOUT_RUN_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "status": "passed" if heldout_integrity_passed else "failed",
         "model_role": mode,
         "model": config.model,
@@ -429,7 +437,7 @@ def run_phase4_heldout(
             stream.write(json.dumps(result.to_dict(), sort_keys=True) + "\n")
     if not heldout_integrity_passed:
         raise RuntimeError(
-            f"Phase 4 {mode} heldout evaluation failed integrity gates: "
+            f"{phase_name} {mode} heldout evaluation failed integrity gates: "
             f"completeness={summary['completeness_errors']}, "
             f"infrastructure_errors={summary['infrastructure_error_count']}, "
             f"verifier_timeouts={summary['verifier_timeout_count']}"
@@ -438,9 +446,18 @@ def run_phase4_heldout(
 
 
 def compare_phase4_heldout_runs(
-    training_path: Path, base_dir: Path, adapter_dir: Path, output: Path
+    training_path: Path,
+    base_dir: Path,
+    adapter_dir: Path,
+    output: Path,
+    *,
+    binding_loader: Any = load_selected_adapter_binding,
+    schema_version: str = PHASE4_HELDOUT_COMPARISON_SCHEMA_VERSION,
+    phase_name: str = "Phase 4",
+    artifact_prefix: str = "artifacts/phase4/training",
+    integrity_summary_key: str = "phase4_heldout_integrity_passed",
 ) -> dict[str, Any]:
-    training, binding = load_selected_adapter_binding(training_path)
+    training, binding = binding_loader(training_path)
     base_run = json.loads((base_dir / "run.json").read_text(encoding="utf-8"))
     adapter_run = json.loads((adapter_dir / "run.json").read_text(encoding="utf-8"))
     base_summary = json.loads((base_dir / "summary.json").read_text(encoding="utf-8"))
@@ -451,7 +468,7 @@ def compare_phase4_heldout_runs(
     for role, run in (("base", base_run), ("adapter", adapter_run)):
         if run.get("selected_adapter_binding") != expected_binding:
             raise ValueError(
-                f"Phase 4 heldout {role} run does not match the "
+                f"{phase_name} heldout {role} run does not match the "
                 "training-selected adapter binding"
             )
     for key in (
@@ -472,39 +489,39 @@ def compare_phase4_heldout_runs(
         "verification",
     ):
         if base_run.get(key) != adapter_run.get(key):
-            raise ValueError(f"Phase 4 heldout comparison differs in {key}")
+            raise ValueError(f"{phase_name} heldout comparison differs in {key}")
     if base_run.get("model_role") != "base" or base_run.get("adapter") is not None:
-        raise ValueError("Phase 4 base run unexpectedly enabled an adapter")
+        raise ValueError(f"{phase_name} base run unexpectedly enabled an adapter")
     if adapter_run.get("model_role") != "adapter" or not adapter_run.get(
         "adapter", {}
     ).get("enabled"):
-        raise ValueError("Phase 4 adapter run did not enable the selected adapter")
+        raise ValueError(f"{phase_name} adapter run did not enable the selected adapter")
     if base_run.get("model") != training.get("model"):
-        raise ValueError("Phase 4 heldout model differs from the training trajectory")
+        raise ValueError(f"{phase_name} heldout model differs from the training trajectory")
     if base_run.get("selected_optimizer_step") != binding.selected_optimizer_step:
-        raise ValueError("Phase 4 heldout selected step differs from training")
+        raise ValueError(f"{phase_name} heldout selected step differs from training")
     adapter_metadata = adapter_run["adapter"]
     if adapter_metadata.get("adapter_id") != binding.artifact_id:
-        raise ValueError("Phase 4 heldout adapter identity differs from training")
+        raise ValueError(f"{phase_name} heldout adapter identity differs from training")
     if Path(str(adapter_metadata.get("adapter_path", ""))).resolve() != (
         binding.checkpoint_path
     ):
-        raise ValueError("Phase 4 heldout adapter path differs from training selection")
+        raise ValueError(f"{phase_name} heldout adapter path differs from training selection")
     base_runtime = _runtime_identity(base_run["runtime"])
     adapter_runtime = _runtime_identity(adapter_run["runtime"])
     if base_runtime != adapter_runtime:
-        raise ValueError("Phase 4 heldout comparison differs in local runtime identity")
+        raise ValueError(f"{phase_name} heldout comparison differs in local runtime identity")
     for role, summary in (("base", base_summary), ("adapter", adapter_summary)):
         if not phase4_heldout_integrity_passed(summary):
             raise ValueError(
-                f"Phase 4 heldout {role} run has incomplete, infrastructure-error, "
+                f"{phase_name} heldout {role} run has incomplete, infrastructure-error, "
                 "or timeout results"
             )
-        summary["phase4_heldout_integrity_passed"] = True
+        summary[integrity_summary_key] = True
     base_metrics = base_summary["pass_at_k"]
     adapter_metrics = adapter_summary["pass_at_k"]
     comparison = {
-        "schema_version": PHASE4_HELDOUT_COMPARISON_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "status": "passed",
         "comparison_integrity_passed": True,
         "adapter_improvement_required": False,
@@ -537,7 +554,9 @@ def compare_phase4_heldout_runs(
             },
             "adapter": {
                 "adapter": _sanitized_adapter_metadata(
-                    adapter_run["adapter"], base_run["selected_adapter_binding"]
+                    adapter_run["adapter"],
+                    base_run["selected_adapter_binding"],
+                    artifact_prefix=artifact_prefix,
                 ),
                 "runtime": adapter_runtime,
             },

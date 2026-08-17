@@ -1,0 +1,409 @@
+{
+  "adapter": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "relative_path": "trainer-state/checkpoint-9962"
+  },
+  "checkpoint_candidates": [
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 2491,
+      "relative_path": "trainer-state/checkpoint-2491",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 209075,
+        "examples": 4426,
+        "mean_target_token_cross_entropy": 1.262098865321611,
+        "optimizer_step": 2491,
+        "target_token_next_token_accuracy": 0.6779762696145353,
+        "target_tokens": 308381,
+        "wall_time_seconds": 630.3275020750007
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 4981,
+      "relative_path": "trainer-state/checkpoint-4981",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 214141,
+        "examples": 4426,
+        "mean_target_token_cross_entropy": 1.1711516943962363,
+        "optimizer_step": 4981,
+        "target_token_next_token_accuracy": 0.6944040002464484,
+        "target_tokens": 308381,
+        "wall_time_seconds": 630.0804801860068
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 7472,
+      "relative_path": "trainer-state/checkpoint-7472",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 217263,
+        "examples": 4426,
+        "mean_target_token_cross_entropy": 1.120195390554942,
+        "optimizer_step": 7472,
+        "target_token_next_token_accuracy": 0.7045278405608646,
+        "target_tokens": 308381,
+        "wall_time_seconds": 631.5708500400069
+      }
+    },
+    {
+      "adapter_format": "peft-lora",
+      "files": [
+        "README.md",
+        "adapter_config.json",
+        "adapter_model.safetensors",
+        "added_tokens.json",
+        "chat_template.jinja",
+        "merges.txt",
+        "optimizer.pt",
+        "rng_state.pth",
+        "scheduler.pt",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "vocab.json"
+      ],
+      "merged": false,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 9962,
+      "relative_path": "trainer-state/checkpoint-9962",
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "validation": {
+        "correct_target_tokens": 218186,
+        "examples": 4426,
+        "mean_target_token_cross_entropy": 1.108313809418986,
+        "optimizer_step": 9962,
+        "target_token_next_token_accuracy": 0.7075208913649025,
+        "target_tokens": 308381,
+        "wall_time_seconds": 631.4284663069993
+      }
+    }
+  ],
+  "checkpoint_selection": {
+    "candidate_steps": [
+      2491,
+      4981,
+      7472,
+      9962
+    ],
+    "heldout_or_minif2f_consulted": false,
+    "metric": "validation_mean_target_token_cross_entropy",
+    "rule": "minimum validation mean target-token cross-entropy; ties earlier",
+    "selected_mean_target_token_cross_entropy": 1.108313809418986,
+    "selected_optimizer_step": 9962
+  },
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1"
+  },
+  "lora": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "bias": "none",
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "modules_to_save": null,
+    "r": 16,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "memory_ceiling_bytes": 25769803776,
+  "memory_ceiling_passed": true,
+  "model": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+  },
+  "optimizer_steps_completed": 9962,
+  "packages": {
+    "accelerate": "1.10.1",
+    "bitsandbytes": "0.47.0",
+    "datasets": "4.0.0",
+    "peft": "0.17.1",
+    "torch": "2.8.0",
+    "transformers": "4.55.4",
+    "trl": "0.22.2"
+  },
+  "pre_training_validation": {
+    "correct_target_tokens": 183990,
+    "examples": 4426,
+    "mean_target_token_cross_entropy": 1.8328708688377224,
+    "target_token_next_token_accuracy": 0.5966320882285225,
+    "target_tokens": 308381,
+    "wall_time_seconds": 629.2670321319893
+  },
+  "quantization": {
+    "compute_dtype": "bfloat16",
+    "double_quantization": true,
+    "load_in_4bit": true,
+    "quantization_type": "nf4"
+  },
+  "quantized_linear_modules": 252,
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cumulative_examples_per_second": 2.036277262178609,
+    "cumulative_optimizer_steps_per_second": 0.25453465777232614,
+    "cumulative_training_wall_time_seconds": 39138.088648465,
+    "inference_execution": "local_cuda",
+    "peak_cuda_allocated_bytes": 10258931712,
+    "peak_cuda_reserved_bytes": 13010731008,
+    "python": "3.12.14",
+    "stage_training_wall_time_seconds": 19578.203232926986,
+    "torch_cuda_version": "12.8",
+    "trainer_metrics": {
+      "epoch": 1.0,
+      "total_flos": 5.624136810253824e+17,
+      "train_loss": 0.5566355476080713,
+      "train_runtime": 19577.1326,
+      "train_samples_per_second": 4.071,
+      "train_steps_per_second": 0.509
+    },
+    "training_log_summary": {
+      "all_gradient_norms_finite": true,
+      "all_losses_finite": true,
+      "covers_every_optimizer_step_exactly_once": true,
+      "gradient_norm_before_clipping": {
+        "maximum": 8.503636360168457,
+        "mean": 1.5442784662180649,
+        "minimum": 0.4254078269004822
+      },
+      "logged_optimizer_steps": 9962,
+      "loss": {
+        "maximum": 2.4275,
+        "mean": 1.209009566352138,
+        "minimum": 0.5196
+      }
+    }
+  },
+  "schema_version": "phase5-training-run-v1",
+  "selected_adapter_binding": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 9962,
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+    "training_relative_path": "trainer-state/checkpoint-9962"
+  },
+  "selected_beats_pre_training_validation": true,
+  "serialization": {
+    "id": "mathlib-sft-v1",
+    "supervise_eos": true,
+    "supervise_prompt": false
+  },
+  "status": "passed",
+  "total_parameter_count": 4761498624,
+  "trainable_parameter_count": 43646976,
+  "trainable_parameter_fraction": 0.009166646773770023,
+  "training": {
+    "checkpoint_candidates": [
+      2491,
+      4981,
+      7472,
+      9962
+    ],
+    "checkpoint_interval_steps": 9962,
+    "duplicate_final_batch_fill": false,
+    "epochs": 1,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": true,
+    "learning_rate": 0.0001,
+    "lr_schedule": "cosine",
+    "mandatory_process_stop_step": 4981,
+    "manual_checkpoint_boundaries": true,
+    "maximum_gradient_norm": 1.0,
+    "maximum_optimizer_steps": 9962,
+    "maximum_sequence_tokens": 1024,
+    "memory_ceiling_bytes": 25769803776,
+    "optimizer": "paged_adamw_8bit",
+    "packing": false,
+    "per_device_micro_batch_size": 1,
+    "seed": 0,
+    "trainer": "trl-sft",
+    "truncation": false,
+    "warmup_fraction_denominator": 32,
+    "warmup_steps": 312,
+    "weight_decay": 0.0
+  },
+  "trajectory": {
+    "data_order_seed": 0,
+    "effective_batch_size": 8,
+    "examples_consumed_at_step": 79696,
+    "ignore_data_skip": false,
+    "mandatory_process_stop_observed": true,
+    "one_pass_data_accounting": {
+      "all_eligible_examples_consumed_exactly_once": true,
+      "duplicate_final_batch_fill": false,
+      "eligible_training_examples": 79696,
+      "final_optimizer_update_examples": 8,
+      "full_effective_batches_before_final": 9961,
+      "planned_optimizer_steps": 9962
+    },
+    "process_legs": [
+      {
+        "process_leg": 1,
+        "resume_checkpoint": null,
+        "started_from_optimizer_step": 0,
+        "stopped_at_optimizer_step": 4981,
+        "training_wall_time_seconds": 19559.88541553801
+      },
+      {
+        "process_leg": 2,
+        "resume_checkpoint": "trainer-state/checkpoint-4981",
+        "started_from_optimizer_step": 4981,
+        "stopped_at_optimizer_step": 9962,
+        "training_wall_time_seconds": 19578.203232926986
+      }
+    ],
+    "resume_state": {
+      "data_position_mechanism": "trainer global_step with ignore_data_skip=false",
+      "data_position_preserved": true,
+      "optimizer_state_preserved": true,
+      "optimizer_step": 4981,
+      "rng_state_preserved": true,
+      "scheduler_state_preserved": true,
+      "trainer_epoch": 0.5
+    },
+    "same_trajectory_resume": true,
+    "scheduler_configured_for_complete_trajectory": true
+  },
+  "validation_probes": [
+    {
+      "correct_target_tokens": 209075,
+      "examples": 4426,
+      "mean_target_token_cross_entropy": 1.262098865321611,
+      "optimizer_step": 2491,
+      "target_token_next_token_accuracy": 0.6779762696145353,
+      "target_tokens": 308381,
+      "wall_time_seconds": 630.3275020750007
+    },
+    {
+      "correct_target_tokens": 214141,
+      "examples": 4426,
+      "mean_target_token_cross_entropy": 1.1711516943962363,
+      "optimizer_step": 4981,
+      "target_token_next_token_accuracy": 0.6944040002464484,
+      "target_tokens": 308381,
+      "wall_time_seconds": 630.0804801860068
+    },
+    {
+      "correct_target_tokens": 217263,
+      "examples": 4426,
+      "mean_target_token_cross_entropy": 1.120195390554942,
+      "optimizer_step": 7472,
+      "target_token_next_token_accuracy": 0.7045278405608646,
+      "target_tokens": 308381,
+      "wall_time_seconds": 631.5708500400069
+    },
+    {
+      "correct_target_tokens": 218186,
+      "examples": 4426,
+      "mean_target_token_cross_entropy": 1.108313809418986,
+      "optimizer_step": 9962,
+      "target_token_next_token_accuracy": 0.7075208913649025,
+      "target_tokens": 308381,
+      "wall_time_seconds": 631.4284663069993
+    }
+  ],
+  "workloads": {
+    "cross_split_record_ids_disjoint": true,
+    "heldout": {
+      "id": "phase5-heldout512-v1",
+      "membership_reference": "workloads.json#workloads.heldout",
+      "optimizer_batches": false
+    },
+    "train": {
+      "examples": 79696,
+      "id": "phase5-train-full-v1",
+      "membership_reference": "workloads.json#workloads.train"
+    },
+    "validation": {
+      "examples": 4426,
+      "id": "phase5-validation-full-v1",
+      "membership_reference": "workloads.json#workloads.validation",
+      "optimizer_batches": false
+    }
+  }
+}

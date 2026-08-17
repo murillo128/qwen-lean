@@ -6,6 +6,7 @@ import math
 import platform
 import time
 from pathlib import Path
+from statistics import fmean
 from typing import Any, Sequence
 
 from .phase3 import (
@@ -56,13 +57,24 @@ def _release_cuda(torch: Any, *values: Any) -> None:
 
 
 def run_phase4_preflight(
-    config: Phase4Config, workload_path: Path, output: Path
+    config: Phase4Config,
+    workload_path: Path,
+    output: Path,
+    *,
+    workload_loader: Any = load_phase4_workloads,
+    schema_version: str = PHASE4_PREFLIGHT_SCHEMA_VERSION,
+    phase_name: str = "Phase 4",
+    workloads_override: Any | None = None,
 ) -> dict[str, Any]:
     torch, device_index, properties = _require_local_cuda()
     torch.manual_seed(int(config.training["seed"]))
     torch.cuda.manual_seed_all(int(config.training["seed"]))
     torch.cuda.reset_peak_memory_stats(device_index)
-    workloads = load_phase4_workloads(workload_path, config)
+    workloads = (
+        workload_loader(workload_path, config)
+        if workloads_override is None
+        else workloads_override
+    )
     example = max(workloads.train, key=lambda item: len(item.input_ids))
     runtime = load_qlora_runtime(config)
     trainer = _build_trainer(
@@ -81,7 +93,9 @@ def run_phase4_preflight(
     padding_masked = not bool(batch["labels"][padding].ne(IGNORE_INDEX).any())
     eos_supervised = int(batch["labels"][0, -1].item()) == workloads.eos_token_id
     if not prompt_masked or not padding_masked or not eos_supervised:
-        raise RuntimeError("Phase 4 production preflight label masking is invalid")
+        raise RuntimeError(
+            f"{phase_name} production preflight label masking is invalid"
+        )
 
     device = next(
         parameter
@@ -109,7 +123,7 @@ def run_phase4_preflight(
     ):
         loss = trainer.compute_loss(runtime.model, batch)
     if not bool(torch.isfinite(loss).item()):
-        raise RuntimeError("Phase 4 preflight loss is non-finite")
+        raise RuntimeError(f"{phase_name} preflight loss is non-finite")
     trainer.accelerator.backward(loss)
     gradients = [
         parameter.grad
@@ -119,7 +133,9 @@ def run_phase4_preflight(
     if not gradients or any(
         not bool(torch.isfinite(gradient).all().item()) for gradient in gradients
     ):
-        raise RuntimeError("Phase 4 preflight gradients are missing or non-finite")
+        raise RuntimeError(
+            f"{phase_name} preflight gradients are missing or non-finite"
+        )
     gradient_norm = torch.nn.utils.clip_grad_norm_(
         [
             parameter
@@ -134,16 +150,16 @@ def run_phase4_preflight(
     base_unchanged = torch.equal(base_before, base_parameter.detach())
     if not adapter_changed or not base_unchanged:
         raise RuntimeError(
-            "Phase 4 preflight parameter update mismatch: "
+            f"{phase_name} preflight parameter update mismatch: "
             f"adapter_changed={adapter_changed}, base_unchanged={base_unchanged}"
         )
     runtime_metadata = _cuda_metadata(torch, device_index, properties)
     memory_passed = _peak_within_ceiling(runtime_metadata, config)
     if not memory_passed:
-        raise RuntimeError("Phase 4 preflight exceeds the 24 GiB memory ceiling")
+        raise RuntimeError(f"{phase_name} preflight exceeds the 24 GiB memory ceiling")
 
     value = {
-        "schema_version": PHASE4_PREFLIGHT_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "passed": True,
         "fresh_model_state_discarded_after_process": True,
         "model": config.model,
@@ -203,12 +219,13 @@ def run_phase4_preflight(
 
 
 def validate_phase4_resume_checkpoint(
-    config: Phase4Config, checkpoint: Path
+    config: Phase4Config, checkpoint: Path, *, phase_name: str = "Phase 4"
 ) -> dict[str, Any]:
     expected_step = int(config.training["mandatory_process_stop_step"])
     if checkpoint.name != f"checkpoint-{expected_step}":
         raise ValueError(
-            f"Phase 4 must resume from checkpoint-{expected_step}, got {checkpoint.name}"
+            f"{phase_name} must resume from checkpoint-{expected_step}, "
+            f"got {checkpoint.name}"
         )
     missing = [
         name
@@ -225,10 +242,13 @@ def validate_phase4_resume_checkpoint(
         )
         observed_step = int(trainer_state["global_step"])
     except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
-        raise ValueError("Phase 4 checkpoint has invalid trainer state") from error
+        raise ValueError(
+            f"{phase_name} checkpoint has invalid trainer state"
+        ) from error
     if observed_step != expected_step:
         raise ValueError(
-            f"Phase 4 checkpoint global step is {observed_step}, expected {expected_step}"
+            f"{phase_name} checkpoint global step is {observed_step}, "
+            f"expected {expected_step}"
         )
     return {
         "optimizer_step": observed_step,
@@ -244,20 +264,22 @@ def validate_phase4_resume_checkpoint(
 def select_validation_checkpoint(
     validation_probes: Sequence[dict[str, Any]],
     candidate_steps: Sequence[int] = (128, 256, 384, 512),
+    *,
+    phase_name: str = "Phase 4",
 ) -> dict[str, Any]:
     expected = tuple(int(step) for step in candidate_steps)
     by_step: dict[int, dict[str, Any]] = {}
     for probe in validation_probes:
         step = int(probe["optimizer_step"])
         if step in by_step:
-            raise ValueError(f"duplicate Phase 4 validation probe at step {step}")
+            raise ValueError(f"duplicate {phase_name} validation probe at step {step}")
         cross_entropy = float(probe["mean_target_token_cross_entropy"])
         if not math.isfinite(cross_entropy):
-            raise ValueError(f"non-finite Phase 4 validation loss at step {step}")
+            raise ValueError(f"non-finite {phase_name} validation loss at step {step}")
         by_step[step] = probe
     if tuple(sorted(by_step)) != tuple(sorted(expected)):
         raise ValueError(
-            "Phase 4 checkpoint selection requires exactly the configured boundaries"
+            f"{phase_name} checkpoint selection requires exactly the configured boundaries"
         )
     selected_step = min(
         expected,
@@ -278,33 +300,76 @@ def select_validation_checkpoint(
     }
 
 
+def summarize_finite_training_logs(
+    log_history: Sequence[dict[str, Any]], expected_optimizer_steps: int
+) -> dict[str, Any]:
+    entries = [item for item in log_history if "loss" in item]
+    observed_steps = [int(item.get("step", -1)) for item in entries]
+    expected_steps = list(range(1, expected_optimizer_steps + 1))
+    if observed_steps != expected_steps:
+        raise RuntimeError(
+            "training logs do not cover every optimizer step exactly once: "
+            f"observed {len(observed_steps)}, expected {expected_optimizer_steps}"
+        )
+    losses = [float(item["loss"]) for item in entries]
+    try:
+        gradient_norms = [float(item["grad_norm"]) for item in entries]
+    except (KeyError, TypeError, ValueError) as error:
+        raise RuntimeError("training logs are missing gradient norms") from error
+    if not all(math.isfinite(value) for value in (*losses, *gradient_norms)):
+        raise RuntimeError("training logs contain a non-finite loss or gradient norm")
+    return {
+        "logged_optimizer_steps": len(entries),
+        "covers_every_optimizer_step_exactly_once": True,
+        "all_losses_finite": True,
+        "all_gradient_norms_finite": True,
+        "loss": {
+            "minimum": min(losses),
+            "maximum": max(losses),
+            "mean": fmean(losses),
+        },
+        "gradient_norm_before_clipping": {
+            "minimum": min(gradient_norms),
+            "maximum": max(gradient_norms),
+            "mean": fmean(gradient_norms),
+        },
+    }
+
+
 def _load_prior_run(
     output_dir: Path,
     config: Phase4Config,
     train_examples: Sequence[TokenizedSFTExample],
     validation_examples: Sequence[TokenizedSFTExample],
+    *,
+    phase_name: str = "Phase 4",
+    scheduler_marker: str = "scheduler_configured_for_512_steps",
 ) -> dict[str, Any]:
     path = output_dir / "run.json"
     if not path.is_file():
-        raise ValueError(f"Phase 4 resume requires prior trajectory metadata at {path}")
+        raise ValueError(
+            f"{phase_name} resume requires prior trajectory metadata at {path}"
+        )
     value = json.loads(path.read_text(encoding="utf-8"))
     expected_step = int(config.training["mandatory_process_stop_step"])
     if int(value.get("optimizer_steps_completed", -1)) != expected_step:
-        raise ValueError("Phase 4 prior trajectory did not stop at step 256")
+        raise ValueError(f"{phase_name} prior trajectory stopped at the wrong boundary")
     if value.get("model") != config.model or value.get("training") != config.training:
-        raise ValueError("Phase 4 prior trajectory changed model or training config")
+        raise ValueError(
+            f"{phase_name} prior trajectory changed model or training config"
+        )
     expected_train_ids = [example.record_id for example in train_examples]
     expected_validation_ids = [example.record_id for example in validation_examples]
     workload = value.get("workloads", {})
     if workload.get("train", {}).get("selected_record_ids") != expected_train_ids:
-        raise ValueError("Phase 4 prior trajectory changed training data/order")
+        raise ValueError(f"{phase_name} prior trajectory changed training data/order")
     if (
         workload.get("validation", {}).get("selected_record_ids")
         != expected_validation_ids
     ):
-        raise ValueError("Phase 4 prior trajectory changed validation data/order")
-    if not value.get("trajectory", {}).get("scheduler_configured_for_512_steps"):
-        raise ValueError("Phase 4 prior trajectory used a shortened LR schedule")
+        raise ValueError(f"{phase_name} prior trajectory changed validation data/order")
+    if not value.get("trajectory", {}).get(scheduler_marker):
+        raise ValueError(f"{phase_name} prior trajectory used a shortened LR schedule")
     return value
 
 
@@ -314,24 +379,32 @@ def run_phase4_training(
     output_dir: Path,
     *,
     resume_from_checkpoint: Path | None = None,
+    workload_loader: Any = load_phase4_workloads,
+    schema_version: str = PHASE4_TRAINING_SCHEMA_VERSION,
+    phase_name: str = "Phase 4",
+    scheduler_marker: str = "scheduler_configured_for_512_steps",
+    workloads_override: Any | None = None,
 ) -> dict[str, Any]:
     torch, device_index, properties = _require_local_cuda()
     torch.manual_seed(int(config.training["seed"]))
     torch.cuda.manual_seed_all(int(config.training["seed"]))
     torch.cuda.reset_peak_memory_stats(device_index)
-    workloads = load_phase4_workloads(workload_path, config)
+    workloads = (
+        workload_loader(workload_path, config)
+        if workloads_override is None
+        else workloads_override
+    )
     train_examples = workloads.train
     validation_examples = workloads.validation
     stop_step = int(config.training["mandatory_process_stop_step"])
     maximum_steps = int(config.training["maximum_optimizer_steps"])
-    interval = int(config.training["checkpoint_interval_steps"])
 
     if resume_from_checkpoint is None:
         if (output_dir / "run.json").exists() or any(
             (output_dir / "trainer-state").glob("checkpoint-*")
         ):
             raise ValueError(
-                "fresh Phase 4 training requires a new output trajectory directory"
+                f"fresh {phase_name} training requires a new output trajectory directory"
             )
         process_leg = 1
         prior_run: dict[str, Any] | None = None
@@ -341,10 +414,19 @@ def run_phase4_training(
         resolved_checkpoint = resume_from_checkpoint.resolve()
         expected_parent = (output_dir / "trainer-state").resolve()
         if resolved_checkpoint.parent != expected_parent:
-            raise ValueError("Phase 4 resume checkpoint must belong to this trajectory")
-        resume_metadata = validate_phase4_resume_checkpoint(config, resolved_checkpoint)
+            raise ValueError(
+                f"{phase_name} resume checkpoint must belong to this trajectory"
+            )
+        resume_metadata = validate_phase4_resume_checkpoint(
+            config, resolved_checkpoint, phase_name=phase_name
+        )
         prior_run = _load_prior_run(
-            output_dir, config, train_examples, validation_examples
+            output_dir,
+            config,
+            train_examples,
+            validation_examples,
+            phase_name=phase_name,
+            scheduler_marker=scheduler_marker,
         )
         resume_from_checkpoint = resolved_checkpoint
         process_leg = 2
@@ -354,12 +436,16 @@ def run_phase4_training(
     try:
         from transformers import TrainerCallback
     except ImportError as error:
-        raise RuntimeError("Phase 4 requires Transformers") from error
+        raise RuntimeError(f"{phase_name} requires Transformers") from error
 
     validation_probes: list[dict[str, Any]] = (
         [] if prior_run is None else list(prior_run["validation_probes"])
     )
     pad_token_id = int(runtime.tokenizer.pad_token_id)
+
+    boundary_steps = tuple(
+        int(step) for step in config.training["checkpoint_candidates"]
+    )
 
     class Phase4SafetyValidationAndStopCallback(TrainerCallback):
         def on_pre_optimizer_step(
@@ -375,7 +461,7 @@ def run_phase4_training(
                 for gradient in gradients
             ):
                 raise RuntimeError(
-                    "missing or non-finite gradients before Phase 4 optimizer step "
+                    f"missing or non-finite gradients before {phase_name} optimizer step "
                     f"{state.global_step + 1}"
                 )
             return control
@@ -392,7 +478,7 @@ def run_phase4_training(
                 for key in ("loss", "grad_norm"):
                     if key in logs and not math.isfinite(float(logs[key])):
                         raise RuntimeError(
-                            f"non-finite Phase 4 {key} at step {state.global_step}"
+                            f"non-finite {phase_name} {key} at step {state.global_step}"
                         )
             return control
 
@@ -400,12 +486,8 @@ def run_phase4_training(
             self, args: Any, state: Any, control: Any, **kwargs: Any
         ) -> Any:
             step = int(state.global_step)
-            if (
-                step
-                and step % interval == 0
-                and not any(
-                    int(probe["optimizer_step"]) == step for probe in validation_probes
-                )
+            if step in boundary_steps and not any(
+                int(probe["optimizer_step"]) == step for probe in validation_probes
             ):
                 metrics = teacher_forced_metrics(
                     kwargs["model"],
@@ -414,6 +496,8 @@ def run_phase4_training(
                 )
                 metrics["optimizer_step"] = step
                 validation_probes.append(metrics)
+                if bool(config.training.get("manual_checkpoint_boundaries", False)):
+                    control.should_save = True
             if step >= process_stop_after:
                 control.should_training_stop = True
             return control
@@ -443,13 +527,19 @@ def run_phase4_training(
     completed_steps = int(trainer.state.global_step)
     if completed_steps != process_stop_after:
         raise RuntimeError(
-            f"Phase 4 process stopped at {completed_steps}, expected {process_stop_after}"
+            f"{phase_name} process stopped at {completed_steps}, "
+            f"expected {process_stop_after}"
         )
-    expected_probe_steps = list(range(interval, completed_steps + 1, interval))
+    expected_probe_steps = [step for step in boundary_steps if step <= completed_steps]
     if [
         int(item["optimizer_step"]) for item in validation_probes
     ] != expected_probe_steps:
-        raise RuntimeError("Phase 4 validation boundaries are incomplete or reordered")
+        raise RuntimeError(
+            f"{phase_name} validation boundaries are incomplete or reordered"
+        )
+    training_log_summary = summarize_finite_training_logs(
+        trainer.state.log_history, completed_steps
+    )
 
     checkpoint_candidates: list[dict[str, Any]] = []
     probes_by_step = {
@@ -459,7 +549,9 @@ def run_phase4_training(
         checkpoint = output_dir / "trainer-state" / f"checkpoint-{step}"
         metadata = _checkpoint_inventory(checkpoint)
         if any(path.name.startswith("model-") for path in checkpoint.iterdir()):
-            raise RuntimeError("Phase 4 unexpectedly saved merged base-model shards")
+            raise RuntimeError(
+                f"{phase_name} unexpectedly saved merged base-model shards"
+            )
         checkpoint_candidates.append(
             {
                 "optimizer_step": step,
@@ -509,6 +601,7 @@ def run_phase4_training(
         selection = select_validation_checkpoint(
             validation_probes,
             candidate_steps=config.training["checkpoint_candidates"],
+            phase_name=phase_name,
         )
         validation_improved = bool(
             selection["selected_mean_target_token_cross_entropy"]
@@ -516,7 +609,7 @@ def run_phase4_training(
         )
 
     value = {
-        "schema_version": PHASE4_TRAINING_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "status": (
             "stopped_at_mandatory_resume_boundary"
             if completed_steps == stop_step
@@ -555,14 +648,35 @@ def run_phase4_training(
             "mandatory_process_stop_observed": completed_steps >= stop_step,
             "same_trajectory_resume": process_leg == 2,
             "resume_state": resume_metadata,
-            "scheduler_configured_for_512_steps": True,
+            scheduler_marker: True,
+            "scheduler_configured_for_complete_trajectory": True,
             "ignore_data_skip": False,
             "data_order_seed": int(config.training["seed"]),
             "effective_batch_size": int(config.training["per_device_micro_batch_size"])
             * int(config.training["gradient_accumulation_steps"]),
-            "examples_consumed_at_step": completed_steps
-            * int(config.training["per_device_micro_batch_size"])
-            * int(config.training["gradient_accumulation_steps"]),
+            "examples_consumed_at_step": min(
+                len(train_examples),
+                completed_steps
+                * int(config.training["per_device_micro_batch_size"])
+                * int(config.training["gradient_accumulation_steps"]),
+            ),
+            "one_pass_data_accounting": {
+                "eligible_training_examples": len(train_examples),
+                "planned_optimizer_steps": maximum_steps,
+                "full_effective_batches_before_final": max(maximum_steps - 1, 0),
+                "final_optimizer_update_examples": (
+                    len(train_examples)
+                    - max(maximum_steps - 1, 0)
+                    * int(config.training["per_device_micro_batch_size"])
+                    * int(config.training["gradient_accumulation_steps"])
+                ),
+                "duplicate_final_batch_fill": bool(
+                    config.training.get("duplicate_final_batch_fill", False)
+                ),
+                "all_eligible_examples_consumed_exactly_once": (
+                    completed_steps == maximum_steps
+                ),
+            },
         },
         "pre_training_validation": pre_training,
         "validation_probes": validation_probes,
@@ -594,11 +708,22 @@ def run_phase4_training(
             "python": platform.python_version(),
             "stage_training_wall_time_seconds": stage_wall_time,
             "cumulative_training_wall_time_seconds": cumulative_wall_time,
+            "cumulative_examples_per_second": min(
+                len(train_examples),
+                completed_steps
+                * int(config.training["per_device_micro_batch_size"])
+                * int(config.training["gradient_accumulation_steps"]),
+            )
+            / cumulative_wall_time,
+            "cumulative_optimizer_steps_per_second": (
+                completed_steps / cumulative_wall_time
+            ),
             "trainer_metrics": {
                 key: item
                 for key, item in train_result.metrics.items()
                 if isinstance(item, (str, int, float, bool)) or item is None
             },
+            "training_log_summary": training_log_summary,
             **runtime_metadata,
             "peak_cuda_allocated_bytes": max(
                 previous_peak_allocated,
@@ -613,9 +738,9 @@ def run_phase4_training(
     _write_json(output_dir / "run.json", value)
     _release_cuda(torch, trainer, runtime)
     if not stage_memory_passed:
-        raise RuntimeError("Phase 4 training exceeds the 24 GiB memory ceiling")
+        raise RuntimeError(f"{phase_name} training exceeds the 24 GiB memory ceiling")
     if completed_steps == maximum_steps and not validation_improved:
-        raise RuntimeError("Phase 4 validation loss did not improve over step 0")
+        raise RuntimeError(f"{phase_name} validation loss did not improve over step 0")
     return value
 
 
@@ -625,26 +750,36 @@ def run_phase4_adapter_reload(
     training_path: Path,
     adapter_dir: Path,
     output: Path,
+    *,
+    workload_loader: Any = load_phase4_workloads,
+    binding_loader: Any = load_selected_adapter_binding,
+    schema_version: str = PHASE4_ADAPTER_RELOAD_SCHEMA_VERSION,
+    phase_name: str = "Phase 4",
+    workloads_override: Any | None = None,
 ) -> dict[str, Any]:
-    training, binding = load_selected_adapter_binding(
+    training, binding = binding_loader(
         training_path,
         expected_artifact_id=str(config.lora["artifact_id"]),
         adapter_dir=adapter_dir,
     )
     torch, device_index, properties = _require_local_cuda()
     torch.cuda.reset_peak_memory_stats(device_index)
-    workloads = load_phase4_workloads(workload_path, config)
+    workloads = (
+        workload_loader(workload_path, config)
+        if workloads_override is None
+        else workloads_override
+    )
     selection = training.get("checkpoint_selection") or {}
     try:
         from peft import PeftConfig, PeftModel
         from transformers import AutoModelForCausalLM, BitsAndBytesConfig
     except ImportError as error:
-        raise RuntimeError("Phase 4 requires PEFT and Transformers") from error
+        raise RuntimeError(f"{phase_name} requires PEFT and Transformers") from error
     adapter_config = PeftConfig.from_pretrained(adapter_dir)
     if adapter_config.base_model_name_or_path != str(config.model["model_id"]):
-        raise RuntimeError("Phase 4 adapter identifies a different base model")
+        raise RuntimeError(f"{phase_name} adapter identifies a different base model")
     if adapter_config.revision != str(config.model["model_revision"]):
-        raise RuntimeError("Phase 4 adapter identifies a different base revision")
+        raise RuntimeError(f"{phase_name} adapter identifies a different base revision")
     base = AutoModelForCausalLM.from_pretrained(
         str(config.model["model_id"]),
         revision=str(config.model["model_revision"]),
@@ -674,10 +809,10 @@ def run_phase4_adapter_reload(
         logits = model(**inputs, use_cache=False).logits
     finite_logits = bool(torch.isfinite(logits).all().item())
     if not finite_logits:
-        raise RuntimeError("Phase 4 reloaded adapter produced non-finite logits")
+        raise RuntimeError(f"{phase_name} reloaded adapter produced non-finite logits")
     runtime_metadata = _cuda_metadata(torch, device_index, properties)
     value = {
-        "schema_version": PHASE4_ADAPTER_RELOAD_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "passed": True,
         "base_model_id": config.model["model_id"],
         "base_model_revision": config.model["model_revision"],

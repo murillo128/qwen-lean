@@ -203,6 +203,9 @@ def _build_trainer(
         if "checkpoint_interval_steps" in training
         else training["memorization_probe_interval_steps"]
     )
+    manual_checkpoint_boundaries = bool(
+        training.get("manual_checkpoint_boundaries", False)
+    )
     arguments = SFTConfig(
         output_dir=str(output_dir),
         overwrite_output_dir=True,
@@ -216,6 +219,7 @@ def _build_trainer(
         max_steps=(
             int(training["maximum_optimizer_steps"]) if max_steps is None else max_steps
         ),
+        num_train_epochs=float(training.get("epochs", 3)),
         lr_scheduler_type=str(training["lr_schedule"]),
         warmup_steps=int(training["warmup_steps"]),
         optim=str(training["optimizer"]),
@@ -228,7 +232,11 @@ def _build_trainer(
         logging_steps=1,
         logging_first_step=True,
         logging_nan_inf_filter=False,
-        save_strategy="steps" if save_checkpoints else "no",
+        save_strategy=(
+            "no"
+            if not save_checkpoints or manual_checkpoint_boundaries
+            else "steps"
+        ),
         save_steps=checkpoint_interval,
         save_only_model=False,
         report_to=[],
