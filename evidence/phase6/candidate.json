@@ -1,0 +1,50 @@
+{
+  "adapter": {
+    "adapter_config_sha256": "4b7b513b216484554e05d3c75ecf0777ee1fbae94935e93d949d63cf4a76481c",
+    "adapter_model_sha256": "8aa50fa56f6a1d03a702abcaafc20e11d661a4a2ac935864bf5648411e5cdc58",
+    "alpha": 32,
+    "artifact_id": "phase5-train-full-v1-lora",
+    "dropout": 0.0,
+    "format": "peft-lora",
+    "hub_repository": "murillo2000/qwen3-8b-base-lean-sft-qlora",
+    "hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+    "local_path_retained_outside_git": true,
+    "local_source_kind": "immutable_hub_snapshot",
+    "merged": false,
+    "rank": 16,
+    "selected_optimizer_step": 9962,
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990"
+  },
+  "candidate_set_size": 1,
+  "logical_id": "reference-sft-v1",
+  "model": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+  },
+  "phase5_selected_adapter_binding": {
+    "artifact_id": "phase5-train-full-v1-lora",
+    "format": "peft-lora",
+    "merged": false,
+    "selected_optimizer_step": 9962,
+    "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+    "training_relative_path": "trainer-state/checkpoint-9962"
+  },
+  "schema_version": "phase6-reference-candidate-v1",
+  "selection": {
+    "ineligible_optimizer_steps": [
+      2491,
+      4981,
+      7472
+    ],
+    "metric": "validation_mean_target_token_cross_entropy",
+    "phase6_metrics_may_change_identity": false,
+    "rule": "minimum validation mean target-token cross-entropy; ties earlier",
+    "selected_before_minif2f_test": true,
+    "selected_before_phase6_train_generation": true
+  },
+  "status": "frozen"
+}

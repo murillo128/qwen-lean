@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
-
 ResultCategory = Literal[
     "verified",
     "lean_rejected",
@@ -17,10 +16,12 @@ CandidateSource = Literal["fixture", "model"]
 RESULT_SCHEMA_VERSION = "phase0-v1"
 PHASE1_RESULT_SCHEMA_VERSION = "phase1-v1"
 PHASE3_RESULT_SCHEMA_VERSION = "phase3-adapter-smoke-v1"
+PHASE6_TEST_RESULT_SCHEMA_VERSION = "phase6-minif2f-test-run-v1"
 SUPPORTED_RESULT_SCHEMA_VERSIONS = {
     RESULT_SCHEMA_VERSION,
     PHASE1_RESULT_SCHEMA_VERSION,
     PHASE3_RESULT_SCHEMA_VERSION,
+    PHASE6_TEST_RESULT_SCHEMA_VERSION,
 }
 RESULT_CATEGORIES = {
     "verified",

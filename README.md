@@ -408,6 +408,63 @@ uv run --frozen qwen-lean phase5-evidence \
   --evidence-dir evidence/phase5
 ```
 
+## Phase 6 comparative evaluation
+
+Phase 6 performs no training. It first binds `reference-sft-v1` to the immutable
+published step-9962 adapter, reconstructs the exact Phase 5 training membership,
+and freezes the deterministic 512-task diagnostic before any new generation:
+
+```bash
+uv run --frozen --extra training qwen-lean phase6-freeze \
+  --adapter-dir /path/to/hub/snapshot/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5 \
+  --output artifacts/phase6/candidate.json
+uv run --frozen --extra training qwen-lean phase6-materialize \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --output artifacts/phase6/train-workload.json
+uv run --frozen qwen-lean phase6-checkpoint-a-evidence \
+  --candidate artifacts/phase6/candidate.json \
+  --train-workload artifacts/phase6/train-workload.json \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --evidence-dir evidence/phase6
+```
+
+After Checkpoint A passes independent review, run both local-GPU train-diagnostic
+arms and both complete miniF2F-test arms. The base commands still require the
+frozen adapter directory so they can validate the pre-generation candidate
+manifest; they do not enable that adapter.
+
+```bash
+uv run --frozen --extra baseline qwen-lean phase6-train \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase6/train-workload.json \
+  --candidate artifacts/phase6/candidate.json \
+  --adapter-dir /path/to/hub/snapshot/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5 \
+  --mode base --output-dir artifacts/phase6/train/base
+uv run --frozen --extra baseline qwen-lean phase6-train \
+  --dataset-dir artifacts/phase2/mathlib-whole-proof-v1 \
+  --mathlib-root artifacts/phase2/leandojo-trace/mathlib4 \
+  --workload artifacts/phase6/train-workload.json \
+  --candidate artifacts/phase6/candidate.json \
+  --adapter-dir /path/to/hub/snapshot/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5 \
+  --mode adapter --output-dir artifacts/phase6/train/adapter
+uv run --frozen --extra baseline qwen-lean phase6-minif2f-test \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --candidate artifacts/phase6/candidate.json \
+  --adapter-dir /path/to/hub/snapshot/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5 \
+  --mode base --output-dir artifacts/phase6/minif2f-test/base
+uv run --frozen --extra baseline qwen-lean phase6-minif2f-test \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --candidate artifacts/phase6/candidate.json \
+  --adapter-dir /path/to/hub/snapshot/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5 \
+  --mode adapter --output-dir artifacts/phase6/minif2f-test/adapter
+uv run --frozen qwen-lean phase6-evidence --evidence-dir evidence/phase6
+```
+
+Raw continuations and bulky run artifacts remain ignored under
+`artifacts/phase6/`. Compact evidence keeps exact-target and Lean success
+separate and includes deterministic seed-0 task-bootstrap intervals.
+
 ## Status
 
 The roadmap epic owns the current phase and links its controlling execution issue.

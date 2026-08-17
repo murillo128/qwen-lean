@@ -9,11 +9,9 @@ from typing import Any
 
 from .schema import TaskRecord
 
-
 PHASE1_CONFIG_SCHEMA_VERSION = "phase1-config-v1"
-_THEOREM_PATTERN = re.compile(
-    r"(?ms)^theorem\s+(?P<name>[^\s(:]+)(?P<tail>.*?)\s*:=\s*by\n\s+sorry\s*(?=\n|\Z)"
-)
+_THEOREM_START_PATTERN = re.compile(r"(?m)^theorem\s+(?P<name>[^\s(:]+)")
+_PROOF_START_PATTERN = re.compile(r"(?ms)\s*:=\s*(?:by\b|rfl\b)")
 
 
 @dataclass(frozen=True)
@@ -25,7 +23,9 @@ class Phase1Config:
     def load(cls, path: Path) -> Phase1Config:
         value = json.loads(path.read_text(encoding="utf-8"))
         if value.get("schema_version") != PHASE1_CONFIG_SCHEMA_VERSION:
-            raise ValueError(f"unknown Phase 1 config schema: {value.get('schema_version')}")
+            raise ValueError(
+                f"unknown Phase 1 config schema: {value.get('schema_version')}"
+            )
         return cls(path=path.resolve(), value=value)
 
     @property
@@ -59,7 +59,9 @@ class Phase1Config:
             ids = [str(task_id) for task_id in workload["task_ids"]]
             missing = sorted(set(ids) - tasks_by_id.keys())
             if missing:
-                raise ValueError(f"workload {workload_id} has unknown task ids: {missing}")
+                raise ValueError(
+                    f"workload {workload_id} has unknown task ids: {missing}"
+                )
             selected = [tasks_by_id[task_id] for task_id in ids]
         else:
             raise ValueError(
@@ -84,7 +86,9 @@ def validate_benchmark_checkout(config: Phase1Config, benchmark_root: Path) -> s
         check=False,
     )
     if completed.returncode != 0:
-        raise ValueError(f"not a readable git checkout: {root}: {completed.stderr.strip()}")
+        raise ValueError(
+            f"not a readable git checkout: {root}: {completed.stderr.strip()}"
+        )
     actual_revision = completed.stdout.strip()
     expected_revision = str(config.benchmark["revision"])
     if actual_revision != expected_revision:
@@ -94,15 +98,17 @@ def validate_benchmark_checkout(config: Phase1Config, benchmark_root: Path) -> s
     return actual_revision
 
 
-def materialize_validation_tasks(
+def materialize_benchmark_tasks(
     config: Phase1Config, benchmark_root: Path
 ) -> list[TaskRecord]:
     validate_benchmark_checkout(config, benchmark_root)
     source_path = benchmark_root.resolve() / str(config.benchmark["source_path"])
     source = source_path.read_text(encoding="utf-8")
-    tasks = materialize_validation_source(
+    tasks = materialize_benchmark_source(
         source,
-        expected_primary_task_count=int(config.benchmark["expected_primary_task_count"]),
+        expected_primary_task_count=int(
+            config.benchmark["expected_primary_task_count"]
+        ),
     )
     manifest_path = config.path.parent / str(config.benchmark["primary_task_manifest"])
     expected_ids = [
@@ -112,22 +118,32 @@ def materialize_validation_tasks(
     ]
     actual_ids = [task.id for task in tasks]
     if actual_ids != expected_ids:
-        raise ValueError("materialized miniF2F primary task IDs differ from pinned manifest")
+        raise ValueError(
+            "materialized miniF2F primary task IDs differ from pinned manifest"
+        )
     return tasks
 
 
-def materialize_validation_source(
+def materialize_benchmark_source(
     source: str, *, expected_primary_task_count: int
 ) -> list[TaskRecord]:
     preamble = _extract_preamble(source)
 
     tasks: list[TaskRecord] = []
     declaration_names: set[str] = set()
-    for match in _THEOREM_PATTERN.finditer(source):
+    starts = list(_THEOREM_START_PATTERN.finditer(source))
+    for index, match in enumerate(starts):
         name = match.group("name")
         if ".variants." in name:
             continue
-        declaration = f"theorem {name}{match.group('tail')}".rstrip()
+        block_end = (
+            starts[index + 1].start() if index + 1 < len(starts) else len(source)
+        )
+        block = source[match.start() : block_end]
+        proof_start = _PROOF_START_PATTERN.search(block)
+        if proof_start is None:
+            raise ValueError(f"miniF2F theorem has no supported proof start: {name}")
+        declaration = block[: proof_start.start()].rstrip()
         if name in declaration_names:
             raise ValueError(f"duplicate primary theorem declaration: {name}")
         declaration_names.add(name)
@@ -142,10 +158,28 @@ def materialize_validation_source(
 
     if len(tasks) != expected_primary_task_count:
         raise ValueError(
-            "miniF2F validation contract expected "
+            "miniF2F benchmark contract expected "
             f"{expected_primary_task_count} primary tasks, got {len(tasks)}"
         )
     return tasks
+
+
+def materialize_validation_tasks(
+    config: Phase1Config, benchmark_root: Path
+) -> list[TaskRecord]:
+    """Backward-compatible name for the Phase 1 validation materializer."""
+
+    return materialize_benchmark_tasks(config, benchmark_root)
+
+
+def materialize_validation_source(
+    source: str, *, expected_primary_task_count: int
+) -> list[TaskRecord]:
+    """Backward-compatible name for validation-source fixture tests."""
+
+    return materialize_benchmark_source(
+        source, expected_primary_task_count=expected_primary_task_count
+    )
 
 
 def verifier_environment_metadata(
@@ -198,16 +232,18 @@ def verifier_environment_metadata(
 def _extract_preamble(source: str) -> str:
     lines = source.splitlines()
     try:
-        first_import = next(index for index, line in enumerate(lines) if line.startswith("import "))
+        first_import = next(
+            index for index, line in enumerate(lines) if line.startswith("import ")
+        )
     except StopIteration as error:
-        raise ValueError("miniF2F validation source has no import preamble") from error
+        raise ValueError("miniF2F benchmark source has no import preamble") from error
 
     preamble_lines: list[str] = []
     for line in lines[first_import:]:
-        if line.startswith("/--") or line.startswith("theorem "):
+        if line.startswith(("/--", "theorem ")):
             break
         preamble_lines.append(line)
     preamble = "\n".join(preamble_lines).rstrip()
     if not preamble:
-        raise ValueError("miniF2F validation source has an empty preamble")
+        raise ValueError("miniF2F benchmark source has an empty preamble")
     return preamble

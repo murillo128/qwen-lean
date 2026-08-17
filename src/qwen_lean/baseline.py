@@ -14,11 +14,16 @@ from .artifacts import read_artifacts, write_artifacts
 from .metrics import summarize_results
 from .minif2f import (
     Phase1Config,
-    materialize_validation_tasks,
+    materialize_benchmark_tasks,
     verifier_environment_metadata,
 )
 from .prompt import PROMPT_FORMAT_ID, render_prompt
-from .schema import CandidateResult, PHASE1_RESULT_SCHEMA_VERSION, RunMetadata, TaskRecord
+from .schema import (
+    PHASE1_RESULT_SCHEMA_VERSION,
+    CandidateResult,
+    RunMetadata,
+    TaskRecord,
+)
 from .verifier import LeanVerifier
 
 
@@ -71,7 +76,7 @@ def validate_minif2f_environment(
     *,
     timeout_seconds: float,
 ) -> dict[str, Any]:
-    tasks = materialize_validation_tasks(config, benchmark_root)
+    tasks = materialize_benchmark_tasks(config, benchmark_root)
     environment = verifier_environment_metadata(config, benchmark_root)
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
     known_task_id = str(config.value["verifier"]["known_valid_task_id"])
@@ -79,7 +84,9 @@ def validate_minif2f_environment(
     try:
         known_task = next(task for task in tasks if task.id == known_task_id)
     except StopIteration as error:
-        raise ValueError(f"known-valid task not materialized: {known_task_id}") from error
+        raise ValueError(
+            f"known-valid task not materialized: {known_task_id}"
+        ) from error
     outcome = verifier.verify(known_task, known_candidate)
     if outcome.category != "verified":
         diagnostics = outcome.diagnostics["stdout"] + outcome.diagnostics["stderr"]
@@ -117,7 +124,7 @@ def run_phase1_baseline(
     adapter: LoRAAdapterSpec | None = None,
     result_schema_version: str = PHASE1_RESULT_SCHEMA_VERSION,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
-    all_tasks = materialize_validation_tasks(config, benchmark_root)
+    all_tasks = materialize_benchmark_tasks(config, benchmark_root)
     tasks = config.select_workload(workload_id, all_tasks)
     environment_validation = validate_minif2f_environment(
         config,
@@ -140,7 +147,9 @@ def run_phase1_baseline(
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=verification_workers) as executor:
-        results = list(executor.map(lambda item: _verify_candidate(verifier, item), generated))
+        results = list(
+            executor.map(lambda item: _verify_candidate(verifier, item), generated)
+        )
     verification_wall_time = time.perf_counter() - verification_started
     runtime["verification_wall_time_seconds"] = verification_wall_time
     runtime["verification_workers"] = verification_workers
@@ -218,7 +227,7 @@ def reverify_phase1_artifacts(
     if metadata.benchmark_revision != str(config.benchmark["revision"]):
         raise ValueError("benchmark revision differs from the Phase 1 configuration")
 
-    all_tasks = materialize_validation_tasks(config, benchmark_root)
+    all_tasks = materialize_benchmark_tasks(config, benchmark_root)
     tasks = config.select_workload(metadata.workload_id, all_tasks)
     tasks_by_id = {task.id: task for task in tasks}
     validate_minif2f_environment(
@@ -246,7 +255,9 @@ def reverify_phase1_artifacts(
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=verification_workers) as executor:
-        results = list(executor.map(lambda item: _verify_candidate(verifier, item), generated))
+        results = list(
+            executor.map(lambda item: _verify_candidate(verifier, item), generated)
+        )
     verification_wall_time = time.perf_counter() - verification_started
 
     runtime = dict(metadata.runtime)
@@ -273,8 +284,7 @@ def reverify_phase1_artifacts(
     )
     summary["workload_id"] = metadata.workload_id
     summary["run_wall_time_seconds"] = (
-        float(runtime.get("generation_wall_time_seconds", 0.0))
-        + verification_wall_time
+        float(runtime.get("generation_wall_time_seconds", 0.0)) + verification_wall_time
     )
     write_artifacts(output_dir, updated_metadata, results, summary=summary)
     return updated_metadata, results, summary
@@ -284,7 +294,9 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
     try:
         import torch
     except ImportError as error:
-        raise RuntimeError("Phase 1 requires the baseline/model optional dependencies") from error
+        raise RuntimeError(
+            "Phase 1 requires the baseline/model optional dependencies"
+        ) from error
 
     if not torch.cuda.is_available():
         raise RuntimeError("Phase 1 baseline generation requires a local CUDA GPU")
@@ -319,7 +331,9 @@ def _generate_candidates(
         import vllm
         from vllm import LLM, SamplingParams
     except ImportError as error:
-        raise RuntimeError("Phase 1 requires the baseline optional dependencies") from error
+        raise RuntimeError(
+            "Phase 1 requires the baseline optional dependencies"
+        ) from error
 
     engine = config.engine
     configured_version = str(engine["version"])
@@ -350,7 +364,9 @@ def _generate_candidates(
     except Exception as error:
         latency = time.perf_counter() - started
         message = f"{type(error).__name__}: {error}"
-        return _generation_error_records(tasks, sampling, message, latency), vllm.__version__
+        return _generation_error_records(
+            tasks, sampling, message, latency
+        ), vllm.__version__
 
     wall_time = time.perf_counter() - started
     try:
@@ -556,4 +572,6 @@ def _verify_candidate(
 
 def write_environment_validation(path: Path, evidence: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )

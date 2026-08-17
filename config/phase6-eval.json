@@ -1,0 +1,73 @@
+{
+  "schema_version": "phase6-config-v1",
+  "reference_candidate": {
+    "logical_id": "reference-sft-v1",
+    "selection_predates_phase6_outputs": true,
+    "eligible_candidate_count": 1,
+    "ineligible_optimizer_steps": [2491, 4981, 7472],
+    "phase6_metrics_may_change_identity": false,
+    "adapter": {
+      "artifact_id": "phase5-train-full-v1-lora",
+      "format": "peft-lora",
+      "merged": false,
+      "selected_optimizer_step": 9962,
+      "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+      "hub_repository": "murillo2000/qwen3-8b-base-lean-sft-qlora",
+      "hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+      "adapter_model_sha256": "8aa50fa56f6a1d03a702abcaafc20e11d661a4a2ac935864bf5648411e5cdc58",
+      "adapter_config_sha256": "4b7b513b216484554e05d3c75ecf0777ee1fbae94935e93d949d63cf4a76481c",
+      "rank": 16,
+      "alpha": 32,
+      "dropout": 0.0
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "add_special_tokens": false,
+    "chat_template": null
+  },
+  "phase5_inputs": {
+    "train_workload_id": "phase5-train-full-v1",
+    "train_input_examples": 80062,
+    "train_eligible_examples": 79696,
+    "train_ordered_ids_sha256": "0ec5ef7e969774924384d80d04b5ea9ea6e0eabac9f38cf3deff9924c714d816",
+    "heldout_workload_id": "phase5-heldout512-v1",
+    "heldout_ordered_ids_sha256": "936091af02d7c58dfe172c10b91376afd1e144cb1586a1f07a0a924f8e0b194b",
+    "minif2f_validation_workload_id": "minif2f-valid-v1"
+  },
+  "train_workload": {
+    "id": "phase6-train512-v1",
+    "selection_hash_prefix": "phase6-train512-v1\u0000",
+    "expected_examples": 512,
+    "maximum_prompt_and_generation_tokens": 2048
+  },
+  "train_generation": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "minif2f_test": {
+    "config": "config/phase6-minif2f-test.json",
+    "workload_id": "minif2f-test-v1",
+    "expected_tasks": 244,
+    "candidates_per_task": 8
+  },
+  "verification": {
+    "workers": 4,
+    "train_timeout_seconds": 300.0,
+    "minif2f_timeout_seconds": 30.0
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "seed": 0,
+    "interval_percentiles": [2.5, 97.5]
+  }
+}
