@@ -336,6 +336,15 @@ one-pass optimizer count, quarter checkpoints, midpoint stop, and 1/32 warmup
 from the exact eligible training count. Materialize the workloads and run the
 production preflight before starting the two-process trajectory:
 
+The validation-selected step-9962 adapter is published as the standard,
+unmerged PEFT LoRA repository
+[`murillo2000/qwen3-8b-base-lean-sft-qlora`](https://huggingface.co/murillo2000/qwen3-8b-base-lean-sft-qlora)
+at Hub revision
+[`5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5`](https://huggingface.co/murillo2000/qwen3-8b-base-lean-sft-qlora/commit/5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5).
+It requires `Qwen/Qwen3-8B-Base` revision
+`49e3418fbbbca6ecbdf9608b4d22e5a407081db4`; neither the base weights nor the
+Phase 5 trainer state are stored in this Git repository.
+
 ```bash
 uv run --frozen --extra training qwen-lean phase5-materialize \
   --artifact-dir artifacts/phase2/mathlib-whole-proof-v1 \
