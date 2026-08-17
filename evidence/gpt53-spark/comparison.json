@@ -1,0 +1,31 @@
+{
+  "candidate_budget": {
+    "gpt53_codex_spark": {
+      "candidate_count": 244,
+      "candidates_per_task": 1
+    },
+    "qwen3_8b_base": {
+      "candidate_count": 1952,
+      "candidates_per_task": 8
+    },
+    "reference_sft_v1": {
+      "candidate_count": 1952,
+      "candidates_per_task": 8
+    }
+  },
+  "comparison_caveat": "GPT-5.3-Codex Spark used one isolated xhigh reasoning execution per theorem; the Qwen base and reference-sft-v1 pass@1 estimates come from the accepted Phase 1 sampling contract with eight stochastic candidates per task. All three use the same raw-continuation Lean verifier, but their generation procedures are not identical.",
+  "delta_gpt53_spark_minus_qwen3_8b_base": 0.1880122950819672,
+  "delta_gpt53_spark_minus_reference_sft_v1": 0.16137295081967212,
+  "pass_at_1": {
+    "Qwen/Qwen3-8B-Base": 0.012807377049180328,
+    "gpt-5.3-codex-spark-xhigh-one-shot": 0.20081967213114754,
+    "reference-sft-v1": 0.03944672131147541
+  },
+  "schema_version": "gpt53-spark-assessment-evidence-v1",
+  "source_evidence": {
+    "qwen3_8b_base": "evidence/phase1/baseline/summary.json",
+    "reference_sft_v1": "evidence/phase6/minif2f-validation.json"
+  },
+  "status": "passed",
+  "workload_id": "minif2f-valid-v1"
+}
