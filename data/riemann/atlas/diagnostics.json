@@ -1,9 +1,9 @@
 {
   "alias_collisions": 10,
   "by_formalization_status": {
-    "external-lean": 25,
-    "literature-only": 18,
-    "mathlib": 188,
+    "external-lean": 24,
+    "literature-only": 21,
+    "mathlib": 186,
     "other-prover": 3
   },
   "by_relationship_class": {

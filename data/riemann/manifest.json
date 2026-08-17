@@ -26,11 +26,11 @@
     },
     "atlas/diagnostics.json": {
       "bytes": 2456,
-      "sha256": "5981de926cdd6f5f69471ae3be3c73b6509e50c6db6798bd0d1627a4edd7e9fe"
+      "sha256": "e0af5ee74dac80c4c06594b6a63eb9b9870686f71c16460c9b783ed74cbdf58c"
     },
     "atlas/entries.jsonl": {
-      "bytes": 256742,
-      "sha256": "d174462943ef6151e9a1797859a46c11d0b0a85bf11c5761b2eeaa8d96f88ab0"
+      "bytes": 256572,
+      "sha256": "efd88929dd64dbab837020826ad21c6ba616780ee6ee778ffb5df239ed8106e0"
     },
     "atlas/relationships.jsonl": {
       "bytes": 32494,
@@ -105,12 +105,12 @@
       "sha256": "6651dde453fd43c020f208d91c9dccaffcfd292dc08d9244d09983318d32cffa"
     },
     "evidence/opportunities.json": {
-      "bytes": 20597,
-      "sha256": "781687d14cde85e127e1b21dd0c8b0ae60fbf07b30c5b77baffebd16541f302c"
+      "bytes": 20826,
+      "sha256": "8ca8073d327f82615e32cc56d1da2333ee0c865768a64e56591db479ffe1b1ba"
     },
     "evidence/summary.json": {
       "bytes": 7485,
-      "sha256": "b1c16da540f4d038a5333160a81579b3c2c00a546a2d353831c510ab89e4119b"
+      "sha256": "39c570ceb330007be3f9c28b4b4aed321f6e5dcac5b854deeb6e330304d2fa31"
     },
     "external/riemann-external-lean-v1.jsonl": {
       "bytes": 134452,

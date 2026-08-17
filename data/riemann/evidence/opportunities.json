@@ -413,57 +413,63 @@
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
+      "atlas_id": "mobius-summatory-criterion",
+      "name": "RH criterion via the Mertens function",
+      "rank": 4,
+      "reason": "Important attributed RH relation without verified Lean source in the census."
+    },
+    {
       "atlas_id": "nyman-beurling-criterion",
       "name": "Nyman-Beurling functional-analytic criterion",
-      "rank": 4,
+      "rank": 5,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "psi-error-criterion",
       "name": "RH criterion via Chebyshev psi",
-      "rank": 5,
+      "rank": 6,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "riesz-criterion",
       "name": "Riesz criterion for RH",
-      "rank": 6,
+      "rank": 7,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "robin-criterion",
       "name": "Robin divisor-sum criterion",
-      "rank": 7,
+      "rank": 8,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "speiser-criterion",
       "name": "Speiser derivative-zero criterion",
-      "rank": 8,
+      "rank": 9,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "von-koch-prime-error",
       "name": "von Koch RH criterion for pi(x)",
-      "rank": 9,
+      "rank": 10,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "explicit-formula",
       "name": "Explicit formula for prime-counting functions",
-      "rank": 10,
+      "rank": 11,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "riemann-von-mangoldt-zero-count",
       "name": "Riemann-von Mangoldt zero-counting formula",
-      "rank": 11,
+      "rank": 12,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     },
     {
       "atlas_id": "schoenfeld-conditional-bounds",
       "name": "Explicit prime estimates conditional on RH",
-      "rank": 12,
+      "rank": 13,
       "reason": "Important attributed RH relation without verified Lean source in the census."
     }
   ],
