@@ -65,6 +65,8 @@ def run_phase4_preflight(
     schema_version: str = PHASE4_PREFLIGHT_SCHEMA_VERSION,
     phase_name: str = "Phase 4",
     workloads_override: Any | None = None,
+    runtime_loader: Any = load_qlora_runtime,
+    runtime_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     torch, device_index, properties = _require_local_cuda()
     torch.manual_seed(int(config.training["seed"]))
@@ -76,7 +78,7 @@ def run_phase4_preflight(
         else workloads_override
     )
     example = max(workloads.train, key=lambda item: len(item.input_ids))
-    runtime = load_qlora_runtime(config)
+    runtime = runtime_loader(config)
     trainer = _build_trainer(
         runtime,
         [example],
@@ -213,6 +215,8 @@ def run_phase4_preflight(
             **runtime_metadata,
         },
     }
+    if runtime_evidence is not None:
+        value["continuation_parent"] = runtime_evidence
     _write_json(output, value)
     _release_cuda(torch, trainer, runtime)
     return value
@@ -384,6 +388,10 @@ def run_phase4_training(
     phase_name: str = "Phase 4",
     scheduler_marker: str = "scheduler_configured_for_512_steps",
     workloads_override: Any | None = None,
+    runtime_loader: Any = load_qlora_runtime,
+    fixed_endpoint_step: int | None = None,
+    pre_training_validator: Any | None = None,
+    runtime_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     torch, device_index, properties = _require_local_cuda()
     torch.manual_seed(int(config.training["seed"]))
@@ -432,7 +440,11 @@ def run_phase4_training(
         process_leg = 2
         process_stop_after = maximum_steps
 
-    runtime = load_qlora_runtime(config)
+    if fixed_endpoint_step is not None and fixed_endpoint_step != maximum_steps:
+        raise ValueError(
+            f"{phase_name} fixed endpoint must equal the complete trajectory"
+        )
+    runtime = runtime_loader(config)
     try:
         from transformers import TrainerCallback
     except ImportError as error:
@@ -517,6 +529,8 @@ def run_phase4_training(
         if prior_run is None
         else prior_run["pre_training_validation"]
     )
+    if pre_training_validator is not None:
+        pre_training_validator(pre_training)
     started = time.perf_counter()
     train_result = trainer.train(
         resume_from_checkpoint=(
@@ -598,14 +612,30 @@ def run_phase4_training(
     selection: dict[str, Any] | None = None
     validation_improved: bool | None = None
     if completed_steps == maximum_steps:
-        selection = select_validation_checkpoint(
-            validation_probes,
-            candidate_steps=config.training["checkpoint_candidates"],
-            phase_name=phase_name,
-        )
+        if fixed_endpoint_step is None:
+            selection = select_validation_checkpoint(
+                validation_probes,
+                candidate_steps=config.training["checkpoint_candidates"],
+                phase_name=phase_name,
+            )
+            selected_ce = float(selection["selected_mean_target_token_cross_entropy"])
+        else:
+            endpoint_probe = probes_by_step[fixed_endpoint_step]
+            selected_ce = float(endpoint_probe["mean_target_token_cross_entropy"])
+            selection = {
+                "rule": "fixed complete staged pass; validation is diagnostic only",
+                "metric": "none (fixed endpoint)",
+                "candidate_steps": list(boundary_steps),
+                "diagnostic_only_steps": [
+                    step for step in boundary_steps if step != fixed_endpoint_step
+                ],
+                "selected_optimizer_step": fixed_endpoint_step,
+                "selected_mean_target_token_cross_entropy": selected_ce,
+                "validation_influenced_endpoint": False,
+                "heldout_or_minif2f_consulted": False,
+            }
         validation_improved = bool(
-            selection["selected_mean_target_token_cross_entropy"]
-            < float(pre_training["mean_target_token_cross_entropy"])
+            selected_ce < float(pre_training["mean_target_token_cross_entropy"])
         )
 
     value = {
@@ -614,7 +644,8 @@ def run_phase4_training(
             "stopped_at_mandatory_resume_boundary"
             if completed_steps == stop_step
             else "passed"
-            if validation_improved and stage_memory_passed
+            if (fixed_endpoint_step is not None or validation_improved)
+            and stage_memory_passed
             else "failed"
         ),
         "model": config.model,
@@ -735,11 +766,17 @@ def run_phase4_training(
             ),
         },
     }
+    if runtime_evidence is not None:
+        value["continuation_parent"] = runtime_evidence
     _write_json(output_dir / "run.json", value)
     _release_cuda(torch, trainer, runtime)
     if not stage_memory_passed:
         raise RuntimeError(f"{phase_name} training exceeds the 24 GiB memory ceiling")
-    if completed_steps == maximum_steps and not validation_improved:
+    if (
+        completed_steps == maximum_steps
+        and fixed_endpoint_step is None
+        and not validation_improved
+    ):
         raise RuntimeError(f"{phase_name} validation loss did not improve over step 0")
     return value
 

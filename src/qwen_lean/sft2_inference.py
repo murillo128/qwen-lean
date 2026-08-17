@@ -1,0 +1,332 @@
+from __future__ import annotations
+
+import json
+import platform
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
+from pathlib import Path
+from statistics import fmean
+from typing import Any, Sequence
+
+from .baseline import _generate_candidates, _local_cuda_runtime, run_phase1_baseline
+from .phase2_extraction import Phase2Config
+from .phase2_verification import validate_record_source_identity
+from .phase3_verification import _validate_phase2_environment
+from .phase4_inference import (
+    _heldout_candidate_result,
+    _write_json,
+    phase4_adapter_spec,
+    run_phase4_heldout,
+)
+from .phase5 import ordered_record_ids_sha256
+from .phase6 import (
+    load_phase6_train_workload,
+    summarize_phase6_train_results,
+    target_exact,
+)
+from .phase6_inference import _load_selected_train_records
+from .prompt import PROMPT_FORMAT_ID
+from .schema import CandidateResult, TaskRecord
+from .sft2 import SFT2Config, load_sft2_endpoint_binding, load_sft2_workloads
+
+
+SFT2_TRAIN_RUN_SCHEMA_VERSION = "sft2-train512-run-v1"
+SFT2_HELDOUT_RUN_SCHEMA_VERSION = "sft2-heldout512-run-v1"
+SFT2_MINIF2F_RUN_SCHEMA_VERSION = "sft2-minif2f-validation-run-v1"
+
+
+def run_sft2_train512(
+    config: SFT2Config,
+    phase2_config: Phase2Config,
+    dataset_dir: Path,
+    mathlib_root: Path,
+    workload_path: Path,
+    training_path: Path,
+    adapter_dir: Path,
+    output_dir: Path,
+    *,
+    verification_workers: int | None = None,
+    timeout_seconds: float | None = None,
+) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
+    _, binding = load_sft2_endpoint_binding(
+        training_path,
+        expected_artifact_id=str(config.lora["artifact_id"]),
+        adapter_dir=adapter_dir,
+    )
+    phase6 = config.phase6_config()
+    examples = load_phase6_train_workload(workload_path, phase6)
+    selected_ids = [item.record_id for item in examples]
+    train_contract = config.value["train_evaluation"]
+    if (
+        len(selected_ids) != int(train_contract["expected_examples"])
+        or ordered_record_ids_sha256(selected_ids)
+        != train_contract["workload_ordered_ids_sha256"]
+    ):
+        raise ValueError("SFT-2 train512 workload differs from Phase 6")
+    _validate_phase2_environment(phase2_config, dataset_dir, mathlib_root)
+    records = _load_selected_train_records(dataset_dir, selected_ids)
+    for record, example in zip(records, examples, strict=True):
+        if record.declaration_name != example.declaration_name:
+            raise ValueError("SFT-2 train512 declaration identity differs")
+    sources = {
+        record.id: validate_record_source_identity(record, mathlib_root)
+        for record in records
+    }
+
+    phase1 = config.phase1_validation_config()
+    adapter = phase4_adapter_spec(config, adapter_dir)  # type: ignore[arg-type]
+    adapter.validate(phase1)
+    tasks = [
+        TaskRecord(
+            id=record.id,
+            preamble="",
+            declaration=record.declaration,
+            declaration_name=record.declaration_name,
+        )
+        for record in records
+    ]
+    prompts = [item.prompt for item in examples]
+    sampling = dict(config.value["heldout_generation"])
+    runtime = _local_cuda_runtime(phase1)
+    generation_started = time.perf_counter()
+    generated, engine_version = _generate_candidates(
+        phase1,
+        tasks,
+        prompts=prompts,
+        sampling=sampling,
+        adapter=adapter,
+    )
+    generation_wall_time = time.perf_counter() - generation_started
+    expected_candidates = len(records) * int(sampling["candidates_per_task"])
+    if len(generated) != expected_candidates:
+        raise RuntimeError(
+            f"SFT-2 vLLM returned {len(generated)} train512 candidates, "
+            f"expected {expected_candidates}"
+        )
+
+    worker_count = int(
+        config.value["verification"]["workers"]
+        if verification_workers is None
+        else verification_workers
+    )
+    timeout = float(
+        config.value["verification"]["train_timeout_seconds"]
+        if timeout_seconds is None
+        else timeout_seconds
+    )
+    if worker_count < 1 or timeout <= 0:
+        raise ValueError("SFT-2 train512 verification settings must be positive")
+    records_by_id = {record.id: record for record in records}
+    verification_started = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        results = list(
+            executor.map(
+                lambda item: _heldout_candidate_result(
+                    item,
+                    records_by_id[item.task.id],
+                    sources[item.task.id],
+                    mathlib_root,
+                    timeout_seconds=timeout,
+                ),
+                generated,
+            )
+        )
+    verification_wall_time = time.perf_counter() - verification_started
+    exact = {
+        (item.task_id, item.candidate_index): target_exact(
+            item.candidate_text, records_by_id[item.task_id].completion
+        )
+        for item in results
+    }
+    summary = summarize_phase6_train_results(
+        results,
+        expected_task_ids=selected_ids,
+        target_exact_by_candidate=exact,
+    )
+    summary.update(
+        {
+            "workload_id": train_contract["workload_id"],
+            "model_role": "sft2_endpoint",
+            "generation_wall_time_seconds": generation_wall_time,
+            "verification_wall_time_seconds": verification_wall_time,
+            "run_wall_time_seconds": generation_wall_time + verification_wall_time,
+            "sft2_train_integrity_passed": summary["phase6_train_integrity_passed"],
+        }
+    )
+    metadata = {
+        "schema_version": SFT2_TRAIN_RUN_SCHEMA_VERSION,
+        "status": "passed" if summary["sft2_train_integrity_passed"] else "failed",
+        "model_role": "sft2_endpoint",
+        "model": config.model,
+        "adapter": adapter.metadata(),
+        "selected_adapter_binding": binding.to_dict(),
+        "fixed_complete_q4_endpoint": True,
+        "dataset_schema_version": config.value["dataset"]["schema_version"],
+        "dataset_split": "train",
+        "source_membership_workload_id": config.workloads["train"]["id"],
+        "workload_id": train_contract["workload_id"],
+        "selected_record_ids": selected_ids,
+        "prompt_format_id": PROMPT_FORMAT_ID,
+        "serialization_or_prompt_transformation": None,
+        "exact_target_normalization": (
+            "line endings and trailing transport whitespace only"
+        ),
+        "generation_settings": {
+            **sampling,
+            "dtype": phase1.engine["dtype"],
+            "tensor_parallel_size": phase1.engine["tensor_parallel_size"],
+            "max_model_len": phase1.engine["max_model_len"],
+            "max_num_seqs": phase1.engine["max_num_seqs"],
+            "gpu_memory_utilization": phase1.engine["gpu_memory_utilization"],
+            "enforce_eager": phase1.engine["enforce_eager"],
+            "quantization": phase1.engine["quantization"],
+            "chat_template": None,
+        },
+        "inference_engine": phase1.engine["name"],
+        "inference_engine_version": engine_version,
+        "source_repository": phase2_config.source["repository"],
+        "source_revision": phase2_config.source["revision"],
+        "lean_toolchain": phase2_config.source["lean_toolchain"],
+        "verification": {
+            "workers": worker_count,
+            "timeout_seconds": timeout,
+            "original_source_span_reconstruction": True,
+            "raw_continuation_no_repair": True,
+        },
+        "runtime": {
+            "python": platform.python_version(),
+            **runtime,
+            "generation_wall_time_seconds": generation_wall_time,
+            "verification_wall_time_seconds": verification_wall_time,
+        },
+    }
+    output_dir.mkdir(parents=True, exist_ok=True)
+    _write_json(output_dir / "run.json", metadata)
+    _write_json(output_dir / "summary.json", summary)
+    with (output_dir / "results.jsonl").open("w", encoding="utf-8") as stream:
+        for result in results:
+            value = result.to_dict()
+            value["target_exact"] = exact[(result.task_id, result.candidate_index)]
+            stream.write(json.dumps(value, sort_keys=True) + "\n")
+    if not summary["sft2_train_integrity_passed"]:
+        raise RuntimeError("SFT-2 train512 evaluation failed integrity gates")
+    return metadata, results, summary
+
+
+def run_sft2_heldout512(
+    config: SFT2Config,
+    phase2_config: Phase2Config,
+    dataset_dir: Path,
+    mathlib_root: Path,
+    workload_path: Path,
+    training_path: Path,
+    adapter_dir: Path,
+    output_dir: Path,
+    *,
+    verification_workers: int | None = None,
+    timeout_seconds: float | None = None,
+) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
+    return run_phase4_heldout(
+        config,  # type: ignore[arg-type]
+        phase2_config,
+        dataset_dir,
+        mathlib_root,
+        workload_path,
+        training_path,
+        output_dir,
+        adapter_dir=adapter_dir,
+        verification_workers=verification_workers,
+        timeout_seconds=timeout_seconds,
+        workload_loader=load_sft2_workloads,
+        binding_loader=load_sft2_endpoint_binding,
+        schema_version=SFT2_HELDOUT_RUN_SCHEMA_VERSION,
+        phase_name="SFT-2",
+        integrity_summary_key="sft2_heldout_integrity_passed",
+    )
+
+
+def run_sft2_minif2f_validation(
+    config: SFT2Config,
+    benchmark_root: Path,
+    training_path: Path,
+    adapter_dir: Path,
+    output_dir: Path,
+    *,
+    verification_workers: int | None = None,
+    timeout_seconds: float | None = None,
+) -> tuple[Any, Sequence[CandidateResult], dict[str, Any]]:
+    _, binding = load_sft2_endpoint_binding(
+        training_path,
+        expected_artifact_id=str(config.lora["artifact_id"]),
+        adapter_dir=adapter_dir,
+    )
+    contract = config.value["minif2f"]
+    if contract.get("test_evaluation_forbidden") is not True:
+        raise ValueError("SFT-2 must forbid miniF2F test evaluation")
+    phase1 = config.phase1_validation_config()
+    if (
+        phase1.benchmark["split"] != "validation"
+        or phase1.benchmark["source_path"] != "MiniF2F/Valid.lean"
+        or phase1.sampling["candidates_per_task"]
+        != int(contract["candidates_per_task"])
+    ):
+        raise ValueError("SFT-2 miniF2F contract is not frozen validation")
+    adapter = phase4_adapter_spec(config, adapter_dir)  # type: ignore[arg-type]
+    adapter.validate(phase1)
+    worker_count = int(
+        config.value["verification"]["workers"]
+        if verification_workers is None
+        else verification_workers
+    )
+    timeout = float(
+        config.value["verification"]["minif2f_timeout_seconds"]
+        if timeout_seconds is None
+        else timeout_seconds
+    )
+    if worker_count < 1 or timeout <= 0:
+        raise ValueError("SFT-2 miniF2F verification settings must be positive")
+    metadata, results, summary = run_phase1_baseline(
+        phase1,
+        benchmark_root,
+        str(contract["workload_id"]),
+        output_dir,
+        timeout_seconds=timeout,
+        verification_workers=worker_count,
+        adapter=adapter,
+        result_schema_version=SFT2_MINIF2F_RUN_SCHEMA_VERSION,
+    )
+    metadata = replace(metadata, selected_adapter_binding=binding.to_dict())
+    _write_json(output_dir / "run.json", metadata.to_dict())
+    expected_candidates = int(contract["expected_tasks"]) * int(
+        contract["candidates_per_task"]
+    )
+    token_counts = [int(item.generated_token_count or 0) for item in results]
+    passed = bool(
+        summary["complete"]
+        and len(results) == expected_candidates
+        and int(summary["infrastructure_error_count"]) == 0
+        and int(summary["verifier_timeout_count"]) == 0
+    )
+    summary.update(
+        {
+            "schema_version": "sft2-minif2f-validation-summary-v1",
+            "sft2_minif2f_validation_integrity_passed": passed,
+            "model_role": "sft2_endpoint",
+            "selected_adapter_binding": binding.to_dict(),
+            "fixed_complete_q4_endpoint": True,
+            "expected_tasks": contract["expected_tasks"],
+            "expected_candidates": expected_candidates,
+            "miniF2F_test_evaluated": False,
+            "generated_token_counts": {
+                "total": sum(token_counts),
+                "mean": fmean(token_counts),
+                "minimum": min(token_counts),
+                "maximum": max(token_counts),
+            },
+        }
+    )
+    _write_json(output_dir / "summary.json", summary)
+    if not passed:
+        raise RuntimeError("SFT-2 miniF2F validation failed integrity gates")
+    return metadata, results, summary

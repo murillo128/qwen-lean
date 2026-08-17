@@ -1,0 +1,153 @@
+{
+  "d015_or_reference_mutation": false,
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1"
+  },
+  "endpoint": {
+    "fixed_optimizer_step": 9962,
+    "intermediate_checkpoints_diagnostic_only": [
+      2491,
+      4981,
+      7472
+    ],
+    "validation_selects_endpoint": false
+  },
+  "exact_phase5_workload": {
+    "artifact_sha256": "c25fa88ac5a8553e179e651a31ac4403e53cd42cd4e5cb2164755a24e4d85636",
+    "heldout_optimizer_batches": false,
+    "miniF2F_optimizer_batches": false,
+    "train_examples": 79696,
+    "train_ordered_ids_sha256": "0ec5ef7e969774924384d80d04b5ea9ea6e0eabac9f38cf3deff9924c714d816",
+    "train_workload_id": "phase5-train-full-v1",
+    "validation_examples": 4426,
+    "validation_ordered_ids_sha256": "c4b7189e6b6b61a8bf22b807554cd534180fe73e9fb2ffca1a2cf0e8c603401c",
+    "validation_workload_id": "phase5-validation-full-v1"
+  },
+  "lora": {
+    "artifact_id": "sft2-q4-v1-lora",
+    "bias": "none",
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "modules_to_save": null,
+    "r": 16,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "model": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+  },
+  "preflight": {
+    "adapter_parameter_changed": true,
+    "all_gradients_finite": true,
+    "frozen_parameter_unchanged": true,
+    "loss": 0.8185966610908508,
+    "memory_ceiling_bytes": 25769803776,
+    "memory_ceiling_passed": true,
+    "only_intended_lora_parameters_trainable": true,
+    "runtime": {
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_index": 0,
+      "cuda_device_total_memory_bytes": 20989804544,
+      "inference_execution": "local_cuda",
+      "peak_cuda_allocated_bytes": 9986938368,
+      "peak_cuda_reserved_bytes": 13056868352,
+      "python": "3.12.14",
+      "torch_cuda_version": "12.8"
+    },
+    "total_parameter_count": 4761498624,
+    "trainable_parameter_count": 43646976
+  },
+  "quantization": {
+    "compute_dtype": "bfloat16",
+    "double_quantization": true,
+    "load_in_4bit": true,
+    "quantization_type": "nf4"
+  },
+  "reference_parent": {
+    "adapter": {
+      "adapter_config_sha256": "4b7b513b216484554e05d3c75ecf0777ee1fbae94935e93d949d63cf4a76481c",
+      "adapter_model_sha256": "8aa50fa56f6a1d03a702abcaafc20e11d661a4a2ac935864bf5648411e5cdc58",
+      "alpha": 32,
+      "artifact_id": "phase5-train-full-v1-lora",
+      "dropout": 0.0,
+      "format": "peft-lora",
+      "hub_repository": "murillo2000/qwen3-8b-base-lean-sft-qlora",
+      "hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+      "merged": false,
+      "rank": 16,
+      "selected_optimizer_step": 9962,
+      "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990"
+    },
+    "candidate_manifest_sha256": "3bad27b7bf740986d3e7a857c5870ff40eafa4f33248db2c68df326155cf8c5f",
+    "immutable": true,
+    "logical_id": "reference-sft-v1",
+    "model": {
+      "add_special_tokens": false,
+      "chat_template": null,
+      "model_id": "Qwen/Qwen3-8B-Base",
+      "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "tokenizer_id": "Qwen/Qwen3-8B-Base",
+      "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+    },
+    "source_kind": "immutable_hub_snapshot",
+    "unchanged_after_preflight": true
+  },
+  "schema_version": "sft2-checkpoint-a-v1",
+  "serialization": {
+    "id": "mathlib-sft-v1",
+    "supervise_eos": true,
+    "supervise_prompt": false
+  },
+  "status": "ready",
+  "training": {
+    "checkpoint_candidates": [
+      2491,
+      4981,
+      7472,
+      9962
+    ],
+    "checkpoint_interval_steps": 9962,
+    "duplicate_final_batch_fill": false,
+    "endpoint_policy": "fixed_complete_q4",
+    "epochs": 1,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": true,
+    "learning_rate": 0.0001,
+    "lr_schedule": "cosine",
+    "mandatory_process_stop_step": 4981,
+    "manual_checkpoint_boundaries": true,
+    "maximum_gradient_norm": 1.0,
+    "maximum_optimizer_steps": 9962,
+    "maximum_sequence_tokens": 1024,
+    "memory_ceiling_bytes": 25769803776,
+    "optimizer": "paged_adamw_8bit",
+    "packing": false,
+    "per_device_micro_batch_size": 1,
+    "seed": 0,
+    "staged_optimizer_restart": true,
+    "staged_scheduler_restart": true,
+    "trainer": "trl-sft",
+    "truncation": false,
+    "uninterrupted_two_epoch_equivalence_claimed": false,
+    "warmup_fraction_denominator": 32,
+    "warmup_steps": 312,
+    "weight_decay": 0.0
+  }
+}

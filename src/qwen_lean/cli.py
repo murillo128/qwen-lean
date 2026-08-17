@@ -77,6 +77,21 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .sft2 import SFT2Config
+from .sft2_evidence import (
+    write_sft2_checkpoint_a_evidence,
+    write_sft2_final_evidence,
+)
+from .sft2_inference import (
+    run_sft2_heldout512,
+    run_sft2_minif2f_validation,
+    run_sft2_train512,
+)
+from .sft2_training import (
+    run_sft2_adapter_reload,
+    run_sft2_preflight,
+    run_sft2_training,
+)
 
 
 def _project_root() -> Path:
@@ -540,6 +555,132 @@ def _parser() -> argparse.ArgumentParser:
     phase6_evidence.add_argument("--evidence-dir", type=Path, required=True)
     phase6_evidence.add_argument(
         "--config", type=Path, default=root / "config/phase6-eval.json"
+    )
+
+    sft2_preflight = subparsers.add_parser(
+        "sft2-preflight", help="validate immutable-parent SFT-2 continuation"
+    )
+    sft2_preflight.add_argument("--workload", type=Path, required=True)
+    sft2_preflight.add_argument("--parent-adapter-dir", type=Path, required=True)
+    sft2_preflight.add_argument("--candidate", type=Path, required=True)
+    sft2_preflight.add_argument("--output", type=Path, required=True)
+    sft2_preflight.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_checkpoint = subparsers.add_parser(
+        "sft2-checkpoint-a-evidence",
+        help="write compact pre-training SFT-2 integrity evidence",
+    )
+    sft2_checkpoint.add_argument("--workload", type=Path, required=True)
+    sft2_checkpoint.add_argument("--preflight", type=Path, required=True)
+    sft2_checkpoint.add_argument("--output", type=Path, required=True)
+    sft2_checkpoint.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_train = subparsers.add_parser(
+        "sft2-train", help="run or resume the fixed one-pass SFT-2 stage"
+    )
+    sft2_train.add_argument("--workload", type=Path, required=True)
+    sft2_train.add_argument("--parent-adapter-dir", type=Path, required=True)
+    sft2_train.add_argument("--candidate", type=Path, required=True)
+    sft2_train.add_argument("--output-dir", type=Path, required=True)
+    sft2_train.add_argument("--resume-from-checkpoint", type=Path)
+    sft2_train.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_reload = subparsers.add_parser(
+        "sft2-adapter-reload", help="reload the fixed SFT-2 Q4 endpoint"
+    )
+    sft2_reload.add_argument("--workload", type=Path, required=True)
+    sft2_reload.add_argument("--training", type=Path, required=True)
+    sft2_reload.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_reload.add_argument("--output", type=Path, required=True)
+    sft2_reload.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_train_eval = subparsers.add_parser(
+        "sft2-train512", help="evaluate the fixed SFT-2 endpoint on train512"
+    )
+    sft2_train_eval.add_argument("--dataset-dir", type=Path, required=True)
+    sft2_train_eval.add_argument("--mathlib-root", type=Path, required=True)
+    sft2_train_eval.add_argument("--workload", type=Path, required=True)
+    sft2_train_eval.add_argument("--training", type=Path, required=True)
+    sft2_train_eval.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_train_eval.add_argument("--output-dir", type=Path, required=True)
+    sft2_train_eval.add_argument("--workers", type=int)
+    sft2_train_eval.add_argument("--timeout", type=float)
+    sft2_train_eval.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+    sft2_train_eval.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    sft2_heldout = subparsers.add_parser(
+        "sft2-heldout512", help="evaluate the fixed SFT-2 endpoint on heldout512"
+    )
+    sft2_heldout.add_argument("--dataset-dir", type=Path, required=True)
+    sft2_heldout.add_argument("--mathlib-root", type=Path, required=True)
+    sft2_heldout.add_argument("--workload", type=Path, required=True)
+    sft2_heldout.add_argument("--training", type=Path, required=True)
+    sft2_heldout.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_heldout.add_argument("--output-dir", type=Path, required=True)
+    sft2_heldout.add_argument("--workers", type=int)
+    sft2_heldout.add_argument("--timeout", type=float)
+    sft2_heldout.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+    sft2_heldout.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
+    sft2_minif2f = subparsers.add_parser(
+        "sft2-minif2f-validation",
+        help="evaluate the fixed SFT-2 endpoint on miniF2F validation",
+    )
+    sft2_minif2f.add_argument("--benchmark-root", type=Path, required=True)
+    sft2_minif2f.add_argument("--training", type=Path, required=True)
+    sft2_minif2f.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_minif2f.add_argument("--output-dir", type=Path, required=True)
+    sft2_minif2f.add_argument("--workers", type=int)
+    sft2_minif2f.add_argument("--timeout", type=float)
+    sft2_minif2f.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_evidence = subparsers.add_parser(
+        "sft2-evidence", help="write compact final SFT-2 comparison evidence"
+    )
+    sft2_evidence.add_argument(
+        "--artifact-dir", type=Path, default=root / "artifacts/sft2"
+    )
+    sft2_evidence.add_argument(
+        "--reference-train-dir",
+        type=Path,
+        default=root / "artifacts/phase6/train/adapter",
+    )
+    sft2_evidence.add_argument(
+        "--reference-heldout-dir",
+        type=Path,
+        default=root / "artifacts/phase5/heldout/adapter",
+    )
+    sft2_evidence.add_argument(
+        "--reference-minif2f-dir",
+        type=Path,
+        default=root / "artifacts/phase5/minif2f",
+    )
+    sft2_evidence.add_argument(
+        "--phase6-comparison",
+        type=Path,
+        default=root / "evidence/phase6/comparison.json",
+    )
+    sft2_evidence.add_argument("--evidence-dir", type=Path, required=True)
+    sft2_evidence.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
     )
     return parser
 
@@ -1036,6 +1177,108 @@ def main(argv: list[str] | None = None) -> int:
             args.phase5_heldout_adapter_dir,
             args.phase1_validation_base_summary,
             args.phase5_validation_adapter_evidence,
+            args.evidence_dir,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "sft2-preflight":
+        value = run_sft2_preflight(
+            SFT2Config.load(args.config),
+            args.workload,
+            args.parent_adapter_dir,
+            args.candidate,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "sft2-checkpoint-a-evidence":
+        value = write_sft2_checkpoint_a_evidence(
+            SFT2Config.load(args.config),
+            args.workload,
+            args.preflight,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "sft2-train":
+        value = run_sft2_training(
+            SFT2Config.load(args.config),
+            args.workload,
+            args.parent_adapter_dir,
+            args.candidate,
+            args.output_dir,
+            resume_from_checkpoint=args.resume_from_checkpoint,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "sft2-adapter-reload":
+        value = run_sft2_adapter_reload(
+            SFT2Config.load(args.config),
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "sft2-train512":
+        _, _, summary = run_sft2_train512(
+            SFT2Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "sft2-heldout512":
+        _, _, summary = run_sft2_heldout512(
+            SFT2Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "sft2-minif2f-validation":
+        _, _, summary = run_sft2_minif2f_validation(
+            SFT2Config.load(args.config),
+            args.benchmark_root,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+            verification_workers=args.workers,
+            timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "sft2-evidence":
+        value = write_sft2_final_evidence(
+            SFT2Config.load(args.config),
+            args.artifact_dir,
+            args.reference_train_dir,
+            args.reference_heldout_dir,
+            args.reference_minif2f_dir,
+            args.phase6_comparison,
             args.evidence_dir,
         )
         print(json.dumps(value, indent=2))
