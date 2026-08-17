@@ -77,11 +77,13 @@ Train the selected Qwen base model with QLoRA on the verified dataset at the sca
 
 Compare the base model and the first full SFT model using the same evaluation contract. Report at least pass@1 and higher-k sampling metrics where useful, plus failure categories and operational measurements that help explain the result.
 
+Add a deterministic training-set generation diagnostic for the selected SFT checkpoint. Evaluate a fixed sample of Phase 5 training theorems through the same free-generation and Lean-verification path used for held-out evaluation, and report both exact target-proof reproduction and Lean-accepted proof success. Compare this train-sample result directly with the held-out result so Phase 6 can distinguish memorization from generalization and quantify the train-to-heldout generalization gap. The controlling Phase 6 issue should freeze the exact sample size, selection rule, and candidate budget before observing model outputs.
+
 Select one SFT checkpoint for later post-training without tuning against the external benchmark test split. That checkpoint becomes the common parent and retained control for both Phase 7 and Phase 8.
 
 Use the external benchmark test split only for checkpoints that have already been selected without tuning against that test set.
 
-**Exit gate:** the project can state a supported conclusion about whether SFT improved Lean proof generation, where it improved, and what important limitations remain; one reference SFT checkpoint is explicitly selected as the common parent/control for the independent post-training branches.
+**Exit gate:** the project can state a supported conclusion about whether SFT improved Lean proof generation, where it improved, how training-set proof regeneration differs from held-out generalization, and what important limitations remain; one reference SFT checkpoint is explicitly selected as the common parent/control for the independent post-training branches.
 
 ## Phase 7 — Branch A: verifier-filtered self-training
 
