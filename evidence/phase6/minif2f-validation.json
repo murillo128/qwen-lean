@@ -1,0 +1,102 @@
+{
+  "accepted_results_reused_without_regeneration": true,
+  "adapter": {
+    "candidate_count": 1952,
+    "candidates_per_task": 8,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 1875,
+      "verified": 77,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.9605532786885246,
+      "verified": 0.03944672131147541,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "finish_reason_counts": {
+      "eos": 1596,
+      "token_limit": 356
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.03944672131147541,
+      "pass@4": 0.1031615925058548,
+      "pass@8": 0.14344262295081966
+    },
+    "task_count": 244,
+    "tasks_with_verified_candidate": {
+      "count": 35,
+      "fraction": 0.14344262295081966
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 10.65824774042544,
+      "candidate_total_latency_sum": 20804.89958931046,
+      "generation_candidate_latency_mean": 5.306762870786889,
+      "generation_candidate_latency_sum": 10358.801123776007,
+      "verification_latency_mean": 5.351484869638551,
+      "verification_latency_sum": 10446.098465534451
+    },
+    "verifier_timeout_count": 0
+  },
+  "base": {
+    "candidate_count": 1952,
+    "candidates_per_task": 8,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 1927,
+      "verified": 25,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.9871926229508197,
+      "verified": 0.012807377049180328,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "finish_reason_counts": {
+      "eos": 1508,
+      "token_limit": 444
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.012807377049180328,
+      "pass@4": 0.04771662763466042,
+      "pass@8": 0.0860655737704918
+    },
+    "task_count": 244,
+    "tasks_with_verified_candidate": {
+      "count": 21,
+      "fraction": 0.0860655737704918
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 12.664242432838606,
+      "candidate_total_latency_sum": 24720.60122890096,
+      "generation_candidate_latency_mean": 5.044260550344275,
+      "generation_candidate_latency_sum": 9846.396594272024,
+      "verification_latency_mean": 7.619981882494332,
+      "verification_latency_sum": 14874.204634628935
+    },
+    "verifier_timeout_count": 0
+  },
+  "checkpoint_selection_influenced_by_validation": false,
+  "delta_adapter_minus_base": {
+    "pass@1": 0.026639344262295084,
+    "pass@4": 0.05544496487119438,
+    "pass@8": 0.05737704918032786
+  },
+  "schema_version": "phase6-minif2f-validation-reference-v1",
+  "status": "passed",
+  "workload_id": "minif2f-valid-v1"
+}

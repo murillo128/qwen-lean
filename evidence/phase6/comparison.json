@@ -1,0 +1,151 @@
+{
+  "differential_gap_bootstrap": {
+    "differential_gap": {
+      "pass@1": {
+        "ci95": [
+          0.0048828125,
+          0.02880859375
+        ],
+        "estimate": 0.0166015625
+      },
+      "pass@4": {
+        "ci95": [
+          0.009765625,
+          0.072265625
+        ],
+        "estimate": 0.041015625
+      }
+    },
+    "heldout_task_count": 512,
+    "interval_percentiles": [
+      2.5,
+      97.5
+    ],
+    "method": "independent-workload-paired-model-task-bootstrap",
+    "resamples": 10000,
+    "seed": 0,
+    "train_task_count": 512
+  },
+  "opaque_combined_quality_score": null,
+  "reference_candidate": {
+    "adapter": {
+      "adapter_config_sha256": "4b7b513b216484554e05d3c75ecf0777ee1fbae94935e93d949d63cf4a76481c",
+      "adapter_model_sha256": "8aa50fa56f6a1d03a702abcaafc20e11d661a4a2ac935864bf5648411e5cdc58",
+      "alpha": 32,
+      "artifact_id": "phase5-train-full-v1-lora",
+      "dropout": 0.0,
+      "format": "peft-lora",
+      "hub_repository": "murillo2000/qwen3-8b-base-lean-sft-qlora",
+      "hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+      "merged": false,
+      "rank": 16,
+      "selected_optimizer_step": 9962,
+      "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990"
+    },
+    "base_model": {
+      "add_special_tokens": false,
+      "chat_template": null,
+      "model_id": "Qwen/Qwen3-8B-Base",
+      "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "tokenizer_id": "Qwen/Qwen3-8B-Base",
+      "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+    },
+    "logical_id": "reference-sft-v1",
+    "phase6_metrics_changed_identity": false,
+    "selection_predates_phase6_outputs": true
+  },
+  "result_types_kept_distinct": [
+    "target-proof reproduction",
+    "alternative Lean-valid proof generation",
+    "internal heldout generalization",
+    "external validation generalization",
+    "external test generalization",
+    "termination and verifier operational behavior"
+  ],
+  "schema_version": "phase6-comparison-v1",
+  "status": "passed",
+  "train_to_heldout_generalization_gaps": {
+    "pass@1": {
+      "base_train_gap": -0.00048828125,
+      "differential_gap": 0.0166015625,
+      "heldout_sft_lift": 0.0146484375,
+      "sft_train_gap": 0.01611328125,
+      "train_sft_lift": 0.03125
+    },
+    "pass@4": {
+      "base_train_gap": -0.001953125,
+      "differential_gap": 0.041015625,
+      "heldout_sft_lift": 0.041015625,
+      "sft_train_gap": 0.0390625,
+      "train_sft_lift": 0.08203125
+    }
+  },
+  "uncertainty_references": {
+    "heldout_lean": "heldout-analysis.json#bootstrap",
+    "minif2f_test_delta": "minif2f-test.json#bootstrap",
+    "train_exact_target": "train-comparison.json#exact_target_pass_bootstrap",
+    "train_lean": "train-comparison.json#lean_pass_bootstrap"
+  },
+  "workloads": {
+    "minif2f-test-v1": {
+      "adapter_lean": {
+        "pass@1": 0.045081967213114756,
+        "pass@4": 0.10971896955503513,
+        "pass@8": 0.13524590163934427
+      },
+      "base_lean": {
+        "pass@1": 0.015368852459016393,
+        "pass@4": 0.05357142857142857,
+        "pass@8": 0.0860655737704918
+      }
+    },
+    "minif2f-valid-v1": {
+      "adapter_lean": {
+        "pass@1": 0.03944672131147541,
+        "pass@4": 0.1031615925058548,
+        "pass@8": 0.14344262295081966
+      },
+      "base_lean": {
+        "pass@1": 0.012807377049180328,
+        "pass@4": 0.04771662763466042,
+        "pass@8": 0.0860655737704918
+      }
+    },
+    "phase5-heldout512-v1": {
+      "adapter_lean": {
+        "pass@1": 0.0166015625,
+        "pass@4": 0.048828125
+      },
+      "base_lean": {
+        "pass@1": 0.001953125,
+        "pass@4": 0.0078125
+      }
+    },
+    "phase6-train512-v1": {
+      "adapter_exact_target": {
+        "pass@1": 0.01611328125,
+        "pass@4": 0.04296875
+      },
+      "adapter_lean": {
+        "pass@1": 0.03271484375,
+        "pass@4": 0.087890625
+      },
+      "adapter_verified_non_exact_candidates": {
+        "count": 34,
+        "fraction": 0.0166015625
+      },
+      "base_exact_target": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "base_lean": {
+        "pass@1": 0.00146484375,
+        "pass@4": 0.005859375
+      },
+      "base_verified_non_exact_candidates": {
+        "count": 3,
+        "fraction": 0.00146484375
+      }
+    }
+  }
+}
