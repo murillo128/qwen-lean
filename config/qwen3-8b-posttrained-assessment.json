@@ -80,6 +80,7 @@
     "verifier_feedback": false,
     "repair": false,
     "native_mode_diagnostic": false,
+    "environment_probe_timeout_seconds": 120.0,
     "model_license": "Apache-2.0"
   }
 }

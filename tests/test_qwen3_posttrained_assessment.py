@@ -52,6 +52,7 @@ def test_config_freezes_strict_cross_model_contract() -> None:
         "verifier_feedback": False,
         "repair": False,
         "native_mode_diagnostic": False,
+        "environment_probe_timeout_seconds": 120.0,
         "model_license": "Apache-2.0",
     }
 

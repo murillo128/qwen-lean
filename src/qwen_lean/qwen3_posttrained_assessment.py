@@ -61,6 +61,7 @@ def validate_assessment_config(config: Phase1Config) -> None:
         (("assessment", "verifier_feedback"), False),
         (("assessment", "repair"), False),
         (("assessment", "native_mode_diagnostic"), False),
+        (("assessment", "environment_probe_timeout_seconds"), 120.0),
     ]
     for field_path, expected in required:
         value: Any = config.value
@@ -110,6 +111,10 @@ def run_strict_assessment(
         output_dir,
         timeout_seconds=float(config.value["verifier"]["timeout_seconds"]),
         verification_workers=verification_workers,
+        report_progress=True,
+        environment_probe_timeout_seconds=float(
+            config.value["assessment"]["environment_probe_timeout_seconds"]
+        ),
     )
 
 
