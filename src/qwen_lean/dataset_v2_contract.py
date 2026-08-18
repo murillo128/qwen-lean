@@ -5,6 +5,8 @@ import textwrap
 from dataclasses import dataclass
 from typing import Iterable
 
+from .phase2_corpus import normalized_lean_code
+
 
 DATASET_V2_PROOF_CANONICALIZATION = "dataset-v2-proof-canonicalization-v1"
 DERIVATION_FAMILY_FINGERPRINT = "dataset-v2-derivation-family-v1"
@@ -65,9 +67,9 @@ def canonicalize_proof_expression(proof_expression: str) -> CanonicalProof:
 
 
 def proof_fingerprint(proof: str) -> str:
-    normalized = proof.replace("\r\n", "\n").replace("\r", "\n").rstrip()
-    if not normalized:
+    if not proof.strip():
         raise ValueError("proof is empty")
+    normalized = normalized_lean_code(proof)
     payload = f"{DATASET_V2_PROOF_CANONICALIZATION}\0{normalized}"
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
@@ -85,7 +87,15 @@ def derivation_family_fingerprint(
     generator family must not cross train/validation/test.
     """
 
-    lemmas = tuple(sorted({str(item).strip() for item in source_lemma_ids if str(item).strip()}))
+    lemmas = tuple(
+        sorted(
+            {
+                str(item).strip()
+                for item in source_lemma_ids
+                if str(item).strip()
+            }
+        )
+    )
     dag = normalized_proof_dag.strip()
     family = generator_family.strip()
     if not lemmas:
