@@ -5,14 +5,17 @@ from pathlib import Path
 import pytest
 
 from qwen_lean.artifacts import write_artifacts
+from qwen_lean import baseline
 from qwen_lean.baseline import vllm_engine_kwargs
 from qwen_lean.metrics import summarize_results
+from qwen_lean.minif2f import Phase1Config
 from qwen_lean.qwen35_4b_posttrained_assessment import (
     DEV16_WORKLOAD_ID,
     FULL_WORKLOAD_ID,
     MODEL_ID,
     MODEL_REVISION,
     PREFLIGHT_WORKLOAD_ID,
+    REQUIRED_RUNTIME_PACKAGES,
     load_assessment_config,
     validate_assessment_config,
     write_compact_evidence,
@@ -47,12 +50,48 @@ def test_qwen35_config_freezes_cross_model_casting_contract() -> None:
     assert config.engine["quantization"] is None
     assert config.engine["language_model_only"] is True
     assert config.engine["use_flashinfer_sampler"] is False
+    assert config.engine["required_runtime_packages"] == REQUIRED_RUNTIME_PACKAGES
     assert config.value["assessment"]["chat_template"] is None
 
     kwargs = vllm_engine_kwargs(config, config.sampling, None)
     assert kwargs["revision"] == MODEL_REVISION
     assert kwargs["tokenizer_revision"] == MODEL_REVISION
     assert kwargs["language_model_only"] is True
+
+
+def test_runtime_package_capture_tolerates_missing_optional_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = Phase1Config.load(ROOT / "config/phase1-minif2f.json")
+
+    def version(name: str) -> str:
+        if name in {"flashinfer-python", "nvidia-ml-py"}:
+            raise baseline.importlib.metadata.PackageNotFoundError(name)
+        return "test-version"
+
+    monkeypatch.setattr(baseline.importlib.metadata, "version", version)
+
+    assert baseline._runtime_package_versions(config) == {
+        "torch": "test-version",
+        "transformers": "test-version",
+        "vllm": "test-version",
+    }
+
+
+def test_qwen35_runtime_requires_its_recorded_packages(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = load_assessment_config(CONFIG_PATH)
+
+    def version(name: str) -> str:
+        if name == "flashinfer-python":
+            raise baseline.importlib.metadata.PackageNotFoundError(name)
+        return "test-version"
+
+    monkeypatch.setattr(baseline.importlib.metadata, "version", version)
+
+    with pytest.raises(RuntimeError, match="required but missing: flashinfer-python"):
+        baseline._runtime_package_versions(config)
 
 
 def test_qwen35_config_rejects_sampling_or_prompt_drift() -> None:

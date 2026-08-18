@@ -30,6 +30,15 @@ from .schema import (
 from .verifier import LeanVerifier
 
 
+_RUNTIME_PACKAGE_NAMES = (
+    "flashinfer-python",
+    "nvidia-ml-py",
+    "torch",
+    "transformers",
+    "vllm",
+)
+
+
 @dataclass(frozen=True)
 class GeneratedCandidate:
     task: TaskRecord
@@ -391,16 +400,7 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "torch_cuda_version": torch.version.cuda,
-        "package_versions": {
-            name: importlib.metadata.version(name)
-            for name in (
-                "flashinfer-python",
-                "nvidia-ml-py",
-                "torch",
-                "transformers",
-                "vllm",
-            )
-        },
+        "package_versions": _runtime_package_versions(config),
         "inference_execution": "local_cuda",
         "cuda_device_index": device_index,
         "cuda_device": properties.name,
@@ -412,6 +412,21 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
             else "vllm_pytorch_native"
         ),
     }
+
+
+def _runtime_package_versions(config: Phase1Config) -> dict[str, str]:
+    required = set(config.engine.get("required_runtime_packages", []))
+    package_names = dict.fromkeys((*_RUNTIME_PACKAGE_NAMES, *sorted(required)))
+    versions: dict[str, str] = {}
+    for name in package_names:
+        try:
+            versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError as error:
+            if name in required:
+                raise RuntimeError(
+                    f"assessment runtime package is required but missing: {name}"
+                ) from error
+    return versions
 
 
 def _generate_candidates(

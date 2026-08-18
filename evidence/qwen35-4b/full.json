@@ -78,6 +78,7 @@
     "no_quantization": true,
     "prompt_format_id": true,
     "raw_continuation": true,
+    "required_runtime_packages_recorded": true,
     "tokenizer_id": true,
     "tokenizer_revision": true,
     "workload_id": true

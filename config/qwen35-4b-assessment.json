@@ -76,6 +76,13 @@
     "quantization": null,
     "language_model_only": true,
     "use_flashinfer_sampler": false,
+    "required_runtime_packages": [
+      "flashinfer-python",
+      "nvidia-ml-py",
+      "torch",
+      "transformers",
+      "vllm"
+    ],
     "require_gpu_memory_monitor": true,
     "expected_cuda_device_name_fragment": "Ada"
   },

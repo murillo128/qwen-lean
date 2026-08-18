@@ -27,6 +27,13 @@ STRICT_SAMPLING = {
     "stop": "tokenizer_eos_or_token_limit",
     "seed": 0,
 }
+REQUIRED_RUNTIME_PACKAGES = [
+    "flashinfer-python",
+    "nvidia-ml-py",
+    "torch",
+    "transformers",
+    "vllm",
+]
 
 
 def load_assessment_config(path: Path) -> Phase1Config:
@@ -50,6 +57,7 @@ def validate_assessment_config(config: Phase1Config) -> None:
         (("engine", "quantization"), None),
         (("engine", "language_model_only"), True),
         (("engine", "use_flashinfer_sampler"), False),
+        (("engine", "required_runtime_packages"), REQUIRED_RUNTIME_PACKAGES),
         (("engine", "require_gpu_memory_monitor"), True),
         (("engine", "expected_cuda_device_name_fragment"), "Ada"),
         (("verifier", "timeout_seconds"), 30.0),
@@ -298,6 +306,15 @@ def _compact_run(
         "gpu_memory_observed": metadata.runtime.get("gpu_memory_monitoring")
         == "nvml_device_used_bytes",
     }
+    if workload_id == FULL_WORKLOAD_ID:
+        package_versions = metadata.runtime.get("package_versions")
+        identity_checks["required_runtime_packages_recorded"] = isinstance(
+            package_versions, dict
+        ) and all(
+            isinstance(package_versions.get(name), str)
+            and bool(package_versions[name])
+            for name in REQUIRED_RUNTIME_PACKAGES
+        )
     if not all(identity_checks.values()):
         failed = [name for name, passed in identity_checks.items() if not passed]
         raise ValueError(f"Qwen3.5 run identity checks failed: {failed}")
