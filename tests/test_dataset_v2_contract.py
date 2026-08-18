@@ -1,6 +1,7 @@
 from qwen_lean.dataset_v2_contract import (
     canonicalize_equation_clauses,
     canonicalize_proof_expression,
+    canonicalize_where_fields,
     derivation_family_fingerprint,
     proof_fingerprint,
     proof_variant_id,
@@ -35,6 +36,16 @@ def test_equation_clauses_are_wrapped_as_an_explicit_function() -> None:
     assert value.source_expression.startswith("| 0")
     assert "exact (\n    @fun\n      | 0 => by simp" in value.canonical_proof
     assert value.transformation == "equations-to-fun-exact"
+
+
+def test_where_fields_are_wrapped_as_an_explicit_structure() -> None:
+    value = canonicalize_where_fields(
+        "where\n  mp h := h\n  mpr h := h"
+    )
+
+    assert value.source_expression.startswith("where")
+    assert "exact {\n    mp h := h\n    mpr h := h" in value.canonical_proof
+    assert value.transformation == "where-to-structure-exact"
 
 
 def test_proof_fingerprint_uses_lean_lexical_normalization() -> None:

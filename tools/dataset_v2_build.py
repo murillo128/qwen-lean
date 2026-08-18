@@ -19,7 +19,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-FULL_CACHE_VERSION = "dataset-v2-full-cache-v1"
+FULL_CACHE_VERSION = "dataset-v2-full-cache-v2"
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 
 from qwen_lean.dataset_v2 import (  # noqa: E402

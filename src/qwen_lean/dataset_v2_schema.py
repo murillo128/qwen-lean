@@ -12,7 +12,12 @@ TrainingRole = Literal["training", "validation", "test"]
 ProvenanceKind = Literal[
     "real-mathlib", "external-lean", "mixed-real", "synthetic"
 ]
-TransformationKind = Literal["none", "term-to-exact", "equations-to-fun-exact"]
+TransformationKind = Literal[
+    "none",
+    "term-to-exact",
+    "equations-to-fun-exact",
+    "where-to-structure-exact",
+]
 CompatibilityStatus = Literal[
     "verified-target-environment",
     "verified-native",

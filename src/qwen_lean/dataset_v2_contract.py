@@ -92,6 +92,26 @@ def canonicalize_equation_clauses(proof_expression: str) -> CanonicalProof:
     )
 
 
+def canonicalize_where_fields(proof_expression: str) -> CanonicalProof:
+    """Turn a theorem ``where`` field block into an explicit structure term."""
+
+    source = _normalize_transport(proof_expression)
+    if not source.startswith("where") or (
+        len(source) > len("where") and not source[len("where")].isspace()
+    ):
+        raise ValueError("where proof does not begin with a where block")
+    fields = textwrap.dedent(source[len("where") :]).strip()
+    if not fields:
+        raise ValueError("where proof has no fields")
+    canonical = "by\n  exact {\n" + textwrap.indent(fields, "    ") + "\n  }"
+    return CanonicalProof(
+        source_expression=source,
+        canonical_proof=canonical,
+        completion=canonical[2:].lstrip(),
+        transformation="where-to-structure-exact",
+    )
+
+
 def proof_fingerprint(proof: str) -> str:
     if not proof.strip():
         raise ValueError("proof is empty")

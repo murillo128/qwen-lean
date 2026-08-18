@@ -130,6 +130,65 @@ def test_equation_clause_theorem_is_recovered_as_a_verified_candidate_shape() ->
     assert ":= by\n  exact (\n    @fun\n      | 0 => by rfl" in reconstructed
 
 
+def test_where_theorem_is_recovered_as_an_explicit_structure_proof() -> None:
+    source = (
+        "theorem identity (P : Prop) : P ↔ P where\n"
+        "  mp h := h\n"
+        "  mpr h := h\n"
+    )
+    theorem = _Theorem(
+        proof_start=_Pos(2, 3),
+        proof_end=_Pos(3, len("  mpr h := h") + 1),
+    )
+    candidate = candidate_from_traced_theorem(
+        theorem,
+        source=source,
+        file_path="Mathlib/Test.lean",
+        source_repository="https://github.com/leanprover-community/mathlib4",
+        source_revision="a" * 40,
+        provenance="real-mathlib",
+    )
+
+    assert candidate.declaration == "theorem identity (P : Prop) : P ↔ P"
+    assert candidate.transformation_kind == "where-to-structure-exact"
+    assert candidate.source_expression.startswith("where\n")
+    reconstructed = substitute_proofs(source, [candidate])
+    assert reconstructed.startswith(
+        "theorem identity (P : Prop) : P ↔ P := by\n  exact {\n"
+    )
+    assert "mp h := h" in reconstructed
+    assert "mpr h := h" in reconstructed
+
+
+def test_outer_assignment_recovers_complete_term_when_trace_points_inside_it() -> None:
+    source = (
+        "theorem identity : Function.Injective (fun n : Nat => n) :=\n"
+        "  Function.Injective.of_comp\n"
+        "    (f := fun n : Nat => n)\n"
+        "    Function.injective_id\n"
+    )
+    theorem = _Theorem(
+        proof_start=_Pos(4, 5),
+        proof_end=_Pos(4, len("    Function.injective_id") + 1),
+    )
+    candidate = candidate_from_traced_theorem(
+        theorem,
+        source=source,
+        file_path="Mathlib/Test.lean",
+        source_repository="https://github.com/leanprover-community/mathlib4",
+        source_revision="a" * 40,
+        provenance="real-mathlib",
+    )
+
+    assert candidate.transformation_kind == "term-to-exact"
+    assert candidate.source_expression.startswith("Function.Injective.of_comp")
+    assert "(f := fun n : Nat => n)" in candidate.source_expression
+    reconstructed = substitute_proofs(source, [candidate])
+    assert reconstructed.startswith(
+        "theorem identity : Function.Injective (fun n : Nat => n) :=\n  by\n"
+    )
+
+
 def test_deterministic_selection_requires_requested_transformation_population() -> None:
     term = _candidate("theorem identity (P : Prop) : P → P := fun h => h")
     selected = select_candidates(

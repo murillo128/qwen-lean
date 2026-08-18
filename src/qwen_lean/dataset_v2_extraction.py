@@ -16,6 +16,7 @@ from typing import Any
 from .dataset_v2_contract import (
     canonicalize_equation_clauses,
     canonicalize_proof_expression,
+    canonicalize_where_fields,
     proof_fingerprint,
     proof_variant_id,
     statement_fingerprint_v2,
@@ -149,6 +150,16 @@ def _span(start: Any, end: Any) -> SourceSpan:
     return SourceSpan(start=_position(start), end=_position(end))
 
 
+def _position_from_offset(source: str, offset: int) -> SourcePosition:
+    if offset < 0 or offset > len(source):
+        raise ValueError("source offset is outside the file")
+    prefix = source[:offset]
+    return SourcePosition(
+        line=prefix.count("\n") + 1,
+        column=len(prefix.rsplit("\n", 1)[-1]) + 1,
+    )
+
+
 def _module(file_path: str) -> str:
     return file_path.removesuffix(".lean").replace("/", ".")
 
@@ -165,6 +176,68 @@ def _contains_placeholder(value: str) -> bool:
         kind == "identifier" and token in {"sorry", "admit"}
         for kind, token in _lex_lean(value)
     )
+
+
+def _top_level_assignment_indices(value: str) -> list[int]:
+    """Locate proof-assignment tokens outside comments, strings, and brackets."""
+
+    assignments: list[int] = []
+    closing_stack: list[str] = []
+    block_comment_depth = 0
+    in_line_comment = False
+    in_string = False
+    escaped = False
+    opening = {"(": ")", "[": "]", "{": "}", "⦃": "⦄"}
+    index = 0
+    while index < len(value):
+        pair = value[index : index + 2]
+        char = value[index]
+        if in_line_comment:
+            if char == "\n":
+                in_line_comment = False
+            index += 1
+            continue
+        if block_comment_depth:
+            if pair == "/-":
+                block_comment_depth += 1
+                index += 2
+            elif pair == "-/":
+                block_comment_depth -= 1
+                index += 2
+            else:
+                index += 1
+            continue
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            index += 1
+            continue
+        if pair == "--":
+            in_line_comment = True
+            index += 2
+            continue
+        if pair == "/-":
+            block_comment_depth = 1
+            index += 2
+            continue
+        if char == '"':
+            in_string = True
+            index += 1
+            continue
+        if char in opening:
+            closing_stack.append(opening[char])
+        elif closing_stack and char == closing_stack[-1]:
+            closing_stack.pop()
+        elif pair == ":=" and not closing_stack:
+            assignments.append(index)
+            index += 2
+            continue
+        index += 1
+    return assignments
 
 
 def _proof_dependencies(proof_node: Any) -> tuple[str, ...]:
@@ -363,21 +436,52 @@ def candidate_from_traced_theorem(
     declaration_span = _span(traced_theorem.start, proof_start)
     proof_span = _span(proof_start, proof_end)
     raw_declaration = source_slice(source, declaration_span)
-    declaration = canonical_declaration(raw_declaration)
     if any(
         kind == "identifier" and token == "private"
         for kind, token in _lex_lean(raw_declaration)
     ):
         raise ValueError("private")
+    recovered_assignment = False
+    if raw_declaration.rstrip().endswith("where"):
+        where_offset = raw_declaration.rstrip().rfind("where")
+        absolute_where_offset = (
+            position_offset(source, source_span.start) + where_offset
+        )
+        where_position = _position_from_offset(source, absolute_where_offset)
+        declaration_span = SourceSpan(source_span.start, where_position)
+        proof_span = SourceSpan(where_position, source_span.end)
+        raw_declaration = source_slice(source, declaration_span)
+    elif not raw_declaration.rstrip().endswith(":="):
+        assignments = _top_level_assignment_indices(raw_declaration)
+        if assignments:
+            recovered_assignment = True
+            assignment_offset = assignments[-1]
+            absolute_assignment_offset = (
+                position_offset(source, source_span.start) + assignment_offset
+            )
+            proof_offset = absolute_assignment_offset + 2
+            while proof_offset < len(source) and source[proof_offset].isspace():
+                proof_offset += 1
+            declaration_span = SourceSpan(
+                source_span.start,
+                _position_from_offset(source, absolute_assignment_offset),
+            )
+            proof_span = SourceSpan(
+                _position_from_offset(source, proof_offset), source_span.end
+            )
+            raw_declaration = source_slice(source, declaration_span)
     source_expression = source_slice(source, proof_span)
     if _contains_placeholder(source_expression):
         raise ValueError("proof-placeholder")
-    if raw_declaration.rstrip().endswith(":="):
+    if raw_declaration.rstrip().endswith(":=") or recovered_assignment:
         proof = canonicalize_proof_expression(source_expression)
+    elif source_expression.lstrip().startswith("where"):
+        proof = canonicalize_where_fields(source_expression)
     elif source_expression.lstrip().startswith("|"):
         proof = canonicalize_equation_clauses(source_expression)
     else:
         raise ValueError("unsupported-proof-delimiter")
+    declaration = canonical_declaration(raw_declaration)
     verification_status = "accepted" if proof.transformation == "none" else "pending"
     verification_method = (
         "pinned-source-build" if proof.transformation == "none" else "pending-reconstruction"
@@ -536,7 +640,8 @@ def substitute_proofs(source: str, candidates: Sequence[SourceCandidate]) -> str
             raise ValueError(f"source proof identity mismatch for {candidate.declaration_name}")
         replacement = (
             ":= " + candidate.canonical_proof
-            if candidate.transformation_kind == "equations-to-fun-exact"
+            if candidate.transformation_kind
+            in {"equations-to-fun-exact", "where-to-structure-exact"}
             else candidate.canonical_proof
         )
         replacements.append((start, end, replacement))
