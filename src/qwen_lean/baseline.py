@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gc
 import json
+import os
 import platform
 import time
 from collections.abc import Mapping
@@ -198,7 +199,22 @@ def run_phase1_baseline(
             "gpu_memory_utilization": float(config.engine["gpu_memory_utilization"]),
             "enforce_eager": bool(config.engine["enforce_eager"]),
             "quantization": config.engine["quantization"],
-            "chat_template": None,
+            **(
+                {"language_model_only": bool(config.engine["language_model_only"])}
+                if "language_model_only" in config.engine
+                else {}
+            ),
+            **(
+                {"sampler_backend": "native"}
+                if config.engine.get("use_flashinfer_sampler") is False
+                else {}
+            ),
+            **(
+                {"add_special_tokens": bool(config.model["add_special_tokens"])}
+                if "add_special_tokens" in config.model
+                else {}
+            ),
+            "chat_template": config.model.get("chat_template"),
             "prompt_transformation": None,
             "adapter": None if adapter is None else adapter.metadata(),
         },
@@ -327,6 +343,8 @@ def _generate_candidates(
     sampling: Mapping[str, Any] | None = None,
     adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[list[GeneratedCandidate], str]:
+    if config.engine.get("use_flashinfer_sampler") is False:
+        os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     try:
         import vllm
         from vllm import LLM, SamplingParams
@@ -470,6 +488,8 @@ def vllm_engine_kwargs(
         "seed": int(sampling["seed"]),
         "trust_remote_code": False,
     }
+    if "language_model_only" in engine:
+        kwargs["language_model_only"] = bool(engine["language_model_only"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(

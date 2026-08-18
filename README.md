@@ -135,6 +135,31 @@ Each model run writes versioned `run.json`, raw `results.jsonl`, and `summary.js
 Only compact accepted baseline evidence belongs under `evidence/`; raw continuations
 and external benchmark/model caches remain local and ignored.
 
+## Qwen3.5-2B strict casting assessment
+
+The Qwen3.5 assessment keeps its newer vLLM stack isolated from the accepted
+Phase 1 environment. Prepare the locked runtime, run the real BF16 preflight,
+then run dev16 before the frozen 244-task, four-candidate validation workload:
+
+```bash
+uv sync --frozen --project tools/qwen35-assessment
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-preflight \
+  --benchmark-root /tmp/qwen-lean-minif2f
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/qwen35-2b/dev16
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/qwen35-2b/full
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-evidence
+```
+
+Raw candidates, model files, and caches remain outside Git. The evidence command
+retains only compact aggregate results and a hash binding them to the local raw
+candidate manifest.
+
 ## Phase 2 verified mathlib corpus
 
 Phase 2 uses LeanDojo-v2 at the revision pinned in
