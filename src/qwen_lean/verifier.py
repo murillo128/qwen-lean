@@ -60,9 +60,19 @@ class LeanVerifier:
         return self._run_source(reconstruct_source(task, candidate), started=started)
 
     def _probe_preamble(self, preamble: str) -> VerificationOutcome | None:
+        return self.prime_preamble(preamble, timeout_seconds=self.timeout_seconds)
+
+    def prime_preamble(
+        self, preamble: str, *, timeout_seconds: float
+    ) -> VerificationOutcome | None:
+        """Validate and cache one shared preamble outside a candidate timeout."""
+
         with self._preamble_probe_lock:
             if preamble not in self._preamble_probes:
-                outcome = self._run_source(f"{preamble}\n\n#check True\n")
+                outcome = self._run_source(
+                    f"{preamble}\n\n#check True\n",
+                    timeout_seconds=timeout_seconds,
+                )
                 if outcome.category != "verified":
                     outcome = VerificationOutcome(
                         category="verifier_error",
@@ -76,7 +86,11 @@ class LeanVerifier:
             return self._preamble_probes[preamble]
 
     def _run_source(
-        self, source: str, *, started: float | None = None
+        self,
+        source: str,
+        *,
+        started: float | None = None,
+        timeout_seconds: float | None = None,
     ) -> VerificationOutcome:
         started = time.perf_counter() if started is None else started
         try:
@@ -95,7 +109,11 @@ class LeanVerifier:
                     cwd=self.project_root,
                     text=True,
                     capture_output=True,
-                    timeout=self.timeout_seconds,
+                    timeout=(
+                        self.timeout_seconds
+                        if timeout_seconds is None
+                        else timeout_seconds
+                    ),
                     check=False,
                 )
         except subprocess.TimeoutExpired as error:

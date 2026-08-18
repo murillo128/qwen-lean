@@ -21,6 +21,15 @@ from .gpt53_assessment import (
     write_compact_evidence as write_gpt53_evidence,
 )
 from .minif2f import Phase1Config
+from .qwen3_posttrained_assessment import (
+    load_assessment_config as load_qwen3_posttrained_config,
+)
+from .qwen3_posttrained_assessment import (
+    run_strict_assessment as run_qwen3_posttrained_assessment,
+)
+from .qwen3_posttrained_assessment import (
+    write_compact_evidence as write_qwen3_posttrained_evidence,
+)
 from .phase2_corpus import load_phase2_dataset
 from .phase2_extraction import Phase2Config, write_compact_evidence
 from .phase2_verification import verify_phase2_sample
@@ -215,6 +224,51 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    qwen3_assess = subparsers.add_parser(
+        "qwen3-posttrained-assess",
+        help="run the strict Qwen3-8B official post-trained assessment",
+    )
+    qwen3_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen3_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen3-8b-posttrained-assessment.json",
+    )
+    qwen3_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen3_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen3_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen3_evidence = subparsers.add_parser(
+        "qwen3-posttrained-evidence",
+        help="write compact Qwen3-8B post-trained comparison evidence",
+    )
+    qwen3_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen3-8b-posttrained-assessment.json",
+    )
+    qwen3_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen3-8b/dev16"
+    )
+    qwen3_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen3-8b/full"
+    )
+    qwen3_evidence.add_argument(
+        "--base-dir", type=Path, default=root / "evidence/phase1/baseline"
+    )
+    qwen3_evidence.add_argument(
+        "--reference",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    qwen3_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen3-8b-posttrained"
+    )
 
     qwen35_9b_posttrained_preflight = subparsers.add_parser(
         "qwen35-9b-preflight",
@@ -1245,6 +1299,32 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
+
+    if args.command == "qwen3-posttrained-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen3_posttrained_assessment(
+            load_qwen3_posttrained_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen3-posttrained-evidence":
+        comparison = write_qwen3_posttrained_evidence(
+            load_qwen3_posttrained_config(args.config),
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            base_dir=args.base_dir,
+            reference_path=args.reference,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
 
     if args.command == "qwen35-9b-preflight":
         state = run_qwen35_9b_posttrained_preflight(

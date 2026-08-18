@@ -176,6 +176,33 @@ def run_phase1_baseline(
     runtime["generation_wall_time_seconds"] = generation_wall_time
 
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
+    post_generation_probe_timeout = (
+        timeout_seconds
+        if environment_probe_timeout_seconds is None
+        else environment_probe_timeout_seconds
+    )
+    post_generation_probe_started = time.perf_counter()
+    probe_failure = verifier.prime_preamble(
+        tasks[0].preamble,
+        timeout_seconds=post_generation_probe_timeout,
+    )
+    post_generation_probe_wall_time = (
+        time.perf_counter() - post_generation_probe_started
+    )
+    if probe_failure is not None:
+        diagnostics = (
+            probe_failure.diagnostics["stdout"] + probe_failure.diagnostics["stderr"]
+        )
+        raise RuntimeError(
+            "post-generation verifier environment probe failed as "
+            f"{probe_failure.category}: {diagnostics}"
+        )
+    runtime["post_generation_environment_probe_timeout_seconds"] = (
+        post_generation_probe_timeout
+    )
+    runtime["post_generation_environment_probe_wall_time_seconds"] = (
+        post_generation_probe_wall_time
+    )
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=verification_workers) as executor:
         results = []
@@ -211,7 +238,11 @@ def run_phase1_baseline(
         candidates_per_task=int(sampling["candidates_per_task"]),
     )
     summary["workload_id"] = workload_id
-    summary["run_wall_time_seconds"] = generation_wall_time + verification_wall_time
+    summary["run_wall_time_seconds"] = (
+        generation_wall_time
+        + post_generation_probe_wall_time
+        + verification_wall_time
+    )
 
     metadata = RunMetadata(
         schema_version=result_schema_version,
@@ -329,10 +360,15 @@ def reverify_phase1_artifacts(
     all_tasks = materialize_benchmark_tasks(config, benchmark_root)
     tasks = config.select_workload(metadata.workload_id, all_tasks)
     tasks_by_id = {task.id: task for task in tasks}
+    environment_probe_timeout = float(
+        config.value.get("assessment", {}).get(
+            "environment_probe_timeout_seconds", timeout_seconds
+        )
+    )
     validate_minif2f_environment(
         config,
         benchmark_root,
-        timeout_seconds=timeout_seconds,
+        timeout_seconds=environment_probe_timeout,
     )
     generated = [
         GeneratedCandidate(
@@ -352,6 +388,22 @@ def reverify_phase1_artifacts(
     ]
 
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
+    post_generation_probe_started = time.perf_counter()
+    probe_failure = verifier.prime_preamble(
+        tasks[0].preamble,
+        timeout_seconds=environment_probe_timeout,
+    )
+    post_generation_probe_wall_time = (
+        time.perf_counter() - post_generation_probe_started
+    )
+    if probe_failure is not None:
+        diagnostics = (
+            probe_failure.diagnostics["stdout"] + probe_failure.diagnostics["stderr"]
+        )
+        raise RuntimeError(
+            "reverification environment probe failed as "
+            f"{probe_failure.category}: {diagnostics}"
+        )
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=verification_workers) as executor:
         results = list(
@@ -367,6 +419,12 @@ def reverify_phase1_artifacts(
             "previous_verification_wall_time_seconds": previous_verification_wall_time,
             "verification_wall_time_seconds": verification_wall_time,
             "verification_workers": verification_workers,
+            "post_generation_environment_probe_timeout_seconds": (
+                environment_probe_timeout
+            ),
+            "post_generation_environment_probe_wall_time_seconds": (
+                post_generation_probe_wall_time
+            ),
         }
     )
     updated_metadata = RunMetadata(
@@ -383,7 +441,9 @@ def reverify_phase1_artifacts(
     )
     summary["workload_id"] = metadata.workload_id
     summary["run_wall_time_seconds"] = (
-        float(runtime.get("generation_wall_time_seconds", 0.0)) + verification_wall_time
+        float(runtime.get("generation_wall_time_seconds", 0.0))
+        + post_generation_probe_wall_time
+        + verification_wall_time
     )
     write_artifacts(output_dir, updated_metadata, results, summary=summary)
     return updated_metadata, results, summary
@@ -401,6 +461,7 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         raise RuntimeError("Phase 1 baseline generation requires a local CUDA GPU")
     device_index = torch.cuda.current_device()
     properties = torch.cuda.get_device_properties(device_index)
+    package_versions = _runtime_package_versions(config)
     expected_fragment = str(config.engine["expected_cuda_device_name_fragment"])
     if expected_fragment not in properties.name:
         raise RuntimeError(
@@ -410,23 +471,27 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "torch_cuda_version": torch.version.cuda,
-        "package_versions": _runtime_package_versions(config),
+        "package_versions": package_versions,
         "inference_execution": "local_cuda",
         "cuda_device_index": device_index,
         "cuda_device": properties.name,
         "cuda_device_capability": [properties.major, properties.minor],
         "cuda_device_total_memory_bytes": properties.total_memory,
-        "sampling_backend": (
-            "flashinfer"
-            if bool(
-                config.engine.get(
-                    "use_flashinfer_sampler",
-                    config.engine.get("flashinfer_sampler", True),
-                )
-            )
-            else "vllm_pytorch_native"
-        ),
+        "sampling_backend": _sampling_backend(config.engine, package_versions),
     }
+
+
+def _sampling_backend(
+    engine: Mapping[str, Any], package_versions: Mapping[str, str]
+) -> str:
+    if (
+        engine.get("use_flashinfer_sampler", engine.get("flashinfer_sampler", True))
+        is False
+    ):
+        return "vllm_pytorch_native"
+    if "flashinfer-python" in package_versions:
+        return "flashinfer"
+    return "vllm_pytorch_native_fallback"
 
 
 def _runtime_package_versions(config: Phase1Config) -> dict[str, str]:
