@@ -79,7 +79,7 @@ Compare the base model and the first full SFT model using the same evaluation co
 
 Add a deterministic training-set generation diagnostic for the selected SFT checkpoint. Evaluate a fixed sample of Phase 5 training theorems through the same free-generation and Lean-verification path used for held-out evaluation, and report both exact target-proof reproduction and Lean-accepted proof success. Compare this train-sample result directly with the held-out result so Phase 6 can distinguish memorization from generalization and quantify the train-to-heldout generalization gap. The controlling Phase 6 issue should freeze the exact sample size, selection rule, and candidate budget before observing model outputs.
 
-Select one SFT checkpoint for later post-training without tuning against the external benchmark test split. That checkpoint becomes the common parent and retained control for both Phase 7 and Phase 8.
+Select one SFT checkpoint for later post-training without tuning against the external benchmark test split. That checkpoint becomes the common parent and retained control for Phases 7, 8, and 9.
 
 Use the external benchmark test split only for checkpoints that have already been selected without tuning against that test set.
 
@@ -91,7 +91,7 @@ Use the external benchmark test split only for checkpoints that have already bee
 
 Start from the reference SFT checkpoint selected in Phase 6. Sample multiple candidate proofs for additional theorem statements, run every candidate through the unchanged Lean verifier, retain successful examples under explicit filtering rules, and perform a new supervised training iteration on the resulting verified synthetic data.
 
-This branch is independent of Phase 8. Where practical, use the same theorem-source pool and comparable generation budget intended for the GRPO branch so the later comparison is interpretable.
+This branch is independent of Phases 8 and 9. Where practical, use the same theorem-source pool and comparable generation budget intended for the other post-SFT branches so the later comparison is interpretable.
 
 **Entry condition:** the reference SFT model solves enough sampled examples for verifier filtering to produce a useful synthetic corpus.
 
@@ -101,7 +101,7 @@ This branch is independent of Phase 8. Where practical, use the same theorem-sou
 
 **Purpose:** independently measure what is gained by training directly from online Lean verifier reward rather than converting successes into a new SFT dataset.
 
-Start from the same reference SFT checkpoint selected in Phase 6, **not** from the Phase 7 self-trained checkpoint. The first GRPO/RLVR experiment uses a binary outcome reward tied to valid proof completion: `1` for a `verified` proof and `0` otherwise.
+Start from the same reference SFT checkpoint selected in Phase 6, **not** from the Phase 7 self-trained checkpoint or the Phase 9 process-supervised checkpoint. The first GRPO/RLVR experiment uses a binary outcome reward tied to valid proof completion: `1` for a `verified` proof and `0` otherwise.
 
 Generate groups of candidate proofs, verify them through the unchanged Lean path, and use the verifier outcomes as the online training signal. Record reward density and group variation explicitly so sparse-reward failure can be distinguished from implementation failure.
 
@@ -109,32 +109,53 @@ If the binary reward produces too little useful signal, do not silently change t
 
 **Entry condition:** generation, verification, reward computation, artifact handling, and comparative evaluation are stable enough that RL-specific failures can be distinguished from infrastructure failures.
 
-**Exit gate:** a GRPO/RLVR Model B exists or the binary-reward experiment has produced a supported sparse-reward conclusion; the result is evaluated against the same retained SFT control without using Model A as its initialization.
+**Exit gate:** a GRPO/RLVR Model B exists or the binary-reward experiment has produced a supported sparse-reward conclusion; the result is evaluated against the same retained SFT control without using Model A or Model C as its initialization.
 
-## Phase 9 — Independent post-training comparison
+## Phase 9 — Branch C: proof-state process supervision
 
-**Purpose:** determine what each post-training method contributes before combining them.
+**Purpose:** measure whether exposing Lean's verified intermediate proof states and tactic transitions teaches useful proof-construction structure beyond whole-proof output supervision alone.
+
+Start from the same reference SFT checkpoint selected in Phase 6. Build a process-supervision corpus from Lean-verified proofs by extracting trajectories of the form `proof state -> tactic/action -> resulting proof state`. The source proofs may come from existing verified training material and, when useful, independently sampled proofs from the common SFT parent, but this branch must not depend on Model A or Model B outputs/checkpoints as required inputs.
+
+Train a distinct Model C with an explicitly designed process-supervision objective or auxiliary supervised mixture. The exact serialization and loss mixture belong to the Phase 9 design issue; they must preserve which intermediate states and actions are mechanically grounded by Lean rather than treating free-form natural-language rationales as verified evidence.
+
+For this first process-supervision experiment, **evaluation remains whole-proof generation under `whole-proof-v1` and the unchanged Lean verifier**. Do not change the evaluation task to interactive tactic selection merely because proof states are used during training. That architectural change remains a later milestone.
+
+Where practical, use theorem sources and training/generation budgets that make comparison with the other independent branches meaningful. Record process-corpus size, trajectory lengths, tactic/state coverage, and any filtering losses needed to interpret the result.
+
+**Entry condition:** the project can reliably extract proof-state/tactic transitions from verified Lean proofs with enough context to replay or validate sampled trajectories.
+
+**Exit gate:** a process-supervised Model C exists and has been evaluated against the same retained SFT control using whole-proof evaluation; the project can state whether process supervision improves proof validity or task success beyond output-only SFT, with data yield, cost, and limitations understood.
+
+## Phase 10 — Independent post-training comparison
+
+**Purpose:** determine what each post-training method contributes before combining them or changing the proving architecture.
 
 Compare at minimum:
 
 - the retained reference SFT checkpoint (control);
 - Model A from verifier-filtered self-training;
 - Model B from binary-reward GRPO/RLVR, when training produced a usable checkpoint;
+- Model C from proof-state process supervision;
 - any separately designed shaped-RL variant, if one was needed.
 
-Use the same prompt, Lean environment, held-out workloads, generation/evaluation settings, and verifier semantics. Compare task quality and also the cost needed to obtain it: candidate-generation volume, training GPU time, verifier workload, stability, and relevant failure distributions.
+Use the same whole-proof prompt, Lean environment, held-out workloads, generation/evaluation settings, and verifier semantics. Compare task quality and also the cost needed to obtain it: candidate-generation volume, training GPU time, verifier workload, process-data extraction cost, stability, and relevant failure distributions.
 
-Do not treat self-training followed by GRPO as the default experiment. Only after the independent comparison may a later design test whether the methods are complementary in sequence.
+For Model C, also inspect whether gains correlate with process-level changes such as higher rates of valid tactic execution or more useful intermediate proof-state transitions, while keeping final model-quality claims anchored to verifier-based whole-proof success.
 
-**Exit gate:** the project can state which isolated post-training method improved over the common SFT parent, by how much, at what cost, and whether a combined follow-up is justified.
+Do not treat self-training followed by GRPO, process supervision followed by GRPO, or another composition as the default experiment. Only after the independent comparison may a later design test whether methods are complementary in sequence or mixture.
 
-## Phase 10 — Tactic-level proving and search
+**Exit gate:** the project can state which isolated post-training method improved over the common SFT parent, by how much, at what cost, and whether a combined follow-up or a tactic-level architecture is justified.
+
+## Phase 11 — Tactic-level proving and search
 
 **Purpose:** move beyond whole-proof generation if the project benefits from a more capable theorem-proving architecture.
 
 This is a separate milestone. The task changes from generating an entire proof in one completion to repeatedly choosing tactics from a Lean proof state, potentially adding premise retrieval, search, and progress/value estimates.
 
-**Entry condition:** whole-proof experiments have produced enough evidence to justify the additional system complexity.
+Proof-state data learned or extracted in Phase 9 may inform this design, but Phase 11 changes the inference/control loop and must not be treated as merely turning on an already-trained auxiliary objective.
+
+**Entry condition:** whole-proof experiments and the process-supervision branch have produced enough evidence to justify the additional system complexity.
 
 **Exit gate:** to be defined by a dedicated design issue when this phase becomes active.
 
