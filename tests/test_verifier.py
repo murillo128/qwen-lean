@@ -93,6 +93,26 @@ def test_concurrent_candidates_share_one_preamble_probe(tmp_path: Path) -> None:
     assert probe_log.read_text(encoding="utf-8").splitlines() == ["probe"]
 
 
+def test_preamble_can_be_primed_outside_candidate_timeout(tmp_path: Path) -> None:
+    probe_log = tmp_path / "probes.log"
+    fake_lake = tmp_path / "fake-lake"
+    fake_lake.write_text(
+        "#!/bin/sh\n"
+        f"if grep -q '#check True' \"$5\"; then echo probe >> {probe_log}; "
+        "sleep 0.05; fi\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    fake_lake.chmod(0o755)
+    verifier = LeanVerifier(ROOT, timeout_seconds=0.01, lake_command=str(fake_lake))
+
+    assert verifier.prime_preamble("import Init", timeout_seconds=0.2) is None
+    outcome = verifier.verify(CORE_TASK, "exact h")
+
+    assert outcome.category == "verified"
+    assert probe_log.read_text(encoding="utf-8").splitlines() == ["probe"]
+
+
 def test_mathlib_candidate_uses_pinned_dependency() -> None:
     task = TaskRecord(
         id="add-zero",
