@@ -1,0 +1,66 @@
+{
+  "accepted_anchors": {
+    "qwen3_8b_base": {
+      "candidate_count": 1952,
+      "candidates_per_task": 8,
+      "id": "Qwen/Qwen3-8B-Base",
+      "pass_at_k": {
+        "pass@1": 0.012807377049180328,
+        "pass@4": 0.04771662763466042
+      },
+      "revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "source": "evidence/phase1/baseline"
+    },
+    "reference_sft_v1": {
+      "adapter_id": "phase5-train-full-v1-lora",
+      "base_model_id": "Qwen/Qwen3-8B-Base",
+      "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "candidate_count": 1952,
+      "candidates_per_task": 8,
+      "id": "reference-sft-v1",
+      "pass_at_k": {
+        "pass@1": 0.03944672131147541,
+        "pass@4": 0.1031615925058548
+      },
+      "source": "evidence/phase5/minif2f.json"
+    }
+  },
+  "anchors_regenerated": false,
+  "candidate_budget_caveat": "The strict post-trained lane uses the issue-mandated four candidates per task; accepted Qwen3-8B-Base and reference-sft-v1 evidence use eight. All values use the same pass@k estimator and unchanged raw Lean verifier, but the finite sampling budgets differ.",
+  "metrics": {
+    "pass@1": {
+      "delta_posttrained_minus_base": -0.008709016393442622,
+      "delta_posttrained_minus_reference": -0.03534836065573771,
+      "fraction_of_base": 0.32,
+      "fraction_of_reference": 0.10389610389610389,
+      "qwen3_8b_base": 0.012807377049180328,
+      "qwen3_8b_posttrained": 0.004098360655737705,
+      "reference_sft_v1": 0.03944672131147541
+    },
+    "pass@4": {
+      "delta_posttrained_minus_base": -0.031323185011709595,
+      "delta_posttrained_minus_reference": -0.08676814988290397,
+      "fraction_of_base": 0.34355828220858897,
+      "fraction_of_reference": 0.15891032917139616,
+      "qwen3_8b_base": 0.04771662763466042,
+      "qwen3_8b_posttrained": 0.01639344262295082,
+      "reference_sft_v1": 0.1031615925058548
+    }
+  },
+  "schema_version": "qwen3-8b-posttrained-comparison-v1",
+  "status": "passed",
+  "strict_execution_integrity": {
+    "candidate_count": 976,
+    "chat_template": null,
+    "infrastructure_error_count": 0,
+    "proof_extraction": false,
+    "raw_continuation": true,
+    "repair": false,
+    "task_count": 244,
+    "verifier_feedback": false,
+    "verifier_timeout_count": 0
+  },
+  "strict_model": "Qwen/Qwen3-8B",
+  "strict_model_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+  "workload_id": "minif2f-valid-v1"
+}

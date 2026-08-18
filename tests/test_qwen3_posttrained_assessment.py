@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from qwen_lean.artifacts import write_artifacts
-from qwen_lean.baseline import vllm_engine_kwargs
+from qwen_lean.baseline import _sampling_backend, vllm_engine_kwargs
 from qwen_lean.metrics import summarize_results
 from qwen_lean.qwen3_posttrained_assessment import (
     BASE_MODEL_ID,
@@ -75,6 +75,16 @@ def test_config_rejects_sampling_and_prompt_drift() -> None:
         validate_assessment_config(type(config)(path=config.path, value=changed))
 
 
+def test_sampling_backend_records_vllm_native_fallback() -> None:
+    assert _sampling_backend({}, {}) == "vllm_pytorch_native_fallback"
+    assert _sampling_backend({}, {"flashinfer-python": "0.4.1"}) == "flashinfer"
+    assert (
+        _sampling_backend(
+            {"use_flashinfer_sampler": False}, {"flashinfer-python": "0.4.1"}
+        )
+        == "vllm_pytorch_native"
+    )
+
 def test_compact_evidence_checks_counts_and_compares_both_anchors(
     tmp_path: Path,
 ) -> None:
@@ -113,6 +123,7 @@ def test_compact_evidence_checks_counts_and_compares_both_anchors(
         }
     )
     assert full["generated_token_counts"]["total"] == 9760
+    assert len(full["generation_identity_sha256"]) == 64
     assert full["throughput"]["generated_tokens_per_second"] == pytest.approx(976)
     assert full["verifier_timeout_semantics"] == "unsuccessful_proof_outcome"
 

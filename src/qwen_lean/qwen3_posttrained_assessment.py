@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import statistics
 from pathlib import Path
@@ -229,7 +230,9 @@ def _compact_run(
         "inference_engine_version": metadata.inference_engine_version
         == str(config.engine["version"]),
         "candidate_budget": metadata.candidates_per_task == 4,
-        "strict_sampling": all(settings.get(key) == value for key, value in STRICT_SAMPLING.items()),
+        "strict_sampling": all(
+            settings.get(key) == value for key, value in STRICT_SAMPLING.items()
+        ),
         "local_cuda": metadata.runtime.get("inference_execution") == "local_cuda",
         "ada_gpu": "Ada" in str(metadata.runtime.get("cuda_device", "")),
         "bf16": settings.get("dtype") == "bfloat16",
@@ -275,6 +278,31 @@ def _compact_run(
     run_wall = float(summary["run_wall_time_seconds"])
     solved_tasks = int(summary["tasks_with_verified_candidate"]["count"])
     total_tokens = sum(concrete_counts)
+    generation_identity = [
+        {
+            "task_id": result.task_id,
+            "candidate_id": result.candidate_id,
+            "candidate_index": result.candidate_index,
+            "candidate_text": result.candidate_text,
+            "generation_latency_seconds": result.generation_latency_seconds,
+            "generated_token_count": result.generated_token_count,
+            "finish_reason": result.finish_reason,
+        }
+        for result in results
+    ]
+    runtime = dict(metadata.runtime)
+    package_versions = runtime.get("package_versions", {})
+    if (
+        runtime.get("sampling_backend") == "flashinfer"
+        and isinstance(package_versions, dict)
+        and "flashinfer-python" not in package_versions
+    ):
+        runtime["sampling_backend_reported_by_runner"] = "flashinfer"
+        runtime["sampling_backend"] = "vllm_pytorch_native_fallback"
+        runtime["sampling_backend_resolution"] = (
+            "flashinfer-python was absent; vLLM 0.10.2 automatically fell back "
+            "to its PyTorch-native top-p/top-k sampler"
+        )
     return {
         "schema_version": "qwen3-8b-posttrained-run-evidence-v1",
         "status": "passed",
@@ -295,7 +323,7 @@ def _compact_run(
             "verifier_environment": metadata.verifier_environment,
         },
         "runtime": {
-            **metadata.runtime,
+            **runtime,
             "inference_engine": metadata.inference_engine,
             "inference_engine_version": metadata.inference_engine_version,
         },
@@ -311,6 +339,13 @@ def _compact_run(
         "infrastructure_error_count": summary["infrastructure_error_count"],
         "verifier_timeout_count": summary["verifier_timeout_count"],
         "verifier_timeout_semantics": "unsuccessful_proof_outcome",
+        "generation_identity_sha256": hashlib.sha256(
+            json.dumps(
+                generation_identity,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest(),
         "generated_token_counts": {
             "total": total_tokens,
             "minimum": min(concrete_counts),
@@ -449,11 +484,18 @@ generation/verifier infrastructure errors. The full run retained
 {full['verifier_timeout_count']} `verifier_timeout` outcomes as unsuccessful
 proofs. Compute per solved task was {compute_text}.
 
+The dev16 continuations were generated once and then reverified unchanged after
+the original run exposed a shared post-generation preamble-probe timeout. Its
+generation-identity digest is `{dev16['generation_identity_sha256']}`; accepted
+reverification produced 64 Lean rejections and zero task-level timeouts.
+
 **ACCEPTED:** the score uses exact `whole-proof-v1` raw continuation, four
 candidates per task, temperature 0.8, top-p 0.95, no top-k, 1,024 new tokens,
 seed 0, no chat template, no proof extraction, no verifier feedback, and no
 repair. It ran in BF16 without quantization using local vLLM
-`{config.engine['version']}` on {full['runtime']['cuda_device']}.
+`{config.engine['version']}` on {full['runtime']['cuda_device']}. FlashInfer was
+not installed, so vLLM automatically used its PyTorch-native sampling fallback;
+the frozen temperature/top-p/no-top-k contract was unchanged.
 
 The model and tokenizer are pinned to `{MODEL_REVISION}`. No optional native/chat
 diagnostic was run. The official model is Apache-2.0; weights, caches, and raw

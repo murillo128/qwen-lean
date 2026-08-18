@@ -451,6 +451,7 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         raise RuntimeError("Phase 1 baseline generation requires a local CUDA GPU")
     device_index = torch.cuda.current_device()
     properties = torch.cuda.get_device_properties(device_index)
+    package_versions = _runtime_package_versions(config)
     expected_fragment = str(config.engine["expected_cuda_device_name_fragment"])
     if expected_fragment not in properties.name:
         raise RuntimeError(
@@ -460,18 +461,24 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "torch_cuda_version": torch.version.cuda,
-        "package_versions": _runtime_package_versions(config),
+        "package_versions": package_versions,
         "inference_execution": "local_cuda",
         "cuda_device_index": device_index,
         "cuda_device": properties.name,
         "cuda_device_capability": [properties.major, properties.minor],
         "cuda_device_total_memory_bytes": properties.total_memory,
-        "sampling_backend": (
-            "flashinfer"
-            if bool(config.engine.get("use_flashinfer_sampler", True))
-            else "vllm_pytorch_native"
-        ),
+        "sampling_backend": _sampling_backend(config.engine, package_versions),
     }
+
+
+def _sampling_backend(
+    engine: Mapping[str, Any], package_versions: Mapping[str, str]
+) -> str:
+    if engine.get("use_flashinfer_sampler") is False:
+        return "vllm_pytorch_native"
+    if "flashinfer-python" in package_versions:
+        return "flashinfer"
+    return "vllm_pytorch_native_fallback"
 
 
 def _runtime_package_versions(config: Phase1Config) -> dict[str, str]:
