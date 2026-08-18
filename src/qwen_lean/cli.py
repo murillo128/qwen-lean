@@ -12,6 +12,14 @@ from .baseline import (
 )
 from .evaluator import load_fixture_set, run_fixture_evaluation
 from .generation import run_model_smoke
+from .gpt53_assessment import (
+    GPT53Config,
+    run_assessment,
+    run_preflight,
+)
+from .gpt53_assessment import (
+    write_compact_evidence as write_gpt53_evidence,
+)
 from .minif2f import Phase1Config
 from .phase2_corpus import load_phase2_dataset
 from .phase2_extraction import Phase2Config, write_compact_evidence
@@ -77,6 +85,12 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .riemann_data import (
+    RiemannAtlasConfig,
+    RiemannDataConfig,
+    materialize_riemann_data,
+    validate_materialized_riemann_data,
+)
 from .sft2 import SFT2Config
 from .sft2_evidence import (
     write_sft2_checkpoint_a_evidence,
@@ -159,6 +173,60 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
 
+    gpt53_preflight = subparsers.add_parser(
+        "gpt53-spark-preflight",
+        help="prove the pinned GPT-5.3-Codex Spark/xhigh nested CLI contract",
+    )
+    gpt53_preflight.add_argument(
+        "--config", type=Path, default=root / "config/gpt53-assessment.json"
+    )
+    gpt53_preflight.add_argument(
+        "--output-dir", type=Path, default=root / "artifacts/gpt53-spark/preflight"
+    )
+
+    gpt53_assess = subparsers.add_parser(
+        "gpt53-spark-assess",
+        help="run isolated one-shot GPT-5.3-Codex Spark candidates through Lean",
+    )
+    gpt53_assess.add_argument("--benchmark-root", type=Path, required=True)
+    gpt53_assess.add_argument(
+        "--config", type=Path, default=root / "config/gpt53-assessment.json"
+    )
+    gpt53_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    gpt53_assess.add_argument(
+        "--preflight-dir", type=Path, default=root / "artifacts/gpt53-spark/preflight"
+    )
+    gpt53_assess.add_argument("--output-dir", type=Path, required=True)
+    gpt53_assess.add_argument(
+        "--resume",
+        action="store_true",
+        help="reuse only exact, hash-validated accepted candidate artifacts",
+    )
+
+    gpt53_evidence = subparsers.add_parser(
+        "gpt53-spark-evidence",
+        help="write compact GPT-5.3-Codex Spark comparison evidence",
+    )
+    gpt53_evidence.add_argument(
+        "--config", type=Path, default=root / "config/gpt53-assessment.json"
+    )
+    gpt53_evidence.add_argument(
+        "--preflight-dir", type=Path, default=root / "artifacts/gpt53-spark/preflight"
+    )
+    gpt53_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/gpt53-spark/dev16"
+    )
+    gpt53_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/gpt53-spark/full"
+    )
+    gpt53_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/gpt53-spark"
+    )
+
     phase2_loader = subparsers.add_parser(
         "phase2-loader-smoke", help="load and validate local Phase 2 JSONL splits"
     )
@@ -183,6 +251,34 @@ def _parser() -> argparse.ArgumentParser:
     phase2_evidence.add_argument("--artifact-dir", type=Path, required=True)
     phase2_evidence.add_argument("--verification", type=Path)
     phase2_evidence.add_argument("--evidence-dir", type=Path, required=True)
+
+    riemann_materialize = subparsers.add_parser(
+        "riemann-materialize",
+        help="materialize the pinned Riemann graph, corpora, holdouts, and atlas",
+    )
+    riemann_materialize.add_argument("--phase2-artifact-dir", type=Path, required=True)
+    riemann_materialize.add_argument(
+        "--phase2-snapshot-dir",
+        type=Path,
+        default=root / "data/mathlib-whole-proof-v1",
+    )
+    riemann_materialize.add_argument("--external-root", type=Path, required=True)
+    riemann_materialize.add_argument(
+        "--config", type=Path, default=root / "config/riemann-data.json"
+    )
+    riemann_materialize.add_argument(
+        "--atlas-config", type=Path, default=root / "config/riemann-atlas.json"
+    )
+    riemann_materialize.add_argument(
+        "--output-dir", type=Path, default=root / "data/riemann"
+    )
+
+    riemann_validate = subparsers.add_parser(
+        "riemann-validate", help="validate committed Riemann data and file hashes"
+    )
+    riemann_validate.add_argument(
+        "--data-dir", type=Path, default=root / "data/riemann"
+    )
 
     phase3_materialize = subparsers.add_parser(
         "phase3-materialize",
@@ -791,6 +887,34 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
 
+    if args.command == "gpt53-spark-preflight":
+        summary = run_preflight(GPT53Config.load(args.config), args.output_dir)
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "gpt53-spark-assess":
+        _, _, summary = run_assessment(
+            GPT53Config.load(args.config),
+            benchmark_root=args.benchmark_root,
+            workload_id=args.workload,
+            preflight_dir=args.preflight_dir,
+            output_dir=args.output_dir,
+            resume=args.resume,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "gpt53-spark-evidence":
+        comparison = write_gpt53_evidence(
+            GPT53Config.load(args.config),
+            preflight_dir=args.preflight_dir,
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
     if args.command == "phase2-loader-smoke":
         dataset = load_phase2_dataset(args.artifact_dir)
         counts = {split: len(dataset[split]) for split in dataset}
@@ -817,6 +941,23 @@ def main(argv: list[str] | None = None) -> int:
             verification_path=args.verification,
         )
         print(str(args.evidence_dir))
+        return 0
+
+    if args.command == "riemann-materialize":
+        summary = materialize_riemann_data(
+            args.phase2_artifact_dir,
+            args.output_dir,
+            RiemannDataConfig.load(args.config),
+            RiemannAtlasConfig.load(args.atlas_config),
+            external_root=args.external_root,
+            phase2_snapshot_dir=args.phase2_snapshot_dir,
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "riemann-validate":
+        summary = validate_materialized_riemann_data(args.data_dir)
+        print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
 
     if args.command == "phase3-materialize":

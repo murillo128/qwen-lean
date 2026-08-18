@@ -1,0 +1,268 @@
+{
+  "atlas": {
+    "alias_collisions": 10,
+    "by_formalization_status": {
+      "external-lean": 24,
+      "literature-only": 21,
+      "mathlib": 186,
+      "other-prover": 3
+    },
+    "by_relationship_class": {
+      "RH-implies": 1,
+      "analogue/generalization": 3,
+      "conditional-on-RH": 1,
+      "definition/foundation": 2,
+      "equivalent-to-RH": 11,
+      "heuristic/conjectural-neighborhood": 1,
+      "implies-RH": 1,
+      "partial-progress": 6,
+      "prerequisite": 208
+    },
+    "by_topic": {
+      "Chebyshev-psi": 3,
+      "Dedekind-zeta": 1,
+      "Dirichlet": 1,
+      "Dirichlet-L-functions": 2,
+      "Euler-product": 1,
+      "GRH": 2,
+      "HOL-Light": 1,
+      "Hadamard-factorization": 1,
+      "Isabelle": 1,
+      "Mellin": 2,
+      "Mertens-function": 1,
+      "Metamath": 1,
+      "Mobius": 2,
+      "PNT": 11,
+      "RH": 1,
+      "Riesz": 1,
+      "analytic-continuation": 1,
+      "analytic-machinery": 19,
+      "approximation": 1,
+      "argument-principle": 2,
+      "arithmetic-function": 1,
+      "arithmetic-functions": 41,
+      "conditional-on-RH": 1,
+      "convolution": 1,
+      "critical-line": 1,
+      "derivative-criterion": 1,
+      "dirichlet-lseries": 52,
+      "disproved-conjecture": 1,
+      "divisor-sum": 2,
+      "entire-functions": 1,
+      "equivalent-criterion": 10,
+      "error-term": 3,
+      "explicit-estimates": 1,
+      "explicit-formula": 1,
+      "finite-verification": 1,
+      "functional-analysis": 1,
+      "functional-equation": 1,
+      "harmonic-numbers": 1,
+      "heat-flow": 1,
+      "log-derivative": 2,
+      "nonvanishing": 1,
+      "nth-prime": 1,
+      "number-fields": 1,
+      "partial-progress": 1,
+      "pole-at-one": 1,
+      "prime-counting": 2,
+      "prime-distribution": 47,
+      "prime-estimates": 2,
+      "prime-gaps": 1,
+      "primes": 1,
+      "primes-in-progressions": 2,
+      "random-matrix": 1,
+      "residue": 1,
+      "riemann-zeta": 23,
+      "sequence-criterion": 1,
+      "sieve": 2,
+      "smoothing": 1,
+      "von-Mangoldt": 1,
+      "xi-function": 1,
+      "zero-counting": 5,
+      "zero-free-region": 3,
+      "zero-statistics": 1,
+      "zeros": 2,
+      "zeta": 2,
+      "zeta-bounds": 4,
+      "zeta-derivative": 2,
+      "zeta-growth": 1,
+      "zeta-values": 1,
+      "zeta-zeros": 3
+    },
+    "census_scope": "Pinned mathlib Phase 2, pinned external Lean projects in riemann-data.json, primary other-prover pages for PNT, and attributed literature sources covering the named RH theorem/criterion families. This is not globally exhaustive.",
+    "entries": 234,
+    "globally_complete": false,
+    "relationships": 226
+  },
+  "external_lean": {
+    "accepted_corpus_materialized": true,
+    "accepted_records": 22,
+    "sources_inspected": 4
+  },
+  "gpu_required": false,
+  "internal_graph": {
+    "bounds": {
+      "premise": {
+        "candidate_nodes_before_global_bound": 231,
+        "dropped_by_global_bound": 0,
+        "frontiers_truncated_by_degree_bound": 0,
+        "max_depth": 2,
+        "max_neighbors_per_frontier": 64,
+        "max_ring_nodes": 12000,
+        "relation": "premise",
+        "retained_nodes": 231
+      },
+      "source": {
+        "candidate_nodes_before_global_bound": 78,
+        "dropped_by_global_bound": 0,
+        "max_nodes": 4000,
+        "retained_nodes": 78,
+        "window": 2
+      },
+      "user": {
+        "candidate_nodes_before_global_bound": 38,
+        "dropped_by_global_bound": 0,
+        "frontiers_truncated_by_degree_bound": 0,
+        "max_depth": 2,
+        "max_neighbors_per_frontier": 64,
+        "max_ring_nodes": 12000,
+        "relation": "user",
+        "retained_nodes": 38
+      }
+    },
+    "class_counts": {
+      "core": 182,
+      "number-theory-control": 3242,
+      "premise-1": 139,
+      "premise-2": 92,
+      "source-neighborhood": 52,
+      "user-1": 27,
+      "user-2": 8
+    },
+    "degree_distributions": {
+      "premise": {
+        "count": 88958,
+        "max": 28,
+        "median": 0.0,
+        "min": 0,
+        "p95": 3
+      },
+      "same-source": {
+        "count": 88958,
+        "max": 4,
+        "median": 4.0,
+        "min": 0,
+        "p95": 4
+      },
+      "user": {
+        "count": 88958,
+        "max": 294,
+        "median": 0.0,
+        "min": 0,
+        "p95": 3
+      }
+    },
+    "edge_counts": {
+      "premise": 79125,
+      "same-source": 318098,
+      "user": 79125
+    },
+    "max_selected_proportion": 0.45,
+    "most_of_mathlib_guard_passed": true,
+    "nodes": 88958,
+    "premise_coverage": 0.12205524841424588,
+    "premises_resolved_to_retained_nodes": 79125,
+    "premises_total": 648272,
+    "seed_entries": 182,
+    "selected_proportion": 0.042064794622181254,
+    "unique_seed_records": 182
+  },
+  "model_outputs_used_for_membership": false,
+  "phase2": {
+    "contamination": {
+      "excluded_records": [],
+      "primary_statements_by_file": {
+        "MiniF2F/Test.lean": 242,
+        "MiniF2F/Valid.lean": 244
+      },
+      "reference": {
+        "expected_primary_statement_counts": {
+          "MiniF2F/Test.lean": 242,
+          "MiniF2F/Valid.lean": 244
+        },
+        "license": "Apache-2.0",
+        "repository": "https://github.com/google-deepmind/miniF2F",
+        "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+        "source_paths": [
+          "MiniF2F/Valid.lean",
+          "MiniF2F/Test.lean"
+        ]
+      },
+      "remaining_exact_statement_matches": 0,
+      "unique_primary_names": 486
+    },
+    "records": 88958,
+    "source": {
+      "input_revision": "v4.32.0",
+      "lean_toolchain": "leanprover/lean4:v4.32.0",
+      "license": "Apache-2.0",
+      "observed_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+      "repository": "https://github.com/leanprover-community/mathlib4",
+      "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+      "scope": "Mathlib/**/*.lean"
+    },
+    "split_hygiene": {
+      "cross_split_components": 0,
+      "cross_split_files": 0,
+      "cross_split_statement_fingerprints": 0,
+      "files_in_multiple_components": 0,
+      "statement_fingerprints_in_multiple_components": 0
+    }
+  },
+  "schema_version": "riemann-evidence-v1",
+  "snapshot_date": "2026-08-17",
+  "specialist_partitions": {
+    "counts": {
+      "number-theory-far-holdout-v1": 136,
+      "number-theory-wide-v1": 3446,
+      "riemann-bubble-v1": 452,
+      "riemann-core-v1": 165,
+      "riemann-near-holdout-v1": 356,
+      "riemann-specialist-validation-v1": 556
+    },
+    "dependency_edges_crossing_phase2_splits": {
+      "heldout->train": 1991,
+      "heldout->validation": 123,
+      "train->heldout": 2590,
+      "train->validation": 2430,
+      "validation->heldout": 109,
+      "validation->train": 1970
+    },
+    "forbidden_leakage": {
+      "near-far-holdout": {
+        "components": 0,
+        "fingerprints": 0
+      },
+      "train-holdout": {
+        "components": 0,
+        "fingerprints": 0
+      },
+      "train-validation": {
+        "components": 0,
+        "fingerprints": 0
+      },
+      "validation-holdout": {
+        "components": 0,
+        "fingerprints": 0
+      }
+    },
+    "membership_frozen_without_model_outputs": true,
+    "minif2f_hygiene_inherited_unchanged": true,
+    "overlaps": {
+      "number-theory-wide-v1|riemann-bubble-v1": 452,
+      "number-theory-wide-v1|riemann-core-v1": 165,
+      "riemann-bubble-v1|riemann-core-v1": 165
+    },
+    "phase2_validation_and_heldout_evaluation_only": true
+  }
+}

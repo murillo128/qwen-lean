@@ -1,0 +1,12 @@
+{
+  "corpus_id": "riemann-external-lean-v1",
+  "membership": "membership.jsonl",
+  "membership_sha256": "3c7335ef25b4092d6de61f94ca1481e515283596533fdf4338d19d0dd4260b6c",
+  "merged_into_phase2_pool": false,
+  "provenance_lane": "external-lean",
+  "record_count": 22,
+  "record_store": "../../external/riemann-external-lean-v1.jsonl",
+  "record_store_sha256": "25a12d3704e74a11e7cd2bee2dd9be848490abf287b7e1986973fe2cf46a1e05",
+  "role": "separate-training-source",
+  "schema_version": "riemann-corpus-manifest-v1"
+}

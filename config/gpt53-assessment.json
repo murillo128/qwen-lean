@@ -1,0 +1,46 @@
+{
+  "schema_version": "gpt53-spark-assessment-config-v1",
+  "model": {
+    "id": "gpt-5.3-codex-spark",
+    "reasoning_effort": "xhigh"
+  },
+  "benchmark": {
+    "phase1_config": "config/phase1-minif2f.json"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": 16,
+    "minif2f-valid-v1": 244
+  },
+  "prompt": {
+    "id": "whole-proof-v1-codex-spark-one-shot-v1",
+    "base_format_id": "whole-proof-v1",
+    "instruction": "Work in complete isolation. Do not call or use any external tools, shell or command execution, file operations, web search, browsing, MCP, plugins, or other external resources. Reason internally. Return exactly one final answer containing only Lean code continuing after `by`. Do not include Markdown fences, prose, or a repeated `by`. Do not use `sorry` or `admit`. Treat the theorem request below as a code-completion prefix and supply only its proof continuation."
+  },
+  "codex": {
+    "heartbeat_seconds": 15.0,
+    "max_retryable_attempts": 2,
+    "disabled_features": [
+      "apps",
+      "browser_use",
+      "browser_use_external",
+      "browser_use_full_cdp_access",
+      "code_mode_host",
+      "computer_use",
+      "image_generation",
+      "in_app_browser",
+      "multi_agent",
+      "multi_agent_v2",
+      "plugins",
+      "remote_plugin",
+      "shell_tool",
+      "skill_mcp_dependency_install",
+      "skill_search",
+      "tool_suggest",
+      "view_image"
+    ]
+  },
+  "comparison": {
+    "phase1_base_summary": "evidence/phase1/baseline/summary.json",
+    "reference_sft_validation": "evidence/phase6/minif2f-validation.json"
+  }
+}

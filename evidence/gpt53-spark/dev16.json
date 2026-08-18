@@ -1,0 +1,129 @@
+{
+  "candidate_count": 16,
+  "candidates_per_task": 1,
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 16,
+    "verified": 0,
+    "verifier_error": 0,
+    "verifier_timeout": 0
+  },
+  "child_process_retry_accounting": {
+    "accepted_candidate_execution_count": 16,
+    "child_failure_count": 0,
+    "retry_count": 0,
+    "total_child_attempt_count": 16
+  },
+  "execution_integrity": {
+    "accepted_candidate_execution_count": 16,
+    "child_failure_count": 0,
+    "event_type_counts": {
+      "item.completed": 16,
+      "thread.started": 16,
+      "turn.completed": 16,
+      "turn.started": 16
+    },
+    "failures": [],
+    "latency_seconds": {
+      "count": 16,
+      "max": 163.2889034129912,
+      "mean": 71.25192092143698,
+      "median": 75.5951631784992,
+      "min": 14.293882382015
+    },
+    "output_bytes": {
+      "count": 16,
+      "max": 6308,
+      "mean": 2236.875,
+      "median": 2321.0,
+      "min": 10
+    },
+    "raw_final_messages_used_without_repair": true,
+    "requested_model": "gpt-5.3-codex-spark",
+    "requested_reasoning_effort": "xhigh",
+    "retry_count": 0,
+    "tool_event_count": 0,
+    "total_child_attempt_count": 16,
+    "usage_totals": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 85888,
+      "input_tokens": 128263,
+      "output_tokens": 813384,
+      "reasoning_output_tokens": 798605
+    },
+    "valid": true
+  },
+  "infrastructure_error_count": 0,
+  "pass_at_k": {
+    "pass@1": 0.0
+  },
+  "progress_log_excerpt": [
+    {
+      "candidate_index": 0,
+      "completed": 0,
+      "event": "candidate_started",
+      "pid": 1996933,
+      "requested_model": "gpt-5.3-codex-spark",
+      "requested_reasoning_effort": "xhigh",
+      "task_id": "aimeII_2001_p3",
+      "timestamp": "2026-08-17T18:39:36.031755+00:00",
+      "total": 16,
+      "workload_id": "minif2f-valid-dev16-v1"
+    },
+    {
+      "candidate_index": 0,
+      "completed": 0,
+      "elapsed_seconds": 15.238,
+      "event": "candidate_heartbeat",
+      "event_count": 2,
+      "pid": 1996933,
+      "task_id": "aimeII_2001_p3",
+      "thread_id": "01a01105-9f09-7e80-a2f3-3520ec3e9134",
+      "timestamp": "2026-08-17T18:39:51.269057+00:00",
+      "total": 16,
+      "workload_id": "minif2f-valid-dev16-v1"
+    },
+    {
+      "candidate_index": 0,
+      "completed": 1,
+      "elapsed_seconds": 37.953,
+      "event": "candidate_completed",
+      "event_count": 4,
+      "exit_code": 0,
+      "final_message_sha256": "a598b9e43b9a28ec979c81519414b5bda3b8cbf54ba69914254c07d2bc9fd2a3",
+      "pid": 1996933,
+      "requested_model": "gpt-5.3-codex-spark",
+      "requested_reasoning_effort": "xhigh",
+      "task_id": "aimeII_2001_p3",
+      "thread_id": "01a01105-9f09-7e80-a2f3-3520ec3e9134",
+      "timestamp": "2026-08-17T18:40:13.985118+00:00",
+      "tool_event_count": 0,
+      "total": 16,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 7552,
+        "input_tokens": 8042,
+        "output_tokens": 34421,
+        "reasoning_output_tokens": 33630
+      },
+      "workload_id": "minif2f-valid-dev16-v1"
+    }
+  ],
+  "schema_version": "gpt53-spark-assessment-evidence-v1",
+  "status": "passed",
+  "task_count": 16,
+  "tasks_with_verified_candidate": {
+    "count": 0,
+    "fraction": 0.0
+  },
+  "verifier_policy": {
+    "timeout_seconds": 30.0,
+    "verifier_timeout_is_infrastructure_error": false,
+    "verifier_timeout_semantics": "unsuccessful_proof_attempt",
+    "verifier_timeout_triggers_candidate_regeneration": false,
+    "verifier_timeout_triggers_verification_retry": false
+  },
+  "verifier_timeout_count": 0,
+  "workload_id": "minif2f-valid-dev16-v1"
+}
