@@ -215,6 +215,11 @@ def run_phase1_baseline(
                 else {}
             ),
             "chat_template": config.model.get("chat_template"),
+            **(
+                {"model_artifact_resolution": "pinned_local_snapshot"}
+                if config.engine.get("resolve_pinned_snapshot", False)
+                else {}
+            ),
             "prompt_transformation": None,
             **(
                 {
@@ -482,11 +487,32 @@ def vllm_engine_kwargs(
     adapter: LoRAAdapterSpec | None,
 ) -> dict[str, Any]:
     engine = config.engine
+    model_id = str(config.model["model_id"])
+    tokenizer_id = str(config.model["tokenizer_id"])
+    model_revision = str(config.model["model_revision"])
+    tokenizer_revision = str(config.model["tokenizer_revision"])
+    if engine.get("resolve_pinned_snapshot", False):
+        if model_id != tokenizer_id or model_revision != tokenizer_revision:
+            raise ValueError(
+                "pinned local snapshot resolution requires one model/tokenizer repo "
+                "and revision"
+            )
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError as error:
+            raise RuntimeError(
+                "pinned local snapshot resolution requires huggingface_hub"
+            ) from error
+        snapshot = snapshot_download(repo_id=model_id, revision=model_revision)
+        model_path = tokenizer_path = snapshot
+    else:
+        model_path = model_id
+        tokenizer_path = tokenizer_id
     kwargs: dict[str, Any] = {
-        "model": str(config.model["model_id"]),
-        "revision": str(config.model["model_revision"]),
-        "tokenizer": str(config.model["tokenizer_id"]),
-        "tokenizer_revision": str(config.model["tokenizer_revision"]),
+        "model": model_path,
+        "revision": model_revision,
+        "tokenizer": tokenizer_path,
+        "tokenizer_revision": tokenizer_revision,
         "dtype": str(engine["dtype"]),
         "tensor_parallel_size": int(engine["tensor_parallel_size"]),
         "gpu_memory_utilization": float(engine["gpu_memory_utilization"]),
