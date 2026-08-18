@@ -11,6 +11,7 @@ from qwen_lean.qwen35_9b_base_assessment import (
     MODEL_REVISION,
     Qwen35BaseAssessmentConfig,
     _compact_run,
+    _ensure_cuda_linker_layout,
     _token_statistics,
     _validate_preflight,
     validate_model_snapshot,
@@ -91,6 +92,23 @@ def test_sampling_kwargs_are_raw_four_candidate_continuations() -> None:
         "skip_special_tokens": True,
         "spaces_between_special_tokens": True,
     }
+
+
+def test_cuda_linker_layout_exposes_versioned_runtime_library(
+    tmp_path: Path,
+) -> None:
+    config = Qwen35BaseAssessmentConfig.load(CONFIG_PATH)
+    cuda_home = tmp_path / "cu13"
+    runtime_library = cuda_home / "lib" / "libcudart.so.13"
+    runtime_library.parent.mkdir(parents=True)
+    runtime_library.write_bytes(b"fixture")
+
+    _ensure_cuda_linker_layout(cuda_home, config)
+    _ensure_cuda_linker_layout(cuda_home, config)
+
+    linker_library = cuda_home / "lib64" / "libcudart.so"
+    assert linker_library.is_symlink()
+    assert linker_library.resolve() == runtime_library.resolve()
 
 
 def test_snapshot_requires_pinned_revision_and_all_shards(tmp_path: Path) -> None:

@@ -131,6 +131,8 @@ class Qwen35BaseAssessmentConfig:
             or runtime["expected_cuda_device_name"]
             != "NVIDIA RTX 4000 Ada Generation"
             or runtime["cuda_toolkit_source"] != "isolated-python-runtime"
+            or runtime["cuda_linker_layout"]
+            != "python-wheel-lib64-compat-v1"
             or runtime["vllm_enable_v1_multiprocessing"] is not False
             or runtime["vllm_worker_multiproc_method"] != "spawn"
         ):
@@ -1007,6 +1009,7 @@ def _configure_cuda_toolkit(config: Qwen35BaseAssessmentConfig) -> None:
     nvcc = cuda_home / "bin" / "nvcc"
     if not nvcc.is_file():
         raise RuntimeError(f"isolated runtime CUDA compiler is missing: {nvcc}")
+    _ensure_cuda_linker_layout(cuda_home, config)
     requested = str(cuda_home.resolve())
     existing = os.environ.get("CUDA_HOME")
     if existing is not None and Path(existing).resolve() != cuda_home.resolve():
@@ -1020,6 +1023,32 @@ def _configure_cuda_toolkit(config: Qwen35BaseAssessmentConfig) -> None:
         os.environ["PATH"] = os.pathsep.join([bin_path, *path_entries])
     if shutil.which("nvcc") != str(nvcc.resolve()):
         raise RuntimeError("isolated runtime nvcc is not first on PATH")
+
+
+def _ensure_cuda_linker_layout(
+    cuda_home: Path, config: Qwen35BaseAssessmentConfig
+) -> None:
+    if config.runtime["cuda_linker_layout"] != "python-wheel-lib64-compat-v1":
+        raise RuntimeError("unsupported CUDA linker layout")
+    runtime_library = cuda_home / "lib" / "libcudart.so.13"
+    if not runtime_library.is_file():
+        raise RuntimeError(
+            f"isolated runtime CUDA library is missing: {runtime_library}"
+        )
+    linker_dir = cuda_home / "lib64"
+    linker_dir.mkdir(exist_ok=True)
+    linker_library = linker_dir / "libcudart.so"
+    if linker_library.is_symlink():
+        if linker_library.resolve() != runtime_library.resolve():
+            raise RuntimeError(
+                f"isolated runtime CUDA linker path conflicts: {linker_library}"
+            )
+    elif linker_library.exists():
+        raise RuntimeError(
+            f"isolated runtime CUDA linker path conflicts: {linker_library}"
+        )
+    else:
+        linker_library.symlink_to(runtime_library)
 
 
 def _validate_runtime_versions(
@@ -1072,6 +1101,7 @@ def _local_runtime(config: Qwen35BaseAssessmentConfig) -> dict[str, Any]:
         "vllm": vllm.__version__,
         "bitsandbytes": bitsandbytes.__version__,
         "cuda_toolkit_source": config.runtime["cuda_toolkit_source"],
+        "cuda_linker_layout": config.runtime["cuda_linker_layout"],
         "nvcc_version": nvcc.stdout.strip().splitlines()[-1],
         "cuda_device_index": index,
         "cuda_device": properties.name,

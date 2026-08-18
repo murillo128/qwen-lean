@@ -61,6 +61,7 @@
     "transformers_version": "5.15.0",
     "bitsandbytes_version": "0.49.1",
     "cuda_toolkit_source": "isolated-python-runtime",
+    "cuda_linker_layout": "python-wheel-lib64-compat-v1",
     "expected_cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
     "vllm_enable_v1_multiprocessing": false,
     "vllm_worker_multiproc_method": "spawn"
