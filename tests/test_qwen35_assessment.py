@@ -121,9 +121,7 @@ def test_local_jit_tools_are_exposed_to_subprocesses(monkeypatch: pytest.MonkeyP
 
     _configure_cuda_home()
 
-    assert os.environ["PATH"].split(os.pathsep)[0] == str(
-        Path(sys.executable).resolve().parent
-    )
+    assert os.environ["PATH"].split(os.pathsep)[0] == str(Path(sys.prefix) / "bin")
     assert Path(os.environ["CUDA_HOME"], "bin", "nvcc").is_file()
 
 

@@ -7,6 +7,7 @@ import importlib.util
 import json
 import os
 import platform
+import shutil
 import subprocess
 import sys
 import threading
@@ -460,12 +461,14 @@ def _runtime_versions() -> dict[str, Any]:
 
 
 def _configure_cuda_home() -> None:
-    executable_directory = str(Path(sys.executable).resolve().parent)
+    executable_directory = str(Path(sys.prefix) / "bin")
     path_entries = os.environ.get("PATH", "").split(os.pathsep)
     if executable_directory not in path_entries:
         os.environ["PATH"] = os.pathsep.join(
             [executable_directory, *path_entries]
         )
+    if shutil.which("ninja") is None:
+        raise RuntimeError("Qwen3.5 GDN JIT requires ninja on PATH")
     if os.environ.get("CUDA_HOME"):
         return
     namespace = importlib.util.find_spec("nvidia")
