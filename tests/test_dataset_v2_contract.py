@@ -25,9 +25,9 @@ def test_canonicalize_term_proof_wraps_exact_without_claiming_verification() -> 
     assert value.requires_lean_verification
 
 
-def test_proof_fingerprint_normalizes_transport_only() -> None:
-    assert proof_fingerprint("by\r\n  exact h\r\n") == proof_fingerprint(
-        "by\n  exact h\n"
+def test_proof_fingerprint_uses_lean_lexical_normalization() -> None:
+    assert proof_fingerprint("by\r\n  exact h -- transport comment\r\n") == proof_fingerprint(
+        "by\n exact h\n"
     )
     assert proof_fingerprint("by\n  exact h") != proof_fingerprint("by\n  simpa using h")
 
