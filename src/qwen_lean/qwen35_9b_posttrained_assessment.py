@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# Issue #29's isolated Qwen3.5-9B post-trained assessment implementation.
+
 import copy
 import gc
 import hashlib

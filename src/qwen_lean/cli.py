@@ -85,13 +85,13 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
-from .qwen35_assessment import (
+from .qwen35_9b_posttrained_assessment import (
     run_assessment as run_qwen35_assessment,
 )
-from .qwen35_assessment import (
+from .qwen35_9b_posttrained_assessment import (
     run_precision_preflight as run_qwen35_preflight,
 )
-from .qwen35_assessment import (
+from .qwen35_9b_posttrained_assessment import (
     write_compact_evidence as write_qwen35_evidence,
 )
 from .riemann_data import (

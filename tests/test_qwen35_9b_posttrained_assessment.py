@@ -7,7 +7,7 @@ import pytest
 
 from qwen_lean.baseline import vllm_engine_kwargs
 from qwen_lean.minif2f import Phase1Config
-from qwen_lean.qwen35_assessment import (
+from qwen_lean.qwen35_9b_posttrained_assessment import (
     BF16_LANE,
     FALLBACK_LANE,
     PREFLIGHT_SCHEMA_VERSION,
