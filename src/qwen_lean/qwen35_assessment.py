@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import gc
 import importlib.metadata
+import importlib.util
 import json
 import os
 import platform
@@ -132,6 +133,9 @@ def run_precision_preflight(
         state["selected_lane"] = lane
         state["selected_precision"] = attempt["precision"]
     else:
+        attempt["failure_kind"] = _classify_preflight_failure(
+            str(attempt.get("error", ""))
+        )
         state["status"] = "failed"
         state["selected_lane"] = None
         state["selected_precision"] = None
@@ -155,6 +159,7 @@ def run_assessment(
     if state.get("status") != "passed" or state.get("selected_lane") not in SUPPORTED_LANES:
         raise ValueError("Qwen3.5 assessment requires a passed precision preflight")
     os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
+    _configure_cuda_home()
     selected = config_for_lane(config, str(state["selected_lane"]))
     return run_phase1_baseline(
         selected,
@@ -251,6 +256,26 @@ def _load_preflight_state(
         "assessment_id": config.value["qwen35_assessment"]["id"],
     }
     if lane == BF16_LANE:
+        if output.is_file():
+            state = json.loads(output.read_text(encoding="utf-8"))
+            _validate_preflight_identity(config, state)
+            attempts = state.get("attempts", [])
+            for attempt in attempts:
+                if attempt.get("status") == "failed" and "failure_kind" not in attempt:
+                    attempt["failure_kind"] = _classify_preflight_failure(
+                        str(attempt.get("error", ""))
+                    )
+            if (
+                state.get("selected_lane") is None
+                and attempts
+                and all(
+                    attempt.get("lane") == BF16_LANE
+                    and attempt.get("status") == "failed"
+                    for attempt in attempts
+                )
+            ):
+                return state
+            raise ValueError("BF16 retry requires only prior failed BF16 attempts")
         return {
             "schema_version": PREFLIGHT_SCHEMA_VERSION,
             "status": "running",
@@ -268,12 +293,18 @@ def _load_preflight_state(
     _validate_preflight_identity(config, state)
     attempts = state.get("attempts", [])
     if (
-        len(attempts) != 1
-        or attempts[0].get("lane") != BF16_LANE
-        or attempts[0].get("status") != "failed"
+        not attempts
+        or any(
+            attempt.get("lane") != BF16_LANE
+            or attempt.get("status") != "failed"
+            for attempt in attempts
+        )
+        or attempts[-1].get("failure_kind") != "memory_feasibility"
         or state.get("selected_lane") is not None
     ):
-        raise ValueError("4-bit fallback is allowed only after one failed BF16 attempt")
+        raise ValueError(
+            "4-bit fallback is allowed only after BF16 fails at the memory boundary"
+        )
     return state
 
 
@@ -281,6 +312,7 @@ def _attempt_vllm_preflight(
     config: Phase1Config, prompt: str, lane: str
 ) -> dict[str, Any]:
     os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
+    _configure_cuda_home()
     started = time.perf_counter()
     monitor = _NvidiaMemoryMonitor()
     runtime = _runtime_versions()
@@ -374,11 +406,29 @@ def _attempt_vllm_preflight(
     return attempt
 
 
+def _classify_preflight_failure(message: str) -> str:
+    normalized = message.lower()
+    memory_markers = (
+        "cuda out of memory",
+        "free memory on device",
+        "insufficient memory",
+        "no available memory for the cache",
+        "not enough memory",
+        "out of memory",
+    )
+    return (
+        "memory_feasibility"
+        if any(marker in normalized for marker in memory_markers)
+        else "compatibility_or_runtime"
+    )
+
+
 def _runtime_versions() -> dict[str, Any]:
     packages = {}
     for name in (
         "bitsandbytes",
         "huggingface-hub",
+        "nvidia-cuda-nvcc",
         "torch",
         "transformers",
         "vllm",
@@ -403,7 +453,21 @@ def _runtime_versions() -> dict[str, Any]:
         "packages": packages,
         "inference_execution": "local_cuda",
         "gpu_query": gpu.stdout.strip(),
+        "cuda_home": os.environ.get("CUDA_HOME"),
     }
+
+
+def _configure_cuda_home() -> None:
+    if os.environ.get("CUDA_HOME"):
+        return
+    namespace = importlib.util.find_spec("nvidia")
+    if namespace is None or not namespace.submodule_search_locations:
+        return
+    for location in namespace.submodule_search_locations:
+        candidate = Path(location) / "cu13"
+        if (candidate / "bin" / "nvcc").is_file():
+            os.environ["CUDA_HOME"] = str(candidate)
+            return
 
 
 def _precision_metadata(config: Phase1Config, lane: str) -> dict[str, Any]:
