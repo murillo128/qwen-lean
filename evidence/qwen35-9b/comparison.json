@@ -1,0 +1,41 @@
+{
+  "assessment_id": "qwen35-9b-posttrained-strict-casting-v1",
+  "comparison_limitations": [
+    "The strict lane uses four candidates per task while the accepted reference estimator uses eight."
+  ],
+  "delta_qwen35_minus_reference": {
+    "pass@1": -0.02305327868852459,
+    "pass@4": -0.041686182669789226
+  },
+  "execution_limitations": [
+    "Wall-time and candidate-timeout observations include periods of external non-batch Lean CPU and I/O contention on the shared host; all 10 candidate timeouts remain unsuccessful under the frozen protocol.",
+    "The accepted full verification reuses the exact generated candidates after serializing the shared verifier preamble probe; model generation was not rerun."
+  ],
+  "reference": {
+    "candidates_per_task": 8,
+    "logical_id": "reference-sft-v1",
+    "pass_at_k": {
+      "pass@1": 0.03944672131147541,
+      "pass@4": 0.1031615925058548
+    },
+    "source": "evidence/phase6/minif2f-validation.json"
+  },
+  "result": "reference_sft_higher_at_pass1_and_pass4",
+  "schema_version": "qwen35-9b-assessment-evidence-v1",
+  "status": "OBSERVED",
+  "strict_lane": {
+    "model_id": "Qwen/Qwen3.5-9B",
+    "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "pass_at_k": {
+      "pass@1": 0.01639344262295082,
+      "pass@4": 0.06147540983606557
+    },
+    "precision": {
+      "cpu_offload_gb": 0.0,
+      "dtype": "bfloat16",
+      "id": "bf16-local-vllm-v1",
+      "quantization": null
+    },
+    "precision_lane": "bf16"
+  }
+}

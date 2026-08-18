@@ -200,6 +200,14 @@ def write_compact_evidence(
     reference = reference_evidence["adapter"]
     current_metrics = full["summary"]["pass_at_k"]
     reference_metrics = reference["pass_at_k"]
+    execution_limitations = [
+        "Wall-time and candidate-timeout observations include periods of external "
+        "non-batch Lean CPU and I/O contention on the shared host; all 10 candidate "
+        "timeouts remain unsuccessful under the frozen protocol.",
+        "The accepted full verification reuses the exact generated candidates after "
+        "serializing the shared verifier preamble probe; model generation was not rerun.",
+    ]
+    full["execution_limitations"] = execution_limitations
     deltas = {
         key: float(current_metrics[key]) - float(reference_metrics[key])
         for key in ("pass@1", "pass@4")
@@ -231,6 +239,7 @@ def write_compact_evidence(
             "source": config.value["qwen35_assessment"]["reference_evidence"],
         },
         "delta_qwen35_minus_reference": deltas,
+        "execution_limitations": execution_limitations,
         "comparison_limitations": [
             "The strict lane uses four candidates per task while the accepted reference estimator uses eight.",
             "A 4-bit selected lane is not precision-identical to the BF16 Qwen3 anchors.",
@@ -717,6 +726,8 @@ def _render_readme(
 | full validation | {total['task_count']} | {total['candidate_count']} | {total['pass_at_k']['pass@1']:.6f} | {total['pass_at_k']['pass@4']:.6f} | {total['infrastructure_error_count']} | {total['verifier_timeout_count']} |
 
 The strict lane preserves the raw `whole-proof-v1` continuation prompt with no chat template, proof extraction, or Lean-guided retry. Raw candidates, model weights, caches, and bulky logs remain outside Git; the JSON evidence records exact identities, precision, packages, GPU, counts, finish reasons, token lengths, latency, and compute summaries.
+
+Execution limitations: {" ".join(comparison["execution_limitations"])}
 """
 
 
