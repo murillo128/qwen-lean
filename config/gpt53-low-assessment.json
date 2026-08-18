@@ -1,0 +1,50 @@
+{
+  "schema_version": "gpt53-spark-assessment-config-v1",
+  "artifact_namespace": "gpt53-spark-low",
+  "model": {
+    "id": "gpt-5.3-codex-spark",
+    "reasoning_effort": "low"
+  },
+  "benchmark": {
+    "phase1_config": "config/phase1-minif2f.json"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": 16,
+    "minif2f-valid-v1": 244
+  },
+  "prompt": {
+    "id": "whole-proof-v1-codex-spark-one-shot-v1",
+    "base_format_id": "whole-proof-v1",
+    "instruction": "Work in complete isolation. Do not call or use any external tools, shell or command execution, file operations, web search, browsing, MCP, plugins, or other external resources. Reason internally. Return exactly one final answer containing only Lean code continuing after `by`. Do not include Markdown fences, prose, or a repeated `by`. Do not use `sorry` or `admit`. Treat the theorem request below as a code-completion prefix and supply only its proof continuation."
+  },
+  "codex": {
+    "heartbeat_seconds": 15.0,
+    "max_retryable_attempts": 2,
+    "disabled_features": [
+      "apps",
+      "browser_use",
+      "browser_use_external",
+      "browser_use_full_cdp_access",
+      "code_mode_host",
+      "computer_use",
+      "image_generation",
+      "in_app_browser",
+      "multi_agent",
+      "multi_agent_v2",
+      "plugins",
+      "remote_plugin",
+      "shell_tool",
+      "skill_mcp_dependency_install",
+      "skill_search",
+      "tool_suggest",
+      "view_image"
+    ]
+  },
+  "comparison": {
+    "xhigh_full_artifacts": "artifacts/gpt53-spark/full",
+    "xhigh_candidate_records_manifest_sha256": "6042f88750b8d5b9ed71bda9a9834dcf593e5600b2ab27014e7ca41fada662e6",
+    "xhigh_full_evidence": "evidence/gpt53-spark/full.json",
+    "xhigh_full_evidence_sha256": "1e068fd3bf8d8796378b1e26f7b14b5cfd3b0287531abb0d8785eb8a4d1d7e0b",
+    "xhigh_pass_at_1": 0.20081967213114754
+  }
+}

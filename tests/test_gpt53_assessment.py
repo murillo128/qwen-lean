@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from qwen_lean.gpt53_assessment import (
+    ALLOWED_REASONING_EFFORTS,
     API_KEY_ENVIRONMENT_VARIABLES,
     MODEL_ID,
     REASONING_EFFORT,
@@ -14,14 +15,17 @@ from qwen_lean.gpt53_assessment import (
     ProgressLogger,
     audit_jsonl_text,
     build_child_argv,
+    candidate_records_manifest_sha256,
     compact_workload_evidence,
     is_retryable_infrastructure_failure,
     load_existing_candidate,
     load_prior_retryable_attempts,
+    paired_outcome_comparison,
     read_final_message,
     render_codex_prompt,
     sanitize_child_environment,
     should_retry_result_category,
+    validate_arm_artifact_path,
     validate_child_argv,
     validate_isolated_workdir,
 )
@@ -29,6 +33,7 @@ from qwen_lean.schema import TaskRecord
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config/gpt53-assessment.json"
+LOW_CONFIG_PATH = ROOT / "config/gpt53-low-assessment.json"
 
 
 def _valid_jsonl() -> str:
@@ -68,11 +73,62 @@ def test_config_and_argv_freeze_exact_model_and_reasoning_pin(tmp_path: Path) ->
     assert all("theorem" not in value for value in argv)
 
 
+def test_low_config_changes_only_effort_and_uses_exact_low_argv(tmp_path: Path) -> None:
+    xhigh = GPT53Config.load(CONFIG_PATH)
+    low = GPT53Config.load(LOW_CONFIG_PATH)
+    argv = build_child_argv(
+        low,
+        codex_binary=tmp_path / "codex",
+        final_message_path=tmp_path / "final.txt",
+    )
+
+    assert ALLOWED_REASONING_EFFORTS == {"low", "xhigh"}
+    assert xhigh.reasoning_effort == REASONING_EFFORT == "xhigh"
+    assert low.reasoning_effort == "low"
+    assert low.value["model"]["id"] == xhigh.value["model"]["id"]
+    assert low.value["benchmark"] == xhigh.value["benchmark"]
+    assert low.value["workloads"] == xhigh.value["workloads"]
+    assert low.value["prompt"] == xhigh.value["prompt"]
+    assert low.value["codex"] == xhigh.value["codex"]
+    assert argv.count("--model") == 1
+    assert argv[argv.index("--model") + 1] == "gpt-5.3-codex-spark"
+    assert 'model_reasoning_effort="low"' in argv
+    assert 'model_reasoning_effort="xhigh"' not in argv
+
+
+@pytest.mark.parametrize("effort", [None, "", "medium", "high", "LOW"])
+def test_config_rejects_unapproved_or_implicit_reasoning_effort(
+    tmp_path: Path, effort: str | None
+) -> None:
+    value = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    if effort is None:
+        value["model"].pop("reasoning_effort")
+    else:
+        value["model"]["reasoning_effort"] = effort
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="explicitly selected"):
+        GPT53Config.load(path)
+
+
 def test_child_argv_cannot_omit_or_change_explicit_model() -> None:
     with pytest.raises(ValueError, match="omits"):
         validate_child_argv(["codex", "exec", "--json"])
     with pytest.raises(ValueError, match="exactly gpt-5.3-codex-spark"):
         validate_child_argv(["codex", "exec", "--model", "gpt-5.3-codex"])
+    with pytest.raises(ValueError, match="required low override"):
+        validate_child_argv(
+            [
+                "codex",
+                "exec",
+                "--model",
+                MODEL_ID,
+                "-c",
+                'model_reasoning_effort="xhigh"',
+            ],
+            reasoning_effort="low",
+        )
 
 
 def test_config_rejects_any_model_default_or_substitution(tmp_path: Path) -> None:
@@ -83,6 +139,34 @@ def test_config_rejects_any_model_default_or_substitution(tmp_path: Path) -> Non
 
     with pytest.raises(ValueError, match="exactly gpt-5.3-codex-spark"):
         GPT53Config.load(path)
+
+
+def test_low_arm_cannot_use_or_overwrite_xhigh_artifact_paths() -> None:
+    config = GPT53Config.load(LOW_CONFIG_PATH)
+
+    validate_arm_artifact_path(config, ROOT / "artifacts/gpt53-spark-low/full")
+    validate_arm_artifact_path(config, ROOT / "evidence/gpt53-spark-low", evidence=True)
+    with pytest.raises(ValueError, match="gpt53-spark-low"):
+        validate_arm_artifact_path(config, ROOT / "artifacts/gpt53-spark/full")
+    with pytest.raises(ValueError, match="gpt53-spark-low"):
+        validate_arm_artifact_path(config, ROOT / "evidence/gpt53-spark", evidence=True)
+
+
+def test_low_arm_rejects_namespace_symlink_to_xhigh(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    config_path = project_root / "config/low.json"
+    config_path.parent.mkdir(parents=True)
+    config_path.write_text(
+        LOW_CONFIG_PATH.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    xhigh_root = project_root / "artifacts/gpt53-spark"
+    xhigh_root.mkdir(parents=True)
+    low_root = project_root / "artifacts/gpt53-spark-low"
+    low_root.symlink_to(xhigh_root, target_is_directory=True)
+    config = GPT53Config.load(config_path)
+
+    with pytest.raises(ValueError, match="gpt53-spark-low"):
+        validate_arm_artifact_path(config, low_root / "full")
 
 
 def test_child_environment_removes_api_keys_and_lean_path(tmp_path: Path) -> None:
@@ -224,6 +308,35 @@ def test_context_window_exhaustion_is_retryable_infrastructure() -> None:
                 "type": "turn.failed",
                 "error": {
                     "message": ("Codex ran out of room in the model's context window.")
+                },
+            },
+        )
+    )
+    audit = audit_jsonl_text(failed_jsonl)
+
+    assert is_retryable_infrastructure_failure(
+        exit_code=1,
+        stderr_text=failed_jsonl,
+        audit=audit,
+    )
+
+
+def test_model_capacity_is_retryable_infrastructure() -> None:
+    failed_jsonl = "".join(
+        json.dumps(event) + "\n"
+        for event in (
+            {"type": "thread.started", "thread_id": "thread-test"},
+            {"type": "turn.started"},
+            {
+                "type": "error",
+                "message": "Selected model is at capacity. Please try a different model.",
+            },
+            {
+                "type": "turn.failed",
+                "error": {
+                    "message": (
+                        "Selected model is at capacity. Please try a different model."
+                    )
                 },
             },
         )
@@ -494,3 +607,64 @@ def test_compact_evidence_freezes_timeout_as_proof_failure(tmp_path: Path) -> No
         "verifier_timeout_triggers_verification_retry": False,
     }
     assert evidence["child_process_retry_accounting"] == execution_integrity
+
+
+def test_paired_comparison_requires_exact_ids_and_uses_discordant_pairs() -> None:
+    task_ids = ["both", "xhigh-only", "low-only", "neither"]
+    low = {
+        "both": "verified",
+        "xhigh-only": "lean_rejected",
+        "low-only": "verified",
+        "neither": "verifier_timeout",
+    }
+    xhigh = {
+        "both": "verified",
+        "xhigh-only": "verified",
+        "low-only": "lean_rejected",
+        "neither": "empty_candidate",
+    }
+
+    comparison = paired_outcome_comparison(
+        low,
+        xhigh,
+        expected_task_ids=task_ids,
+        xhigh_pass_at_1=0.5,
+    )
+
+    assert comparison["paired_outcome_table"] == {
+        "low_fail_xhigh_fail": 1,
+        "low_fail_xhigh_verified": 1,
+        "low_verified_xhigh_fail": 1,
+        "low_verified_xhigh_verified": 1,
+    }
+    assert comparison["paired_outcomes"] == {
+        "solved_by_both": 1,
+        "solved_only_by_xhigh": 1,
+        "solved_only_by_low": 1,
+        "solved_by_neither": 1,
+    }
+    assert comparison["paired_binary_test"] == {
+        "method": "exact_two_sided_mcnemar_binomial",
+        "discordant_pair_count": 2,
+        "p_value": 1.0,
+        "interpretation": "descriptive_uncertainty_not_a_hard_success_gate",
+    }
+
+    with pytest.raises(ValueError, match="task IDs differ"):
+        paired_outcome_comparison(
+            {key: value for key, value in low.items() if key != "neither"},
+            xhigh,
+            expected_task_ids=task_ids,
+            xhigh_pass_at_1=0.5,
+        )
+
+
+def test_candidate_record_manifest_hash_changes_with_records(tmp_path: Path) -> None:
+    record_path = tmp_path / "candidates/task/candidate.json"
+    record_path.parent.mkdir(parents=True)
+    record_path.write_text('{"status":"accepted"}\n', encoding="utf-8")
+    original = candidate_records_manifest_sha256(tmp_path)
+
+    record_path.write_text('{"status":"changed"}\n', encoding="utf-8")
+
+    assert candidate_records_manifest_sha256(tmp_path) != original
