@@ -85,6 +85,16 @@ Use the external benchmark test split only for checkpoints that have already bee
 
 **Exit gate:** the project can state a supported conclusion about whether SFT improved Lean proof generation, where it improved, how training-set proof regeneration differs from held-out generalization, and what important limitations remain; one reference SFT checkpoint is explicitly selected as the common parent/control for the independent post-training branches.
 
+## Parallel next-generation corpus refresh — Dataset v2
+
+**Purpose:** build the training-first verified corpus used by the next selected trainable foundation and by the Riemann/prime specialization path, without rewriting the historical Dataset-v1 experiment.
+
+Dataset v2 starts from the repository-owned Phase 2/Riemann data layer but recomputes future training membership under D016. It should recover useful verified source proofs that the first extractor omitted because of proof syntax, include all eligible prime/number-theory source theorems, preserve declared Lean context/environment, and add Lean-verified synthetic composition examples. Fresh validation/test must use new obligations and new derivation families rather than withholding useful source knowledge.
+
+The corpus refresh is independent of the final foundation choice and requires no model training. The controlling Dataset-v2 issue owns its extraction, composition, contamination, packaging, and preflight details.
+
+**Exit gate:** the authoritative Dataset-v2 training corpus is loadable from a fresh checkout, all eligible prime source knowledge is optimizer-eligible or explicitly blocked for a concrete reason, recoverable term-style proofs are no longer silently lost, synthetic composition passes its freshness/essentiality gates, and clean validation/test workloads are ready for routine pass@8 checkpoint selection. The next foundation-specific training issue may then choose token/context limits and curriculum weights without changing corpus membership silently.
+
 ## Phase 7 — Branch A: verifier-filtered self-training
 
 **Purpose:** measure what is gained by turning the SFT model's own Lean-verified successes into additional supervised training data.

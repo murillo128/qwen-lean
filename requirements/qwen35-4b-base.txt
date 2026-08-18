@@ -1,0 +1,2 @@
+# Exact vLLM main build required for Qwen3.5 model support.
+vllm @ https://wheels.vllm.ai/41f179b57aa8ab6f634f508128ce1f1efadd0eb1/vllm-0.27.2rc1.dev203%2Bg41f179b57-cp38-abi3-manylinux_2_28_x86_64.whl
