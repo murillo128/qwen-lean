@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -23,6 +23,20 @@ def test_qwen35_assessment_contract_is_pinned() -> None:
     assert config.sampling["candidates_per_task"] == 4
     assert config.engine["dtype"] == "bfloat16"
     assert config.engine["language_model_only"] is True
+
+
+def test_qwen35_assessment_rejects_verifier_timeout_change() -> None:
+    config = Phase1Config.load(ROOT / "config/qwen35-4b-base-assessment.json")
+    changed = Phase1Config(
+        path=config.path,
+        value={
+            **config.value,
+            "verifier": {**config.value["verifier"], "timeout_seconds": 31.0},
+        },
+    )
+
+    with pytest.raises(ValueError, match="verifier timeout must be 30 seconds"):
+        validate_assessment_config(changed)
 
 
 def test_qwen35_engine_uses_text_only_compatibility_lane(monkeypatch) -> None:

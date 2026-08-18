@@ -1089,7 +1089,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "qwen35-preflight":
-        summary = run_qwen35_base_preflight(Phase1Config.load(args.config), args.output)
+        summary = run_qwen35_base_preflight(
+            Phase1Config.load(args.config), args.output
+        )
         print(json.dumps(summary, indent=2))
         return 0
 
