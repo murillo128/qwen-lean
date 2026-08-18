@@ -3,11 +3,12 @@ from __future__ import annotations
 import json
 import platform
 import time
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
 from statistics import fmean
-from typing import Any, Sequence
+from typing import Any
 
 from .baseline import (
     GeneratedCandidate,
@@ -33,9 +34,8 @@ from .phase4 import (
     load_phase4_workloads,
     load_selected_adapter_binding,
 )
-from .schema import CandidateResult, TaskRecord
 from .prompt import PROMPT_FORMAT_ID, normalize_transport
-
+from .schema import CandidateResult, TaskRecord
 
 PHASE4_HELDOUT_RUN_SCHEMA_VERSION = "phase4-heldout-run-v1"
 PHASE4_HELDOUT_COMPARISON_SCHEMA_VERSION = "phase4-heldout-comparison-v1"
@@ -227,7 +227,7 @@ def _heldout_candidate_result(
             mathlib_root,
             timeout_seconds=timeout_seconds,
         )
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - isolate one verifier failure.
         check = None
         category = "verifier_error"
         exit_code = None
@@ -278,6 +278,7 @@ def run_phase4_heldout(
     schema_version: str = PHASE4_HELDOUT_RUN_SCHEMA_VERSION,
     phase_name: str = "Phase 4",
     integrity_summary_key: str = "phase4_heldout_integrity_passed",
+    allow_verifier_timeouts: bool = False,
 ) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
     mode = "base" if adapter_dir is None else "adapter"
     training, binding = binding_loader(
@@ -382,7 +383,14 @@ def run_phase4_heldout(
             "run_wall_time_seconds": (generation_wall_time + verification_wall_time),
         }
     )
-    heldout_integrity_passed = phase4_heldout_integrity_passed(summary)
+    heldout_integrity_passed = (
+        bool(
+            summary.get("complete")
+            and int(summary.get("infrastructure_error_count", -1)) == 0
+        )
+        if allow_verifier_timeouts
+        else phase4_heldout_integrity_passed(summary)
+    )
     summary[integrity_summary_key] = heldout_integrity_passed
     metadata = {
         "schema_version": schema_version,
@@ -495,9 +503,13 @@ def compare_phase4_heldout_runs(
     if adapter_run.get("model_role") != "adapter" or not adapter_run.get(
         "adapter", {}
     ).get("enabled"):
-        raise ValueError(f"{phase_name} adapter run did not enable the selected adapter")
+        raise ValueError(
+            f"{phase_name} adapter run did not enable the selected adapter"
+        )
     if base_run.get("model") != training.get("model"):
-        raise ValueError(f"{phase_name} heldout model differs from the training trajectory")
+        raise ValueError(
+            f"{phase_name} heldout model differs from the training trajectory"
+        )
     if base_run.get("selected_optimizer_step") != binding.selected_optimizer_step:
         raise ValueError(f"{phase_name} heldout selected step differs from training")
     adapter_metadata = adapter_run["adapter"]
@@ -506,11 +518,15 @@ def compare_phase4_heldout_runs(
     if Path(str(adapter_metadata.get("adapter_path", ""))).resolve() != (
         binding.checkpoint_path
     ):
-        raise ValueError(f"{phase_name} heldout adapter path differs from training selection")
+        raise ValueError(
+            f"{phase_name} heldout adapter path differs from training selection"
+        )
     base_runtime = _runtime_identity(base_run["runtime"])
     adapter_runtime = _runtime_identity(adapter_run["runtime"])
     if base_runtime != adapter_runtime:
-        raise ValueError(f"{phase_name} heldout comparison differs in local runtime identity")
+        raise ValueError(
+            f"{phase_name} heldout comparison differs in local runtime identity"
+        )
     for role, summary in (("base", base_summary), ("adapter", adapter_summary)):
         if not phase4_heldout_integrity_passed(summary):
             raise ValueError(

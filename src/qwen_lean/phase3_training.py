@@ -40,7 +40,10 @@ _RESUMABLE_CHECKPOINT_FILES = (
 class QLoRARuntime:
     model: Any
     tokenizer: Any
-    lora_config: Any
+    # Fresh-SFT stages provide a LoRA config for SFTTrainer to attach. A
+    # continuation stage instead supplies an already attached, trainable PEFT
+    # adapter and leaves this unset so TRL cannot stack a second adapter.
+    lora_config: Any | None
     quantized_linear_modules: int
     trainable_parameter_count: int = 0
     total_parameter_count: int = 0
@@ -159,10 +162,17 @@ def _capture_and_validate_trainables(
         for name, parameter in runtime.model.named_parameters()
         if parameter.requires_grad
     )
-    if not trainable_names or any(
-        ".lora_A." not in name and ".lora_B." not in name for name in trainable_names
-    ):
-        raise RuntimeError("Phase 3 found a trainable parameter outside LoRA A/B")
+    unexpected_trainables = [
+        name
+        for name in trainable_names
+        if ".lora_A." not in name and ".lora_B." not in name
+    ]
+    if not trainable_names or unexpected_trainables:
+        detail = ", ".join(unexpected_trainables[:5])
+        raise RuntimeError(
+            "Phase 3 found a trainable parameter outside LoRA A/B"
+            + (f": {detail}" if detail else "")
+        )
     if any("lm_head" in name for name in trainable_names):
         raise RuntimeError("Phase 3 must not train or save the base lm_head")
     target_modules = tuple(str(item) for item in config.lora["target_modules"])
@@ -233,9 +243,7 @@ def _build_trainer(
         logging_first_step=True,
         logging_nan_inf_filter=False,
         save_strategy=(
-            "no"
-            if not save_checkpoints or manual_checkpoint_boundaries
-            else "steps"
+            "no" if not save_checkpoints or manual_checkpoint_boundaries else "steps"
         ),
         save_steps=checkpoint_interval,
         save_only_model=False,
@@ -259,6 +267,17 @@ def _build_trainer(
         peft_config=runtime.lora_config,
     )
     runtime.model = trainer.model
+    if runtime.lora_config is None:
+        # TRL prepares an already attached quantized PEFT model for k-bit
+        # training, which intentionally freezes every parameter before a new
+        # adapter would normally be attached. Continuation stages do not attach
+        # a new adapter, so reactivate the one existing adapter through PEFT's
+        # API after preparation. The validation below still rejects every
+        # non-LoRA trainable and any unexpected target module.
+        active_adapter = getattr(runtime.model, "active_adapter", None)
+        if not isinstance(active_adapter, str):
+            raise RuntimeError("continuation training requires one active PEFT adapter")
+        runtime.model.set_adapter(active_adapter)
     _capture_and_validate_trainables(runtime, config)
     return trainer
 

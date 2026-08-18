@@ -1,0 +1,159 @@
+{
+  "schema_version": "sft2-config-v1",
+  "reference_parent": {
+    "logical_id": "reference-sft-v1",
+    "immutable": true,
+    "adapter": {
+      "artifact_id": "phase5-train-full-v1-lora",
+      "format": "peft-lora",
+      "merged": false,
+      "selected_optimizer_step": 9962,
+      "training_artifact_sha256": "48d33bc2f276d6f8c22525a5cb30fafe8677da95e866dbf3f37116e78e8ae990",
+      "hub_repository": "murillo2000/qwen3-8b-base-lean-sft-qlora",
+      "hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+      "adapter_model_sha256": "8aa50fa56f6a1d03a702abcaafc20e11d661a4a2ac935864bf5648411e5cdc58",
+      "adapter_config_sha256": "4b7b513b216484554e05d3c75ecf0777ee1fbae94935e93d949d63cf4a76481c",
+      "rank": 16,
+      "alpha": 32,
+      "dropout": 0.0
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "tokenizer_id": "Qwen/Qwen3-8B-Base",
+    "tokenizer_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "add_special_tokens": false,
+    "chat_template": null
+  },
+  "dataset": {
+    "schema_version": "mathlib-whole-proof-v1"
+  },
+  "serialization": {
+    "id": "mathlib-sft-v1",
+    "supervise_prompt": false,
+    "supervise_eos": true
+  },
+  "phase5_inputs": {
+    "workload_artifact_sha256": "c25fa88ac5a8553e179e651a31ac4403e53cd42cd4e5cb2164755a24e4d85636",
+    "train_ordered_ids_sha256": "0ec5ef7e969774924384d80d04b5ea9ea6e0eabac9f38cf3deff9924c714d816",
+    "validation_ordered_ids_sha256": "c4b7189e6b6b61a8bf22b807554cd534180fe73e9fb2ffca1a2cf0e8c603401c",
+    "heldout_ordered_ids_sha256": "936091af02d7c58dfe172c10b91376afd1e144cb1586a1f07a0a924f8e0b194b",
+    "train_eligible_examples": 79696,
+    "validation_eligible_examples": 4426
+  },
+  "workloads": {
+    "train": {
+      "id": "phase5-train-full-v1",
+      "split": "train",
+      "selection": "all_eligible",
+      "expected_input_examples": 80062,
+      "maximum_sequence_tokens": 1024
+    },
+    "validation": {
+      "id": "phase5-validation-full-v1",
+      "split": "validation",
+      "selection": "all_eligible",
+      "expected_input_examples": 4448,
+      "maximum_sequence_tokens": 1024
+    },
+    "heldout": {
+      "id": "phase5-heldout512-v1",
+      "split": "heldout",
+      "selection_hash_prefix": "phase5-heldout512-v1\u0000",
+      "expected_input_examples": 4448,
+      "expected_examples": 512,
+      "maximum_prompt_and_generation_tokens": 2048
+    }
+  },
+  "quantization": {
+    "load_in_4bit": true,
+    "quantization_type": "nf4",
+    "double_quantization": true,
+    "compute_dtype": "bfloat16"
+  },
+  "lora": {
+    "artifact_id": "sft2-q4-v1-lora",
+    "task_type": "CAUSAL_LM",
+    "r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "bias": "none",
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "modules_to_save": null
+  },
+  "training": {
+    "trainer": "trl-sft",
+    "per_device_micro_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "maximum_sequence_tokens": 1024,
+    "optimizer": "paged_adamw_8bit",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 1.0,
+    "lr_schedule": "cosine",
+    "warmup_fraction_denominator": 32,
+    "seed": 0,
+    "packing": false,
+    "truncation": false,
+    "gradient_checkpointing": true,
+    "epochs": 1,
+    "duplicate_final_batch_fill": false,
+    "manual_checkpoint_boundaries": true,
+    "memory_ceiling_bytes": 25769803776,
+    "staged_optimizer_restart": true,
+    "staged_scheduler_restart": true,
+    "uninterrupted_two_epoch_equivalence_claimed": false,
+    "endpoint_policy": "fixed_complete_q4"
+  },
+  "step0_reference_validation": {
+    "mean_target_token_cross_entropy": 1.108313809418986,
+    "target_token_next_token_accuracy": 0.7075208913649025,
+    "target_tokens": 308381,
+    "examples": 4426,
+    "maximum_cross_entropy_absolute_delta": 0.005,
+    "maximum_accuracy_absolute_delta": 0.002
+  },
+  "heldout_generation": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "train_evaluation": {
+    "workload_id": "phase6-train512-v1",
+    "expected_examples": 512,
+    "workload_ordered_ids_sha256": "ad0c5f4e9cf158f324bac101f6d9bb492483a6c2f70399bea254b9d944adc2c8",
+    "candidates_per_task": 4
+  },
+  "minif2f": {
+    "phase1_config": "config/phase1-minif2f.json",
+    "workload_id": "minif2f-valid-v1",
+    "expected_tasks": 244,
+    "candidates_per_task": 8,
+    "test_evaluation_forbidden": true
+  },
+  "verification": {
+    "workers": 4,
+    "train_timeout_seconds": 300.0,
+    "heldout_timeout_seconds": 300.0,
+    "minif2f_timeout_seconds": 30.0
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "seed": 0,
+    "interval_percentiles": [2.5, 97.5]
+  }
+}
