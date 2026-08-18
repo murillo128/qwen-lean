@@ -201,6 +201,9 @@ def run_phase1_baseline(
             "language_model_only": bool(
                 config.engine.get("language_model_only", False)
             ),
+            "flashinfer_sampler": bool(
+                config.engine.get("flashinfer_sampler", True)
+            ),
             "cpu_offload_gb": float(config.engine.get("cpu_offload_gb", 0.0)),
             "chat_template": None,
             "prompt_transformation": None,

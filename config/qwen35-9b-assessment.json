@@ -68,6 +68,7 @@
     "enforce_eager": true,
     "quantization": null,
     "language_model_only": true,
+    "flashinfer_sampler": false,
     "cpu_offload_gb": 0.0,
     "expected_cuda_device_name_fragment": "Ada"
   },

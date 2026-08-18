@@ -50,6 +50,7 @@ def test_qwen35_vllm_kwargs_disable_multimodal_loading_and_cpu_offload() -> None
     assert kwargs["cpu_offload_gb"] == 0.0
     assert kwargs["quantization"] == "bitsandbytes"
     assert kwargs["max_model_len"] == 2048
+    assert config.engine["flashinfer_sampler"] is False
 
 
 def test_four_bit_fallback_requires_one_recorded_failed_bf16_attempt(

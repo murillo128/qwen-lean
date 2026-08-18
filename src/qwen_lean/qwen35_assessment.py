@@ -52,6 +52,7 @@ def validate_assessment_contract(config: Phase1Config) -> None:
         ("engine", "dtype"): "bfloat16",
         ("engine", "max_model_len"): 2048,
         ("engine", "language_model_only"): True,
+        ("engine", "flashinfer_sampler"): False,
         ("engine", "cpu_offload_gb"): 0.0,
         ("qwen35_assessment", "prompt_format_id"): PROMPT_FORMAT_ID,
         ("qwen35_assessment", "raw_continuation"): True,
@@ -161,6 +162,7 @@ def run_assessment(
     if state.get("status") != "passed" or state.get("selected_lane") not in SUPPORTED_LANES:
         raise ValueError("Qwen3.5 assessment requires a passed precision preflight")
     os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
+    os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     _configure_cuda_home()
     selected = config_for_lane(config, str(state["selected_lane"]))
     return run_phase1_baseline(
@@ -314,6 +316,7 @@ def _attempt_vllm_preflight(
     config: Phase1Config, prompt: str, lane: str
 ) -> dict[str, Any]:
     os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
+    os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     _configure_cuda_home()
     started = time.perf_counter()
     monitor = _NvidiaMemoryMonitor()
@@ -458,6 +461,9 @@ def _runtime_versions() -> dict[str, Any]:
         "inference_execution": "local_cuda",
         "gpu_query": gpu.stdout.strip(),
         "cuda_home": os.environ.get("CUDA_HOME"),
+        "vllm_use_flashinfer_sampler": os.environ.get(
+            "VLLM_USE_FLASHINFER_SAMPLER"
+        ),
     }
 
 
