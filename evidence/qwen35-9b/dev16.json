@@ -1,0 +1,144 @@
+{
+  "compute_per_solved_task": {
+    "generation_gpu_hours_per_solved_task": null,
+    "generation_wall_seconds_per_solved_task": null,
+    "tasks_with_verified_candidate": 0
+  },
+  "engine": {
+    "generation_settings": {
+      "adapter": null,
+      "candidates_per_task": 4,
+      "chat_template": null,
+      "cpu_offload_gb": 0.0,
+      "do_sample": true,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "flashinfer_sampler": false,
+      "gpu_memory_utilization": 0.95,
+      "language_model_only": true,
+      "max_model_len": 2048,
+      "max_new_tokens": 1024,
+      "max_num_seqs": 4,
+      "prompt_transformation": null,
+      "quantization": null,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "tensor_parallel_size": 1,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "name": "vllm",
+    "runtime": {
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_index": 0,
+      "cuda_device_total_memory_bytes": 20989804544,
+      "generation_wall_time_seconds": 835.6739759250195,
+      "inference_execution": "local_cuda",
+      "python": "3.12.14",
+      "torch": "2.11.0+cu130",
+      "torch_cuda_version": "13.0",
+      "verification_wall_time_seconds": 104.35343884100439,
+      "verification_workers": 8
+    },
+    "version": "0.21.0"
+  },
+  "generated_token_counts": {
+    "count": 64,
+    "maximum": 1024,
+    "mean": 897.828125,
+    "minimum": 22,
+    "p50": 1024.0,
+    "p95": 1024.0,
+    "total": 57461
+  },
+  "latency_seconds": {
+    "generation": {
+      "count": 64,
+      "maximum": 51.829526006436936,
+      "mean": 51.829526006436936,
+      "minimum": 51.829526006436936,
+      "p50": 51.829526006436936,
+      "p95": 51.829526006436936,
+      "total": 3317.089664411964
+    },
+    "total": {
+      "count": 64,
+      "maximum": 86.48387572741558,
+      "mean": 64.48930396427932,
+      "minimum": 57.34477376043287,
+      "p50": 59.840457511443674,
+      "p95": 85.83593970678412,
+      "total": 4127.315453713876
+    },
+    "verification": {
+      "count": 64,
+      "maximum": 34.654349720978644,
+      "mean": 12.65977795784238,
+      "minimum": 5.515247753995936,
+      "p50": 8.010931505006738,
+      "p95": 34.00641370034718,
+      "total": 810.2257893019123
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-9B",
+    "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "tokenizer_id": "Qwen/Qwen3.5-9B",
+    "tokenizer_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+  },
+  "raw_candidates_retained_outside_git": true,
+  "schema_version": "qwen35-9b-assessment-evidence-v1",
+  "status": "OBSERVED",
+  "summary": {
+    "candidate_count": 64,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 64,
+      "verified": 0,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 1.0,
+      "verified": 0.0,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "complete": true,
+    "finish_reason_counts": {
+      "eos": 10,
+      "token_limit": 54
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.0,
+      "pass@4": 0.0
+    },
+    "run_wall_time_seconds": 940.0274147660239,
+    "task_count": 16,
+    "tasks_with_verified_candidate": {
+      "count": 0,
+      "fraction": 0.0
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 64.48930396427932,
+      "candidate_total_latency_sum": 4127.315453713876,
+      "generation_candidate_latency_mean": 51.829526006436936,
+      "generation_candidate_latency_sum": 3317.089664411964,
+      "verification_latency_mean": 12.65977795784238,
+      "verification_latency_sum": 810.2257893019123
+    },
+    "verifier_timeout_count": 0
+  },
+  "verifier_timeout_semantics": "unsuccessful_candidate_not_infrastructure_error",
+  "workload_id": "minif2f-valid-dev16-v1"
+}

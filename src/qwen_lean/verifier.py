@@ -63,7 +63,7 @@ class LeanVerifier:
         with self._preamble_probe_lock:
             if preamble not in self._preamble_probes:
                 outcome = self._run_source(f"{preamble}\n\n#check True\n")
-                if outcome.category == "lean_rejected":
+                if outcome.category != "verified":
                     outcome = VerificationOutcome(
                         category="verifier_error",
                         lean_exit_code=outcome.lean_exit_code,
