@@ -85,10 +85,10 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
-from .qwen35_assessment import (
+from .qwen35_4b_base_assessment import (
     run_assessment as run_qwen35_assessment,
 )
-from .qwen35_assessment import (
+from .qwen35_4b_base_assessment import (
     write_compact_evidence as write_qwen35_evidence,
 )
 from .riemann_data import (
@@ -195,7 +195,6 @@ def _parser() -> argparse.ArgumentParser:
         choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
     )
     qwen35_assess.add_argument("--output-dir", type=Path, required=True)
-    qwen35_assess.add_argument("--timeout", type=float)
     qwen35_assess.add_argument("--verification-workers", type=int, default=8)
 
     qwen35_evidence = subparsers.add_parser(
@@ -934,11 +933,7 @@ def main(argv: list[str] | None = None) -> int:
             print("--verification-workers must be positive")
             return 2
         config = Phase1Config.load(args.config)
-        timeout = (
-            float(config.value["verifier"]["timeout_seconds"])
-            if args.timeout is None
-            else args.timeout
-        )
+        timeout = float(config.value["verifier"]["timeout_seconds"])
         _, _, summary = run_qwen35_assessment(
             config,
             args.benchmark_root,

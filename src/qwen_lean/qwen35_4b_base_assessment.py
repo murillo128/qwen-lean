@@ -72,6 +72,8 @@ def validate_assessment_config(config: Phase1Config) -> None:
         VLLM_SOURCE_REVISION
     ):
         raise ValueError("Qwen3.5 assessment vLLM source revision mismatch")
+    if config.value.get("verifier", {}).get("timeout_seconds") != 30.0:
+        raise ValueError("Qwen3.5 assessment verifier timeout must be 30 seconds")
 
 
 class _GpuMemorySampler:
@@ -130,6 +132,12 @@ def run_assessment(
     verification_workers: int,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
     validate_assessment_config(config)
+    required_timeout = float(config.value["verifier"]["timeout_seconds"])
+    if timeout_seconds != required_timeout:
+        raise ValueError(
+            "Qwen3.5-4B-Base verifier timeout mismatch: "
+            f"{timeout_seconds!r} != {required_timeout!r}"
+        )
     if workload_id not in WORKLOAD_TASK_COUNTS:
         raise ValueError(f"unknown Qwen3.5 assessment workload: {workload_id}")
 
@@ -410,6 +418,12 @@ def _validate_run_contract(
                 f"{workload_id} run contract mismatch for {field}: "
                 f"{getattr(metadata, field)!r} != {value!r}"
             )
+    required_timeout = float(config.value["verifier"]["timeout_seconds"])
+    if metadata.verifier_timeout_seconds != required_timeout:
+        raise ValueError(
+            f"{workload_id} verifier timeout mismatch: "
+            f"{metadata.verifier_timeout_seconds!r} != {required_timeout!r}"
+        )
     settings = metadata.generation_settings or {}
     for key, value in {
         **config.sampling,
