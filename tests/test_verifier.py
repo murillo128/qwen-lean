@@ -1,9 +1,11 @@
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
 
 from qwen_lean.schema import TaskRecord
-from qwen_lean.verifier import LeanVerifier
+from qwen_lean.verifier import LeanVerifier, VerificationOutcome
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +53,42 @@ def test_broken_preamble_is_a_verifier_error() -> None:
     )
     outcome = LeanVerifier(ROOT).verify(task, "exact h")
     assert outcome.category == "verifier_error"
+
+
+def test_timed_out_preamble_is_a_verifier_error(tmp_path: Path) -> None:
+    fake_lake = tmp_path / "slow-lake"
+    fake_lake.write_text("#!/bin/sh\nsleep 1\n", encoding="utf-8")
+    fake_lake.chmod(0o755)
+
+    outcome = LeanVerifier(
+        ROOT, timeout_seconds=0.01, lake_command=str(fake_lake)
+    ).verify(CORE_TASK, "exact h")
+
+    assert outcome.category == "verifier_error"
+    assert "verifier environment probe failed" in outcome.diagnostics["stderr"]
+
+
+def test_shared_verifier_serializes_one_preamble_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    verifier = LeanVerifier(ROOT)
+    preamble_probe_count = 0
+
+    def fake_run_source(
+        source: str, *, started: float | None = None
+    ) -> VerificationOutcome:
+        nonlocal preamble_probe_count
+        if "#check True" in source:
+            preamble_probe_count += 1
+            time.sleep(0.05)
+        return VerificationOutcome("verified", 0, {"stdout": "", "stderr": ""}, 0.0)
+
+    monkeypatch.setattr(verifier, "_run_source", fake_run_source)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        outcomes = list(executor.map(lambda _: verifier.verify(CORE_TASK, "exact h"), range(8)))
+
+    assert preamble_probe_count == 1
+    assert all(outcome.category == "verified" for outcome in outcomes)
 
 
 def test_zero_exit_error_diagnostic_is_rejected(tmp_path: Path) -> None:
