@@ -214,16 +214,20 @@ def _compact_run(
     *,
     workload_id: str,
     expected_tasks: int,
+    model_id: str = MODEL_ID,
+    model_revision: str = MODEL_REVISION,
+    assessment_name: str = "Qwen3-8B",
+    run_evidence_schema: str = "qwen3-8b-posttrained-run-evidence-v1",
 ) -> dict[str, Any]:
     metadata, results = read_artifacts(run_dir)
     summary = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
     expected_candidates = expected_tasks * 4
     settings = metadata.generation_settings or {}
     identity_checks = {
-        "model_id": metadata.model_id == MODEL_ID,
-        "model_revision": metadata.model_revision == MODEL_REVISION,
-        "tokenizer_id": metadata.tokenizer_id == MODEL_ID,
-        "tokenizer_revision": metadata.tokenizer_revision == MODEL_REVISION,
+        "model_id": metadata.model_id == model_id,
+        "model_revision": metadata.model_revision == model_revision,
+        "tokenizer_id": metadata.tokenizer_id == model_id,
+        "tokenizer_revision": metadata.tokenizer_revision == model_revision,
         "workload_id": metadata.workload_id == workload_id,
         "prompt_format_id": metadata.prompt_format_id == "whole-proof-v1",
         "inference_engine": metadata.inference_engine == "vllm",
@@ -245,33 +249,39 @@ def _compact_run(
     }
     if not all(identity_checks.values()):
         failed = [name for name, passed in identity_checks.items() if not passed]
-        raise ValueError(f"Qwen3-8B run identity checks failed: {failed}")
+        raise ValueError(f"{assessment_name} run identity checks failed: {failed}")
     if not summary.get("complete"):
         raise ValueError(
-            f"Qwen3-8B run is incomplete: {summary.get('completeness_errors')}"
+            f"{assessment_name} run is incomplete: {summary.get('completeness_errors')}"
         )
     if int(summary.get("task_count", -1)) != expected_tasks:
-        raise ValueError("Qwen3-8B task count differs from the frozen workload")
+        raise ValueError(f"{assessment_name} task count differs from the frozen workload")
     if len(results) != expected_candidates or int(
         summary.get("candidate_count", -1)
     ) != expected_candidates:
-        raise ValueError("Qwen3-8B candidate count differs from the frozen workload")
+        raise ValueError(
+            f"{assessment_name} candidate count differs from the frozen workload"
+        )
     if int(summary.get("infrastructure_error_count", -1)) != 0:
-        raise ValueError("Qwen3-8B run contains generation/verifier errors")
+        raise ValueError(f"{assessment_name} run contains generation/verifier errors")
     finish_reasons = summary.get("finish_reason_counts", {})
     if set(finish_reasons) - {"eos", "token_limit"} or sum(
         int(value) for value in finish_reasons.values()
     ) != expected_candidates:
-        raise ValueError("Qwen3-8B run has incomplete or unknown finish reasons")
+        raise ValueError(
+            f"{assessment_name} run has incomplete or unknown finish reasons"
+        )
     pass_at_k = summary.get("pass_at_k")
     if not isinstance(pass_at_k, dict) or any(
         key not in pass_at_k for key in ("pass@1", "pass@4")
     ):
-        raise ValueError("Qwen3-8B run has no complete pass@1/pass@4 metrics")
+        raise ValueError(
+            f"{assessment_name} run has no complete pass@1/pass@4 metrics"
+        )
 
     token_counts = [result.generated_token_count for result in results]
     if any(value is None for value in token_counts):
-        raise ValueError("Qwen3-8B run is missing generated-token counts")
+        raise ValueError(f"{assessment_name} run is missing generated-token counts")
     concrete_counts = [int(value) for value in token_counts if value is not None]
     generation_wall = float(metadata.runtime["generation_wall_time_seconds"])
     verification_wall = float(metadata.runtime["verification_wall_time_seconds"])
@@ -304,7 +314,7 @@ def _compact_run(
             "to its PyTorch-native top-p/top-k sampler"
         )
     return {
-        "schema_version": "qwen3-8b-posttrained-run-evidence-v1",
+        "schema_version": run_evidence_schema,
         "status": "passed",
         "workload_id": workload_id,
         "model": {

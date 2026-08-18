@@ -12,6 +12,15 @@ from .baseline import (
 )
 from .evaluator import load_fixture_set, run_fixture_evaluation
 from .generation import run_model_smoke
+from .deepseek_prover_assessment import (
+    load_assessment_config as load_deepseek_prover_config,
+)
+from .deepseek_prover_assessment import (
+    run_strict_assessment as run_deepseek_prover_assessment,
+)
+from .deepseek_prover_assessment import (
+    write_compact_evidence as write_deepseek_prover_evidence,
+)
 from .gpt53_assessment import (
     GPT53Config,
     run_assessment,
@@ -268,6 +277,66 @@ def _parser() -> argparse.ArgumentParser:
     )
     qwen3_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/qwen3-8b-posttrained"
+    )
+
+    deepseek_assess = subparsers.add_parser(
+        "deepseek-prover-assess",
+        help="run the strict DeepSeek-Prover-V2-7B Lean assessment",
+    )
+    deepseek_assess.add_argument("--benchmark-root", type=Path, required=True)
+    deepseek_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-assessment.json",
+    )
+    deepseek_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    deepseek_assess.add_argument("--output-dir", type=Path, required=True)
+    deepseek_assess.add_argument("--verification-workers", type=int, default=8)
+
+    deepseek_evidence = subparsers.add_parser(
+        "deepseek-prover-evidence",
+        help="write compact DeepSeek-Prover-V2-7B comparison evidence",
+    )
+    deepseek_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-assessment.json",
+    )
+    deepseek_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/deepseek-prover/dev16"
+    )
+    deepseek_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/deepseek-prover/full"
+    )
+    deepseek_evidence.add_argument(
+        "--base-dir", type=Path, default=root / "evidence/phase1/baseline"
+    )
+    deepseek_evidence.add_argument(
+        "--reference", type=Path, default=root / "evidence/phase5/minif2f.json"
+    )
+    deepseek_evidence.add_argument(
+        "--qwen3-posttrained",
+        type=Path,
+        default=root / "evidence/qwen3-8b-posttrained/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--qwen35-4b-base",
+        type=Path,
+        default=root / "evidence/qwen35-4b-base/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--goedel",
+        type=Path,
+        default=root / "evidence/goedel-prover-v2-8b/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/deepseek-prover-v2-7b",
     )
 
     qwen35_9b_posttrained_preflight = subparsers.add_parser(
@@ -1321,6 +1390,35 @@ def main(argv: list[str] | None = None) -> int:
             full_dir=args.full_dir,
             base_dir=args.base_dir,
             reference_path=args.reference,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "deepseek-prover-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_deepseek_prover_assessment(
+            load_deepseek_prover_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "deepseek-prover-evidence":
+        comparison = write_deepseek_prover_evidence(
+            load_deepseek_prover_config(args.config),
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            base_dir=args.base_dir,
+            reference_path=args.reference,
+            qwen3_posttrained_path=args.qwen3_posttrained,
+            qwen35_4b_base_path=args.qwen35_4b_base,
+            goedel_path=args.goedel,
             evidence_dir=args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
