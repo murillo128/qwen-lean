@@ -85,6 +85,12 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .qwen35_4b_posttrained_assessment import (
+    load_assessment_config as load_qwen35_assessment_config,
+    run_preflight as run_qwen35_preflight,
+    run_strict_assessment as run_qwen35_strict_assessment,
+    write_compact_evidence as write_qwen35_evidence,
+)
 from .qwen35_4b_base_assessment import (
     run_assessment as run_qwen35_4b_base_assessment,
 )
@@ -193,6 +199,60 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-4b-preflight",
+        help="run the frozen one-task Qwen3.5-4B BF16 compatibility preflight",
+    )
+    qwen35_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_preflight.add_argument("--output-dir", type=Path, required=True)
+    qwen35_preflight.add_argument("--verification-workers", type=int, default=1)
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-4b-assess",
+        help="run the frozen Qwen3.5-4B strict raw-continuation assessment",
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_assess.add_argument(
+        "--workload",
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+        required=True,
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-4b-evidence",
+        help="write compact Qwen3.5-4B casting evidence from retained local runs",
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight-dir",
+        type=Path,
+        default=root / "artifacts/qwen35-4b/preflight",
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-4b/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-4b/full"
+    )
+    qwen35_evidence.add_argument(
+        "--reference-summary",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-4b"
+    )
 
     qwen35_4b_base_assess = subparsers.add_parser(
         "qwen35-4b-base-assess",
@@ -1058,6 +1118,45 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-preflight":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen35_preflight(
+            load_qwen35_assessment_config(args.config),
+            args.benchmark_root,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen35_strict_assessment(
+            load_qwen35_assessment_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-evidence":
+        comparison = write_qwen35_evidence(
+            load_qwen35_assessment_config(args.config),
+            preflight_dir=args.preflight_dir,
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            reference_summary_path=args.reference_summary,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
 
     if args.command == "qwen35-4b-base-assess":
         if args.verification_workers < 1:

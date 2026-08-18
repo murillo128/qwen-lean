@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import tempfile
+import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +33,7 @@ class LeanVerifier:
         self.timeout_seconds = timeout_seconds
         self.lake_command = lake_command
         self._preamble_probes: dict[str, VerificationOutcome | None] = {}
+        self._preamble_probe_lock = threading.Lock()
 
     def verify(self, task: TaskRecord, candidate: str) -> VerificationOutcome:
         started = time.perf_counter()
@@ -58,19 +60,20 @@ class LeanVerifier:
         return self._run_source(reconstruct_source(task, candidate), started=started)
 
     def _probe_preamble(self, preamble: str) -> VerificationOutcome | None:
-        if preamble not in self._preamble_probes:
-            outcome = self._run_source(f"{preamble}\n\n#check True\n")
-            if outcome.category == "lean_rejected":
-                outcome = VerificationOutcome(
-                    category="verifier_error",
-                    lean_exit_code=outcome.lean_exit_code,
-                    diagnostics=outcome.diagnostics,
-                    latency_seconds=outcome.latency_seconds,
+        with self._preamble_probe_lock:
+            if preamble not in self._preamble_probes:
+                outcome = self._run_source(f"{preamble}\n\n#check True\n")
+                if outcome.category == "lean_rejected":
+                    outcome = VerificationOutcome(
+                        category="verifier_error",
+                        lean_exit_code=outcome.lean_exit_code,
+                        diagnostics=outcome.diagnostics,
+                        latency_seconds=outcome.latency_seconds,
+                    )
+                self._preamble_probes[preamble] = (
+                    None if outcome.category == "verified" else outcome
                 )
-            self._preamble_probes[preamble] = (
-                None if outcome.category == "verified" else outcome
-            )
-        return self._preamble_probes[preamble]
+            return self._preamble_probes[preamble]
 
     def _run_source(
         self, source: str, *, started: float | None = None
