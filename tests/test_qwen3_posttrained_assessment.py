@@ -84,6 +84,13 @@ def test_sampling_backend_records_vllm_native_fallback() -> None:
         )
         == "vllm_pytorch_native"
     )
+    assert (
+        _sampling_backend(
+            {"flashinfer_sampler": False}, {"flashinfer-python": "0.4.1"}
+        )
+        == "vllm_pytorch_native"
+    )
+
 
 def test_compact_evidence_checks_counts_and_compares_both_anchors(
     tmp_path: Path,

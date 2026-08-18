@@ -1,0 +1,150 @@
+{
+  "compute_per_solved_task": {
+    "generation_gpu_hours_per_solved_task": 0.21504037609774,
+    "generation_wall_seconds_per_solved_task": 774.145353951864,
+    "tasks_with_verified_candidate": 15
+  },
+  "engine": {
+    "generation_settings": {
+      "adapter": null,
+      "candidates_per_task": 4,
+      "chat_template": null,
+      "cpu_offload_gb": 0.0,
+      "do_sample": true,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "flashinfer_sampler": false,
+      "gpu_memory_utilization": 0.95,
+      "language_model_only": true,
+      "max_model_len": 2048,
+      "max_new_tokens": 1024,
+      "max_num_seqs": 4,
+      "prompt_transformation": null,
+      "quantization": null,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "tensor_parallel_size": 1,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "name": "vllm",
+    "runtime": {
+      "candidate_generation_reused": true,
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_index": 0,
+      "cuda_device_total_memory_bytes": 20989804544,
+      "generation_wall_time_seconds": 11612.18030927796,
+      "inference_execution": "local_cuda",
+      "previous_verification_wall_time_seconds": 30.09078353201039,
+      "python": "3.12.14",
+      "torch": "2.11.0+cu130",
+      "torch_cuda_version": "13.0",
+      "verification_wall_time_seconds": 1081.1573784860084,
+      "verification_workers": 8
+    },
+    "version": "0.21.0"
+  },
+  "execution_limitations": [
+    "Wall-time and candidate-timeout observations include periods of external non-batch Lean CPU and I/O contention on the shared host; all 10 candidate timeouts remain unsuccessful under the frozen protocol.",
+    "The accepted full verification reuses the exact generated candidates after serializing the shared verifier preamble probe; model generation was not rerun."
+  ],
+  "generated_token_counts": {
+    "count": 976,
+    "maximum": 1024,
+    "mean": 817.3534836065573,
+    "minimum": 2,
+    "p50": 1024.0,
+    "p95": 1024.0,
+    "total": 797737
+  },
+  "latency_seconds": {
+    "generation": {
+      "count": 976,
+      "maximum": 47.56353285755737,
+      "mean": 47.56353285755737,
+      "minimum": 47.56353285755737,
+      "p50": 47.56353285755737,
+      "p95": 47.56353285755737,
+      "total": 46422.00806897599
+    },
+    "total": {
+      "count": 976,
+      "maximum": 77.70142440356554,
+      "mean": 56.39920234390187,
+      "minimum": 52.797967285541894,
+      "p50": 55.630054845050985,
+      "p95": 59.21576460580233,
+      "total": 55045.621487648226
+    },
+    "verification": {
+      "count": 976,
+      "maximum": 30.137891546008177,
+      "mean": 8.835669486344502,
+      "minimum": 5.2344344279845245,
+      "p50": 8.066521987493616,
+      "p95": 11.652231748244958,
+      "total": 8623.613418672234
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-9B",
+    "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "tokenizer_id": "Qwen/Qwen3.5-9B",
+    "tokenizer_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+  },
+  "raw_candidates_retained_outside_git": true,
+  "schema_version": "qwen35-9b-assessment-evidence-v1",
+  "status": "OBSERVED",
+  "summary": {
+    "candidate_count": 976,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 950,
+      "verified": 16,
+      "verifier_error": 0,
+      "verifier_timeout": 10
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.9733606557377049,
+      "verified": 0.01639344262295082,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.010245901639344262
+    },
+    "complete": true,
+    "finish_reason_counts": {
+      "eos": 256,
+      "token_limit": 720
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.01639344262295082,
+      "pass@4": 0.06147540983606557
+    },
+    "run_wall_time_seconds": 12693.337687763968,
+    "task_count": 244,
+    "tasks_with_verified_candidate": {
+      "count": 15,
+      "fraction": 0.06147540983606557
+    },
+    "timing_seconds": {
+      "candidate_total_latency_mean": 56.39920234390187,
+      "candidate_total_latency_sum": 55045.621487648226,
+      "generation_candidate_latency_mean": 47.56353285755737,
+      "generation_candidate_latency_sum": 46422.00806897599,
+      "verification_latency_mean": 8.835669486344502,
+      "verification_latency_sum": 8623.613418672234
+    },
+    "verifier_timeout_count": 10
+  },
+  "verifier_timeout_semantics": "unsuccessful_candidate_not_infrastructure_error",
+  "workload_id": "minif2f-valid-v1"
+}

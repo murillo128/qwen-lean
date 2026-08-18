@@ -73,7 +73,7 @@ class LeanVerifier:
                     f"{preamble}\n\n#check True\n",
                     timeout_seconds=timeout_seconds,
                 )
-                if outcome.category == "lean_rejected":
+                if outcome.category != "verified":
                     outcome = VerificationOutcome(
                         category="verifier_error",
                         lean_exit_code=outcome.lean_exit_code,

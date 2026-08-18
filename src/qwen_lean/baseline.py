@@ -281,6 +281,16 @@ def run_phase1_baseline(
             "enforce_eager": bool(config.engine["enforce_eager"]),
             "quantization": config.engine["quantization"],
             **(
+                {"cpu_offload_gb": float(config.engine["cpu_offload_gb"])}
+                if "cpu_offload_gb" in config.engine
+                else {}
+            ),
+            **(
+                {"flashinfer_sampler": bool(config.engine["flashinfer_sampler"])}
+                if "flashinfer_sampler" in config.engine
+                else {}
+            ),
+            **(
                 {"language_model_only": bool(config.engine["language_model_only"])}
                 if "language_model_only" in config.engine
                 else {}
@@ -474,7 +484,10 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
 def _sampling_backend(
     engine: Mapping[str, Any], package_versions: Mapping[str, str]
 ) -> str:
-    if engine.get("use_flashinfer_sampler") is False:
+    if (
+        engine.get("use_flashinfer_sampler", engine.get("flashinfer_sampler", True))
+        is False
+    ):
         return "vllm_pytorch_native"
     if "flashinfer-python" in package_versions:
         return "flashinfer"
@@ -504,7 +517,12 @@ def _generate_candidates(
     sampling: Mapping[str, Any] | None = None,
     adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[list[GeneratedCandidate], str]:
-    if config.engine.get("use_flashinfer_sampler") is False:
+    if (
+        config.engine.get(
+            "use_flashinfer_sampler", config.engine.get("flashinfer_sampler")
+        )
+        is False
+    ):
         os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     try:
         import vllm
@@ -672,6 +690,8 @@ def vllm_engine_kwargs(
     }
     if "language_model_only" in engine:
         kwargs["language_model_only"] = bool(engine["language_model_only"])
+    if "cpu_offload_gb" in engine:
+        kwargs["cpu_offload_gb"] = float(engine["cpu_offload_gb"])
     if "limit_mm_per_prompt" in engine:
         kwargs["limit_mm_per_prompt"] = dict(engine["limit_mm_per_prompt"])
     if adapter is not None:
