@@ -16,6 +16,7 @@ This skill owns only:
 - independent versus dependent issue semantics;
 - the base ref passed to each worker;
 - failure propagation between issues;
+- batch-worker progress observability;
 - the final orchestration summary.
 
 It does **not** own issue implementation, validation, publication, review, or merge decisions. Every worker executes exactly one controlling issue using `.agents/skills/spec-driven-codex-loop/SKILL.md` and the normal repository workflow.
@@ -50,13 +51,56 @@ For every dispatched issue:
 1. start a fresh worker agent;
 2. give it exactly one controlling issue and the base ref selected by this skill;
 3. require it to load `AGENTS.md`, that controlling issue, and `spec-driven-codex-loop` normally;
-4. let the worker own its branch, implementation, validation, evidence, commits, independent review, PR publication, and ready-for-review handoff;
-5. wait for the worker outcome according to the selected schedule;
-6. record only the outcome needed by the orchestration loop.
+4. enable the orchestration progress-observability policy defined below;
+5. let the worker own its branch, implementation, validation, evidence, commits, independent review, PR publication, and ready-for-review handoff;
+6. wait for the worker outcome according to the selected schedule;
+7. record only the outcome needed by the orchestration loop.
 
 Do not carry implementation conclusions, temporary diagnostics, prompt changes, benchmark observations, or uncommitted state from one worker into another unless `dependency=dependent` and the state is preserved in the predecessor's published branch by design.
 
 Each controlling issue still gets its own PR under the normal spec-driven workflow. This skill never merges or enables auto-merge.
+
+## Batch worker observability
+
+Orchestrated execution is intentionally more observable than an ordinary single-issue Codex run. The worker should leave concise progress comments on its **controlling issue** in addition to the normal material checkpoint and final-handoff comments.
+
+This is a progress-reporting request from the calling workflow; it does not change the issue contract, acceptance criteria, review gates, or source-of-truth hierarchy.
+
+Post a progress update when it gives a remote observer useful new state, normally at these boundaries:
+
+- worker started and the execution/base context is established;
+- a material preflight, compatibility, setup, or environment phase finishes;
+- a long-running training, generation, evaluation, migration, or similar phase starts;
+- a long-running phase reaches a useful coarse progress boundary when that progress is cheaply available;
+- that long-running phase finishes and the worker moves into validation/evidence/review;
+- an unexpected failure, retry, fallback decision, or blocker materially changes what the worker is doing.
+
+For a long-running loop, prefer a few coarse updates such as roughly quarter/half/three-quarter progress over time-based chatter. Do not comment per task, candidate, test case, training step, retry, or log line.
+
+Write progress comments in short, natural language rather than as a rigid status form. In two or three sentences, say what just completed, what is running now, include a useful progress count when cheaply available, and mention an unexpected issue only when there is one. For example:
+
+```markdown
+## Progress update
+
+The model and revision are pinned, and the dev smoke test completed successfully. I’ve now started the full 244-task benchmark; no tasks have completed yet. I’ll report again once there is meaningful progress or if anything unexpected happens.
+```
+
+Later in the same run, a useful update could simply say:
+
+```markdown
+## Progress update
+
+The full benchmark is running normally. 121 of 244 tasks have completed so far, with no infrastructure issues. I’ll continue through the remaining tasks and update again near completion.
+```
+
+Avoid mechanical `Current / Completed / Progress / Next` fields unless the controlling issue explicitly requires that structure. Update counts only when the worker already has them cheaply; do not add instrumentation solely to produce issue comments.
+
+Progress comments are observability, not checkpoints:
+
+- they do not require publication of a review target;
+- they do not trigger independent review;
+- they do not authorize contract changes;
+- they do not replace the normal checkpoint, blocker, or ready-for-review comments required by `spec-driven-codex-loop`.
 
 ## Independent issues
 

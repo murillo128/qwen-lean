@@ -1,0 +1,11 @@
+[project]
+name = "qwen35-assessment-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "qwen-lean",
+  "vllm==0.23.0",
+]
+
+[tool.uv.sources]
+qwen-lean = { path = "../..", editable = true }

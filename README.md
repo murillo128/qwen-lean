@@ -135,6 +135,59 @@ Each model run writes versioned `run.json`, raw `results.jsonl`, and `summary.js
 Only compact accepted baseline evidence belongs under `evidence/`; raw continuations
 and external benchmark/model caches remain local and ignored.
 
+## Qwen3.5-2B post-trained strict casting assessment
+
+The Qwen3.5 assessment keeps its newer vLLM stack isolated from the accepted
+Phase 1 environment. Prepare the locked runtime, run the real BF16 preflight,
+then run dev16 before the frozen 244-task, four-candidate validation workload:
+
+```bash
+uv sync --frozen --project tools/qwen35-assessment
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-preflight \
+  --benchmark-root /tmp/qwen-lean-minif2f
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/qwen35-2b/dev16
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/qwen35-2b/full
+uv run --frozen --project tools/qwen35-assessment qwen-lean qwen35-2b-evidence
+```
+
+Raw candidates, model files, and caches remain outside Git. The evidence command
+retains only compact aggregate results and a hash binding them to the local raw
+candidate manifest.
+
+### Qwen3.5-2B-Base assessment
+
+The independent Qwen3.5 casting assessment uses an isolated locked vLLM 0.17.0
+runtime because the original Phase 1 stack predates the Qwen3.5 architecture.
+It keeps the same pinned miniF2F checkout, raw `whole-proof-v1` continuation,
+and Lean verifier while disabling image and video inputs at the engine boundary.
+Run the compatibility/memory preflight, dev16 gate, and full 244-by-4 assessment
+in that order on the project Ada GPU:
+
+```bash
+uv sync --frozen --project tools/qwen35-eval
+PYTHONPATH=src uv run --frozen --project tools/qwen35-eval python -m qwen_lean qwen35-preflight
+PYTHONPATH=src uv run --frozen --project tools/qwen35-eval python -m qwen_lean qwen35-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/qwen35-2b-base/dev16
+PYTHONPATH=src uv run --frozen --project tools/qwen35-eval python -m qwen_lean qwen35-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/qwen35-2b-base/full
+PYTHONPATH=src uv run --frozen --project tools/qwen35-eval python -m qwen_lean qwen35-evidence
+```
+
+The compact evidence records exact revisions and runtime versions, peak GPU
+memory, pass@1/pass@4, all evaluator categories and finish reasons, generated
+tokens, timing, throughput, and compute per solved task when defined. Raw
+candidates, weights, caches, and logs remain ignored under `artifacts/`.
+
 ## Phase 2 verified mathlib corpus
 
 Phase 2 uses LeanDojo-v2 at the revision pinned in
