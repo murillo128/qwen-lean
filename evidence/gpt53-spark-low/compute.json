@@ -1,0 +1,150 @@
+{
+  "arms": {
+    "low": {
+      "accepted_child_latency_seconds": {
+        "count": 244,
+        "max": 54.38161895298981,
+        "mean": 13.730433032492016,
+        "median": 11.631923791006557,
+        "min": 3.1222826369921677,
+        "p95": 30.375353675649965,
+        "total": 3350.2256599280518
+      },
+      "candidate_count": 244,
+      "efficiency": {
+        "mean_reasoning_tokens_per_task": 6845.274590163935,
+        "reasoning_tokens_per_verified_proof": 47721.34285714286,
+        "verified_proofs": 35,
+        "verified_proofs_per_1m_reasoning_tokens": 20.954984502292177
+      },
+      "infrastructure_retry_count": 1,
+      "usage": {
+        "cache_write_input_tokens": {
+          "count": 244,
+          "max": 0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0,
+          "p95": 0.0,
+          "total": 0
+        },
+        "cached_input_tokens": {
+          "count": 244,
+          "max": 7936,
+          "mean": 7328.0,
+          "median": 7552.0,
+          "min": 2176,
+          "p95": 7552.0,
+          "total": 1788032
+        },
+        "input_tokens": {
+          "count": 244,
+          "max": 8315,
+          "mean": 7983.9672131147545,
+          "median": 7978.0,
+          "min": 7931,
+          "p95": 8039.25,
+          "total": 1948088
+        },
+        "output_tokens": {
+          "count": 244,
+          "max": 38634,
+          "mean": 7090.852459016393,
+          "median": 4429.0,
+          "min": 181,
+          "p95": 21303.5,
+          "total": 1730168
+        },
+        "reasoning_output_tokens": {
+          "count": 244,
+          "max": 38605,
+          "mean": 6845.274590163935,
+          "median": 4237.0,
+          "min": 174,
+          "p95": 20475.399999999998,
+          "total": 1670247
+        }
+      },
+      "verified_count": 35,
+      "verifier_timeout_count": 0
+    },
+    "xhigh": {
+      "accepted_child_latency_seconds": {
+        "count": 244,
+        "max": 230.8505469050142,
+        "mean": 35.28870775179172,
+        "median": 24.968183060496813,
+        "min": 3.2076075240038335,
+        "p95": 101.48774045788885,
+        "total": 8610.44469143718
+      },
+      "candidate_count": 244,
+      "efficiency": {
+        "mean_reasoning_tokens_per_task": 22617.918032786885,
+        "reasoning_tokens_per_verified_proof": 112628.0,
+        "verified_proofs": 49,
+        "verified_proofs_per_1m_reasoning_tokens": 8.878786802571296
+      },
+      "infrastructure_retry_count": 2,
+      "usage": {
+        "cache_write_input_tokens": {
+          "count": 244,
+          "max": 0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0,
+          "p95": 0.0,
+          "total": 0
+        },
+        "cached_input_tokens": {
+          "count": 244,
+          "max": 7936,
+          "mean": 6960.262295081967,
+          "median": 7552.0,
+          "min": 2560,
+          "p95": 7552.0,
+          "total": 1698304
+        },
+        "input_tokens": {
+          "count": 244,
+          "max": 8313,
+          "mean": 7984.05737704918,
+          "median": 7978.0,
+          "min": 7930,
+          "p95": 8039.55,
+          "total": 1948110
+        },
+        "output_tokens": {
+          "count": 244,
+          "max": 99174,
+          "mean": 22998.860655737706,
+          "median": 14451.5,
+          "min": 368,
+          "p95": 74122.04999999999,
+          "total": 5611722
+        },
+        "reasoning_output_tokens": {
+          "count": 244,
+          "max": 96987,
+          "mean": 22617.918032786885,
+          "median": 14125.5,
+          "min": 361,
+          "p95": 72869.45,
+          "total": 5518772
+        }
+      },
+      "verified_count": 49,
+      "verifier_timeout_count": 8
+    }
+  },
+  "comparison": {
+    "reasoning_output_token_reduction": 3848525,
+    "reasoning_output_token_reduction_fraction": 0.6973516934564429,
+    "verified_proof_delta_xhigh_minus_low": 14
+  },
+  "interpretation_scope": "Descriptive evidence from one frozen reasoning-effort ablation; it does not identify a compute-independent model-quality effect or establish causality beyond this low-versus-xhigh procedure.",
+  "schema_version": "gpt53-spark-assessment-evidence-v1",
+  "status": "passed",
+  "usage_semantics": "Codex CLI turn.completed usage fields are compared by identical field name under the same model, prompt, candidate count, CLI version, and task IDs.",
+  "workload_id": "minif2f-valid-v1"
+}

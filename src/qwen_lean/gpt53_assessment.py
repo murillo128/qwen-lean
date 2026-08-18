@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import platform
 import queue
@@ -37,6 +38,7 @@ CONFIG_SCHEMA_VERSION = "gpt53-spark-assessment-config-v1"
 EVIDENCE_SCHEMA_VERSION = "gpt53-spark-assessment-evidence-v1"
 MODEL_ID = "gpt-5.3-codex-spark"
 REASONING_EFFORT = "xhigh"
+ALLOWED_REASONING_EFFORTS = frozenset({"low", "xhigh"})
 CANDIDATES_PER_TASK = 1
 API_KEY_ENVIRONMENT_VARIABLES = frozenset({"OPENAI_API_KEY", "CODEX_API_KEY"})
 FORBIDDEN_CHILD_EXECUTABLES = ("lean", "lake", "elan")
@@ -105,6 +107,7 @@ _RETRYABLE_INFRASTRUCTURE_MARKERS = (
     re.compile(r"stream disconnected before completion", re.IGNORECASE),
     re.compile(r"max_output_tokens", re.IGNORECASE),
     re.compile(r"ran out of room in the model's context window", re.IGNORECASE),
+    re.compile(r"selected model is at capacity", re.IGNORECASE),
     re.compile(r"temporarily unavailable", re.IGNORECASE),
     re.compile(r"timed? out", re.IGNORECASE),
     re.compile(r"http (?:500|502|503|504)\b", re.IGNORECASE),
@@ -132,9 +135,17 @@ class GPT53Config:
         model = self.value.get("model", {})
         if model.get("id") != MODEL_ID:
             raise ValueError(f"Spark assessment model must be exactly {MODEL_ID}")
-        if model.get("reasoning_effort") != REASONING_EFFORT:
+        reasoning_effort = model.get("reasoning_effort")
+        if reasoning_effort not in ALLOWED_REASONING_EFFORTS:
             raise ValueError(
-                f"Spark assessment reasoning effort must be exactly {REASONING_EFFORT}"
+                "Spark assessment reasoning effort must be explicitly selected from "
+                f"{sorted(ALLOWED_REASONING_EFFORTS)}"
+            )
+        if reasoning_effort == "low" and self.value.get("artifact_namespace") != (
+            "gpt53-spark-low"
+        ):
+            raise ValueError(
+                "low reasoning assessment must use artifact_namespace gpt53-spark-low"
             )
         codex = self.value.get("codex", {})
         if tuple(codex.get("disabled_features", ())) != REQUIRED_DISABLED_FEATURES:
@@ -168,6 +179,14 @@ class GPT53Config:
     @property
     def prompt_instruction(self) -> str:
         return str(self.value["prompt"]["instruction"])
+
+    @property
+    def reasoning_effort(self) -> str:
+        return str(self.value["model"]["reasoning_effort"])
+
+    @property
+    def artifact_namespace(self) -> str:
+        return str(self.value.get("artifact_namespace", "gpt53-spark"))
 
     @property
     def heartbeat_seconds(self) -> float:
@@ -318,7 +337,7 @@ def build_child_argv(
         "--model",
         MODEL_ID,
         "-c",
-        f'model_reasoning_effort="{REASONING_EFFORT}"',
+        f'model_reasoning_effort="{config.reasoning_effort}"',
     ]
     for feature in config.value["codex"]["disabled_features"]:
         argv.extend(("--disable", str(feature)))
@@ -330,20 +349,33 @@ def build_child_argv(
             "-",
         )
     )
-    validate_child_argv(argv)
+    validate_child_argv(argv, reasoning_effort=config.reasoning_effort)
     return argv
 
 
-def validate_child_argv(argv: Iterable[str]) -> None:
+def validate_child_argv(
+    argv: Iterable[str], *, reasoning_effort: str = REASONING_EFFORT
+) -> None:
     values = list(argv)
+    if reasoning_effort not in ALLOWED_REASONING_EFFORTS:
+        raise ValueError(f"unsupported Spark reasoning effort: {reasoning_effort}")
     if "--model" not in values:
         raise ValueError("nested Codex argv omits the required explicit model flag")
     model_index = values.index("--model")
     if model_index + 1 >= len(values) or values[model_index + 1] != MODEL_ID:
         raise ValueError(f"nested Codex argv must select exactly {MODEL_ID}")
-    effort = f'model_reasoning_effort="{REASONING_EFFORT}"'
+    effort = f'model_reasoning_effort="{reasoning_effort}"'
     if "-c" not in values or effort not in values:
-        raise ValueError("nested Codex argv omits the required xhigh override")
+        raise ValueError(
+            f"nested Codex argv omits the required {reasoning_effort} override"
+        )
+    effort_overrides = [
+        value for value in values if value.startswith("model_reasoning_effort=")
+    ]
+    if effort_overrides != [effort]:
+        raise ValueError(
+            "nested Codex argv must contain exactly one reasoning override"
+        )
     for required in (
         "--ephemeral",
         "--ignore-user-config",
@@ -398,6 +430,23 @@ def validate_isolated_workdir(
         raise ValueError("child working directory is inside the miniF2F checkout")
     if any(resolved.iterdir()):
         raise ValueError("child working directory is not empty")
+
+
+def validate_arm_artifact_path(
+    config: GPT53Config, path: Path, *, evidence: bool = False
+) -> None:
+    if config.reasoning_effort != "low":
+        return
+    category = "evidence" if evidence else "artifacts"
+    expected_root = (
+        config.project_root / category
+    ).resolve() / config.artifact_namespace
+    resolved = path.resolve()
+    if not _is_relative_to(resolved, expected_root):
+        raise ValueError(
+            f"low reasoning {category} path must remain under {expected_root}; got "
+            f"{resolved}"
+        )
 
 
 def _is_relative_to(path: Path, parent: Path) -> bool:
@@ -656,7 +705,7 @@ def run_nested_codex(
                 "completed": completed,
                 "total": total,
                 "requested_model": MODEL_ID,
-                "requested_reasoning_effort": REASONING_EFFORT,
+                "requested_reasoning_effort": config.reasoning_effort,
                 "argv": shlex.join(argv),
                 "pid": process.pid,
                 "started_at": started_at,
@@ -796,7 +845,7 @@ def run_nested_codex(
             "completed": completed + int(accepted),
             "total": total,
             "requested_model": MODEL_ID,
-            "requested_reasoning_effort": REASONING_EFFORT,
+            "requested_reasoning_effort": config.reasoning_effort,
             "pid": process.pid,
             "started_at": started_at,
             "ended_at": ended_at,
@@ -835,6 +884,7 @@ def _drain_stream(
 
 def run_preflight(config: GPT53Config, output_dir: Path) -> dict[str, Any]:
     output_dir = output_dir.resolve()
+    validate_arm_artifact_path(config, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     codex_binary = resolve_codex_binary()
     environment = sanitize_child_environment()
@@ -920,7 +970,7 @@ def run_preflight(config: GPT53Config, output_dir: Path) -> dict[str, Any]:
             option: option in help_text for option in REQUIRED_EXEC_HELP_OPTIONS
         },
         "requested_model": MODEL_ID,
-        "requested_reasoning_effort": REASONING_EFFORT,
+        "requested_reasoning_effort": config.reasoning_effort,
         "api_key_environment_variables_removed": sorted(API_KEY_ENVIRONMENT_VARIABLES),
         "forbidden_child_executables": list(FORBIDDEN_CHILD_EXECUTABLES),
         "disabled_features": list(REQUIRED_DISABLED_FEATURES),
@@ -946,7 +996,7 @@ def assessment_contract_fingerprint(
         "phase1_config_sha256": sha256_bytes(phase1_config.path.read_bytes()),
         "cli_version": cli_version,
         "model": MODEL_ID,
-        "reasoning_effort": REASONING_EFFORT,
+        "reasoning_effort": config.reasoning_effort,
     }
     return sha256_text(json.dumps(payload, sort_keys=True, separators=(",", ":")))
 
@@ -962,7 +1012,7 @@ def validate_preflight(
         "cli_version": cli_version,
         "auth_mode": "ChatGPT",
         "requested_model": MODEL_ID,
-        "requested_reasoning_effort": REASONING_EFFORT,
+        "requested_reasoning_effort": config.reasoning_effort,
     }
     for key, value in expected.items():
         if summary.get(key) != value:
@@ -990,6 +1040,7 @@ def run_assessment(
     if workload_id not in config.value["workloads"]:
         raise ValueError(f"unsupported Spark assessment workload: {workload_id}")
     output_dir = output_dir.resolve()
+    validate_arm_artifact_path(config, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     benchmark_root = benchmark_root.resolve()
     codex_binary = resolve_codex_binary()
@@ -1033,6 +1084,7 @@ def run_assessment(
                 contract_fingerprint=contract_fingerprint,
                 task=task,
                 prompt_sha256=prompt_sha256,
+                reasoning_effort=config.reasoning_effort,
             )
             if should_retry_result_category(result.category):
                 logger.emit(
@@ -1216,7 +1268,7 @@ def run_assessment(
             "candidate_index": 0,
             "prompt_sha256": prompt_sha256,
             "requested_model": MODEL_ID,
-            "requested_reasoning_effort": REASONING_EFFORT,
+            "requested_reasoning_effort": config.reasoning_effort,
             "attempt_count": len(attempt_records),
             "attempts": attempt_records,
             "accepted_attempt": len(attempt_records),
@@ -1259,7 +1311,9 @@ def run_assessment(
     )
     summary["workload_id"] = workload_id
     summary["run_wall_time_seconds"] = time.perf_counter() - run_started
-    summary["execution_integrity"] = summarize_execution_records(records)
+    summary["execution_integrity"] = summarize_execution_records(
+        records, reasoning_effort=config.reasoning_effort
+    )
     if summary["candidate_count"] != expected_count:
         summary["complete"] = False
         summary["completeness_errors"].append(
@@ -1293,7 +1347,7 @@ def run_assessment(
         inference_engine="codex-cli",
         inference_engine_version=cli_version,
         generation_settings={
-            "reasoning_effort": REASONING_EFFORT,
+            "reasoning_effort": config.reasoning_effort,
             "candidates_per_task": CANDIDATES_PER_TASK,
             "prompt_adapter_id": str(config.value["prompt"]["id"]),
             "prompt_instruction_sha256": sha256_text(config.prompt_instruction),
@@ -1345,6 +1399,7 @@ def load_existing_candidate(
     contract_fingerprint: str,
     task: TaskRecord,
     prompt_sha256: str,
+    reasoning_effort: str = REASONING_EFFORT,
 ) -> tuple[dict[str, Any], CandidateResult]:
     record = json.loads(record_path.read_text(encoding="utf-8"))
     expected = {
@@ -1355,7 +1410,7 @@ def load_existing_candidate(
         "candidate_index": 0,
         "prompt_sha256": prompt_sha256,
         "requested_model": MODEL_ID,
-        "requested_reasoning_effort": REASONING_EFFORT,
+        "requested_reasoning_effort": reasoning_effort,
     }
     for key, value in expected.items():
         if record.get(key) != value:
@@ -1448,7 +1503,11 @@ def _resolve_run_artifact_path(output_dir: Path, relative_path: str) -> Path:
     return path
 
 
-def summarize_execution_records(records: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+def summarize_execution_records(
+    records: Iterable[Mapping[str, Any]],
+    *,
+    reasoning_effort: str = REASONING_EFFORT,
+) -> dict[str, Any]:
     materialized = list(records)
     failures: list[str] = []
     accepted_executions: list[Mapping[str, Any]] = []
@@ -1506,7 +1565,7 @@ def summarize_execution_records(records: Iterable[Mapping[str, Any]]) -> dict[st
         "valid": not failures and len(accepted_executions) == len(materialized),
         "failures": failures,
         "requested_model": MODEL_ID,
-        "requested_reasoning_effort": REASONING_EFFORT,
+        "requested_reasoning_effort": reasoning_effort,
         "accepted_candidate_execution_count": len(accepted_executions),
         "total_child_attempt_count": attempt_count,
         "retry_count": attempt_count - len(accepted_executions),
@@ -1559,6 +1618,10 @@ def write_compact_evidence(
     full_dir: Path,
     evidence_dir: Path,
 ) -> dict[str, Any]:
+    if config.reasoning_effort == "low":
+        for path in (preflight_dir, dev16_dir, full_dir):
+            validate_arm_artifact_path(config, path)
+        validate_arm_artifact_path(config, evidence_dir, evidence=True)
     preflight = json.loads((preflight_dir / "summary.json").read_text(encoding="utf-8"))
     dev16 = _load_complete_summary(dev16_dir, "minif2f-valid-dev16-v1", 16)
     full = _load_complete_summary(full_dir, "minif2f-valid-v1", 244)
@@ -1568,18 +1631,6 @@ def write_compact_evidence(
         )
     if preflight.get("config_fingerprint") != config.fingerprint:
         raise ValueError("preflight evidence uses a different Spark assessment config")
-
-    phase1_summary_path = config.project_root / str(
-        config.value["comparison"]["phase1_base_summary"]
-    )
-    phase6_validation_path = config.project_root / str(
-        config.value["comparison"]["reference_sft_validation"]
-    )
-    phase1 = json.loads(phase1_summary_path.read_text(encoding="utf-8"))
-    phase6 = json.loads(phase6_validation_path.read_text(encoding="utf-8"))
-    base_pass1 = float(phase1["pass_at_k"]["pass@1"])
-    reference_pass1 = float(phase6["adapter"]["pass_at_k"]["pass@1"])
-    gpt_pass1 = float(full["pass_at_k"]["pass@1"])
 
     evidence_dir = evidence_dir.resolve()
     evidence_dir.mkdir(parents=True, exist_ok=True)
@@ -1602,6 +1653,27 @@ def write_compact_evidence(
     }
     dev_compact = compact_workload_evidence(dev16, dev16_dir)
     full_compact = compact_workload_evidence(full, full_dir)
+    if config.reasoning_effort == "low":
+        return _write_low_evidence(
+            config,
+            preflight_compact=preflight_compact,
+            dev_compact=dev_compact,
+            full_compact=full_compact,
+            full_dir=full_dir,
+            evidence_dir=evidence_dir,
+        )
+
+    phase1_summary_path = config.project_root / str(
+        config.value["comparison"]["phase1_base_summary"]
+    )
+    phase6_validation_path = config.project_root / str(
+        config.value["comparison"]["reference_sft_validation"]
+    )
+    phase1 = json.loads(phase1_summary_path.read_text(encoding="utf-8"))
+    phase6 = json.loads(phase6_validation_path.read_text(encoding="utf-8"))
+    base_pass1 = float(phase1["pass_at_k"]["pass@1"])
+    reference_pass1 = float(phase6["adapter"]["pass_at_k"]["pass@1"])
+    gpt_pass1 = float(full["pass_at_k"]["pass@1"])
     comparison = {
         "schema_version": EVIDENCE_SCHEMA_VERSION,
         "status": "passed",
@@ -1656,6 +1728,406 @@ def write_compact_evidence(
 """
     (evidence_dir / "README.md").write_text(readme, encoding="utf-8")
     return comparison
+
+
+def _write_low_evidence(
+    config: GPT53Config,
+    *,
+    preflight_compact: Mapping[str, Any],
+    dev_compact: Mapping[str, Any],
+    full_compact: Mapping[str, Any],
+    full_dir: Path,
+    evidence_dir: Path,
+) -> dict[str, Any]:
+    comparison_config = config.value["comparison"]
+    xhigh_dir = (
+        config.project_root / str(comparison_config["xhigh_full_artifacts"])
+    ).resolve()
+    xhigh_evidence_path = (
+        config.project_root / str(comparison_config["xhigh_full_evidence"])
+    ).resolve()
+    expected_xhigh_evidence_sha256 = str(
+        comparison_config["xhigh_full_evidence_sha256"]
+    )
+    actual_xhigh_evidence_sha256 = sha256_bytes(xhigh_evidence_path.read_bytes())
+    if actual_xhigh_evidence_sha256 != expected_xhigh_evidence_sha256:
+        raise ValueError(
+            "accepted xhigh compact evidence hash differs from the low config"
+        )
+    xhigh_evidence = json.loads(xhigh_evidence_path.read_text(encoding="utf-8"))
+    expected_xhigh_pass1 = float(comparison_config["xhigh_pass_at_1"])
+    if (
+        xhigh_evidence.get("execution_integrity", {}).get("requested_reasoning_effort")
+        != "xhigh"
+        or xhigh_evidence.get("candidate_count") != 244
+        or float(xhigh_evidence["pass_at_k"]["pass@1"]) != expected_xhigh_pass1
+    ):
+        raise ValueError("accepted xhigh compact evidence violates the frozen control")
+
+    expected_ids = _primary_task_ids(config)
+    low_records = load_accepted_candidate_records(
+        full_dir, expected_ids=expected_ids, reasoning_effort="low"
+    )
+    xhigh_records = load_accepted_candidate_records(
+        xhigh_dir, expected_ids=expected_ids, reasoning_effort="xhigh"
+    )
+    xhigh_manifest_sha256 = candidate_records_manifest_sha256(xhigh_dir)
+    if xhigh_manifest_sha256 != str(
+        comparison_config["xhigh_candidate_records_manifest_sha256"]
+    ):
+        raise ValueError("accepted xhigh candidate-record manifest hash differs")
+
+    low_outcomes = {
+        task_id: str(record["result"]["category"])
+        for task_id, record in low_records.items()
+    }
+    xhigh_outcomes = {
+        task_id: str(record["result"]["category"])
+        for task_id, record in xhigh_records.items()
+    }
+    comparison = paired_outcome_comparison(
+        low_outcomes,
+        xhigh_outcomes,
+        expected_task_ids=expected_ids,
+        xhigh_pass_at_1=expected_xhigh_pass1,
+    )
+    comparison["source_integrity"].update(
+        {
+            "xhigh_compact_evidence": str(
+                xhigh_evidence_path.relative_to(config.project_root)
+            ),
+            "xhigh_compact_evidence_sha256": actual_xhigh_evidence_sha256,
+            "xhigh_candidate_records": str(xhigh_dir.relative_to(config.project_root)),
+            "xhigh_candidate_records_manifest_sha256": xhigh_manifest_sha256,
+            "low_candidate_records_manifest_sha256": (
+                candidate_records_manifest_sha256(full_dir)
+            ),
+        }
+    )
+    low_pass1 = float(full_compact["pass_at_k"]["pass@1"])
+    if comparison["aggregate"]["low_pass_at_1"] != low_pass1:
+        raise ValueError("low candidate records disagree with the complete run summary")
+
+    compute = {
+        "schema_version": EVIDENCE_SCHEMA_VERSION,
+        "status": "passed",
+        "workload_id": "minif2f-valid-v1",
+        "arms": {
+            "low": runtime_arm_summary(low_records, full_compact),
+            "xhigh": runtime_arm_summary(xhigh_records, xhigh_evidence),
+        },
+        "usage_semantics": (
+            "Codex CLI turn.completed usage fields are compared by identical field name "
+            "under the same model, prompt, candidate count, CLI version, and task IDs."
+        ),
+        "interpretation_scope": (
+            "Descriptive evidence from one frozen reasoning-effort ablation; it does not "
+            "identify a compute-independent model-quality effect or establish causality "
+            "beyond this low-versus-xhigh procedure."
+        ),
+    }
+    low_reasoning = int(
+        compute["arms"]["low"]["usage"]["reasoning_output_tokens"]["total"]
+    )
+    xhigh_reasoning = int(
+        compute["arms"]["xhigh"]["usage"]["reasoning_output_tokens"]["total"]
+    )
+    compute["comparison"] = {
+        "reasoning_output_token_reduction": xhigh_reasoning - low_reasoning,
+        "reasoning_output_token_reduction_fraction": (
+            (xhigh_reasoning - low_reasoning) / xhigh_reasoning
+        ),
+        "verified_proof_delta_xhigh_minus_low": (
+            comparison["paired_outcomes"]["solved_only_by_xhigh"]
+            - comparison["paired_outcomes"]["solved_only_by_low"]
+        ),
+    }
+
+    write_json(evidence_dir / "preflight.json", preflight_compact)
+    write_json(evidence_dir / "dev16.json", dev_compact)
+    write_json(evidence_dir / "full.json", full_compact)
+    write_json(evidence_dir / "comparison.json", comparison)
+    write_json(evidence_dir / "compute.json", compute)
+
+    low_verified = int(full_compact["category_counts"]["verified"])
+    xhigh_verified = int(xhigh_evidence["category_counts"]["verified"])
+    reduction_fraction = float(
+        compute["comparison"]["reasoning_output_token_reduction_fraction"]
+    )
+    compute_assessment = (
+        "materially reduced"
+        if reduction_fraction >= 0.1
+        else "did not materially reduce"
+    )
+    proof_assessment = (
+        "decreased"
+        if low_verified < xhigh_verified
+        else "increased"
+        if low_verified > xhigh_verified
+        else "was unchanged"
+    )
+    readme = f"""# GPT-5.3-Codex Spark low-reasoning ablation
+
+**ACCEPTED:** all low-arm candidates used fresh nested Codex CLI executions with the explicit `gpt-5.3-codex-spark` model pin, `low` reasoning override, ChatGPT authentication, an isolated empty working directory, a sanitized PATH without Lean/Lake/Elan, disabled tool surfaces, and raw final-message verification without repair.
+
+**OBSERVED:** dev16 completed {dev_compact["candidate_count"]}/{dev_compact["task_count"]} candidates with pass@1 {dev_compact["pass_at_k"]["pass@1"]:.6f}. The complete miniF2F validation run completed {full_compact["candidate_count"]}/{full_compact["task_count"]} candidates with {low_verified} verified proofs and pass@1 {low_pass1:.6f}.
+
+**OBSERVED:** the frozen xhigh control verified {xhigh_verified}/244 tasks (pass@1 {expected_xhigh_pass1:.6f}). Low and xhigh solved {comparison["paired_outcomes"]["solved_by_both"]} tasks in common; {comparison["paired_outcomes"]["solved_only_by_xhigh"]} were solved only by xhigh, {comparison["paired_outcomes"]["solved_only_by_low"]} only by low, and {comparison["paired_outcomes"]["solved_by_neither"]} by neither. The exact two-sided McNemar p-value is {comparison["paired_binary_test"]["p_value"]:.6g}.
+
+**OBSERVED:** reducing reasoning effort {compute_assessment} reported test-time reasoning output: {xhigh_reasoning:,} xhigh tokens versus {low_reasoning:,} low tokens ({reduction_fraction:.2%} reduction). Verified proof success {proof_assessment} from {xhigh_verified} to {low_verified}. Latency, other usage fields, verifier timeouts, retries, and proof-per-token efficiencies are recorded in `compute.json`.
+
+**ACCEPTED:** `lean_rejected`, `empty_candidate`, and `verifier_timeout` remain unsuccessful proof attempts and never authorize candidate regeneration. Accepted executions contained {full_compact["execution_integrity"]["tool_event_count"]} external-tool events and {full_compact["execution_integrity"]["retry_count"]} bounded generation-infrastructure retries.
+
+**ACCEPTED:** this is descriptive evidence from one frozen low-versus-xhigh effort ablation. The relative ratio and efficiency values are not compute-independent model-quality claims, and no causal claim is made beyond this exact procedure.
+"""
+    (evidence_dir / "README.md").write_text(readme, encoding="utf-8")
+    return comparison
+
+
+def _primary_task_ids(config: GPT53Config) -> list[str]:
+    phase1_config = Phase1Config.load(config.phase1_config_path)
+    manifest_path = phase1_config.path.parent / str(
+        phase1_config.benchmark["primary_task_manifest"]
+    )
+    task_ids = [
+        line
+        for line in manifest_path.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    ]
+    if len(task_ids) != 244 or len(set(task_ids)) != 244:
+        raise ValueError(
+            "pinned miniF2F validation manifest must contain 244 unique IDs"
+        )
+    return task_ids
+
+
+def candidate_records_manifest_sha256(run_dir: Path) -> str:
+    candidate_root = run_dir.resolve() / "candidates"
+    paths = sorted(candidate_root.glob("*/candidate.json"))
+    manifest = "".join(
+        f"{path.relative_to(run_dir.resolve())} {sha256_bytes(path.read_bytes())}\n"
+        for path in paths
+    )
+    return sha256_text(manifest)
+
+
+def load_accepted_candidate_records(
+    run_dir: Path,
+    *,
+    expected_ids: Iterable[str],
+    reasoning_effort: str,
+) -> dict[str, dict[str, Any]]:
+    ordered_ids = list(expected_ids)
+    candidate_root = run_dir.resolve() / "candidates"
+    paths = sorted(candidate_root.glob("*/candidate.json"))
+    actual_ids = [path.parent.name for path in paths]
+    if set(actual_ids) != set(ordered_ids) or len(actual_ids) != len(ordered_ids):
+        raise ValueError(
+            "paired comparison requires exactly the pinned 244 task IDs in each arm"
+        )
+    records: dict[str, dict[str, Any]] = {}
+    for path in paths:
+        record = json.loads(path.read_text(encoding="utf-8"))
+        task_id = path.parent.name
+        attempts = list(record.get("attempts") or [])
+        accepted_index = int(record.get("accepted_attempt", 0)) - 1
+        if (
+            record.get("status") != "accepted"
+            or record.get("task_id") != task_id
+            or record.get("candidate_index") != 0
+            or record.get("requested_model") != MODEL_ID
+            or record.get("requested_reasoning_effort") != reasoning_effort
+            or accepted_index not in range(len(attempts))
+        ):
+            raise ValueError(f"invalid paired candidate record: {path}")
+        accepted = attempts[accepted_index]
+        audit = accepted.get("audit") or {}
+        if (
+            not accepted.get("accepted")
+            or accepted.get("exit_code") != 0
+            or not audit.get("valid")
+            or audit.get("tool_event_count") != 0
+        ):
+            raise ValueError(f"paired candidate record failed execution audit: {path}")
+        result = record.get("result") or {}
+        if result.get("task_id") != task_id or result.get("candidate_index") != 0:
+            raise ValueError(f"paired candidate result identity differs: {path}")
+        records[task_id] = record
+    return {task_id: records[task_id] for task_id in ordered_ids}
+
+
+def paired_outcome_comparison(
+    low_outcomes: Mapping[str, str],
+    xhigh_outcomes: Mapping[str, str],
+    *,
+    expected_task_ids: Iterable[str],
+    xhigh_pass_at_1: float,
+) -> dict[str, Any]:
+    task_ids = list(expected_task_ids)
+    expected = set(task_ids)
+    if (
+        len(task_ids) != len(expected)
+        or set(low_outcomes) != expected
+        or set(xhigh_outcomes) != expected
+    ):
+        raise ValueError("paired comparison task IDs differ from the pinned manifest")
+    groups = {
+        "solved_by_both": [],
+        "solved_only_by_xhigh": [],
+        "solved_only_by_low": [],
+        "solved_by_neither": [],
+    }
+    for task_id in task_ids:
+        low_verified = low_outcomes[task_id] == "verified"
+        xhigh_verified = xhigh_outcomes[task_id] == "verified"
+        if low_verified and xhigh_verified:
+            group = "solved_by_both"
+        elif xhigh_verified:
+            group = "solved_only_by_xhigh"
+        elif low_verified:
+            group = "solved_only_by_low"
+        else:
+            group = "solved_by_neither"
+        groups[group].append(task_id)
+    counts = {key: len(value) for key, value in groups.items()}
+    xhigh_verified_count = counts["solved_by_both"] + counts["solved_only_by_xhigh"]
+    low_verified_count = counts["solved_by_both"] + counts["solved_only_by_low"]
+    observed_xhigh_pass1 = xhigh_verified_count / len(task_ids)
+    if observed_xhigh_pass1 != xhigh_pass_at_1:
+        raise ValueError("frozen xhigh task outcomes disagree with accepted pass@1")
+    discordant = counts["solved_only_by_xhigh"] + counts["solved_only_by_low"]
+    tail = min(counts["solved_only_by_xhigh"], counts["solved_only_by_low"])
+    p_value = (
+        1.0
+        if discordant == 0
+        else min(
+            1.0,
+            2.0
+            * sum(math.comb(discordant, k) for k in range(tail + 1))
+            / (2**discordant),
+        )
+    )
+    low_pass1 = low_verified_count / len(task_ids)
+    return {
+        "schema_version": EVIDENCE_SCHEMA_VERSION,
+        "status": "passed",
+        "workload_id": "minif2f-valid-v1",
+        "task_count": len(task_ids),
+        "aggregate": {
+            "low_pass_at_1": low_pass1,
+            "xhigh_pass_at_1": xhigh_pass_at_1,
+            "absolute_delta_xhigh_minus_low": xhigh_pass_at_1 - low_pass1,
+            "descriptive_ratio_low_over_xhigh": low_pass1 / xhigh_pass_at_1,
+        },
+        "paired_outcome_table": {
+            "low_fail_xhigh_fail": counts["solved_by_neither"],
+            "low_fail_xhigh_verified": counts["solved_only_by_xhigh"],
+            "low_verified_xhigh_fail": counts["solved_only_by_low"],
+            "low_verified_xhigh_verified": counts["solved_by_both"],
+        },
+        "paired_outcomes": counts,
+        "task_ids_by_paired_outcome": groups,
+        "paired_binary_test": {
+            "method": "exact_two_sided_mcnemar_binomial",
+            "discordant_pair_count": discordant,
+            "p_value": p_value,
+            "interpretation": "descriptive_uncertainty_not_a_hard_success_gate",
+        },
+        "source_integrity": {
+            "same_ordered_task_ids": True,
+            "ordered_task_ids_sha256": sha256_text("\n".join(task_ids) + "\n"),
+            "xhigh_control_reused_without_regeneration": True,
+        },
+        "interpretation_caveat": (
+            "The ratio and paired test describe this single frozen reasoning-effort "
+            "ablation and are not compute-independent model-quality claims."
+        ),
+    }
+
+
+def runtime_arm_summary(
+    records: Mapping[str, Mapping[str, Any]], compact: Mapping[str, Any]
+) -> dict[str, Any]:
+    accepted: list[Mapping[str, Any]] = []
+    verified_count = 0
+    for record in records.values():
+        attempts = list(record["attempts"])
+        accepted.append(attempts[int(record["accepted_attempt"]) - 1])
+        verified_count += int(record["result"]["category"] == "verified")
+    usage_keys = sorted(
+        {
+            key
+            for execution in accepted
+            for key in (execution.get("audit", {}).get("usage", {}) or {})
+        }
+    )
+    usage = {
+        key: distribution_summary(
+            int(execution.get("audit", {}).get("usage", {}).get(key, 0))
+            for execution in accepted
+        )
+        for key in usage_keys
+    }
+    reasoning = usage.get("reasoning_output_tokens")
+    efficiency: dict[str, float | int | None] = {
+        "verified_proofs": verified_count,
+        "verified_proofs_per_1m_reasoning_tokens": None,
+        "reasoning_tokens_per_verified_proof": None,
+        "mean_reasoning_tokens_per_task": None,
+    }
+    if reasoning is not None and int(reasoning["total"]) > 0:
+        reasoning_total = int(reasoning["total"])
+        efficiency["verified_proofs_per_1m_reasoning_tokens"] = (
+            verified_count * 1_000_000 / reasoning_total
+        )
+        efficiency["reasoning_tokens_per_verified_proof"] = (
+            None if verified_count == 0 else reasoning_total / verified_count
+        )
+        efficiency["mean_reasoning_tokens_per_task"] = float(reasoning["mean"])
+    return {
+        "candidate_count": len(accepted),
+        "verified_count": verified_count,
+        "usage": usage,
+        "accepted_child_latency_seconds": distribution_summary(
+            float(execution["elapsed_seconds"]) for execution in accepted
+        ),
+        "verifier_timeout_count": int(compact["verifier_timeout_count"]),
+        "infrastructure_retry_count": int(
+            compact["child_process_retry_accounting"]["retry_count"]
+        ),
+        "efficiency": efficiency,
+    }
+
+
+def distribution_summary(
+    values: Iterable[float | int],
+) -> dict[str, float | int | None]:
+    materialized = sorted(values)
+    if not materialized:
+        return {
+            "count": 0,
+            "total": 0,
+            "min": None,
+            "max": None,
+            "mean": None,
+            "median": None,
+            "p95": None,
+        }
+    rank = (len(materialized) - 1) * 0.95
+    lower = math.floor(rank)
+    upper = math.ceil(rank)
+    p95 = float(materialized[lower])
+    if upper != lower:
+        p95 += (float(materialized[upper]) - p95) * (rank - lower)
+    return {
+        "count": len(materialized),
+        "total": sum(materialized),
+        "min": materialized[0],
+        "max": materialized[-1],
+        "mean": statistics.fmean(materialized),
+        "median": statistics.median(materialized),
+        "p95": p95,
+    }
 
 
 def _load_complete_summary(
