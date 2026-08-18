@@ -1,0 +1,107 @@
+{
+  "schema_version": "qwen35-9b-base-assessment-config-v1",
+  "assessment_id": "qwen35-9b-base-whole-proof-v1",
+  "benchmark": {
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "source_path": "MiniF2F/Valid.lean",
+    "primary_task_manifest": "minif2f-valid-task-ids.txt",
+    "split": "validation",
+    "expected_primary_task_count": 244,
+    "lean_toolchain": "leanprover/lean4:v4.27.0"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": {
+      "selection": "explicit_ids",
+      "expected_task_count": 16,
+      "task_ids": [
+        "aimeII_2001_p3",
+        "aimeII_2020_p6",
+        "aimeI_2000_p7",
+        "aime_1983_p9",
+        "aime_1984_p15",
+        "aime_1984_p5",
+        "aime_1987_p8",
+        "aime_1988_p3",
+        "aime_1988_p4",
+        "aime_1990_p2",
+        "aime_1991_p1",
+        "aime_1991_p6",
+        "aime_1994_p4",
+        "aime_1996_p5",
+        "aime_1997_p11",
+        "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i"
+      ]
+    },
+    "minif2f-valid-v1": {
+      "selection": "all",
+      "expected_task_count": 244
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-9B-Base",
+    "model_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404",
+    "tokenizer_id": "Qwen/Qwen3.5-9B-Base",
+    "tokenizer_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404"
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "runtime": {
+    "inference_engine": "vllm",
+    "inference_engine_version": "0.23.0",
+    "torch_version": "2.11.0+cu130",
+    "transformers_version": "5.15.0",
+    "bitsandbytes_version": "0.49.1",
+    "expected_cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
+    "vllm_enable_v1_multiprocessing": false,
+    "vllm_worker_multiproc_method": "spawn"
+  },
+  "bf16_lane": {
+    "lane_id": "bf16-text-only-v1",
+    "dtype": "bfloat16",
+    "quantization": null,
+    "load_format": "auto",
+    "language_model_only": true,
+    "cpu_offload_gb": 0,
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_num_seqs": 32,
+    "enforce_eager": true
+  },
+  "fallback_lane": {
+    "lane_id": "bitsandbytes-nf4-online-v1",
+    "dtype": "bfloat16",
+    "quantization": "bitsandbytes",
+    "load_format": "bitsandbytes",
+    "language_model_only": true,
+    "cpu_offload_gb": 0,
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.90,
+    "max_model_len": 2048,
+    "max_num_seqs": 32,
+    "enforce_eager": true,
+    "quantization_metadata": {
+      "bits": 4,
+      "quant_type": "nf4",
+      "double_quantization": true,
+      "compute_dtype": "bfloat16",
+      "conversion": "vllm online from pinned BF16 safetensors",
+      "prequantized_checkpoint": false
+    }
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "verification_workers": 8,
+    "known_valid_task_id": "mathd_algebra_182",
+    "known_valid_candidate": "ring"
+  }
+}

@@ -85,6 +85,13 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .qwen35_9b_base_assessment import (
+    Qwen35BaseAssessmentConfig,
+    WORKLOADS,
+    run_assessment as run_qwen35_9b_base_assessment,
+    run_preflight as run_qwen35_9b_base_preflight,
+    write_compact_evidence as write_qwen35_9b_base_evidence,
+)
 from .riemann_data import (
     RiemannAtlasConfig,
     RiemannDataConfig,
@@ -225,6 +232,54 @@ def _parser() -> argparse.ArgumentParser:
     )
     gpt53_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/gpt53-spark"
+    )
+
+    qwen35_9b_preflight = subparsers.add_parser(
+        "qwen35-9b-base-preflight",
+        help="resolve the BF16/4-bit local-Ada lane for Qwen3.5-9B-Base",
+    )
+    qwen35_9b_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_9b_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    qwen35_9b_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_preflight.add_argument("--output", type=Path, required=True)
+
+    qwen35_9b_assess = subparsers.add_parser(
+        "qwen35-9b-base-assess",
+        help="run the strict Qwen3.5-9B-Base miniF2F assessment",
+    )
+    qwen35_9b_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_9b_assess.add_argument("--model-snapshot", type=Path, required=True)
+    qwen35_9b_assess.add_argument("--preflight", type=Path, required=True)
+    qwen35_9b_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_assess.add_argument(
+        "--workload", required=True, choices=WORKLOADS
+    )
+    qwen35_9b_assess.add_argument("--output-dir", type=Path, required=True)
+
+    qwen35_9b_evidence = subparsers.add_parser(
+        "qwen35-9b-base-evidence",
+        help="write compact evidence from the strict Qwen3.5-9B-Base run",
+    )
+    qwen35_9b_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_evidence.add_argument("--preflight", type=Path, required=True)
+    qwen35_9b_evidence.add_argument("--dev16-dir", type=Path, required=True)
+    qwen35_9b_evidence.add_argument("--full-dir", type=Path, required=True)
+    qwen35_9b_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-9b-base",
     )
 
     phase2_loader = subparsers.add_parser(
@@ -913,6 +968,39 @@ def main(argv: list[str] | None = None) -> int:
             evidence_dir=args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen35-9b-base-preflight":
+        evidence = run_qwen35_9b_base_preflight(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen35-9b-base-assess":
+        _, _, summary = run_qwen35_9b_base_assessment(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-base-evidence":
+        evidence = write_qwen35_9b_base_evidence(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence["full"], indent=2))
         return 0
 
     if args.command == "phase2-loader-smoke":
