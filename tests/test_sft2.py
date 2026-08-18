@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from qwen_lean.phase5 import derive_phase5_trajectory
+from qwen_lean.schema import CandidateResult
 from qwen_lean.sft2 import (
     SFT2_ARTIFACT_ID,
     SFT2_ENDPOINT_STEP,
@@ -12,8 +13,16 @@ from qwen_lean.sft2 import (
     load_sft2_endpoint_binding,
     validate_step0_reference,
 )
-from qwen_lean.sft2_evidence import _delta, _task_counts, train_to_heldout_gap
-
+from qwen_lean.sft2_evidence import (
+    _delta,
+    _evaluation_integrity,
+    _task_counts,
+    train_to_heldout_gap,
+)
+from qwen_lean.sft2_inference import (
+    _merge_sft2_train_reverification_results,
+    _resolve_repeated_sft2_timeouts,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -170,3 +179,74 @@ def test_sft2_comparison_keeps_paired_tasks_and_gap_math_explicit() -> None:
     reversed_candidate = {"per_task": list(reversed(candidate["per_task"]))}
     with pytest.raises(ValueError, match="identities/order"):
         _task_counts(reference, reversed_candidate, "verified_candidate_count")
+
+
+def test_sft2_evidence_retains_verifier_retry_audit() -> None:
+    summary = {
+        "sft2_train_integrity_passed": True,
+        "infrastructure_error_count": 0,
+        "verifier_timeout_count": 0,
+        "reverification": {
+            "transient_results_retried": 1,
+            "retry_attempts": 2,
+            "unresolved_timeout_count": 0,
+            "stored_candidates_regenerated": False,
+        },
+    }
+
+    audit = _evaluation_integrity(summary, integrity_key="sft2_train_integrity_passed")
+
+    assert audit == {
+        "integrity_passed": True,
+        "infrastructure_error_count": 0,
+        "unresolved_verifier_timeout_count": 0,
+        "reverification": summary["reverification"],
+    }
+
+
+def _candidate_result(category: str, *, text: str = "exact foo") -> CandidateResult:
+    return CandidateResult(
+        task_id="task",
+        candidate_id="model-0",
+        candidate_index=0,
+        candidate_text=text,
+        category=category,  # type: ignore[arg-type]
+        lean_exit_code=None,
+        diagnostics={"stdout": "", "stderr": ""},
+        generation_latency_seconds=0.5,
+        verification_latency_seconds=1.0,
+        total_latency_seconds=1.5,
+        generated_token_count=2,
+        finish_reason="eos",
+    )
+
+
+def test_sft2_reverification_replaces_only_transient_result_without_regeneration() -> (
+    None
+):
+    timeout = _candidate_result("verifier_timeout")
+    verified = _candidate_result("verified")
+
+    assert _merge_sft2_train_reverification_results([timeout], [verified]) == [verified]
+
+    with pytest.raises(ValueError, match="changed generation evidence"):
+        _merge_sft2_train_reverification_results(
+            [timeout], [_candidate_result("verified", text="different")]
+        )
+    with pytest.raises(ValueError, match="exactly transient"):
+        _merge_sft2_train_reverification_results([verified], [verified])
+
+
+def test_sft2_reverification_resolves_repeated_timeout_as_bounded_rejection() -> None:
+    timeout = _candidate_result("verifier_timeout")
+
+    resolved, count = _resolve_repeated_sft2_timeouts([timeout])
+
+    assert count == 1
+    assert resolved[0].category == "lean_rejected"
+    assert resolved[0].candidate_text == timeout.candidate_text
+    assert resolved[0].generation_latency_seconds == timeout.generation_latency_seconds
+    assert (
+        "repeated under the unchanged timeout contract"
+        in resolved[0].diagnostics["stderr"]
+    )

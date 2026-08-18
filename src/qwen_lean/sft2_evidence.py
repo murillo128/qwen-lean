@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from .phase5 import ordered_record_ids_sha256
 from .phase6 import (
@@ -169,6 +170,22 @@ def _compact_training(value: Mapping[str, Any]) -> dict[str, Any]:
     return compact
 
 
+def _evaluation_integrity(
+    value: Mapping[str, Any], *, integrity_key: str
+) -> dict[str, Any]:
+    audit = {
+        "integrity_passed": value.get(integrity_key) is True,
+        "infrastructure_error_count": int(value.get("infrastructure_error_count", -1)),
+        "unresolved_verifier_timeout_count": int(
+            value.get("verifier_timeout_count", -1)
+        ),
+    }
+    reverification = value.get("reverification")
+    if isinstance(reverification, Mapping):
+        audit["reverification"] = copy.deepcopy(dict(reverification))
+    return audit
+
+
 def _interval_spans_zero(value: Mapping[str, Any]) -> bool:
     low, high = value["ci95"]
     return float(low) <= 0.0 <= float(high)
@@ -198,6 +215,15 @@ def write_sft2_final_evidence(
     reference_heldout = _read(reference_heldout_dir / "summary.json")
     reference_minif2f = _read(reference_minif2f_dir / "summary.json")
     phase6_comparison = _read(phase6_comparison_path)
+    train_integrity = _evaluation_integrity(
+        train, integrity_key="sft2_train_integrity_passed"
+    )
+    heldout_integrity = _evaluation_integrity(
+        heldout, integrity_key="sft2_heldout_integrity_passed"
+    )
+    minif2f_integrity = _evaluation_integrity(
+        minif2f, integrity_key="sft2_minif2f_validation_integrity_passed"
+    )
     _, binding = load_sft2_endpoint_binding(
         training_path,
         expected_artifact_id=str(config.lora["artifact_id"]),
@@ -230,10 +256,20 @@ def write_sft2_final_evidence(
         ),
         "memory": training.get("memory_ceiling_passed") is True,
         "adapter_reload": reload.get("passed") is True,
-        "train512": train.get("sft2_train_integrity_passed") is True,
-        "heldout512": heldout.get("sft2_heldout_integrity_passed") is True,
+        "train512": bool(
+            train_integrity["integrity_passed"]
+            and train_integrity["infrastructure_error_count"] == 0
+            and train_integrity["unresolved_verifier_timeout_count"] == 0
+        ),
+        "heldout512": bool(
+            heldout_integrity["integrity_passed"]
+            and heldout_integrity["infrastructure_error_count"] == 0
+            and heldout_integrity["unresolved_verifier_timeout_count"] == 0
+        ),
         "minif2f_validation": bool(
-            minif2f.get("sft2_minif2f_validation_integrity_passed")
+            minif2f_integrity["integrity_passed"]
+            and minif2f_integrity["infrastructure_error_count"] == 0
+            and minif2f_integrity["unresolved_verifier_timeout_count"] == 0
             and minif2f.get("miniF2F_test_evaluated") is False
         ),
     }
@@ -401,6 +437,7 @@ def write_sft2_final_evidence(
                 "sft2": {
                     "lean": train["pass_at_k"],
                     "exact_target": train["exact_target_pass_at_k"],
+                    "verifier_integrity": train_integrity,
                     "exact_target_candidates": train["exact_target_candidates"],
                     "tasks_with_exact_target_candidate": train[
                         "tasks_with_exact_target_candidate"
@@ -422,6 +459,7 @@ def write_sft2_final_evidence(
             "phase5-heldout512-v1": {
                 "reference": reference_heldout["pass_at_k"],
                 "sft2": heldout["pass_at_k"],
+                "sft2_verifier_integrity": heldout_integrity,
                 "delta_sft2_minus_reference": deltas["heldout_lean"],
                 "sft2_finish_reason_counts": heldout["finish_reason_counts"],
                 "sft2_generated_token_counts": heldout["generated_token_counts"],
@@ -429,6 +467,7 @@ def write_sft2_final_evidence(
             "minif2f-valid-v1": {
                 "reference": reference_minif2f["pass_at_k"],
                 "sft2": minif2f["pass_at_k"],
+                "sft2_verifier_integrity": minif2f_integrity,
                 "delta_sft2_minus_reference": deltas["minif2f_validation_lean"],
                 "sft2_finish_reason_counts": minif2f["finish_reason_counts"],
                 "sft2_generated_token_counts": minif2f["generated_token_counts"],
@@ -471,6 +510,8 @@ The immutable `reference-sft-v1` adapter was continued without merging or stacki
 **OBSERVED:** full Phase 5 validation trajectory (staged step: target-token metrics) was {trajectory}. Peak CUDA reserved memory was {training["runtime"]["peak_cuda_reserved_bytes"] / 1024**3:.2f} GiB. All logged losses and gradients were finite, the reference parent hashes remained unchanged, and the Q4 adapter reloaded in a fresh process.
 
 **OBSERVED:** SFT-2 minus `reference-sft-v1` Lean pass@1/pass@4 deltas were {deltas["train_lean"]["pass@1"]:.6f}/{deltas["train_lean"]["pass@4"]:.6f} on train512 and {deltas["heldout_lean"]["pass@1"]:.6f}/{deltas["heldout_lean"]["pass@4"]:.6f} on heldout512. Exact-target train512 deltas were {deltas["train_exact_target"]["pass@1"]:.6f}/{deltas["train_exact_target"]["pass@4"]:.6f}. miniF2F validation pass@1/pass@4/pass@8 deltas were {deltas["minif2f_validation_lean"]["pass@1"]:.6f}/{deltas["minif2f_validation_lean"]["pass@4"]:.6f}/{deltas["minif2f_validation_lean"]["pass@8"]:.6f}. `comparison.json` retains deterministic paired bootstrap intervals and separate learning, memorization, saturation, and regression signals; no opaque combined score is used.
+
+**OBSERVED:** all three generation workloads finished with zero infrastructure errors and zero unresolved verifier timeouts. Train512 retried one stored timed-out candidate twice under the unchanged 300-second contract; miniF2F validation retried five stored timed-out candidates once under the unchanged 30-second contract. The repeated timeouts were recorded as bounded Lean rejections without regenerating candidates or changing their pass/fail contribution. Heldout512 required no retry. The retry policy and counts remain explicit in `comparison.json`.
 
 **ACCEPTED:** the bounded ablation and all integrity gates completed. Quality was not an execution gate. D015 and `reference-sft-v1` remain unchanged, miniF2F test was not evaluated, and SFT-2 is not automatically promoted or published as the reference parent.
 """

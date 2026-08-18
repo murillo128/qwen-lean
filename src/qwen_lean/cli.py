@@ -83,6 +83,8 @@ from .sft2_evidence import (
     write_sft2_final_evidence,
 )
 from .sft2_inference import (
+    reverify_sft2_minif2f_validation,
+    reverify_sft2_train512,
     run_sft2_heldout512,
     run_sft2_minif2f_validation,
     run_sft2_train512,
@@ -620,6 +622,23 @@ def _parser() -> argparse.ArgumentParser:
         "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
     )
 
+    sft2_train_reverify = subparsers.add_parser(
+        "sft2-train512-reverify",
+        help="retry only transient verifier results from stored SFT-2 train512 output",
+    )
+    sft2_train_reverify.add_argument("--dataset-dir", type=Path, required=True)
+    sft2_train_reverify.add_argument("--mathlib-root", type=Path, required=True)
+    sft2_train_reverify.add_argument("--workload", type=Path, required=True)
+    sft2_train_reverify.add_argument("--training", type=Path, required=True)
+    sft2_train_reverify.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_train_reverify.add_argument("--output-dir", type=Path, required=True)
+    sft2_train_reverify.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+    sft2_train_reverify.add_argument(
+        "--phase2-config", type=Path, default=root / "config/phase2-mathlib.json"
+    )
+
     sft2_heldout = subparsers.add_parser(
         "sft2-heldout512", help="evaluate the fixed SFT-2 endpoint on heldout512"
     )
@@ -649,6 +668,18 @@ def _parser() -> argparse.ArgumentParser:
     sft2_minif2f.add_argument("--workers", type=int)
     sft2_minif2f.add_argument("--timeout", type=float)
     sft2_minif2f.add_argument(
+        "--config", type=Path, default=root / "config/sft2-ablation.json"
+    )
+
+    sft2_minif2f_reverify = subparsers.add_parser(
+        "sft2-minif2f-validation-reverify",
+        help="retry only transient verifier results from stored SFT-2 miniF2F validation",
+    )
+    sft2_minif2f_reverify.add_argument("--benchmark-root", type=Path, required=True)
+    sft2_minif2f_reverify.add_argument("--training", type=Path, required=True)
+    sft2_minif2f_reverify.add_argument("--adapter-dir", type=Path, required=True)
+    sft2_minif2f_reverify.add_argument("--output-dir", type=Path, required=True)
+    sft2_minif2f_reverify.add_argument(
         "--config", type=Path, default=root / "config/sft2-ablation.json"
     )
 
@@ -1242,6 +1273,20 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(summary, indent=2))
         return 0
 
+    if args.command == "sft2-train512-reverify":
+        _, _, summary = reverify_sft2_train512(
+            SFT2Config.load(args.config),
+            Phase2Config.load(args.phase2_config),
+            args.dataset_dir,
+            args.mathlib_root,
+            args.workload,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
     if args.command == "sft2-heldout512":
         _, _, summary = run_sft2_heldout512(
             SFT2Config.load(args.config),
@@ -1267,6 +1312,17 @@ def main(argv: list[str] | None = None) -> int:
             args.output_dir,
             verification_workers=args.workers,
             timeout_seconds=args.timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "sft2-minif2f-validation-reverify":
+        _, _, summary = reverify_sft2_minif2f_validation(
+            SFT2Config.load(args.config),
+            args.benchmark_root,
+            args.training,
+            args.adapter_dir,
+            args.output_dir,
         )
         print(json.dumps(summary, indent=2))
         return 0

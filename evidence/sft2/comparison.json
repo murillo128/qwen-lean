@@ -1,0 +1,480 @@
+{
+  "bootstrap": {
+    "heldout_lean": {
+      "interval_percentiles": [
+        2.5,
+        97.5
+      ],
+      "method": "paired-task-percentile-bootstrap",
+      "metrics": {
+        "pass@1": {
+          "adapter": {
+            "ci95": [
+              0.009765625,
+              0.025390625
+            ],
+            "estimate": 0.01708984375
+          },
+          "base": {
+            "ci95": [
+              0.01025390625,
+              0.02392578125
+            ],
+            "estimate": 0.0166015625
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              -0.00390625,
+              0.0048828125
+            ],
+            "estimate": 0.00048828125
+          }
+        },
+        "pass@4": {
+          "adapter": {
+            "ci95": [
+              0.02734375,
+              0.060546875
+            ],
+            "estimate": 0.04296875
+          },
+          "base": {
+            "ci95": [
+              0.03125,
+              0.068359375
+            ],
+            "estimate": 0.048828125
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              -0.01953125,
+              0.005859375
+            ],
+            "estimate": -0.005859375
+          }
+        }
+      },
+      "resamples": 10000,
+      "seed": 0,
+      "task_count": 512
+    },
+    "minif2f_validation_lean": {
+      "interval_percentiles": [
+        2.5,
+        97.5
+      ],
+      "method": "paired-task-percentile-bootstrap",
+      "metrics": {
+        "pass@1": {
+          "adapter": {
+            "ci95": [
+              0.030225409836065573,
+              0.06454918032786885
+            ],
+            "estimate": 0.04610655737704918
+          },
+          "base": {
+            "ci95": [
+              0.025614754098360656,
+              0.0548155737704918
+            ],
+            "estimate": 0.03944672131147541
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              0.0,
+              0.013831967213114749
+            ],
+            "estimate": 0.00665983606557377
+          }
+        },
+        "pass@4": {
+          "adapter": {
+            "ci95": [
+              0.07845433255269321,
+              0.14695696721311474
+            ],
+            "estimate": 0.11083138173302108
+          },
+          "base": {
+            "ci95": [
+              0.07172131147540983,
+              0.1377049180327869
+            ],
+            "estimate": 0.1031615925058548
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              -0.004566744730679154,
+              0.02084309133489462
+            ],
+            "estimate": 0.007669789227166276
+          }
+        },
+        "pass@8": {
+          "adapter": {
+            "ci95": [
+              0.10655737704918032,
+              0.19672131147540983
+            ],
+            "estimate": 0.15163934426229508
+          },
+          "base": {
+            "ci95": [
+              0.10245901639344263,
+              0.1885245901639344
+            ],
+            "estimate": 0.14344262295081966
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              -0.0122950819672131,
+              0.02868852459016394
+            ],
+            "estimate": 0.00819672131147541
+          }
+        }
+      },
+      "resamples": 10000,
+      "seed": 0,
+      "task_count": 244
+    },
+    "train_exact_target": {
+      "interval_percentiles": [
+        2.5,
+        97.5
+      ],
+      "method": "paired-task-percentile-bootstrap",
+      "metrics": {
+        "pass@1": {
+          "adapter": {
+            "ci95": [
+              0.0166015625,
+              0.037109375
+            ],
+            "estimate": 0.02587890625
+          },
+          "base": {
+            "ci95": [
+              0.00927734375,
+              0.02392578125
+            ],
+            "estimate": 0.01611328125
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              0.00390625,
+              0.01611328125
+            ],
+            "estimate": 0.009765625
+          }
+        },
+        "pass@4": {
+          "adapter": {
+            "ci95": [
+              0.044921875,
+              0.0859375
+            ],
+            "estimate": 0.064453125
+          },
+          "base": {
+            "ci95": [
+              0.025390625,
+              0.060546875
+            ],
+            "estimate": 0.04296875
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              0.005859375,
+              0.037109375
+            ],
+            "estimate": 0.021484375
+          }
+        }
+      },
+      "resamples": 10000,
+      "seed": 0,
+      "task_count": 512
+    },
+    "train_lean": {
+      "interval_percentiles": [
+        2.5,
+        97.5
+      ],
+      "method": "paired-task-percentile-bootstrap",
+      "metrics": {
+        "pass@1": {
+          "adapter": {
+            "ci95": [
+              0.0341796875,
+              0.0615234375
+            ],
+            "estimate": 0.04736328125
+          },
+          "base": {
+            "ci95": [
+              0.02294921875,
+              0.04345703125
+            ],
+            "estimate": 0.03271484375
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              0.00732421875,
+              0.0224609375
+            ],
+            "estimate": 0.0146484375
+          }
+        },
+        "pass@4": {
+          "adapter": {
+            "ci95": [
+              0.08203125,
+              0.13671875
+            ],
+            "estimate": 0.109375
+          },
+          "base": {
+            "ci95": [
+              0.064453125,
+              0.11328125
+            ],
+            "estimate": 0.087890625
+          },
+          "delta_adapter_minus_base": {
+            "ci95": [
+              0.00390625,
+              0.0390625
+            ],
+            "estimate": 0.021484375
+          }
+        }
+      },
+      "resamples": 10000,
+      "seed": 0,
+      "task_count": 512
+    },
+    "train_minus_heldout_increment": {
+      "differential_gap": {
+        "pass@1": {
+          "ci95": [
+            0.00537109375,
+            0.02294921875
+          ]
+        },
+        "pass@4": {
+          "ci95": [
+            0.005859375,
+            0.048828125
+          ]
+        }
+      },
+      "heldout_task_count": 512,
+      "interval_percentiles": [
+        2.5,
+        97.5
+      ],
+      "method": "independent-workload-paired-model-task-bootstrap",
+      "resamples": 10000,
+      "seed": 0,
+      "train_task_count": 512
+    }
+  },
+  "candidate": "sft2-q4-v1-lora",
+  "fixed_endpoint_step": 9962,
+  "outcome_signals": {
+    "additional_learning_or_generalization": true,
+    "memorization_heavy_gain": true,
+    "opaque_combined_score": false,
+    "overfitting_or_regression": true,
+    "saturation": false,
+    "signals_are_nonexclusive": true
+  },
+  "quality_improvement_required": false,
+  "raw_candidate_results_retained_outside_git": true,
+  "reference_control": "reference-sft-v1",
+  "result_types_kept_distinct": [
+    "Lean-verified proof success",
+    "exact retained-target reproduction",
+    "verified non-exact alternatives",
+    "teacher-forced validation metrics"
+  ],
+  "schema_version": "sft2-comparison-v1",
+  "status": "passed",
+  "train_to_heldout_gap": {
+    "pass@1": {
+      "bootstrap_ci95": [
+        0.00537109375,
+        0.02294921875
+      ],
+      "change_sft2_minus_reference": 0.01416015625,
+      "reference_sft_v1_train_minus_heldout": 0.01611328125,
+      "sft2_train_minus_heldout": 0.0302734375
+    },
+    "pass@4": {
+      "bootstrap_ci95": [
+        0.005859375,
+        0.048828125
+      ],
+      "change_sft2_minus_reference": 0.02734375,
+      "reference_sft_v1_train_minus_heldout": 0.0390625,
+      "sft2_train_minus_heldout": 0.06640625
+    }
+  },
+  "workloads": {
+    "minif2f-valid-v1": {
+      "delta_sft2_minus_reference": {
+        "pass@1": 0.006659836065573771,
+        "pass@4": 0.007669789227166282,
+        "pass@8": 0.008196721311475419
+      },
+      "miniF2F_test_evaluated": false,
+      "reference": {
+        "pass@1": 0.03944672131147541,
+        "pass@4": 0.1031615925058548,
+        "pass@8": 0.14344262295081966
+      },
+      "sft2": {
+        "pass@1": 0.04610655737704918,
+        "pass@4": 0.11083138173302108,
+        "pass@8": 0.15163934426229508
+      },
+      "sft2_finish_reason_counts": {
+        "eos": 1658,
+        "token_limit": 294
+      },
+      "sft2_generated_token_counts": {
+        "maximum": 1024,
+        "mean": 288.4579918032787,
+        "minimum": 2,
+        "total": 563070
+      },
+      "sft2_verifier_integrity": {
+        "infrastructure_error_count": 0,
+        "integrity_passed": true,
+        "reverification": {
+          "categories": [
+            "verifier_timeout"
+          ],
+          "resolution_policy": "a repeated same-contract timeout is a bounded proof rejection; candidate generation evidence and pass/fail contribution are unchanged",
+          "resolved_repeated_timeout_count": 5,
+          "retry_attempts": 1,
+          "retry_wall_time_seconds": 64.88139495503856,
+          "stored_candidates_regenerated": false,
+          "timeout_seconds": 30.0,
+          "total_verification_attempts": 2,
+          "transient_results_retried": 5,
+          "unresolved_timeout_count": 0
+        },
+        "unresolved_verifier_timeout_count": 0
+      }
+    },
+    "phase5-heldout512-v1": {
+      "delta_sft2_minus_reference": {
+        "pass@1": 0.00048828125,
+        "pass@4": -0.005859375
+      },
+      "reference": {
+        "pass@1": 0.0166015625,
+        "pass@4": 0.048828125
+      },
+      "sft2": {
+        "pass@1": 0.01708984375,
+        "pass@4": 0.04296875
+      },
+      "sft2_finish_reason_counts": {
+        "eos": 2033,
+        "token_limit": 15
+      },
+      "sft2_generated_token_counts": {
+        "maximum": 1024,
+        "mean": 70.2373046875,
+        "minimum": 2,
+        "total": 143846
+      },
+      "sft2_verifier_integrity": {
+        "infrastructure_error_count": 0,
+        "integrity_passed": true,
+        "unresolved_verifier_timeout_count": 0
+      }
+    },
+    "phase6-train512-v1": {
+      "delta_sft2_minus_reference": {
+        "exact_target": {
+          "pass@1": 0.009765625,
+          "pass@4": 0.021484375
+        },
+        "lean": {
+          "pass@1": 0.0146484375,
+          "pass@4": 0.021484375
+        }
+      },
+      "reference": {
+        "exact_target": {
+          "pass@1": 0.01611328125,
+          "pass@4": 0.04296875
+        },
+        "lean": {
+          "pass@1": 0.03271484375,
+          "pass@4": 0.087890625
+        }
+      },
+      "sft2": {
+        "exact_target": {
+          "pass@1": 0.02587890625,
+          "pass@4": 0.064453125
+        },
+        "exact_target_candidates": {
+          "count": 53,
+          "fraction": 0.02587890625
+        },
+        "finish_reason_counts": {
+          "eos": 2031,
+          "token_limit": 17
+        },
+        "generated_token_counts": {
+          "maximum": 1024,
+          "mean": 69.830078125,
+          "minimum": 2,
+          "total": 143012
+        },
+        "lean": {
+          "pass@1": 0.04736328125,
+          "pass@4": 0.109375
+        },
+        "tasks_with_exact_target_candidate": {
+          "count": 33,
+          "fraction": 0.064453125
+        },
+        "tasks_with_verified_non_exact_candidate": {
+          "count": 32,
+          "fraction": 0.0625
+        },
+        "verified_non_exact_candidates": {
+          "count": 44,
+          "fraction": 0.021484375
+        },
+        "verifier_integrity": {
+          "infrastructure_error_count": 0,
+          "integrity_passed": true,
+          "reverification": {
+            "categories": [
+              "verifier_timeout"
+            ],
+            "resolution_policy": "a repeated same-contract timeout is a bounded proof rejection; candidate generation evidence and pass/fail contribution are unchanged",
+            "resolved_repeated_timeout_count": 1,
+            "retry_attempts": 2,
+            "retry_wall_time_seconds": 300.1404686149908,
+            "stored_candidates_regenerated": false,
+            "timeout_seconds": 300.0,
+            "total_verification_attempts": 3,
+            "transient_results_retried": 1,
+            "unresolved_timeout_count": 0
+          },
+          "unresolved_verifier_timeout_count": 0
+        }
+      }
+    }
+  }
+}
