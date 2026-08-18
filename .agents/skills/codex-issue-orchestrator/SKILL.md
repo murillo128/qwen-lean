@@ -77,18 +77,23 @@ Post a progress update when it gives a remote observer useful new state, normall
 
 For a long-running loop, prefer a few coarse updates such as roughly quarter/half/three-quarter progress over time-based chatter. Do not comment per task, candidate, test case, training step, retry, or log line.
 
-A progress comment should be short and operational, for example:
+Write progress comments in short, natural language rather than as a rigid status form. In two or three sentences, say what just completed, what is running now, include a useful progress count when cheaply available, and mention an unexpected issue only when there is one. For example:
 
 ```markdown
-## Progress
+## Progress update
 
-**Current:** full benchmark generation started
-**Completed:** model/revision pin + dev smoke
-**Progress:** 0/244 tasks
-**Next:** finish generation, then Lean verification
+The model and revision are pinned, and the dev smoke test completed successfully. I’ve now started the full 244-task benchmark; no tasks have completed yet. I’ll report again once there is meaningful progress or if anything unexpected happens.
 ```
 
-Omit fields that are not useful. Update counts only when the worker already has them cheaply; do not add instrumentation solely to produce issue comments.
+Later in the same run, a useful update could simply say:
+
+```markdown
+## Progress update
+
+The full benchmark is running normally. 121 of 244 tasks have completed so far, with no infrastructure issues. I’ll continue through the remaining tasks and update again near completion.
+```
+
+Avoid mechanical `Current / Completed / Progress / Next` fields unless the controlling issue explicitly requires that structure. Update counts only when the worker already has them cheaply; do not add instrumentation solely to produce issue comments.
 
 Progress comments are observability, not checkpoints:
 
