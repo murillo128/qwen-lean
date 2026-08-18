@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -117,13 +118,34 @@ def test_preflight_failure_classification_distinguishes_memory() -> None:
     )
 
 
-def test_local_jit_tools_are_exposed_to_subprocesses(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_local_jit_tools_are_exposed_to_subprocesses(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    runtime = tmp_path / "runtime"
+    runtime_bin = runtime / "bin"
+    runtime_bin.mkdir(parents=True)
+    ninja = runtime_bin / "ninja"
+    ninja.write_text("#!/bin/sh\n", encoding="utf-8")
+    ninja.chmod(0o755)
+    nvidia_namespace = tmp_path / "site-packages" / "nvidia"
+    cuda_bin = nvidia_namespace / "cu13" / "bin"
+    cuda_bin.mkdir(parents=True)
+    nvcc = cuda_bin / "nvcc"
+    nvcc.write_text("#!/bin/sh\n", encoding="utf-8")
+    nvcc.chmod(0o755)
     monkeypatch.setenv("PATH", "/usr/bin")
     monkeypatch.delenv("CUDA_HOME", raising=False)
+    monkeypatch.setattr(sys, "prefix", str(runtime))
+    monkeypatch.setattr(
+        "qwen_lean.qwen35_9b_posttrained_assessment.importlib.util.find_spec",
+        lambda _: SimpleNamespace(
+            submodule_search_locations=[str(nvidia_namespace)]
+        ),
+    )
 
     _configure_cuda_home()
 
-    assert os.environ["PATH"].split(os.pathsep)[0] == str(Path(sys.prefix) / "bin")
+    assert os.environ["PATH"].split(os.pathsep)[0] == str(runtime_bin)
     assert Path(os.environ["CUDA_HOME"], "bin", "nvcc").is_file()
 
 
