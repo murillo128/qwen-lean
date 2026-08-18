@@ -2304,7 +2304,7 @@ provides-extras = ["baseline", "model", "phase2", "training"]
 dev = [{ name = "pytest", specifier = ">=8.4,<9" }]
 
 [[package]]
-name = "qwen35-eval-runtime"
+name = "qwen35-9b-base-eval-runtime"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
