@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import gc
+import hashlib
 import importlib.metadata
 import importlib.util
 import json
@@ -187,8 +188,11 @@ def write_compact_evidence(
     _validate_preflight_identity(config, preflight)
     if preflight.get("status") != "passed":
         raise ValueError("cannot write evidence from a failed preflight")
-    dev16 = _load_complete_run(config, dev16_dir, "minif2f-valid-dev16-v1", 16)
-    full = _load_complete_run(config, full_dir, "minif2f-valid-v1", 244)
+    selected_config = config_for_lane(config, str(preflight["selected_lane"]))
+    dev16 = _load_complete_run(
+        selected_config, dev16_dir, "minif2f-valid-dev16-v1", 16
+    )
+    full = _load_complete_run(selected_config, full_dir, "minif2f-valid-v1", 244)
     reference_path = config.path.parents[1] / str(
         config.value["qwen35_assessment"]["reference_evidence"]
     )
@@ -237,7 +241,7 @@ def write_compact_evidence(
         ],
     }
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    _write_json(evidence_dir / "preflight.json", preflight)
+    _write_json(evidence_dir / "preflight.json", _compact_preflight(preflight))
     _write_json(evidence_dir / "dev16.json", dev16)
     _write_json(evidence_dir / "full.json", full)
     _write_json(evidence_dir / "comparison.json", comparison)
@@ -564,7 +568,24 @@ def _load_complete_run(
     for key, expected in config.sampling.items():
         if settings.get(key) != expected:
             raise ValueError(f"sampling mismatch for {workload_id}: {key}")
-    if settings.get("chat_template") is not None or settings.get("prompt_transformation") is not None:
+    for key in (
+        "dtype",
+        "quantization",
+        "cpu_offload_gb",
+        "tensor_parallel_size",
+        "gpu_memory_utilization",
+        "max_model_len",
+        "max_num_seqs",
+        "enforce_eager",
+        "language_model_only",
+        "flashinfer_sampler",
+    ):
+        if settings.get(key) != config.engine[key]:
+            raise ValueError(f"engine setting mismatch for {workload_id}: {key}")
+    if (
+        settings.get("chat_template") is not None
+        or settings.get("prompt_transformation") is not None
+    ):
         raise ValueError("strict lane applied an unapproved prompt transformation")
     generated_lengths = [result.generated_token_count for result in results]
     if any(value is None for value in generated_lengths):
@@ -647,6 +668,22 @@ def _numeric_summary(values: Iterable[float | int]) -> dict[str, float | int | N
         "p95": _percentile(materialized, 0.95),
         "maximum": materialized[-1],
     }
+
+
+def _compact_preflight(state: dict[str, Any]) -> dict[str, Any]:
+    compact = copy.deepcopy(state)
+    for attempt in compact.get("attempts", []):
+        error = attempt.get("error")
+        if not isinstance(error, str) or len(error) <= 1000:
+            continue
+        attempt["error_sha256"] = hashlib.sha256(error.encode("utf-8")).hexdigest()
+        attempt["error_original_character_count"] = len(error)
+        attempt["error"] = (
+            error[:500]
+            + "\n...[truncated in committed evidence; raw artifact retained outside Git]...\n"
+            + error[-500:]
+        )
+    return compact
 
 
 def _percentile(values: list[float | int], fraction: float) -> float:

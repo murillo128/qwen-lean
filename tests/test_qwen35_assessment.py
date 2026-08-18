@@ -11,6 +11,7 @@ from qwen_lean.qwen35_assessment import (
     BF16_LANE,
     FALLBACK_LANE,
     PREFLIGHT_SCHEMA_VERSION,
+    _compact_preflight,
     _load_preflight_state,
     _numeric_summary,
     _classify_preflight_failure,
@@ -136,3 +137,16 @@ def test_numeric_summary_records_totals_and_percentiles() -> None:
         "p95": pytest.approx(3.85),
         "maximum": 4,
     }
+
+
+def test_compact_preflight_hashes_and_truncates_large_runtime_errors() -> None:
+    error = "prefix" + ("x" * 2000) + "suffix"
+
+    compact = _compact_preflight({"attempts": [{"error": error}]})
+
+    attempt = compact["attempts"][0]
+    assert len(attempt["error"]) < len(error)
+    assert attempt["error_original_character_count"] == len(error)
+    assert len(attempt["error_sha256"]) == 64
+    assert attempt["error"].startswith(error[:500])
+    assert attempt["error"].endswith(error[-500:])
