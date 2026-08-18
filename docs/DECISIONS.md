@@ -218,3 +218,54 @@ generation and miniF2F-test outputs. Those later evaluation results characterize
 the checkpoint but do not retroactively select it. `reference-sft-v1` is the
 controlled parent chosen for this project experiment; it is not claimed to be a
 globally optimal SFT checkpoint.
+
+## D016 — Dataset v2 is training-first and verifier-centered
+
+**Status:** ACCEPTED
+
+The next-generation Dataset v2 corpus is a new future-training contract; it does
+not rewrite or invalidate the accepted historical `mathlib-whole-proof-v1`
+experiment. Dataset v1 remains frozen evidence for the first SFT cycle.
+
+Dataset v2 optimizes for the practical objective of obtaining at least one Lean-
+accepted proof under repeated generation, rather than preserving an old random
+held-out split or reproducing one canonical source proof string. The durable
+rules are:
+
+- useful real verified Lean theorem/proof knowledge is training-first; a theorem
+  is not withheld solely to manufacture an internal held-out metric;
+- proof syntax is not an eligibility criterion: recoverable term-style proofs
+  must be converted to the whole-proof continuation form and re-verified by Lean
+  rather than silently discarded because they are not tactic proofs;
+- every retained row declares the Lean/source environment and enough context to
+  reconstruct and verify the obligation; exact model-visible serialization may
+  be phase-local, but training and evaluation must derive it consistently from
+  that declared context;
+- statement identity is separate from proof identity. Multiple genuinely
+  distinct Lean-verified proof variants may be retained for a training statement,
+  but they do not count as extra theorem coverage and must not accidentally
+  multiply that theorem's sampling weight;
+- no optimizer path may silently truncate or drop an included theorem. Records
+  that exceed a chosen model's context must remain explicit as long-context or
+  incompatible rows until a later training contract can consume them;
+- synthetic composition data is certified by Lean and must record actually-used
+  dependencies plus a derivation/proof-DAG identity. Fresh evaluation separates
+  concrete statements and derivation families, not merely theorem names; source
+  lemmas may appear across splits because the intended test is a new composition
+  of learned knowledge;
+- obvious synthetic shortcuts and degenerate obligations must be detected before
+  they are treated as fresh composition evaluation. Generator families may be
+  reserved from training for a final-only robustness lane;
+- benchmark hygiene follows the frozen training corpus: evaluation workloads such
+  as miniF2F are filtered against Dataset-v2 training contamination rather than
+  deleting useful verified training knowledge to preserve historical task counts.
+
+For routine Dataset-v2-trained checkpoint selection, generate **8 independent
+candidates per task** under the frozen evaluation sampling contract and report
+Lean-verified pass@1, pass@4, and pass@8. **Pass@8 / the fraction of tasks with at
+least one accepted proof among those eight attempts is the primary practical
+checkpoint signal.** pass@1 and pass@4 remain diagnostics for sample efficiency.
+Larger candidate budgets or adaptive Lean-feedback search are optional finalist
+or final-model experiments, not routine checkpoint requirements. Exact target
+reproduction remains a memorization diagnostic and is never a substitute for
+Lean-accepted proof success.
