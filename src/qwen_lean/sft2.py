@@ -17,7 +17,6 @@ from .phase5 import (
 )
 from .phase6 import Phase6Config, load_reference_candidate
 
-
 SFT2_CONFIG_SCHEMA_VERSION = "sft2-config-v1"
 SFT2_TRAINING_SCHEMA_VERSION = "sft2-training-run-v1"
 SFT2_ARTIFACT_ID = "sft2-q4-v1-lora"

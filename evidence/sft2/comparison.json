@@ -322,6 +322,16 @@
       "sft2_train_minus_heldout": 0.06640625
     }
   },
+  "verifier_timeout_policy": {
+    "candidate_regeneration_permitted": false,
+    "category": "verifier_timeout",
+    "fixed_timeout_values_changed": false,
+    "historical_phase6_evidence_modified": false,
+    "infrastructure_error": false,
+    "lean_rejected": false,
+    "scope": "SFT-2 phase-local issue-25 amendment",
+    "successful_proof": false
+  },
   "workloads": {
     "minif2f-valid-v1": {
       "delta_sft2_minus_reference": {
@@ -354,20 +364,22 @@
         "infrastructure_error_count": 0,
         "integrity_passed": true,
         "reverification": {
+          "artifact_category_restoration_only": true,
           "categories": [
             "verifier_timeout"
           ],
-          "resolution_policy": "a repeated same-contract timeout is a bounded proof rejection; candidate generation evidence and pass/fail contribution are unchanged",
-          "resolved_repeated_timeout_count": 5,
+          "repeated_same_contract_timeout_count": 5,
+          "resolution_policy": "a repeated same-contract timeout remains verifier_timeout and is an unsuccessful candidate, not an infrastructure error",
+          "retained_verifier_timeout_count": 5,
           "retry_attempts": 1,
           "retry_wall_time_seconds": 64.88139495503856,
           "stored_candidates_regenerated": false,
           "timeout_seconds": 30.0,
           "total_verification_attempts": 2,
-          "transient_results_retried": 5,
-          "unresolved_timeout_count": 0
+          "transient_results_retried": 5
         },
-        "unresolved_verifier_timeout_count": 0
+        "verifier_timeout_count": 5,
+        "verifier_timeout_semantics": "unsuccessful_candidate_not_infrastructure_error"
       }
     },
     "phase5-heldout512-v1": {
@@ -396,7 +408,8 @@
       "sft2_verifier_integrity": {
         "infrastructure_error_count": 0,
         "integrity_passed": true,
-        "unresolved_verifier_timeout_count": 0
+        "verifier_timeout_count": 0,
+        "verifier_timeout_semantics": "unsuccessful_candidate_not_infrastructure_error"
       }
     },
     "phase6-train512-v1": {
@@ -439,6 +452,7 @@
           "minimum": 2,
           "total": 143012
         },
+        "historical_phase6_zero_timeout_integrity_passed": false,
         "lean": {
           "pass@1": 0.04736328125,
           "pass@4": 0.109375
@@ -459,20 +473,22 @@
           "infrastructure_error_count": 0,
           "integrity_passed": true,
           "reverification": {
+            "artifact_category_restoration_only": true,
             "categories": [
               "verifier_timeout"
             ],
-            "resolution_policy": "a repeated same-contract timeout is a bounded proof rejection; candidate generation evidence and pass/fail contribution are unchanged",
-            "resolved_repeated_timeout_count": 1,
+            "repeated_same_contract_timeout_count": 1,
+            "resolution_policy": "a repeated same-contract timeout remains verifier_timeout and is an unsuccessful candidate, not an infrastructure error",
+            "retained_verifier_timeout_count": 1,
             "retry_attempts": 2,
             "retry_wall_time_seconds": 300.1404686149908,
             "stored_candidates_regenerated": false,
             "timeout_seconds": 300.0,
             "total_verification_attempts": 3,
-            "transient_results_retried": 1,
-            "unresolved_timeout_count": 0
+            "transient_results_retried": 1
           },
-          "unresolved_verifier_timeout_count": 0
+          "verifier_timeout_count": 1,
+          "verifier_timeout_semantics": "unsuccessful_candidate_not_infrastructure_error"
         }
       }
     }

@@ -1,9 +1,11 @@
 import copy
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
+from qwen_lean.metrics import summarize_results
 from qwen_lean.phase5 import derive_phase5_trajectory
 from qwen_lean.schema import CandidateResult
 from qwen_lean.sft2 import (
@@ -21,7 +23,8 @@ from qwen_lean.sft2_evidence import (
 )
 from qwen_lean.sft2_inference import (
     _merge_sft2_train_reverification_results,
-    _resolve_repeated_sft2_timeouts,
+    _restore_repeated_sft2_timeout_categories,
+    sft2_evaluation_integrity_passed,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -185,11 +188,14 @@ def test_sft2_evidence_retains_verifier_retry_audit() -> None:
     summary = {
         "sft2_train_integrity_passed": True,
         "infrastructure_error_count": 0,
-        "verifier_timeout_count": 0,
+        "verifier_timeout_count": 1,
+        "verifier_timeout_semantics": (
+            "unsuccessful_candidate_not_infrastructure_error"
+        ),
         "reverification": {
             "transient_results_retried": 1,
             "retry_attempts": 2,
-            "unresolved_timeout_count": 0,
+            "retained_verifier_timeout_count": 1,
             "stored_candidates_regenerated": False,
         },
     }
@@ -199,7 +205,10 @@ def test_sft2_evidence_retains_verifier_retry_audit() -> None:
     assert audit == {
         "integrity_passed": True,
         "infrastructure_error_count": 0,
-        "unresolved_verifier_timeout_count": 0,
+        "verifier_timeout_count": 1,
+        "verifier_timeout_semantics": (
+            "unsuccessful_candidate_not_infrastructure_error"
+        ),
         "reverification": summary["reverification"],
     }
 
@@ -228,6 +237,8 @@ def test_sft2_reverification_replaces_only_transient_result_without_regeneration
     verified = _candidate_result("verified")
 
     assert _merge_sft2_train_reverification_results([timeout], [verified]) == [verified]
+    retained = _merge_sft2_train_reverification_results([timeout], [timeout])
+    assert retained[0].category == "verifier_timeout"
 
     with pytest.raises(ValueError, match="changed generation evidence"):
         _merge_sft2_train_reverification_results(
@@ -237,16 +248,35 @@ def test_sft2_reverification_replaces_only_transient_result_without_regeneration
         _merge_sft2_train_reverification_results([verified], [verified])
 
 
-def test_sft2_reverification_resolves_repeated_timeout_as_bounded_rejection() -> None:
-    timeout = _candidate_result("verifier_timeout")
+def test_sft2_restores_legacy_relabel_as_distinct_timeout() -> None:
+    legacy = replace(
+        _candidate_result("lean_rejected"),
+        diagnostics={
+            "stdout": "",
+            "stderr": (
+                "Lean verification timed out; repeated under the unchanged timeout "
+                "contract and resolved as a bounded proof rejection"
+            ),
+        },
+    )
 
-    resolved, count = _resolve_repeated_sft2_timeouts([timeout])
+    restored, count = _restore_repeated_sft2_timeout_categories([legacy])
 
     assert count == 1
-    assert resolved[0].category == "lean_rejected"
-    assert resolved[0].candidate_text == timeout.candidate_text
-    assert resolved[0].generation_latency_seconds == timeout.generation_latency_seconds
-    assert (
-        "repeated under the unchanged timeout contract"
-        in resolved[0].diagnostics["stderr"]
+    assert restored[0].category == "verifier_timeout"
+    assert restored[0].lean_exit_code is None
+    assert restored[0].candidate_text == legacy.candidate_text
+    assert restored[0].diagnostics["stderr"] == "Lean verification timed out"
+
+
+def test_sft2_timeout_is_complete_unsuccessful_candidate_not_infrastructure() -> None:
+    timeout = _candidate_result("verifier_timeout")
+    summary = summarize_results(
+        [timeout], expected_task_ids=["task"], candidates_per_task=1, ks=(1,)
     )
+
+    assert summary["complete"] is True
+    assert summary["verifier_timeout_count"] == 1
+    assert summary["infrastructure_error_count"] == 0
+    assert summary["pass_at_k"] == {"pass@1": 0.0}
+    assert sft2_evaluation_integrity_passed(summary) is True

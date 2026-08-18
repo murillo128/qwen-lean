@@ -23,7 +23,6 @@ from .sft2 import (
     validate_step0_reference,
 )
 
-
 SFT2_PREFLIGHT_SCHEMA_VERSION = "sft2-preflight-v1"
 SFT2_ADAPTER_RELOAD_SCHEMA_VERSION = "sft2-adapter-reload-v1"
 SFT2_SCHEDULER_MARKER = "scheduler_restarted_for_complete_sft2_stage"

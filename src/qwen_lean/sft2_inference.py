@@ -44,6 +44,81 @@ from .verifier import LeanVerifier
 SFT2_TRAIN_RUN_SCHEMA_VERSION = "sft2-train512-run-v1"
 SFT2_HELDOUT_RUN_SCHEMA_VERSION = "sft2-heldout512-run-v1"
 SFT2_MINIF2F_RUN_SCHEMA_VERSION = "sft2-minif2f-validation-run-v1"
+_LEGACY_TIMEOUT_RELABEL_MARKER = (
+    "; repeated under the unchanged timeout contract and resolved as a bounded "
+    "proof rejection"
+)
+
+
+def sft2_evaluation_integrity_passed(summary: dict[str, Any]) -> bool:
+    """Treat verifier timeouts as complete unsuccessful SFT-2 candidates."""
+    return bool(
+        summary.get("complete")
+        and int(summary.get("infrastructure_error_count", -1)) == 0
+    )
+
+
+def _sft2_train_integrity_passed(summary: dict[str, Any]) -> bool:
+    return bool(
+        sft2_evaluation_integrity_passed(summary)
+        and int(summary.get("exact_target_but_not_verified_count", -1)) == 0
+    )
+
+
+def _restore_repeated_sft2_timeout_categories(
+    results: Sequence[CandidateResult],
+) -> tuple[list[CandidateResult], int]:
+    """Undo the superseded SFT-2-only timeout-to-rejection relabeling."""
+    restored: list[CandidateResult] = []
+    restored_count = 0
+    for item in results:
+        stderr = item.diagnostics["stderr"]
+        if _LEGACY_TIMEOUT_RELABEL_MARKER not in stderr:
+            restored.append(item)
+            continue
+        if item.category != "lean_rejected" or item.lean_exit_code is not None:
+            raise ValueError("legacy SFT-2 timeout relabel evidence is inconsistent")
+        restored_count += 1
+        timeout_stderr = stderr.replace(_LEGACY_TIMEOUT_RELABEL_MARKER, "")
+        restored.append(
+            replace(
+                item,
+                category="verifier_timeout",
+                diagnostics={
+                    "stdout": item.diagnostics["stdout"],
+                    "stderr": timeout_stderr or "Lean verification timed out",
+                },
+            )
+        )
+    return restored, restored_count
+
+
+def _retained_timeout_reverification(
+    prior: dict[str, Any],
+    *,
+    restored_count: int,
+) -> dict[str, Any]:
+    if (
+        restored_count < 1
+        or int(prior.get("resolved_repeated_timeout_count", -1)) != restored_count
+    ):
+        raise ValueError("stored SFT-2 timeout retry provenance is inconsistent")
+    return {
+        "stored_candidates_regenerated": False,
+        "transient_results_retried": int(prior["transient_results_retried"]),
+        "categories": list(prior["categories"]),
+        "timeout_seconds": float(prior["timeout_seconds"]),
+        "retry_wall_time_seconds": float(prior["retry_wall_time_seconds"]),
+        "retry_attempts": int(prior["retry_attempts"]),
+        "total_verification_attempts": int(prior["total_verification_attempts"]),
+        "repeated_same_contract_timeout_count": restored_count,
+        "retained_verifier_timeout_count": restored_count,
+        "artifact_category_restoration_only": True,
+        "resolution_policy": (
+            "a repeated same-contract timeout remains verifier_timeout and is an "
+            "unsuccessful candidate, not an infrastructure error"
+        ),
+    }
 
 
 def run_sft2_train512(
@@ -161,7 +236,10 @@ def run_sft2_train512(
             "generation_wall_time_seconds": generation_wall_time,
             "verification_wall_time_seconds": verification_wall_time,
             "run_wall_time_seconds": generation_wall_time + verification_wall_time,
-            "sft2_train_integrity_passed": summary["phase6_train_integrity_passed"],
+            "sft2_train_integrity_passed": _sft2_train_integrity_passed(summary),
+            "verifier_timeout_semantics": (
+                "unsuccessful_candidate_not_infrastructure_error"
+            ),
         }
     )
     metadata = {
@@ -265,32 +343,6 @@ def _merge_sft2_train_reverification_results(
     ]
 
 
-def _resolve_repeated_sft2_timeouts(
-    replacements: Sequence[CandidateResult],
-) -> tuple[list[CandidateResult], int]:
-    resolved = []
-    timeout_count = 0
-    for item in replacements:
-        if item.category != "verifier_timeout":
-            resolved.append(item)
-            continue
-        timeout_count += 1
-        resolved.append(
-            replace(
-                item,
-                category="lean_rejected",
-                diagnostics={
-                    "stdout": item.diagnostics["stdout"],
-                    "stderr": (
-                        f"{item.diagnostics['stderr']}; repeated under the unchanged "
-                        "timeout contract and resolved as a bounded proof rejection"
-                    ),
-                },
-            )
-        )
-    return resolved, timeout_count
-
-
 def reverify_sft2_train512(
     config: SFT2Config,
     phase2_config: Phase2Config,
@@ -372,89 +424,115 @@ def reverify_sft2_train512(
     if stored_exact != exact:
         raise ValueError("stored SFT-2 train512 exact-target evidence differs")
 
-    transient = [
-        item
-        for item in results
-        if item.category in {"verifier_timeout", "verifier_error"}
-    ]
-    if not transient:
-        raise ValueError("stored SFT-2 train512 run has no transient results to retry")
     timeout = float(config.value["verification"]["train_timeout_seconds"])
-    started = time.perf_counter()
-    replacements = []
-    for item in transient:
-        record = record_by_id[item.task_id]
-        generated = GeneratedCandidate(
-            task=TaskRecord(
-                id=record.id,
-                preamble="",
-                declaration=record.declaration,
-                declaration_name=record.declaration_name,
-            ),
-            candidate_index=item.candidate_index,
-            text=item.candidate_text,
-            token_count=int(item.generated_token_count or 0),
-            finish_reason=str(item.finish_reason),
-            generation_latency_seconds=float(item.generation_latency_seconds or 0.0),
+    results, restored_count = _restore_repeated_sft2_timeout_categories(results)
+    prior_reverification = dict(
+        prior_summary.get("reverification", metadata.get("reverification", {}))
+    )
+    if restored_count:
+        reverification = _retained_timeout_reverification(
+            prior_reverification,
+            restored_count=restored_count,
         )
-        replacements.append(
-            _heldout_candidate_result(
-                generated,
-                record,
-                sources[item.task_id],
-                mathlib_root,
-                timeout_seconds=timeout,
+        verification_wall_time = float(prior_summary["verification_wall_time_seconds"])
+    else:
+        if int(prior_reverification.get("retained_verifier_timeout_count", 0)) > 0:
+            raise ValueError(
+                "repeated SFT-2 train512 timeouts require no further retry"
             )
+        transient = [
+            item
+            for item in results
+            if item.category in {"verifier_timeout", "verifier_error"}
+        ]
+        if not transient:
+            raise ValueError(
+                "stored SFT-2 train512 run has no transient results to retry"
+            )
+        started = time.perf_counter()
+        replacements = []
+        for item in transient:
+            record = record_by_id[item.task_id]
+            generated = GeneratedCandidate(
+                task=TaskRecord(
+                    id=record.id,
+                    preamble="",
+                    declaration=record.declaration,
+                    declaration_name=record.declaration_name,
+                ),
+                candidate_index=item.candidate_index,
+                text=item.candidate_text,
+                token_count=int(item.generated_token_count or 0),
+                finish_reason=str(item.finish_reason),
+                generation_latency_seconds=float(
+                    item.generation_latency_seconds or 0.0
+                ),
+            )
+            replacements.append(
+                _heldout_candidate_result(
+                    generated,
+                    record,
+                    sources[item.task_id],
+                    mathlib_root,
+                    timeout_seconds=timeout,
+                )
+            )
+        retry_wall_time = time.perf_counter() - started
+        results = _merge_sft2_train_reverification_results(results, replacements)
+        retained_timeout_count = sum(
+            item.category == "verifier_timeout" for item in replacements
         )
-    retry_wall_time = time.perf_counter() - started
-    replacements, resolved_timeout_count = _resolve_repeated_sft2_timeouts(replacements)
-    results = _merge_sft2_train_reverification_results(results, replacements)
+        prior_retry_attempts = int(
+            prior_reverification.get("retry_attempts", 1 if prior_reverification else 0)
+        )
+        reverification = {
+            "stored_candidates_regenerated": False,
+            "transient_results_retried": len(transient),
+            "categories": sorted({item.category for item in transient}),
+            "timeout_seconds": timeout,
+            "retry_wall_time_seconds": retry_wall_time,
+            "retry_attempts": prior_retry_attempts + 1,
+            "total_verification_attempts": prior_retry_attempts + 2,
+            "repeated_same_contract_timeout_count": retained_timeout_count,
+            "retained_verifier_timeout_count": retained_timeout_count,
+            "artifact_category_restoration_only": False,
+            "resolution_policy": (
+                "a repeated same-contract timeout remains verifier_timeout and is an "
+                "unsuccessful candidate, not an infrastructure error"
+            ),
+        }
+        verification_wall_time = (
+            float(prior_summary["verification_wall_time_seconds"]) + retry_wall_time
+        )
     summary = summarize_phase6_train_results(
         results,
         expected_task_ids=selected_ids,
         target_exact_by_candidate=exact,
     )
-    prior_verification_wall_time = float(
-        prior_summary["verification_wall_time_seconds"]
-    )
     generation_wall_time = float(prior_summary["generation_wall_time_seconds"])
-    prior_reverification = metadata.get("reverification", {})
-    prior_retry_attempts = int(
-        prior_reverification.get("retry_attempts", 1 if prior_reverification else 0)
-    )
     summary.update(
         {
             "workload_id": train_contract["workload_id"],
             "model_role": "sft2_endpoint",
             "generation_wall_time_seconds": generation_wall_time,
-            "verification_wall_time_seconds": (
-                prior_verification_wall_time + retry_wall_time
+            "verification_wall_time_seconds": verification_wall_time,
+            "run_wall_time_seconds": generation_wall_time + verification_wall_time,
+            "sft2_train_integrity_passed": _sft2_train_integrity_passed(summary),
+            "verifier_timeout_semantics": (
+                "unsuccessful_candidate_not_infrastructure_error"
             ),
-            "run_wall_time_seconds": (
-                generation_wall_time + prior_verification_wall_time + retry_wall_time
-            ),
-            "sft2_train_integrity_passed": summary["phase6_train_integrity_passed"],
-            "reverification": {
-                "stored_candidates_regenerated": False,
-                "transient_results_retried": len(transient),
-                "categories": sorted({item.category for item in transient}),
-                "timeout_seconds": timeout,
-                "retry_wall_time_seconds": retry_wall_time,
-                "retry_attempts": prior_retry_attempts + 1,
-                "total_verification_attempts": prior_retry_attempts + 2,
-                "resolved_repeated_timeout_count": resolved_timeout_count,
-                "unresolved_timeout_count": summary["verifier_timeout_count"],
-                "resolution_policy": (
-                    "a repeated same-contract timeout is a bounded proof rejection; "
-                    "candidate generation evidence and pass/fail contribution are unchanged"
-                ),
-            },
+            "reverification": reverification,
         }
     )
     metadata["status"] = (
         "passed" if summary["sft2_train_integrity_passed"] else "failed"
     )
     metadata["reverification"] = summary["reverification"]
+    metadata["verifier_timeout_semantics"] = (
+        "unsuccessful_candidate_not_infrastructure_error"
+    )
+    metadata["runtime"]["candidate_generation_reused"] = True
+    metadata["runtime"]["verification_wall_time_seconds"] = verification_wall_time
     _write_json(output_dir / "run.json", metadata)
     _write_json(output_dir / "summary.json", summary)
     with (output_dir / "results.jsonl").open("w", encoding="utf-8") as stream:
@@ -480,7 +558,7 @@ def run_sft2_heldout512(
     verification_workers: int | None = None,
     timeout_seconds: float | None = None,
 ) -> tuple[dict[str, Any], list[CandidateResult], dict[str, Any]]:
-    return run_phase4_heldout(
+    metadata, results, summary = run_phase4_heldout(
         config,  # type: ignore[arg-type]
         phase2_config,
         dataset_dir,
@@ -496,7 +574,14 @@ def run_sft2_heldout512(
         schema_version=SFT2_HELDOUT_RUN_SCHEMA_VERSION,
         phase_name="SFT-2",
         integrity_summary_key="sft2_heldout_integrity_passed",
+        allow_verifier_timeouts=True,
     )
+    summary["sft2_heldout_integrity_passed"] = sft2_evaluation_integrity_passed(summary)
+    summary["verifier_timeout_semantics"] = (
+        "unsuccessful_candidate_not_infrastructure_error"
+    )
+    _write_json(output_dir / "summary.json", summary)
+    return metadata, results, summary
 
 
 def run_sft2_minif2f_validation(
@@ -556,10 +641,8 @@ def run_sft2_minif2f_validation(
     )
     token_counts = [int(item.generated_token_count or 0) for item in results]
     passed = bool(
-        summary["complete"]
+        sft2_evaluation_integrity_passed(summary)
         and len(results) == expected_candidates
-        and int(summary["infrastructure_error_count"]) == 0
-        and int(summary["verifier_timeout_count"]) == 0
     )
     summary.update(
         {
@@ -571,6 +654,9 @@ def run_sft2_minif2f_validation(
             "expected_tasks": contract["expected_tasks"],
             "expected_candidates": expected_candidates,
             "miniF2F_test_evaluated": False,
+            "verifier_timeout_semantics": (
+                "unsuccessful_candidate_not_infrastructure_error"
+            ),
             "generated_token_counts": {
                 "total": sum(token_counts),
                 "mean": fmean(token_counts),
@@ -611,6 +697,9 @@ def reverify_sft2_minif2f_validation(
     candidates_per_task = int(contract["candidates_per_task"])
 
     metadata = json.loads((output_dir / "run.json").read_text(encoding="utf-8"))
+    prior_summary = json.loads(
+        (output_dir / "summary.json").read_text(encoding="utf-8")
+    )
     if (
         metadata.get("schema_version") != SFT2_MINIF2F_RUN_SCHEMA_VERSION
         or metadata.get("selected_adapter_binding") != binding.to_dict()
@@ -638,76 +727,92 @@ def reverify_sft2_minif2f_validation(
         raise ValueError(
             "stored SFT-2 miniF2F validation result identities/order differ"
         )
-    transient = [
-        item
-        for item in results
-        if item.category in {"verifier_timeout", "verifier_error"}
-    ]
-    if not transient:
-        raise ValueError(
-            "stored SFT-2 miniF2F validation has no transient results to retry"
+    results, restored_count = _restore_repeated_sft2_timeout_categories(results)
+    prior_reverification = dict(
+        prior_summary.get("reverification", metadata.get("reverification", {}))
+    )
+    if restored_count:
+        reverification = _retained_timeout_reverification(
+            prior_reverification,
+            restored_count=restored_count,
         )
-    generated = [
-        GeneratedCandidate(
-            task=task_by_id[item.task_id],
-            candidate_index=item.candidate_index,
-            text=item.candidate_text,
-            token_count=int(item.generated_token_count or 0),
-            finish_reason=str(item.finish_reason),
-            generation_latency_seconds=float(item.generation_latency_seconds or 0.0),
-            generation_error=(
-                item.diagnostics["stderr"]
-                if item.category == "generation_error"
-                else None
+        verification_wall_time = float(prior_summary["verification_wall_time_seconds"])
+    else:
+        if int(prior_reverification.get("retained_verifier_timeout_count", 0)) > 0:
+            raise ValueError("repeated SFT-2 miniF2F timeouts require no further retry")
+        transient = [
+            item
+            for item in results
+            if item.category in {"verifier_timeout", "verifier_error"}
+        ]
+        if not transient:
+            raise ValueError(
+                "stored SFT-2 miniF2F validation has no transient results to retry"
+            )
+        generated = [
+            GeneratedCandidate(
+                task=task_by_id[item.task_id],
+                candidate_index=item.candidate_index,
+                text=item.candidate_text,
+                token_count=int(item.generated_token_count or 0),
+                finish_reason=str(item.finish_reason),
+                generation_latency_seconds=float(
+                    item.generation_latency_seconds or 0.0
+                ),
+                generation_error=(
+                    item.diagnostics["stderr"]
+                    if item.category == "generation_error"
+                    else None
+                ),
+            )
+            for item in transient
+        ]
+        verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout)
+        started = time.perf_counter()
+        with ThreadPoolExecutor(
+            max_workers=int(config.value["verification"]["workers"])
+        ) as executor:
+            replacements = list(
+                executor.map(lambda item: _verify_candidate(verifier, item), generated)
+            )
+        retry_wall_time = time.perf_counter() - started
+        results = _merge_sft2_train_reverification_results(results, replacements)
+        retained_timeout_count = sum(
+            item.category == "verifier_timeout" for item in replacements
+        )
+        prior_retry_attempts = int(
+            prior_reverification.get("retry_attempts", 1 if prior_reverification else 0)
+        )
+        reverification = {
+            "stored_candidates_regenerated": False,
+            "transient_results_retried": len(transient),
+            "categories": sorted({item.category for item in transient}),
+            "timeout_seconds": timeout,
+            "retry_wall_time_seconds": retry_wall_time,
+            "retry_attempts": prior_retry_attempts + 1,
+            "total_verification_attempts": prior_retry_attempts + 2,
+            "repeated_same_contract_timeout_count": retained_timeout_count,
+            "retained_verifier_timeout_count": retained_timeout_count,
+            "artifact_category_restoration_only": False,
+            "resolution_policy": (
+                "a repeated same-contract timeout remains verifier_timeout and is an "
+                "unsuccessful candidate, not an infrastructure error"
             ),
+        }
+        verification_wall_time = (
+            float(prior_summary["verification_wall_time_seconds"]) + retry_wall_time
         )
-        for item in transient
-    ]
-    verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout)
-    started = time.perf_counter()
-    with ThreadPoolExecutor(
-        max_workers=int(config.value["verification"]["workers"])
-    ) as executor:
-        replacements = list(
-            executor.map(lambda item: _verify_candidate(verifier, item), generated)
-        )
-    retry_wall_time = time.perf_counter() - started
-    replacements, resolved_timeout_count = _resolve_repeated_sft2_timeouts(replacements)
-    results = _merge_sft2_train_reverification_results(results, replacements)
     summary = summarize_results(
         results,
         expected_task_ids=task_ids,
         candidates_per_task=candidates_per_task,
     )
     token_counts = [int(item.generated_token_count or 0) for item in results]
-    prior_verification_wall_time = float(
-        metadata["runtime"]["verification_wall_time_seconds"]
-    )
-    generation_wall_time = float(metadata["runtime"]["generation_wall_time_seconds"])
-    prior_reverification = metadata.get("reverification", {})
-    prior_retry_attempts = int(
-        prior_reverification.get("retry_attempts", 1 if prior_reverification else 0)
-    )
+    generation_wall_time = float(prior_summary["generation_wall_time_seconds"])
     passed = bool(
-        summary["complete"]
-        and int(summary["infrastructure_error_count"]) == 0
-        and int(summary["verifier_timeout_count"]) == 0
+        sft2_evaluation_integrity_passed(summary)
+        and len(results) == len(task_ids) * candidates_per_task
     )
-    reverification = {
-        "stored_candidates_regenerated": False,
-        "transient_results_retried": len(transient),
-        "categories": sorted({item.category for item in transient}),
-        "timeout_seconds": timeout,
-        "retry_wall_time_seconds": retry_wall_time,
-        "retry_attempts": prior_retry_attempts + 1,
-        "total_verification_attempts": prior_retry_attempts + 2,
-        "resolved_repeated_timeout_count": resolved_timeout_count,
-        "unresolved_timeout_count": summary["verifier_timeout_count"],
-        "resolution_policy": (
-            "a repeated same-contract timeout is a bounded proof rejection; "
-            "candidate generation evidence and pass/fail contribution are unchanged"
-        ),
-    }
     summary.update(
         {
             "schema_version": "sft2-minif2f-validation-summary-v1",
@@ -720,11 +825,10 @@ def reverify_sft2_minif2f_validation(
             "miniF2F_test_evaluated": False,
             "workload_id": contract["workload_id"],
             "generation_wall_time_seconds": generation_wall_time,
-            "verification_wall_time_seconds": (
-                prior_verification_wall_time + retry_wall_time
-            ),
-            "run_wall_time_seconds": (
-                generation_wall_time + prior_verification_wall_time + retry_wall_time
+            "verification_wall_time_seconds": verification_wall_time,
+            "run_wall_time_seconds": generation_wall_time + verification_wall_time,
+            "verifier_timeout_semantics": (
+                "unsuccessful_candidate_not_infrastructure_error"
             ),
             "generated_token_counts": {
                 "total": sum(token_counts),
@@ -737,6 +841,11 @@ def reverify_sft2_minif2f_validation(
     )
     metadata["status"] = "passed" if passed else "failed"
     metadata["reverification"] = reverification
+    metadata["verifier_timeout_semantics"] = (
+        "unsuccessful_candidate_not_infrastructure_error"
+    )
+    metadata["runtime"]["candidate_generation_reused"] = True
+    metadata["runtime"]["verification_wall_time_seconds"] = verification_wall_time
     _write_json(output_dir / "run.json", metadata)
     _write_json(output_dir / "summary.json", summary)
     with (output_dir / "results.jsonl").open("w", encoding="utf-8") as stream:

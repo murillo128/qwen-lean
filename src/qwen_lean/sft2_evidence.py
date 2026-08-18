@@ -176,8 +176,10 @@ def _evaluation_integrity(
     audit = {
         "integrity_passed": value.get(integrity_key) is True,
         "infrastructure_error_count": int(value.get("infrastructure_error_count", -1)),
-        "unresolved_verifier_timeout_count": int(
-            value.get("verifier_timeout_count", -1)
+        "verifier_timeout_count": int(value.get("verifier_timeout_count", -1)),
+        "verifier_timeout_semantics": value.get(
+            "verifier_timeout_semantics",
+            "unsuccessful_candidate_not_infrastructure_error",
         ),
     }
     reverification = value.get("reverification")
@@ -259,17 +261,14 @@ def write_sft2_final_evidence(
         "train512": bool(
             train_integrity["integrity_passed"]
             and train_integrity["infrastructure_error_count"] == 0
-            and train_integrity["unresolved_verifier_timeout_count"] == 0
         ),
         "heldout512": bool(
             heldout_integrity["integrity_passed"]
             and heldout_integrity["infrastructure_error_count"] == 0
-            and heldout_integrity["unresolved_verifier_timeout_count"] == 0
         ),
         "minif2f_validation": bool(
             minif2f_integrity["integrity_passed"]
             and minif2f_integrity["infrastructure_error_count"] == 0
-            and minif2f_integrity["unresolved_verifier_timeout_count"] == 0
             and minif2f.get("miniF2F_test_evaluated") is False
         ),
     }
@@ -438,6 +437,9 @@ def write_sft2_final_evidence(
                     "lean": train["pass_at_k"],
                     "exact_target": train["exact_target_pass_at_k"],
                     "verifier_integrity": train_integrity,
+                    "historical_phase6_zero_timeout_integrity_passed": train[
+                        "phase6_train_integrity_passed"
+                    ],
                     "exact_target_candidates": train["exact_target_candidates"],
                     "tasks_with_exact_target_candidate": train[
                         "tasks_with_exact_target_candidate"
@@ -477,6 +479,16 @@ def write_sft2_final_evidence(
         "train_to_heldout_gap": gap,
         "bootstrap": bootstrap,
         "outcome_signals": outcome_signals,
+        "verifier_timeout_policy": {
+            "scope": "SFT-2 phase-local issue-25 amendment",
+            "category": "verifier_timeout",
+            "successful_proof": False,
+            "lean_rejected": False,
+            "infrastructure_error": False,
+            "fixed_timeout_values_changed": False,
+            "candidate_regeneration_permitted": False,
+            "historical_phase6_evidence_modified": False,
+        },
         "result_types_kept_distinct": [
             "Lean-verified proof success",
             "exact retained-target reproduction",
@@ -511,7 +523,7 @@ The immutable `reference-sft-v1` adapter was continued without merging or stacki
 
 **OBSERVED:** SFT-2 minus `reference-sft-v1` Lean pass@1/pass@4 deltas were {deltas["train_lean"]["pass@1"]:.6f}/{deltas["train_lean"]["pass@4"]:.6f} on train512 and {deltas["heldout_lean"]["pass@1"]:.6f}/{deltas["heldout_lean"]["pass@4"]:.6f} on heldout512. Exact-target train512 deltas were {deltas["train_exact_target"]["pass@1"]:.6f}/{deltas["train_exact_target"]["pass@4"]:.6f}. miniF2F validation pass@1/pass@4/pass@8 deltas were {deltas["minif2f_validation_lean"]["pass@1"]:.6f}/{deltas["minif2f_validation_lean"]["pass@4"]:.6f}/{deltas["minif2f_validation_lean"]["pass@8"]:.6f}. `comparison.json` retains deterministic paired bootstrap intervals and separate learning, memorization, saturation, and regression signals; no opaque combined score is used.
 
-**OBSERVED:** all three generation workloads finished with zero infrastructure errors and zero unresolved verifier timeouts. Train512 retried one stored timed-out candidate twice under the unchanged 300-second contract; miniF2F validation retried five stored timed-out candidates once under the unchanged 30-second contract. The repeated timeouts were recorded as bounded Lean rejections without regenerating candidates or changing their pass/fail contribution. Heldout512 required no retry. The retry policy and counts remain explicit in `comparison.json`.
+**OBSERVED:** all three generation workloads finished with zero generation/verifier infrastructure errors. One train512 candidate remained `verifier_timeout` on all three attempts under the unchanged 300-second contract, and five miniF2F-validation candidates remained `verifier_timeout` on both attempts under the unchanged 30-second contract; heldout512 had zero timeouts. These are distinct unsuccessful candidate outcomes, not `lean_rejected` results or infrastructure failures. No candidate was regenerated, pass@k contributions were unchanged, and the categories plus attempt provenance remain explicit in `comparison.json`.
 
 **ACCEPTED:** the bounded ablation and all integrity gates completed. Quality was not an execution gate. D015 and `reference-sft-v1` remain unchanged, miniF2F test was not evaluated, and SFT-2 is not automatically promoted or published as the reference parent.
 """
