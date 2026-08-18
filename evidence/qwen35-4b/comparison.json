@@ -1,0 +1,34 @@
+{
+  "candidate_budget_caveat": "The strict Qwen3.5 lane uses the issue-mandated four candidates per task; accepted reference-sft-v1 metrics use eight. Both pass@k values use the same unbiased estimator and unchanged Lean verifier, but the finite sampling budgets differ.",
+  "metrics": {
+    "pass@1": {
+      "delta_qwen35_minus_reference": -0.01588114754098361,
+      "fraction_of_reference": 0.5974025974025974,
+      "qwen35_4b": 0.0235655737704918,
+      "reference_sft_v1": 0.03944672131147541
+    },
+    "pass@4": {
+      "delta_qwen35_minus_reference": -0.021194379391100707,
+      "fraction_of_reference": 0.7945516458569807,
+      "qwen35_4b": 0.08196721311475409,
+      "reference_sft_v1": 0.1031615925058548
+    }
+  },
+  "reference_model": "reference-sft-v1",
+  "schema_version": "qwen35-4b-casting-comparison-v1",
+  "status": "passed",
+  "strict_execution_integrity": {
+    "candidate_count": 976,
+    "chat_template": null,
+    "infrastructure_error_count": 0,
+    "proof_extraction": false,
+    "raw_continuation": true,
+    "repair": false,
+    "task_count": 244,
+    "verifier_feedback": false,
+    "verifier_timeout_count": 1
+  },
+  "strict_model": "Qwen/Qwen3.5-4B",
+  "strict_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "workload_id": "minif2f-valid-v1"
+}

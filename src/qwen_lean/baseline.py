@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import gc
+import importlib.metadata
 import json
+import os
 import platform
+import threading
 import time
 from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor
@@ -25,6 +28,15 @@ from .schema import (
     TaskRecord,
 )
 from .verifier import LeanVerifier
+
+
+_RUNTIME_PACKAGE_NAMES = (
+    "flashinfer-python",
+    "nvidia-ml-py",
+    "torch",
+    "transformers",
+    "vllm",
+)
 
 
 @dataclass(frozen=True)
@@ -123,33 +135,72 @@ def run_phase1_baseline(
     sampling_override: Mapping[str, Any] | None = None,
     adapter: LoRAAdapterSpec | None = None,
     result_schema_version: str = PHASE1_RESULT_SCHEMA_VERSION,
+    report_progress: bool = False,
+    environment_probe_timeout_seconds: float | None = None,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
     all_tasks = materialize_benchmark_tasks(config, benchmark_root)
     tasks = config.select_workload(workload_id, all_tasks)
     environment_validation = validate_minif2f_environment(
         config,
         benchmark_root,
-        timeout_seconds=timeout_seconds,
+        timeout_seconds=(
+            timeout_seconds
+            if environment_probe_timeout_seconds is None
+            else environment_probe_timeout_seconds
+        ),
     )
     environment = environment_validation["verifier_environment"]
 
     runtime = _local_cuda_runtime(config)
+    runtime["environment_probe_timeout_seconds"] = (
+        timeout_seconds
+        if environment_probe_timeout_seconds is None
+        else environment_probe_timeout_seconds
+    )
     sampling = dict(config.sampling if sampling_override is None else sampling_override)
     if adapter is not None:
         adapter.validate(config)
-    generation_started = time.perf_counter()
-    generated, engine_version = _generate_candidates(
-        config, tasks, sampling=sampling, adapter=adapter
+    memory_monitor = _GpuMemoryMonitor(
+        int(runtime["cuda_device_index"]),
+        required=bool(config.engine.get("require_gpu_memory_monitor", False)),
     )
+    memory_monitor.start()
+    generation_started = time.perf_counter()
+    try:
+        generated, engine_version = _generate_candidates(
+            config, tasks, sampling=sampling, adapter=adapter
+        )
+    finally:
+        runtime.update(memory_monitor.stop())
     generation_wall_time = time.perf_counter() - generation_started
     runtime["generation_wall_time_seconds"] = generation_wall_time
 
     verifier = LeanVerifier(benchmark_root, timeout_seconds=timeout_seconds)
     verification_started = time.perf_counter()
     with ThreadPoolExecutor(max_workers=verification_workers) as executor:
-        results = list(
-            executor.map(lambda item: _verify_candidate(verifier, item), generated)
-        )
+        results = []
+        expected_candidates = len(generated)
+        progress_boundaries = {
+            max(1, round(expected_candidates * fraction))
+            for fraction in (0.25, 0.5, 0.75, 1.0)
+        }
+        for completed, result in enumerate(
+            executor.map(lambda item: _verify_candidate(verifier, item), generated),
+            start=1,
+        ):
+            results.append(result)
+            if report_progress and completed in progress_boundaries:
+                print(
+                    json.dumps(
+                        {
+                            "phase": "verification",
+                            "completed_candidates": completed,
+                            "total_candidates": expected_candidates,
+                        },
+                        sort_keys=True,
+                    ),
+                    flush=True,
+                )
     verification_wall_time = time.perf_counter() - verification_started
     runtime["verification_wall_time_seconds"] = verification_wall_time
     runtime["verification_workers"] = verification_workers
@@ -198,8 +249,46 @@ def run_phase1_baseline(
             "gpu_memory_utilization": float(config.engine["gpu_memory_utilization"]),
             "enforce_eager": bool(config.engine["enforce_eager"]),
             "quantization": config.engine["quantization"],
-            "chat_template": None,
+            **(
+                {"language_model_only": bool(config.engine["language_model_only"])}
+                if "language_model_only" in config.engine
+                else {}
+            ),
+            **(
+                {
+                    "use_flashinfer_sampler": bool(
+                        config.engine["use_flashinfer_sampler"]
+                    )
+                }
+                if "use_flashinfer_sampler" in config.engine
+                else {}
+            ),
+            **(
+                {"sampler_backend": "native"}
+                if config.engine.get("use_flashinfer_sampler") is False
+                else {}
+            ),
+            **(
+                {"add_special_tokens": bool(config.model["add_special_tokens"])}
+                if "add_special_tokens" in config.model
+                else {}
+            ),
+            "chat_template": config.model.get("chat_template"),
+            **(
+                {"model_artifact_resolution": "pinned_local_snapshot"}
+                if config.engine.get("resolve_pinned_snapshot", False)
+                else {}
+            ),
             "prompt_transformation": None,
+            **(
+                {
+                    "limit_mm_per_prompt": dict(
+                        config.engine["limit_mm_per_prompt"]
+                    )
+                }
+                if "limit_mm_per_prompt" in config.engine
+                else {}
+            ),
             "adapter": None if adapter is None else adapter.metadata(),
         },
         runtime=runtime,
@@ -311,12 +400,33 @@ def _local_cuda_runtime(config: Phase1Config) -> dict[str, Any]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "torch_cuda_version": torch.version.cuda,
+        "package_versions": _runtime_package_versions(config),
         "inference_execution": "local_cuda",
         "cuda_device_index": device_index,
         "cuda_device": properties.name,
         "cuda_device_capability": [properties.major, properties.minor],
         "cuda_device_total_memory_bytes": properties.total_memory,
+        "sampling_backend": (
+            "flashinfer"
+            if bool(config.engine.get("use_flashinfer_sampler", True))
+            else "vllm_pytorch_native"
+        ),
     }
+
+
+def _runtime_package_versions(config: Phase1Config) -> dict[str, str]:
+    required = set(config.engine.get("required_runtime_packages", []))
+    package_names = dict.fromkeys((*_RUNTIME_PACKAGE_NAMES, *sorted(required)))
+    versions: dict[str, str] = {}
+    for name in package_names:
+        try:
+            versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError as error:
+            if name in required:
+                raise RuntimeError(
+                    f"assessment runtime package is required but missing: {name}"
+                ) from error
+    return versions
 
 
 def _generate_candidates(
@@ -327,6 +437,8 @@ def _generate_candidates(
     sampling: Mapping[str, Any] | None = None,
     adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[list[GeneratedCandidate], str]:
+    if config.engine.get("use_flashinfer_sampler") is False:
+        os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     try:
         import vllm
         from vllm import LLM, SamplingParams
@@ -455,11 +567,32 @@ def vllm_engine_kwargs(
     adapter: LoRAAdapterSpec | None,
 ) -> dict[str, Any]:
     engine = config.engine
+    model_id = str(config.model["model_id"])
+    tokenizer_id = str(config.model["tokenizer_id"])
+    model_revision = str(config.model["model_revision"])
+    tokenizer_revision = str(config.model["tokenizer_revision"])
+    if engine.get("resolve_pinned_snapshot", False):
+        if model_id != tokenizer_id or model_revision != tokenizer_revision:
+            raise ValueError(
+                "pinned local snapshot resolution requires one model/tokenizer repo "
+                "and revision"
+            )
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError as error:
+            raise RuntimeError(
+                "pinned local snapshot resolution requires huggingface_hub"
+            ) from error
+        snapshot = snapshot_download(repo_id=model_id, revision=model_revision)
+        model_path = tokenizer_path = snapshot
+    else:
+        model_path = model_id
+        tokenizer_path = tokenizer_id
     kwargs: dict[str, Any] = {
-        "model": str(config.model["model_id"]),
-        "revision": str(config.model["model_revision"]),
-        "tokenizer": str(config.model["tokenizer_id"]),
-        "tokenizer_revision": str(config.model["tokenizer_revision"]),
+        "model": model_path,
+        "revision": model_revision,
+        "tokenizer": tokenizer_path,
+        "tokenizer_revision": tokenizer_revision,
         "dtype": str(engine["dtype"]),
         "tensor_parallel_size": int(engine["tensor_parallel_size"]),
         "gpu_memory_utilization": float(engine["gpu_memory_utilization"]),
@@ -470,6 +603,10 @@ def vllm_engine_kwargs(
         "seed": int(sampling["seed"]),
         "trust_remote_code": False,
     }
+    if "language_model_only" in engine:
+        kwargs["language_model_only"] = bool(engine["language_model_only"])
+    if "limit_mm_per_prompt" in engine:
+        kwargs["limit_mm_per_prompt"] = dict(engine["limit_mm_per_prompt"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(
@@ -479,6 +616,8 @@ def vllm_engine_kwargs(
                 "max_loras": 1,
             }
         )
+    if "language_model_only" in engine:
+        kwargs["language_model_only"] = bool(engine["language_model_only"])
     return kwargs
 
 
@@ -575,3 +714,74 @@ def write_environment_validation(path: Path, evidence: dict[str, Any]) -> None:
     path.write_text(
         json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+
+
+class _GpuMemoryMonitor:
+    def __init__(
+        self,
+        device_index: int,
+        *,
+        required: bool,
+        interval_seconds: float = 0.1,
+    ) -> None:
+        self.device_index = device_index
+        self.required = required
+        self.interval_seconds = interval_seconds
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._pynvml: Any | None = None
+        self._handle: Any | None = None
+        self._samples: list[int] = []
+
+    def start(self) -> None:
+        try:
+            import pynvml
+
+            pynvml.nvmlInit()
+            self._pynvml = pynvml
+            self._handle = pynvml.nvmlDeviceGetHandleByIndex(self.device_index)
+            self._sample()
+        except Exception as error:
+            if self.required:
+                raise RuntimeError("NVML GPU-memory monitoring is required") from error
+            return
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> dict[str, Any]:
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join(timeout=max(1.0, self.interval_seconds * 4))
+        if self._pynvml is None:
+            return {"gpu_memory_monitoring": "unavailable"}
+        self._sample()
+        try:
+            self._pynvml.nvmlShutdown()
+        finally:
+            samples = list(self._samples)
+            self._pynvml = None
+            self._handle = None
+        if not samples:
+            if self.required:
+                raise RuntimeError("NVML GPU-memory monitoring produced no samples")
+            return {"gpu_memory_monitoring": "unavailable"}
+        baseline = samples[0]
+        peak = max(samples)
+        return {
+            "gpu_memory_monitoring": "nvml_device_used_bytes",
+            "gpu_memory_sampling_interval_seconds": self.interval_seconds,
+            "gpu_memory_sample_count": len(samples),
+            "gpu_memory_before_bytes": baseline,
+            "gpu_memory_peak_bytes": peak,
+            "gpu_memory_peak_delta_bytes": max(0, peak - baseline),
+        }
+
+    def _run(self) -> None:
+        while not self._stop.wait(self.interval_seconds):
+            self._sample()
+
+    def _sample(self) -> None:
+        if self._pynvml is None or self._handle is None:
+            return
+        memory = self._pynvml.nvmlDeviceGetMemoryInfo(self._handle)
+        self._samples.append(int(memory.used))

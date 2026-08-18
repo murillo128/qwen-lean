@@ -1,0 +1,117 @@
+{
+  "candidate_generation_projection_sha256": "e9c944f47a9041dab046063c3f3fdf01289105864e033b07b053a24c28218739",
+  "complete": true,
+  "contract": {
+    "benchmark": {
+      "repository": "google-deepmind/miniF2F",
+      "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+      "split": "validation"
+    },
+    "model": {
+      "id": "Qwen/Qwen3.5-2B-Base",
+      "revision": "b1485b2fa6dfa1287294f269f5fb618e03d52d7c"
+    },
+    "model_license": "Apache-2.0",
+    "prompt_format_id": "whole-proof-v1",
+    "sampling": {
+      "candidates_per_task": 4,
+      "do_sample": true,
+      "max_new_tokens": 1024,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "tokenizer": {
+      "id": "Qwen/Qwen3.5-2B-Base",
+      "revision": "b1485b2fa6dfa1287294f269f5fb618e03d52d7c"
+    },
+    "verifier_timeout_is_infrastructure_error": false,
+    "verifier_timeout_seconds": 30.0,
+    "verifier_timeout_semantics": "unsuccessful_proof_attempt"
+  },
+  "results": {
+    "candidate_count": 64,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 64,
+      "verified": 0,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "finish_reason_counts": {
+      "eos": 40,
+      "token_limit": 24
+    },
+    "generated_tokens": {
+      "count": 64,
+      "max": 1024,
+      "mean": 464.828125,
+      "median": 154.5,
+      "min": 2,
+      "total": 29749
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.0,
+      "pass@4": 0.0
+    },
+    "task_count": 16,
+    "tasks_with_verified_candidate": {
+      "count": 0,
+      "fraction": 0.0
+    },
+    "verifier_timeout_count": 0
+  },
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "dtype": "bfloat16",
+    "gpu_driver_version": "580.173.02",
+    "gpu_memory_headroom_at_peak_bytes": 1501954048,
+    "gpu_memory_total_bytes": 21469593600,
+    "inference_engine": "vllm",
+    "inference_engine_version": "0.17.0",
+    "inference_execution": "local_cuda",
+    "peak_gpu_memory_used_bytes": 19967639552,
+    "python": "3.12.14",
+    "quantization": null,
+    "torch": "2.10.0+cu128",
+    "torch_cuda_version": "12.8",
+    "transformers": "4.57.6"
+  },
+  "schema_version": "qwen35-2b-base-evidence-v1",
+  "timing": {
+    "candidate_latency_seconds": {
+      "candidate_total_latency_mean": 13.430279367815274,
+      "candidate_total_latency_sum": 859.5378795401775,
+      "generation_candidate_latency_mean": 3.6511172591272043,
+      "generation_candidate_latency_sum": 233.67150458414108,
+      "verification_latency_mean": 9.77916210868807,
+      "verification_latency_sum": 625.8663749560365
+    },
+    "compute_per_solved_task_available": false,
+    "generated_tokens_per_generation_wall_second": 475.6193762066615,
+    "generation_wall_time_seconds": 62.54791433701757,
+    "generation_wall_time_seconds_per_solved_task": null,
+    "run_wall_time_seconds": 143.7726508710184,
+    "run_wall_time_seconds_per_solved_task": null,
+    "verification_wall_time_seconds": 81.22473653400084
+  },
+  "verifier_environment": {
+    "dependencies": {
+      "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+      "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+    },
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "project": "google-deepmind/miniF2F",
+    "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+  },
+  "workload_id": "minif2f-valid-dev16-v1"
+}
