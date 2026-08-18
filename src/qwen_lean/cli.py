@@ -85,6 +85,15 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .qwen35_assessment import (
+    run_assessment as run_qwen35_assessment,
+)
+from .qwen35_assessment import (
+    run_precision_preflight as run_qwen35_preflight,
+)
+from .qwen35_assessment import (
+    write_compact_evidence as write_qwen35_evidence,
+)
 from .riemann_data import (
     RiemannAtlasConfig,
     RiemannDataConfig,
@@ -172,6 +181,57 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-9b-preflight",
+        help="establish the BF16 or frozen 4-bit Qwen3.5-9B precision lane",
+    )
+    qwen35_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_preflight.add_argument(
+        "--lane", required=True, choices=("bf16", "bitsandbytes-4bit")
+    )
+    qwen35_preflight.add_argument("--output", type=Path, required=True)
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-9b-assess",
+        help="run the strict Qwen3.5-9B miniF2F casting lane",
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_assess.add_argument("--preflight", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--timeout", type=float)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-9b-evidence",
+        help="write compact strict-lane Qwen3.5-9B comparison evidence",
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight", type=Path, default=root / "artifacts/qwen35-9b/preflight.json"
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-9b/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-9b/full"
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-9b"
+    )
 
     gpt53_preflight = subparsers.add_parser(
         "gpt53-spark-preflight",
@@ -886,6 +946,49 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-preflight":
+        state = run_qwen35_preflight(
+            Phase1Config.load(args.config),
+            args.benchmark_root,
+            args.output,
+            lane=args.lane,
+        )
+        print(json.dumps(state, indent=2))
+        return 0 if state["status"] == "passed" else 1
+
+    if args.command == "qwen35-9b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = run_qwen35_assessment(
+            config,
+            args.benchmark_root,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+            timeout_seconds=timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-evidence":
+        comparison = write_qwen35_evidence(
+            Phase1Config.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
 
     if args.command == "gpt53-spark-preflight":
         summary = run_preflight(GPT53Config.load(args.config), args.output_dir)

@@ -1,0 +1,109 @@
+{
+  "schema_version": "phase1-config-v1",
+  "benchmark": {
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "source_path": "MiniF2F/Valid.lean",
+    "primary_task_manifest": "minif2f-valid-task-ids.txt",
+    "split": "validation",
+    "expected_primary_task_count": 244,
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "license": "Apache-2.0",
+    "attribution": "Copyright (c) 2021 OpenAI; authors Kunhao Zheng, Stanislas Polu, David Renshaw, OpenAI GPT-f"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": {
+      "selection": "explicit_ids",
+      "selection_rule": "first 16 primary task IDs in ascending Unicode code-point order",
+      "expected_task_count": 16,
+      "task_ids": [
+        "aimeII_2001_p3",
+        "aimeII_2020_p6",
+        "aimeI_2000_p7",
+        "aime_1983_p9",
+        "aime_1984_p15",
+        "aime_1984_p5",
+        "aime_1987_p8",
+        "aime_1988_p3",
+        "aime_1988_p4",
+        "aime_1990_p2",
+        "aime_1991_p1",
+        "aime_1991_p6",
+        "aime_1994_p4",
+        "aime_1996_p5",
+        "aime_1997_p11",
+        "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i"
+      ]
+    },
+    "minif2f-valid-v1": {
+      "selection": "all",
+      "expected_task_count": 244
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-9B",
+    "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "tokenizer_id": "Qwen/Qwen3.5-9B",
+    "tokenizer_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "license": "Apache-2.0"
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.21.0",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_num_seqs": 4,
+    "enforce_eager": true,
+    "quantization": null,
+    "language_model_only": true,
+    "cpu_offload_gb": 0.0,
+    "expected_cuda_device_name_fragment": "Ada"
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "known_valid_candidate": "ring"
+  },
+  "qwen35_assessment": {
+    "id": "qwen35-9b-posttrained-strict-casting-v1",
+    "prompt_format_id": "whole-proof-v1",
+    "raw_continuation": true,
+    "chat_template": null,
+    "proof_extraction": false,
+    "lean_guided_retry": false,
+    "bf16_lane": {
+      "id": "bf16-local-vllm-v1",
+      "dtype": "bfloat16",
+      "quantization": null,
+      "cpu_offload_gb": 0.0
+    },
+    "fallback_lane": {
+      "id": "bitsandbytes-inflight-fp4-w4a32-v1",
+      "dtype": "bfloat16",
+      "quantization": "bitsandbytes",
+      "weight_bits": 4,
+      "bnb_4bit_quant_type": "fp4",
+      "bnb_4bit_compute_dtype": "float32",
+      "bnb_4bit_quant_storage": "uint8",
+      "bnb_4bit_use_double_quant": false,
+      "activation_dtype": "bfloat16",
+      "source_checkpoint_dtype": "bfloat16",
+      "loading": "inflight",
+      "cpu_offload_gb": 0.0
+    },
+    "reference_evidence": "evidence/phase6/minif2f-validation.json",
+    "reference_logical_id": "reference-sft-v1"
+  }
+}

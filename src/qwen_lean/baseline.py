@@ -198,6 +198,10 @@ def run_phase1_baseline(
             "gpu_memory_utilization": float(config.engine["gpu_memory_utilization"]),
             "enforce_eager": bool(config.engine["enforce_eager"]),
             "quantization": config.engine["quantization"],
+            "language_model_only": bool(
+                config.engine.get("language_model_only", False)
+            ),
+            "cpu_offload_gb": float(config.engine.get("cpu_offload_gb", 0.0)),
             "chat_template": None,
             "prompt_transformation": None,
             "adapter": None if adapter is None else adapter.metadata(),
@@ -470,6 +474,10 @@ def vllm_engine_kwargs(
         "seed": int(sampling["seed"]),
         "trust_remote_code": False,
     }
+    if "language_model_only" in engine:
+        kwargs["language_model_only"] = bool(engine["language_model_only"])
+    if "cpu_offload_gb" in engine:
+        kwargs["cpu_offload_gb"] = float(engine["cpu_offload_gb"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(
