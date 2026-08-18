@@ -2459,6 +2459,16 @@ wheels = [
 ]
 
 [[package]]
+name = "nvidia-cuda-crt"
+version = "13.0.48"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/92/ab25cf2d15b6bbf54b451cbbfb0f3304f525bb7ffd616d9720855d5c95d9/nvidia_cuda_crt-13.0.48-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:577fa718932bbe140171132f014fd6a339a8836cd2c62e3b4d1a83ac656edef6", size = 134087, upload-time = "2025-08-04T10:15:14.159Z" },
+    { url = "https://files.pythonhosted.org/packages/50/51/0f40cd375857a6a4817c3f2704e573c0da86b2feefa799274a5dfd032f26/nvidia_cuda_crt-13.0.48-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:944b6070c50dc4fbb7c012b1a4c28b444c9c5ac071ac17d84dc9726d9cbc6bea", size = 134086, upload-time = "2025-08-04T10:15:22.13Z" },
+    { url = "https://files.pythonhosted.org/packages/de/00/160bebefd26a7cfb8a033c12252be7b5f9049a3c8362f8897f7e3f86f105/nvidia_cuda_crt-13.0.48-py3-none-win_amd64.whl", hash = "sha256:966abe3451a067e6543077d7d2a2236f4c07cabe165d163f52609092d6eaaec0", size = 134861, upload-time = "2025-08-04T10:27:12.031Z" },
+]
+
+[[package]]
 name = "nvidia-cuda-cupti"
 version = "13.0.85"
 source = { registry = "https://pypi.org/simple" }
@@ -3832,6 +3842,7 @@ phase2 = [
 qwen35 = [
     { name = "bitsandbytes", version = "0.49.2", source = { registry = "https://pypi.org/simple" } },
     { name = "ninja" },
+    { name = "nvidia-cuda-crt" },
     { name = "nvidia-cuda-nvcc" },
     { name = "vllm", version = "0.21.0", source = { registry = "https://pypi.org/simple" } },
 ]
@@ -3859,6 +3870,7 @@ requires-dist = [
     { name = "datasets", marker = "extra == 'phase2'", specifier = "==4.0.0" },
     { name = "datasets", marker = "extra == 'training'", specifier = "==4.0.0" },
     { name = "ninja", marker = "extra == 'qwen35'", specifier = "==1.13.0" },
+    { name = "nvidia-cuda-crt", marker = "extra == 'qwen35'", specifier = "==13.0.48" },
     { name = "nvidia-cuda-nvcc", marker = "extra == 'qwen35'", specifier = "==13.0.48" },
     { name = "peft", marker = "extra == 'training'", specifier = "==0.17.1" },
     { name = "torch", marker = "extra == 'model'", specifier = "==2.8.0" },

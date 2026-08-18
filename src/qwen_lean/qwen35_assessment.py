@@ -431,6 +431,7 @@ def _runtime_versions() -> dict[str, Any]:
         "bitsandbytes",
         "huggingface-hub",
         "ninja",
+        "nvidia-cuda-crt",
         "nvidia-cuda-nvcc",
         "torch",
         "transformers",
