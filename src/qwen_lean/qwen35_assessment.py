@@ -399,20 +399,34 @@ def _render_readme(
     metrics = comparison["metrics"]
     peak_gib = full["runtime"]["gpu_memory_peak_bytes"] / 1024**3
     preflight_peak_gib = preflight["runtime"]["gpu_memory_peak_bytes"] / 1024**3
+    strict_pass = (
+        f"{full['pass_at_k']['pass@1']:.6f}/{full['pass_at_k']['pass@4']:.6f}"
+    )
+    reference_pass = (
+        f"{metrics['pass@1']['reference_sft_v1']:.6f}/"
+        f"{metrics['pass@4']['reference_sft_v1']:.6f}"
+    )
+    reference_fraction = (
+        f"{metrics['pass@1']['fraction_of_reference']:.2%}/"
+        f"{metrics['pass@4']['fraction_of_reference']:.2%}"
+    )
+    dev_pass = f"{dev16['pass_at_k']['pass@1']:.6f}/{dev16['pass_at_k']['pass@4']:.6f}"
     return f"""# Qwen3.5-4B strict Lean casting assessment
 
 **OBSERVED:** the post-trained `{MODEL_ID}` strict raw-continuation lane completed
-all {full['task_count']} miniF2F validation tasks and {full['candidate_count']}
-candidates. pass@1/pass@4 were {full['pass_at_k']['pass@1']:.6f}/
-{full['pass_at_k']['pass@4']:.6f}; the accepted `reference-sft-v1` values were
-{metrics['pass@1']['reference_sft_v1']:.6f}/
-{metrics['pass@4']['reference_sft_v1']:.6f}.
+all {full['task_count']} miniF2F validation tasks and {full['candidate_count']} candidates. It verified
+{full['category_counts']['verified']} candidates across {full['tasks_with_verified_candidate']['count']}
+tasks. pass@1/pass@4 were {strict_pass}; the accepted `reference-sft-v1`
+values were {reference_pass}. The strict scores are {reference_fraction} of those
+reference values.
 
-The dev16 gate completed {dev16['candidate_count']} candidates with
-pass@1/pass@4 of {dev16['pass_at_k']['pass@1']:.6f}/
-{dev16['pass_at_k']['pass@4']:.6f}. The real one-task BF16 compatibility
-preflight peaked at {preflight_peak_gib:.2f} GiB device memory; the full run
-peaked at {peak_gib:.2f} GiB on {full['runtime']['cuda_device']}.
+The dev16 gate completed {dev16['candidate_count']} candidates with pass@1/pass@4 of
+{dev_pass}. Its exact generated candidates were retained and reverified after
+the original parallel run exposed and tests fixed a shared preamble-probe
+synchronization defect. The accepted dev evidence has zero timeouts or
+infrastructure errors. The real one-task BF16 compatibility preflight peaked at
+{preflight_peak_gib:.2f} GiB device memory; the full run peaked at {peak_gib:.2f}
+GiB on {full['runtime']['cuda_device']}.
 
 **ACCEPTED:** the primary score uses exact `whole-proof-v1` raw continuation,
 four candidates per task, temperature 0.8, top-p 0.95, no top-k, 1,024 new
@@ -425,7 +439,8 @@ the implementation of the same temperature/top-p sampling contract.
 
 The cold-start environment probe may use 120 seconds to load the pinned Lean
 module graph; every generated candidate retains the unchanged 30-second
-verifier timeout, including `verifier_timeout` as an unsuccessful proof outcome.
+verifier timeout. The full run retained {full['verifier_timeout_count']} `verifier_timeout`
+as an unsuccessful proof outcome and recorded zero infrastructure errors.
 
 The model and tokenizer are pinned to `{MODEL_REVISION}`. The official model is
 Apache-2.0; no weights or raw candidate corpus are committed. Compact JSON here
