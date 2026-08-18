@@ -105,6 +105,31 @@ def test_substitution_reconstructs_term_proof_at_declared_source_position() -> N
     )
 
 
+def test_equation_clause_theorem_is_recovered_as_a_verified_candidate_shape() -> None:
+    source = (
+        "theorem equation : ∀ n : Nat, n = n\n"
+        "  | 0 => by rfl\n"
+        "  | n + 1 => by rfl\n"
+    )
+    theorem = _Theorem(
+        proof_start=_Pos(2, 3),
+        proof_end=_Pos(3, len("  | n + 1 => by rfl") + 1),
+    )
+    candidate = candidate_from_traced_theorem(
+        theorem,
+        source=source,
+        file_path="Mathlib/Test.lean",
+        source_repository="https://github.com/leanprover-community/mathlib4",
+        source_revision="a" * 40,
+        provenance="real-mathlib",
+    )
+
+    assert candidate.transformation_kind == "equations-to-fun-exact"
+    assert candidate.source_expression.startswith("| 0 =>")
+    reconstructed = substitute_proofs(source, [candidate])
+    assert ":= by\n  exact (\n    @fun\n      | 0 => by rfl" in reconstructed
+
+
 def test_deterministic_selection_requires_requested_transformation_population() -> None:
     term = _candidate("theorem identity (P : Prop) : P → P := fun h => h")
     selected = select_candidates(

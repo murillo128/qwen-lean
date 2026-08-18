@@ -25,6 +25,7 @@ def _pool(domain: str, size: int = 16) -> list[CompositionSource]:
             source_module="Mathlib.Test",
             topic_tags=(f"prime-family:{domain}",),
             domain_family=domain,
+            type_head="iff" if index % 2 == 0 else "other",
         )
         for index in range(size)
     ]
@@ -43,16 +44,18 @@ def test_composition_plans_are_unique_and_cover_structural_classes() -> None:
     assert any(plan.generator_family.startswith("final-only:") for plan in plans)
 
 
-def test_rendered_composition_uses_type_elaboration_and_explicit_oracle() -> None:
+def test_rendered_composition_uses_graph_grounded_iff_and_explicit_oracle() -> None:
     plans = build_composition_plans(
         {"pnt-plus": _pool("pnt")}, {"pnt-plus": 3}, seed="pilot"
     )
     source = render_composition_source(plans)
 
     assert "source_type% Source.pnt_" in source
-    assert "Nonempty (source_type% Source.pnt_" in source
-    assert "exact ⟨" in source
+    assert " ↔ " in source
+    assert "Nonempty" not in source
+    assert "exact ⟨fun _ =>" in source
     assert "datasetV2Audit" in source
+    assert all(plan.relation_edges for plan in plans)
 
 
 def test_constant_audit_imports_target_and_indexes_names() -> None:
@@ -103,16 +106,26 @@ def test_shortcut_gate_checks_frozen_suite_and_indexed_sources() -> None:
         tuple(item.declaration_name for item in plan.source_lemmas),
         (),
     )
-    source, line_map = render_shortcut_gate_source(
+    rendered, line_map = render_shortcut_gate_source(
         [plan], {plan.synthetic_name: audit}
     )
 
-    assert "fail_if_success assumption" in source
-    assert "fail_if_success rfl" in source
-    assert "fail_if_success (solve | simp)" in source
-    assert "fail_if_success (exact Source.generic_" in source
-    assert "fail_if_success (simpa using Source.generic_" in source
+    assert "fail_if_success assumption" in rendered
+    assert "fail_if_success rfl" in rendered
+    assert "fail_if_success (solve | simp)" in rendered
+    assert "fail_if_success (exact Source.generic_" in rendered
+    assert "fail_if_success (simpa using Source.generic_" in rendered
     assert set(line_map.values()) == {plan.synthetic_name}
+    assert plan.retrieval_lemmas
+    assert any("dependency-relevance-neighborhood" in origin for _, origin in plan.retrieval_index)
+    assert any("type-head:iff" in origin for _, origin in plan.retrieval_index)
+    assert any(
+        source.declaration_name not in {
+            item.declaration_name for item in plan.source_lemmas
+        }
+        and f"exact {source.declaration_name}" in rendered
+        for source in plan.retrieval_lemmas
+    )
 
 
 def test_shortcut_gate_maps_lean_error_lines(tmp_path, monkeypatch) -> None:

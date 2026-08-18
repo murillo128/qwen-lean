@@ -15,8 +15,8 @@ from .phase2_corpus import (
 
 DATASET_V2_PROOF_CANONICALIZATION = "dataset-v2-proof-canonicalization-v1"
 DERIVATION_FAMILY_FINGERPRINT = "dataset-v2-derivation-family-v1"
-STATEMENT_FINGERPRINT = "dataset-v2-alpha-statement-v1"
-STATEMENT_ID = "dataset-v2-statement-id-v1"
+STATEMENT_FINGERPRINT = "dataset-v2-alpha-statement-v2"
+STATEMENT_ID = "dataset-v2-statement-id-v2"
 PROOF_VARIANT_ID = "dataset-v2-proof-variant-id-v1"
 
 
@@ -74,6 +74,24 @@ def canonicalize_proof_expression(proof_expression: str) -> CanonicalProof:
     )
 
 
+def canonicalize_equation_clauses(proof_expression: str) -> CanonicalProof:
+    """Turn a declaration equation block into an explicit function proof term."""
+
+    source = _normalize_transport(proof_expression)
+    if not source.startswith("|"):
+        raise ValueError("equation proof does not begin with an equation clause")
+    # ``@fun`` disables declaration-level implicit-lambda insertion so equation
+    # patterns bind the full declared function, including implicit arguments.
+    function_term = "@fun\n" + textwrap.indent(source, "  ")
+    canonical = "by\n  exact (\n" + textwrap.indent(function_term, "    ") + "\n  )"
+    return CanonicalProof(
+        source_expression=source,
+        canonical_proof=canonical,
+        completion=canonical[2:].lstrip(),
+        transformation="equations-to-fun-exact",
+    )
+
+
 def proof_fingerprint(proof: str) -> str:
     if not proof.strip():
         raise ValueError("proof is empty")
@@ -82,7 +100,7 @@ def proof_fingerprint(proof: str) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def normalized_statement_v2(value: str) -> str:
+def _normalized_statement_v2_legacy(value: str) -> str:
     """Normalize a declaration name and common explicit/quantified binders.
 
     Lean's elaborator remains the authority for semantic equality. This lexical
@@ -195,6 +213,232 @@ def normalized_statement_v2(value: str) -> str:
         (kind, binder_names.get(token, token)) for kind, token in tokens
     ]
     return "\x1f".join(f"{kind}:{token}" for kind, token in normalized)
+
+
+_OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}", "⦃": "⦄"}
+
+
+def _matching_token(
+    tokens: list[tuple[str, str]], opening_index: int, end: int
+) -> int:
+    opening = tokens[opening_index][1]
+    closing = _OPEN_TO_CLOSE[opening]
+    depth = 1
+    for index in range(opening_index + 1, end):
+        kind, token = tokens[index]
+        if kind != "symbol":
+            continue
+        if token == opening:
+            depth += 1
+        elif token == closing:
+            depth -= 1
+            if depth == 0:
+                return index
+    raise ValueError("unterminated Lean binder/group")
+
+
+def _binder_name_indices(
+    tokens: list[tuple[str, str]], start: int, end: int
+) -> list[int]:
+    """Find declared names in a forall/lambda binder segment."""
+
+    names: list[int] = []
+    saw_bracket = False
+    index = start
+    while index < end:
+        kind, token = tokens[index]
+        if kind == "symbol" and token in _OPEN_TO_CLOSE:
+            saw_bracket = True
+            closing = _matching_token(tokens, index, end)
+            colon = next(
+                (
+                    candidate
+                    for candidate in range(index + 1, closing)
+                    if tokens[candidate] == ("symbol", ":")
+                ),
+                None,
+            )
+            boundary = closing if colon is None else colon
+            names.extend(
+                candidate
+                for candidate in range(index + 1, boundary)
+                if tokens[candidate][0] == "identifier"
+                and tokens[candidate][1] != "_"
+            )
+            index = closing + 1
+            continue
+        index += 1
+    if saw_bracket:
+        return names
+    colon = next(
+        (
+            candidate
+            for candidate in range(start, end)
+            if tokens[candidate] == ("symbol", ":")
+        ),
+        None,
+    )
+    boundary = end if colon is None else colon
+    return [
+        index
+        for index in range(start, boundary)
+        if tokens[index][0] == "identifier" and tokens[index][1] != "_"
+    ]
+
+
+def _normalize_expression_tokens(
+    tokens: list[tuple[str, str]],
+    start: int,
+    end: int,
+    environment: dict[str, str],
+    counter: list[int],
+) -> None:
+    index = start
+    while index < end:
+        kind, token = tokens[index]
+        if kind == "symbol" and token in _OPEN_TO_CLOSE:
+            closing = _matching_token(tokens, index, end)
+            _normalize_expression_tokens(
+                tokens, index + 1, closing, dict(environment), counter
+            )
+            index = closing + 1
+            continue
+        is_binder = (kind == "symbol" and token in {"∀", "λ"}) or (
+            kind == "identifier" and token == "fun"
+        )
+        if is_binder:
+            depth = 0
+            delimiter = index + 1
+            delimiter_width = 1
+            while delimiter < end:
+                delimiter_kind, delimiter_token = tokens[delimiter]
+                if delimiter_kind == "symbol" and delimiter_token in _OPEN_TO_CLOSE:
+                    depth += 1
+                elif (
+                    delimiter_kind == "symbol"
+                    and delimiter_token in _OPEN_TO_CLOSE.values()
+                ):
+                    depth -= 1
+                elif depth == 0 and delimiter_kind == "symbol":
+                    if token == "∀" and delimiter_token == ",":
+                        break
+                    if (
+                        token != "∀"
+                        and delimiter_token == "="
+                        and delimiter + 1 < end
+                        and tokens[delimiter + 1] == ("symbol", ">")
+                    ):
+                        delimiter_width = 2
+                        break
+                delimiter += 1
+            if delimiter < end:
+                name_indices = _binder_name_indices(tokens, index + 1, delimiter)
+                replacements: list[tuple[int, str, str]] = []
+                inner_environment = dict(environment)
+                for name_index in name_indices:
+                    old_name = tokens[name_index][1]
+                    sentinel = f"__DATASET_V2_BINDER_SENTINEL_{counter[0]}__"
+                    canonical = f"__BOUND_{counter[0]}__"
+                    counter[0] += 1
+                    tokens[name_index] = ("identifier", sentinel)
+                    replacements.append((name_index, sentinel, canonical))
+                    inner_environment[old_name] = canonical
+                _normalize_expression_tokens(
+                    tokens, index + 1, delimiter, environment, counter
+                )
+                for name_index, _, canonical in replacements:
+                    tokens[name_index] = ("identifier", canonical)
+                _normalize_expression_tokens(
+                    tokens,
+                    delimiter + delimiter_width,
+                    end,
+                    inner_environment,
+                    counter,
+                )
+                return
+        if kind == "identifier" and token in environment:
+            tokens[index] = (kind, environment[token])
+        index += 1
+
+
+def normalized_statement_v2(value: str) -> str:
+    """Normalize declaration, universe, and lexical binder names scope-safely."""
+
+    tokens = _lex_lean(canonical_declaration(value))
+    name_index = _declaration_name_index(tokens)
+    tokens[name_index - 1] = ("identifier", "theorem_or_lemma")
+    tokens[name_index] = ("identifier", "__DECLARATION_NAME__")
+    environment: dict[str, str] = {}
+    counter = [0]
+
+    index = name_index + 1
+    if (
+        index + 2 < len(tokens)
+        and tokens[index] == ("symbol", ".")
+        and tokens[index + 1] == ("symbol", "{")
+    ):
+        universe_end = _matching_token(tokens, index + 1, len(tokens))
+        universe_number = 0
+        for universe_index in range(index + 2, universe_end):
+            kind, name = tokens[universe_index]
+            if kind == "identifier" and name != "_":
+                canonical = f"__UNIVERSE_{universe_number}__"
+                universe_number += 1
+                environment[name] = canonical
+                tokens[universe_index] = (kind, canonical)
+        index = universe_end + 1
+
+    while index < len(tokens):
+        kind, token = tokens[index]
+        if kind == "symbol" and token == ":":
+            _normalize_expression_tokens(
+                tokens, index + 1, len(tokens), environment, counter
+            )
+            break
+        if kind == "symbol" and token in _OPEN_TO_CLOSE:
+            closing = _matching_token(tokens, index, len(tokens))
+            colon = next(
+                (
+                    candidate
+                    for candidate in range(index + 1, closing)
+                    if tokens[candidate] == ("symbol", ":")
+                ),
+                None,
+            )
+            if colon is not None:
+                name_indices = [
+                    candidate
+                    for candidate in range(index + 1, colon)
+                    if tokens[candidate][0] == "identifier"
+                    and tokens[candidate][1] != "_"
+                ]
+                old_names = [tokens[candidate][1] for candidate in name_indices]
+                for name_index_in_group in name_indices:
+                    tokens[name_index_in_group] = (
+                        "identifier",
+                        f"__DATASET_V2_DECL_SENTINEL_{name_index_in_group}__",
+                    )
+                _normalize_expression_tokens(
+                    tokens, index + 1, closing, environment, counter
+                )
+                for old_name, name_index_in_group in zip(
+                    old_names, name_indices, strict=True
+                ):
+                    canonical = f"__BOUND_{counter[0]}__"
+                    counter[0] += 1
+                    tokens[name_index_in_group] = ("identifier", canonical)
+                    environment[old_name] = canonical
+            else:
+                _normalize_expression_tokens(
+                    tokens, index + 1, closing, environment, counter
+                )
+            index = closing + 1
+            continue
+        if kind == "identifier" and token in environment:
+            tokens[index] = (kind, environment[token])
+        index += 1
+
+    return "\x1f".join(f"{kind}:{token}" for kind, token in tokens)
 
 
 def statement_fingerprint_v2(value: str) -> str:

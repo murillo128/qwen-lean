@@ -12,6 +12,7 @@ from typing import Any
 from .dataset_v2 import validate_prime_coverage
 from .dataset_v2_composition import CompositionSource
 from .dataset_v2_contract import statement_id
+from .phase2_corpus import _lex_lean
 from .dataset_v2_extraction import SourceCandidate
 from .dataset_v2_schema import (
     DATASET_V2_MANIFEST_SCHEMA_VERSION,
@@ -123,6 +124,9 @@ def composition_pools(
             source_module=candidate.module,
             topic_tags=candidate.topic_tags,
             domain_family="generic",
+            canonical_declaration=candidate.declaration,
+            resolved_dependencies=candidate.resolved_dependencies,
+            type_head=_statement_type_head(candidate.declaration),
         )
         if not any(tag == "prime-family:pnt-plus" for tag in candidate.topic_tags):
             pools["generic"].setdefault(candidate.declaration_name, source)
@@ -137,6 +141,40 @@ def composition_pools(
         family: sorted(values.values(), key=lambda item: item.declaration_name)
         for family, values in pools.items()
     }
+
+
+def _statement_type_head(declaration: str) -> str:
+    tokens = _lex_lean(declaration)
+    depth = 0
+    main_colon = None
+    for index, (kind, token) in enumerate(tokens):
+        if kind == "symbol" and token in "([{⦃":
+            depth += 1
+        elif kind == "symbol" and token in ")]}⦄":
+            depth -= 1
+        elif depth == 0 and kind == "symbol" and token == ":":
+            main_colon = index
+            break
+    if main_colon is None:
+        return "other"
+    depth = 0
+    for kind, token in tokens[main_colon + 1 :]:
+        if kind == "symbol" and token in "([{⦃":
+            depth += 1
+        elif kind == "symbol" and token in ")]}⦄":
+            depth -= 1
+        elif depth == 0 and kind == "symbol":
+            if token == "↔":
+                return "iff"
+            if token == "∧":
+                return "and"
+            if token == "∨":
+                return "or"
+            if token == "→":
+                return "implication"
+            if token == "=":
+                return "equality"
+    return "other"
 
 
 def distribute_prime_counts(total: int) -> dict[str, int]:

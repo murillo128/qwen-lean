@@ -85,6 +85,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument(
+        "--composition-workers",
+        type=int,
+        default=2,
+        help="maximum concurrent memory-heavy Lean composition/shortcut batches",
+    )
     parser.add_argument("--verification-timeout", type=float, default=600.0)
     parser.add_argument("--composition-batch-size", type=int, default=256)
     parser.add_argument(
@@ -271,7 +277,7 @@ def _synthetic_records(
     planned_sources = {
         (source.declaration_name, source.source_module): source
         for plan in plans
-        for source in plan.source_lemmas
+        for source in plan.source_lemmas + plan.retrieval_lemmas
     }
     missing_constants: set[str] = set()
     for pnt_plus in (False, True):
@@ -290,7 +296,19 @@ def _synthetic_records(
             )
         )
     plans = [
-        plan
+        replace(
+            plan,
+            retrieval_lemmas=tuple(
+                source
+                for source in plan.retrieval_lemmas
+                if source.declaration_name not in missing_constants
+            ),
+            retrieval_index=tuple(
+                entry
+                for entry in plan.retrieval_index
+                if entry[0] not in missing_constants
+            ),
+        )
         for plan in plans
         if not any(
             source.declaration_name in missing_constants for source in plan.source_lemmas
@@ -382,6 +400,7 @@ def _synthetic_records(
             "simp:no-closure",
             "exact-indexed-single-theorem:no-closure",
             "simpa-using-indexed-single-theorem:no-closure",
+            "retrieval:indexed-type-head-dependency-neighborhood",
         )
         for plan in selected
     }
@@ -441,6 +460,28 @@ def _synthetic_records(
                 )
             ),
         },
+        "source_relation_coverage": dict(
+            sorted(
+                Counter(
+                    relation
+                    for plan in selected
+                    for _, _, relation in plan.relation_edges
+                ).items()
+            )
+        ),
+        "shortcut_retrieval_candidates": sum(
+            len(plan.retrieval_lemmas) for plan in selected
+        ),
+        "shortcut_retrieval_index_coverage": dict(
+            sorted(
+                Counter(
+                    origin
+                    for plan in selected
+                    for _, origins in plan.retrieval_index
+                    for origin in origins.split(",")
+                ).items()
+            )
+        ),
     }
 
 
@@ -508,11 +549,17 @@ def _preflight_real_candidates(
         seed=seed + ":by",
         transformation_kind="none",
     )
+    selected_equations = select_candidates(
+        mathlib_candidates,
+        count=int(config.preflight["equation_clause_sample"]),
+        seed=seed + ":equations",
+        transformation_kind="equations-to-fun-exact",
+    )
     pnt_reserve = select_candidates(
         pnt_candidates, count=len(pnt_candidates), seed=seed + ":pnt"
     )
     verified, file_verification = verify_transformed_candidates(
-        term_reserve + pnt_reserve,
+        term_reserve + selected_equations + pnt_reserve,
         source_roots={
             (
                 str(config.environment["mathlib_repository"]),
@@ -541,21 +588,36 @@ def _preflight_real_candidates(
         by_id.get((item.source_repository, item.file_path, item.declaration_name), item)
         for item in pnt_reserve
     ]
+    verified_equations = [
+        by_id[(item.source_repository, item.file_path, item.declaration_name)]
+        for item in selected_equations
+    ]
     accepted_terms = [
         item for item in verified_term_reserve if item.verification_status == "accepted"
     ]
     accepted_pnt = [
         item for item in verified_pnt_reserve if item.verification_status == "accepted"
     ]
+    accepted_equations = [
+        item for item in verified_equations if item.verification_status == "accepted"
+    ]
     term_count = int(config.preflight["term_proof_sample"])
     pnt_count = int(config.preflight["pnt_plus_sample"])
-    if len(accepted_terms) < term_count or len(accepted_pnt) < pnt_count:
+    equation_count = int(config.preflight["equation_clause_sample"])
+    if (
+        len(accepted_terms) < term_count
+        or len(accepted_equations) < equation_count
+        or len(accepted_pnt) < pnt_count
+    ):
         raise RuntimeError(
             "preflight regeneration reserve exhausted: "
-            f"terms={len(accepted_terms)}/{term_count}, PNT={len(accepted_pnt)}/{pnt_count}"
+            f"terms={len(accepted_terms)}/{term_count}, "
+            f"equations={len(accepted_equations)}/{equation_count}, "
+            f"PNT={len(accepted_pnt)}/{pnt_count}"
         )
     selected_term = accepted_terms[:term_count]
     selected_pnt = accepted_pnt[:pnt_count]
+    selected_equations = accepted_equations[:equation_count]
     unchanged = _verify_unchanged_sources(
         selected_by,
         source_root=target_mathlib,
@@ -583,7 +645,7 @@ def _preflight_real_candidates(
     ):
         raise RuntimeError("preflight prime-family allocation does not sum to its contract")
     return (
-        selected_term + selected_by + selected_pnt,
+        selected_term + selected_equations + selected_by + selected_pnt,
         file_verification,
         unchanged,
         pnt_unchanged,
@@ -593,7 +655,11 @@ def _preflight_real_candidates(
 
 def main() -> int:
     args = _parser().parse_args()
-    if args.workers < 1 or args.composition_batch_size < 1:
+    if (
+        args.workers < 1
+        or args.composition_workers < 1
+        or args.composition_batch_size < 1
+    ):
         raise SystemExit("worker and batch counts must be positive")
     config = DatasetV2Config.load(args.config.resolve())
     target_root = args.target_root.resolve()
@@ -729,7 +795,7 @@ def main() -> int:
         target_root=target_root,
         environment=environment,
         batch_size=args.composition_batch_size,
-        workers=args.workers,
+        workers=args.composition_workers,
         forbidden_statement_ids={statement_id(item.declaration) for item in real_candidates},
     )
     real_records = [candidate_to_record(item, config=config) for item in real_candidates]
@@ -786,6 +852,15 @@ def main() -> int:
             "rejected_attempts": len(rejected_candidate_ids),
             "retained_transformed_candidates": sum(
                 item.transformation_kind != "none" for item in real_candidates
+            ),
+            "retained_transformations": dict(
+                sorted(
+                    Counter(
+                        item.transformation_kind
+                        for item in real_candidates
+                        if item.transformation_kind != "none"
+                    ).items()
+                )
             ),
         },
         "ordinary_by_sample": unchanged,

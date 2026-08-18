@@ -102,6 +102,11 @@ def _record(
         structural_class=structural,
         normalized_proof_dag=None if family is None else f"root({structural})",
         source_lemma_ids=() if family is None else (f"lemma-{name}", "lemma-shared"),
+        source_relation_edges=(
+            ()
+            if family is None
+            else ((f"lemma-{name}", "lemma-shared", "fixture-relevance"),)
+        ),
         shortcut_checks=() if role == "training" else ("assumption:failed",),
     )
 

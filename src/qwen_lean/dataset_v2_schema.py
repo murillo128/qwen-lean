@@ -12,7 +12,7 @@ TrainingRole = Literal["training", "validation", "test"]
 ProvenanceKind = Literal[
     "real-mathlib", "external-lean", "mixed-real", "synthetic"
 ]
-TransformationKind = Literal["none", "term-to-exact"]
+TransformationKind = Literal["none", "term-to-exact", "equations-to-fun-exact"]
 CompatibilityStatus = Literal[
     "verified-target-environment",
     "verified-native",
@@ -164,6 +164,9 @@ class DatasetV2Record:
     structural_class: str | None = None
     normalized_proof_dag: str | None = None
     source_lemma_ids: tuple[str, ...] = ()
+    source_relation_edges: tuple[tuple[str, str, str], ...] = ()
+    shortcut_retrieval_ids: tuple[str, ...] = ()
+    shortcut_retrieval_index: tuple[tuple[str, str], ...] = ()
     shortcut_checks: tuple[str, ...] = ()
 
     @classmethod
@@ -211,6 +214,17 @@ class DatasetV2Record:
             source_lemma_ids=tuple(
                 str(item) for item in value.get("source_lemma_ids", [])
             ),
+            source_relation_edges=tuple(
+                tuple(str(part) for part in item)  # type: ignore[misc]
+                for item in value.get("source_relation_edges", [])
+            ),
+            shortcut_retrieval_ids=tuple(
+                str(item) for item in value.get("shortcut_retrieval_ids", [])
+            ),
+            shortcut_retrieval_index=tuple(
+                tuple(str(part) for part in item)  # type: ignore[misc]
+                for item in value.get("shortcut_retrieval_index", [])
+            ),
             shortcut_checks=tuple(
                 str(item) for item in value.get("shortcut_checks", [])
             ),
@@ -253,6 +267,12 @@ class DatasetV2Record:
             )
             if any(not item for item in required) or not self.source_lemma_ids:
                 raise ValueError("synthetic record lacks derivation metadata")
+            if len(self.source_relation_edges) < len(self.source_lemma_ids) - 1:
+                raise ValueError("synthetic record lacks a connected source relation graph")
+            if any(len(edge) != 3 for edge in self.source_relation_edges):
+                raise ValueError("synthetic source relation edge is malformed")
+            if any(len(entry) != 2 for entry in self.shortcut_retrieval_index):
+                raise ValueError("synthetic shortcut retrieval index is malformed")
         elif any(
             item is not None
             for item in (

@@ -41,6 +41,9 @@ class CompositionSource:
     source_module: str
     topic_tags: tuple[str, ...]
     domain_family: str
+    canonical_declaration: str = ""
+    resolved_dependencies: tuple[str, ...] = ()
+    type_head: str = "other"
 
 
 @dataclass(frozen=True)
@@ -52,6 +55,9 @@ class CompositionPlan:
     generator_family: str
     normalized_proof_dag: str
     derivation_family_fingerprint: str
+    relation_edges: tuple[tuple[str, str, str], ...] = ()
+    retrieval_lemmas: tuple[CompositionSource, ...] = ()
+    retrieval_index: tuple[tuple[str, str], ...] = ()
 
     def validate(self) -> None:
         if self.structural_class not in STRUCTURAL_ARITY:
@@ -63,7 +69,27 @@ class CompositionPlan:
                 f"{self.structural_class} composition requires {expected} distinct source lemmas"
             )
         if self.structural_class == "deep" and self.normalized_proof_dag.count("and(") < 3:
-            raise ValueError("deep composition must have dependency path length at least three")
+            if "path>=3" not in self.normalized_proof_dag:
+                raise ValueError("deep composition must have dependency path length at least three")
+        connected = {self.source_lemmas[0].declaration_name}
+        pending = list(self.relation_edges)
+        while pending:
+            progress = False
+            for edge in list(pending):
+                left, right, _ = edge
+                if left in connected or right in connected:
+                    connected.update((left, right))
+                    pending.remove(edge)
+                    progress = True
+            if not progress:
+                break
+        if connected != names:
+            raise ValueError("composition sources are not connected in the dependency/relevance graph")
+        retrieval_names = {item.declaration_name for item in self.retrieval_lemmas}
+        if names & retrieval_names:
+            raise ValueError("shortcut retrieval repeats a planned source lemma")
+        if {name for name, _ in self.retrieval_index} != retrieval_names:
+            raise ValueError("shortcut retrieval index does not match retrieved lemmas")
 
 
 @dataclass(frozen=True)
@@ -94,18 +120,119 @@ class ShortcutGateRun:
 
 def _dag(structural_class: str, labels: Sequence[str], *, final_only: bool) -> str:
     if structural_class == "direct":
-        return f"and(leaf:{labels[0]},leaf:{labels[1]})"
+        if not final_only:
+            return f"and(leaf:{labels[0]},leaf:{labels[1]});path=2"
+        return f"iff(forward:leaf:{labels[1]},backward:leaf:{labels[0]});path=2"
     if structural_class == "branching":
-        return f"and(and(leaf:{labels[0]},leaf:{labels[1]}),leaf:{labels[2]})"
+        if not final_only:
+            return (
+                f"and(leaf:{labels[0]},iff(forward:leaf:{labels[2]},"
+                f"backward:leaf:{labels[1]}));path=3"
+            )
+        return (
+            f"iff(forward:and(leaf:{labels[1]},leaf:{labels[2]}),"
+            f"backward:leaf:{labels[0]});path=3"
+        )
     if final_only:
         return (
-            f"and(and(leaf:{labels[0]},leaf:{labels[1]}),"
-            f"and(leaf:{labels[2]},leaf:{labels[3]}))"
+            f"iff(forward:and(and(leaf:{labels[1]},leaf:{labels[2]}),"
+            f"leaf:{labels[3]}),backward:leaf:{labels[0]});path>=3"
         )
     return (
-        f"and(leaf:{labels[0]},and(leaf:{labels[1]},"
-        f"and(leaf:{labels[2]},leaf:{labels[3]})))"
+        f"and(iff(forward:leaf:{labels[1]},backward:leaf:{labels[0]}),"
+        f"iff(forward:leaf:{labels[3]},backward:leaf:{labels[2]}));path>=3"
     )
+
+
+def _relation(
+    left: CompositionSource, right: CompositionSource
+) -> str | None:
+    if (
+        right.declaration_name in left.resolved_dependencies
+        or left.declaration_name in right.resolved_dependencies
+    ):
+        return "direct-dependency"
+    shared_dependencies = set(left.resolved_dependencies).intersection(
+        right.resolved_dependencies
+    )
+    if shared_dependencies:
+        return "shared-dependency-neighborhood"
+    if left.source_module == right.source_module:
+        return "same-source-module"
+    shared_relevance = {
+        tag
+        for tag in set(left.topic_tags).intersection(right.topic_tags)
+        if tag.startswith(("prime-family:", "riemann-relevance:", "riemann-seed:"))
+    }
+    if shared_relevance:
+        return "shared-relevance-neighborhood"
+    return None
+
+
+def _graph_indexes(
+    pool: Sequence[CompositionSource],
+) -> tuple[
+    dict[str, CompositionSource],
+    dict[str, list[CompositionSource]],
+    dict[str, list[CompositionSource]],
+    dict[str, list[CompositionSource]],
+    dict[str, list[CompositionSource]],
+]:
+    by_name = {item.declaration_name: item for item in pool}
+    reverse_dependencies: dict[str, list[CompositionSource]] = defaultdict(list)
+    type_heads: dict[str, list[CompositionSource]] = defaultdict(list)
+    modules: dict[str, list[CompositionSource]] = defaultdict(list)
+    relevance: dict[str, list[CompositionSource]] = defaultdict(list)
+    for source in pool:
+        type_heads[source.type_head].append(source)
+        modules[source.source_module].append(source)
+        for tag in source.topic_tags:
+            if tag.startswith(
+                ("prime-family:", "riemann-relevance:", "riemann-seed:")
+            ):
+                relevance[tag].append(source)
+        for dependency in source.resolved_dependencies:
+            reverse_dependencies[dependency].append(source)
+    for values in (
+        *reverse_dependencies.values(),
+        *type_heads.values(),
+        *modules.values(),
+        *relevance.values(),
+    ):
+        values.sort(key=lambda item: item.declaration_name)
+    return by_name, reverse_dependencies, type_heads, modules, relevance
+
+
+def _neighbors(
+    source: CompositionSource,
+    by_name: Mapping[str, CompositionSource],
+    reverse_dependencies: Mapping[str, Sequence[CompositionSource]],
+    modules: Mapping[str, Sequence[CompositionSource]],
+    relevance: Mapping[str, Sequence[CompositionSource]],
+) -> list[tuple[CompositionSource, str]]:
+    related: dict[str, tuple[CompositionSource, str]] = {}
+    for dependency in source.resolved_dependencies:
+        dependency_source = by_name.get(dependency)
+        if dependency_source is not None:
+            related[dependency] = (dependency_source, "direct-dependency")
+        users = reverse_dependencies.get(dependency, ())
+        if len(users) <= 64:
+            for user in users:
+                if user.declaration_name != source.declaration_name:
+                    related.setdefault(
+                        user.declaration_name,
+                        (user, "shared-dependency-neighborhood"),
+                    )
+    candidates = list(modules.get(source.source_module, ()))
+    for tag in source.topic_tags:
+        candidates.extend(relevance.get(tag, ()))
+    for candidate in candidates:
+        if candidate.declaration_name == source.declaration_name:
+            continue
+        relation = _relation(source, candidate)
+        if relation is not None:
+            related.setdefault(candidate.declaration_name, (candidate, relation))
+    return [related[name] for name in sorted(related)]
 
 
 def build_composition_plans(
@@ -124,11 +251,27 @@ def build_composition_plans(
             raise ValueError(
                 f"domain family {domain_family} has {len(pool)} sources; at least four are required"
             )
+        by_name, reverse_dependencies, type_heads, modules, relevance = _graph_indexes(
+            pool
+        )
+        neighbor_cache: dict[str, list[tuple[CompositionSource, str]]] = {}
+
+        def related(source: CompositionSource) -> list[tuple[CompositionSource, str]]:
+            if source.declaration_name not in neighbor_cache:
+                neighbor_cache[source.declaration_name] = _neighbors(
+                    source,
+                    by_name,
+                    reverse_dependencies,
+                    modules,
+                    relevance,
+                )
+            return neighbor_cache[source.declaration_name]
+
         produced = 0
         attempts = 0
         while produced < requested:
             attempts += 1
-            if attempts > max(1000, requested * 100):
+            if attempts > max(2000, requested * 200):
                 raise ValueError(f"could not produce {requested} unique plans for {domain_family}")
             structural = ("direct", "branching", "deep")[global_index % 3]
             arity = STRUCTURAL_ARITY[structural]
@@ -140,16 +283,35 @@ def build_composition_plans(
                     "big",
                 )
             )
-            selected = tuple(rng.sample(pool, arity))
+            selected_list = [pool[rng.randrange(len(pool))]]
+            relation_edges: list[tuple[str, str, str]] = []
+            while len(selected_list) < arity:
+                selected_names = {item.declaration_name for item in selected_list}
+                frontier = [
+                    (source, candidate, relation)
+                    for source in selected_list
+                    for candidate, relation in related(source)
+                    if candidate.declaration_name not in selected_names
+                ]
+                if not frontier:
+                    break
+                source, candidate, relation = frontier[rng.randrange(len(frontier))]
+                selected_list.append(candidate)
+                relation_edges.append(
+                    (source.declaration_name, candidate.declaration_name, relation)
+                )
+            if len(selected_list) != arity:
+                continue
+            selected = tuple(selected_list)
             set_identity = tuple(sorted(item.statement_id for item in selected))
             if set_identity in seen_sets:
                 continue
             seen_sets.add(set_identity)
             final_only = global_index % 10 == 0
             generator = (
-                f"final-only:{structural}-balanced-v1"
+                f"final-only:{structural}-graph-iff-v2"
                 if final_only
-                else f"{structural}-composition-v1"
+                else f"{structural}-graph-logic-v2"
             )
             source_ids = tuple(item.statement_id for item in selected)
             dag = _dag(structural, source_ids, final_only=final_only)
@@ -157,6 +319,36 @@ def build_composition_plans(
                 source_ids,
                 normalized_proof_dag=dag,
                 generator_family=generator,
+            )
+            retrieval_pool: dict[str, tuple[CompositionSource, set[str]]] = {}
+            selected_names = {item.declaration_name for item in selected}
+            for source in selected:
+                for candidate, relation in related(source):
+                    if candidate.declaration_name in selected_names:
+                        continue
+                    _, origins = retrieval_pool.setdefault(
+                        candidate.declaration_name, (candidate, set())
+                    )
+                    origins.add(f"dependency-relevance-neighborhood:{relation}")
+            target_head = "iff" if final_only else "and"
+            for candidate in type_heads.get(target_head, ()):
+                if candidate.declaration_name not in selected_names:
+                    _, origins = retrieval_pool.setdefault(
+                        candidate.declaration_name, (candidate, set())
+                    )
+                    origins.add(f"type-head:{target_head}")
+            retrieval_entries = tuple(
+                sorted(
+                    retrieval_pool.values(),
+                    key=lambda item: hashlib.sha256(
+                        f"{seed}\0{global_index}\0retrieval\0{item[0].declaration_name}".encode()
+                    ).hexdigest(),
+                )[:4]
+            )
+            retrieval = tuple(item for item, _ in retrieval_entries)
+            retrieval_index = tuple(
+                (item.declaration_name, ",".join(sorted(origins)))
+                for item, origins in retrieval_entries
             )
             plan = CompositionPlan(
                 synthetic_name=f"{name_prefix}_{global_index:06d}",
@@ -166,6 +358,9 @@ def build_composition_plans(
                 generator_family=generator,
                 normalized_proof_dag=dag,
                 derivation_family_fingerprint=family,
+                relation_edges=tuple(relation_edges),
+                retrieval_lemmas=retrieval,
+                retrieval_index=retrieval_index,
             )
             plan.validate()
             plans.append(plan)
@@ -176,41 +371,68 @@ def build_composition_plans(
 
 def _type_expression(plan: CompositionPlan) -> str:
     types = [
-        f"Nonempty (source_type% {item.declaration_name})"
+        f"(source_type% {item.declaration_name})"
         for item in plan.source_lemmas
     ]
-    if plan.structural_class == "direct":
+    final_only = plan.generator_family.startswith("final-only:")
+    if plan.structural_class == "direct" and not final_only:
         return f"{types[0]} ∧ {types[1]}"
+    if plan.structural_class == "direct":
+        return f"{types[0]} ↔ {types[1]}"
+    if plan.structural_class == "branching" and not final_only:
+        return f"{types[0]} ∧ ({types[1]} ↔ {types[2]})"
     if plan.structural_class == "branching":
-        return f"({types[0]} ∧ {types[1]}) ∧ {types[2]}"
-    if plan.generator_family.startswith("final-only:"):
-        return f"({types[0]} ∧ {types[1]}) ∧ ({types[2]} ∧ {types[3]})"
-    return f"{types[0]} ∧ ({types[1]} ∧ ({types[2]} ∧ {types[3]}))"
+        return f"{types[0]} ↔ ({types[1]} ∧ {types[2]})"
+    if final_only:
+        return f"{types[0]} ↔ (({types[1]} ∧ {types[2]}) ∧ {types[3]})"
+    return f"({types[0]} ↔ {types[1]}) ∧ ({types[2]} ↔ {types[3]})"
 
 
 def _oracle_expression(plan: CompositionPlan) -> str:
-    names = [f"⟨@{item.declaration_name}⟩" for item in plan.source_lemmas]
-    if plan.structural_class == "direct":
+    names = [f"@{item.declaration_name}" for item in plan.source_lemmas]
+    final_only = plan.generator_family.startswith("final-only:")
+    if plan.structural_class == "direct" and not final_only:
         return f"⟨{names[0]}, {names[1]}⟩"
+    if plan.structural_class == "direct":
+        return f"⟨fun _ => {names[1]}, fun _ => {names[0]}⟩"
+    if plan.structural_class == "branching" and not final_only:
+        return (
+            f"⟨{names[0]}, ⟨fun _ => {names[2]}, fun _ => {names[1]}⟩⟩"
+        )
     if plan.structural_class == "branching":
-        return f"⟨⟨{names[0]}, {names[1]}⟩, {names[2]}⟩"
-    if plan.generator_family.startswith("final-only:"):
-        return f"⟨⟨{names[0]}, {names[1]}⟩, ⟨{names[2]}, {names[3]}⟩⟩"
-    return f"⟨{names[0]}, ⟨{names[1]}, ⟨{names[2]}, {names[3]}⟩⟩⟩"
+        return f"⟨fun _ => ⟨{names[1]}, {names[2]}⟩, fun _ => {names[0]}⟩"
+    if final_only:
+        return (
+            f"⟨fun _ => ⟨⟨{names[1]}, {names[2]}⟩, {names[3]}⟩, "
+            f"fun _ => {names[0]}⟩"
+        )
+    return (
+        f"⟨⟨fun _ => {names[1]}, fun _ => {names[0]}⟩, "
+        f"⟨fun _ => {names[3]}, fun _ => {names[2]}⟩⟩"
+    )
 
 
-def _composition_imports(plans: Sequence[CompositionPlan]) -> tuple[str, ...]:
+def _composition_imports(
+    plans: Sequence[CompositionPlan], *, include_retrieval: bool = False
+) -> tuple[str, ...]:
+    sources = [
+        source
+        for plan in plans
+        for source in (
+            plan.source_lemmas
+            + (plan.retrieval_lemmas if include_retrieval else ())
+        )
+    ]
     pnt_flags = {
         source.source_module.startswith("PrimeNumberTheoremAnd")
-        for plan in plans
-        for source in plan.source_lemmas
+        for source in sources
     }
     if len(pnt_flags) != 1:
         raise ValueError("one generated module cannot mix Mathlib and PNT+ source constants")
     if pnt_flags == {True}:
         return ("PrimeNumberTheoremAnd",)
     return tuple(
-        sorted({source.source_module for plan in plans for source in plan.source_lemmas})
+        sorted({source.source_module for source in sources})
     )
 
 
@@ -432,17 +654,26 @@ def render_shortcut_gate_source(
 ) -> tuple[str, dict[int, str]]:
     """Render one-line gates; any obvious closure causes its example to fail."""
 
-    lines = [*(f"import {module}" for module in _composition_imports(plans)), ""]
+    lines = [
+        *(
+            f"import {module}"
+            for module in _composition_imports(plans, include_retrieval=True)
+        ),
+        "",
+        _LEAN_AUDIT_PRELUDE,
+        "",
+    ]
     line_to_name: dict[int, str] = {}
     for plan in plans:
-        audit = audits[plan.synthetic_name]
-        target = _compact_type(audit.statement_type)
+        if plan.synthetic_name not in audits:
+            raise ValueError(f"missing composition audit for {plan.synthetic_name}")
+        target = _type_expression(plan)
         attempts = [
             "fail_if_success assumption",
             "fail_if_success rfl",
             "fail_if_success (solve | simp)",
         ]
-        for source in plan.source_lemmas:
+        for source in plan.source_lemmas + plan.retrieval_lemmas:
             attempts.append(f"fail_if_success (exact {source.declaration_name})")
             attempts.append(f"fail_if_success (simpa using {source.declaration_name})")
         example_lines = [
@@ -584,6 +815,11 @@ def records_from_compositions(
             structural_class=plan.structural_class,
             normalized_proof_dag=plan.normalized_proof_dag,
             source_lemma_ids=tuple(item.statement_id for item in plan.source_lemmas),
+            source_relation_edges=plan.relation_edges,
+            shortcut_retrieval_ids=tuple(
+                item.statement_id for item in plan.retrieval_lemmas
+            ),
+            shortcut_retrieval_index=plan.retrieval_index,
             shortcut_checks=tuple(shortcut_status.get(plan.synthetic_name, ())),
         )
         record.validate()

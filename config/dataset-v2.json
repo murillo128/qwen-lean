@@ -89,6 +89,7 @@
   },
   "preflight": {
     "term_proof_sample": 64,
+    "equation_clause_sample": 1,
     "by_proof_sample": 16,
     "pnt_plus_sample": 4,
     "synthetic_statements": 128,

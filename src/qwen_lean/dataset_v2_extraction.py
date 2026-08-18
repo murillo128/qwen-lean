@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .dataset_v2_contract import (
+    canonicalize_equation_clauses,
     canonicalize_proof_expression,
     proof_fingerprint,
     proof_variant_id,
@@ -368,12 +369,15 @@ def candidate_from_traced_theorem(
         for kind, token in _lex_lean(raw_declaration)
     ):
         raise ValueError("private")
-    if not raw_declaration.rstrip().endswith(":="):
-        raise ValueError("unsupported-proof-delimiter")
     source_expression = source_slice(source, proof_span)
     if _contains_placeholder(source_expression):
         raise ValueError("proof-placeholder")
-    proof = canonicalize_proof_expression(source_expression)
+    if raw_declaration.rstrip().endswith(":="):
+        proof = canonicalize_proof_expression(source_expression)
+    elif source_expression.lstrip().startswith("|"):
+        proof = canonicalize_equation_clauses(source_expression)
+    else:
+        raise ValueError("unsupported-proof-delimiter")
     verification_status = "accepted" if proof.transformation == "none" else "pending"
     verification_method = (
         "pinned-source-build" if proof.transformation == "none" else "pending-reconstruction"
@@ -530,7 +534,12 @@ def substitute_proofs(source: str, candidates: Sequence[SourceCandidate]) -> str
             raise ValueError(f"empty proof span for {candidate.declaration_name}")
         if source[start:end].replace("\r\n", "\n").replace("\r", "\n").strip() != candidate.source_expression:
             raise ValueError(f"source proof identity mismatch for {candidate.declaration_name}")
-        replacements.append((start, end, candidate.canonical_proof))
+        replacement = (
+            ":= " + candidate.canonical_proof
+            if candidate.transformation_kind == "equations-to-fun-exact"
+            else candidate.canonical_proof
+        )
+        replacements.append((start, end, replacement))
     result = source
     previous_start = len(source) + 1
     for start, end, proof in sorted(replacements, reverse=True):
