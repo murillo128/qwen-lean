@@ -1,0 +1,134 @@
+{
+  "benchmark": {
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "split": "validation",
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    },
+    "verifier_timeout_seconds": 30.0
+  },
+  "candidate_count": 976,
+  "candidate_records_manifest_sha256": "64e58e6233a5af7e80787e23e4a3c19036d13939ee6f119495b42337a9566b17",
+  "candidates_per_task": 4,
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 972,
+    "verified": 3,
+    "verifier_error": 0,
+    "verifier_timeout": 1
+  },
+  "category_fractions": {
+    "empty_candidate": 0.0,
+    "generation_error": 0.0,
+    "lean_rejected": 0.9959016393442623,
+    "verified": 0.0030737704918032786,
+    "verifier_error": 0.0,
+    "verifier_timeout": 0.0010245901639344263
+  },
+  "category_semantics": {
+    "verifier_timeout": "unsuccessful_proof_attempt",
+    "verifier_timeout_is_infrastructure_error": false
+  },
+  "finish_reason_counts": {
+    "eos": 39,
+    "token_limit": 937
+  },
+  "generated_tokens": {
+    "maximum": 1024,
+    "mean": 996.1997950819672,
+    "median": 1024.0,
+    "minimum": 14,
+    "p95_nearest_rank": 1024,
+    "total": 972291
+  },
+  "generation_contract": {
+    "adapter": null,
+    "add_special_tokens": false,
+    "candidates_per_task": 4,
+    "chat_template": null,
+    "do_sample": true,
+    "dtype": "bfloat16",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.9,
+    "language_model_only": true,
+    "max_model_len": 2048,
+    "max_new_tokens": 1024,
+    "max_num_seqs": 32,
+    "prompt_transformation": null,
+    "quantization": null,
+    "sampler_backend": "native",
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit",
+    "temperature": 0.8,
+    "tensor_parallel_size": 1,
+    "top_k": -1,
+    "top_p": 0.95
+  },
+  "generation_throughput_tokens_per_second": 1465.0487776272673,
+  "gpu_memory": {
+    "baseline_used_mib": 2,
+    "device_index": 0,
+    "device_total_mib": 20475,
+    "peak_incremental_mib": 18370,
+    "peak_used_mib": 18372,
+    "sample_count": 3233,
+    "sample_interval_seconds": 0.5
+  },
+  "infrastructure_error_count": 0,
+  "model": {
+    "id": "Qwen/Qwen3.5-2B",
+    "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+    "tokenizer_id": "Qwen/Qwen3.5-2B",
+    "tokenizer_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc"
+  },
+  "pass_at_k": {
+    "pass@1": 0.0030737704918032786,
+    "pass@4": 0.012295081967213115
+  },
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "inference_execution": "local_cuda",
+    "package_versions": {
+      "huggingface-hub": "1.27.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.11.0",
+      "transformers": "5.15.0",
+      "vllm": "0.23.0"
+    },
+    "torch_cuda_version": "13.0"
+  },
+  "schema_version": "qwen35-2b-assessment-evidence-v1",
+  "status": "passed",
+  "task_count": 244,
+  "tasks_with_verified_candidate": {
+    "count": 3,
+    "fraction": 0.012295081967213115
+  },
+  "timing_seconds": {
+    "candidate_total_latency_mean": 11.214136569931247,
+    "candidate_total_latency_sum": 10944.997292252898,
+    "generation_candidate_latency_mean": 2.683537014848343,
+    "generation_candidate_latency_sum": 2619.1321264919825,
+    "generation_seconds_per_solved_task": 221.2192555970008,
+    "generation_wall": 663.6577667910024,
+    "run_seconds_per_solved_task": 569.1046713140095,
+    "run_wall": 1707.3140139420284,
+    "verification_latency_mean": 8.530599555082905,
+    "verification_latency_sum": 8325.865165760915,
+    "verification_wall": 1043.656247151026
+  },
+  "verified_candidate_count": 3,
+  "workload_id": "minif2f-valid-v1"
+}

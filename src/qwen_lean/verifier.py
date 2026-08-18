@@ -73,7 +73,7 @@ class LeanVerifier:
                 self._preamble_probes[preamble] = (
                     None if outcome.category == "verified" else outcome
                 )
-        return self._preamble_probes[preamble]
+            return self._preamble_probes[preamble]
 
     def _run_source(
         self, source: str, *, started: float | None = None

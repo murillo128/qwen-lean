@@ -1,0 +1,281 @@
+{
+  "assessment_id": "qwen35-4b-base-foundation-v1",
+  "dev16": {
+    "candidate_count": 64,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 64,
+      "verified": 0,
+      "verifier_error": 0,
+      "verifier_timeout": 0
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 1.0,
+      "verified": 0.0,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.0
+    },
+    "execution_identity": {
+      "benchmark_repository": "google-deepmind/miniF2F",
+      "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+      "benchmark_split": "validation",
+      "generation_settings": {
+        "adapter": null,
+        "candidates_per_task": 4,
+        "chat_template": null,
+        "do_sample": true,
+        "dtype": "bfloat16",
+        "enforce_eager": true,
+        "gpu_memory_utilization": 0.95,
+        "language_model_only": true,
+        "max_model_len": 2048,
+        "max_new_tokens": 1024,
+        "max_num_seqs": 32,
+        "model_artifact_resolution": "pinned_local_snapshot",
+        "prompt_transformation": null,
+        "quantization": null,
+        "seed": 0,
+        "stop": "tokenizer_eos_or_token_limit",
+        "temperature": 0.8,
+        "tensor_parallel_size": 1,
+        "top_k": -1,
+        "top_p": 0.95
+      },
+      "inference_execution": "local_cuda",
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+      "model_id": "Qwen/Qwen3.5-4B-Base",
+      "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "prompt_format_id": "whole-proof-v1",
+      "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+      "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "verifier_environment": {
+        "dependencies": {
+          "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+          "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+        },
+        "lean_toolchain": "leanprover/lean4:v4.27.0",
+        "project": "google-deepmind/miniF2F",
+        "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+      },
+      "vllm_environment": {
+        "VLLM_USE_FLASHINFER_SAMPLER": "0",
+        "VLLM_WORKER_MULTIPROC_METHOD": "spawn"
+      }
+    },
+    "finish_reason_counts": {
+      "eos": 31,
+      "token_limit": 33
+    },
+    "generated_tokens": {
+      "maximum": 1024,
+      "mean": 657.0625,
+      "median": 1024.0,
+      "minimum": 11,
+      "total": 42052
+    },
+    "generation_identity_sha256": "bdad5e9a6bf98936af4ba4f648d25fab040d3ce3e8527711f8788fb6487f0e63",
+    "gpu": {
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_total_memory_bytes": 20989804544,
+      "gpu_memory_measurement": "device memory.used sampled with nvidia-smi",
+      "gpu_memory_sample_count": 221,
+      "gpu_memory_sampling_interval_seconds": 1.0,
+      "peak_gpu_memory_bytes": 20526923776,
+      "peak_gpu_memory_mib": 19576
+    },
+    "inference_stack": {
+      "engine": "vllm",
+      "engine_version": "0.27.2rc1.dev203+g41f179b57",
+      "huggingface_hub": "1.27.0",
+      "python": "3.12.14",
+      "torch": "2.13.0+cu132",
+      "torch_cuda_version": "13.2",
+      "transformers": "5.15.0",
+      "vllm_source_revision": "41f179b57aa8ab6f634f508128ce1f1efadd0eb1"
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.0,
+      "pass@4": 0.0
+    },
+    "schema_version": "qwen35-4b-base-workload-v1",
+    "task_count": 16,
+    "tasks_with_verified_candidate": {
+      "count": 0,
+      "fraction": 0.0
+    },
+    "throughput": {
+      "candidates_per_second": 0.5416512648701414,
+      "generated_tokens_per_second": 355.8987342237373
+    },
+    "timing_seconds": {
+      "generation_candidate_latency_mean": 6.779512136374251,
+      "generation_wall": 118.15720584598603,
+      "generation_wall_per_solved_task": null,
+      "run_wall": 210.7174689300009,
+      "run_wall_per_solved_task": null,
+      "verification_candidate_latency_mean": 10.462481394206407,
+      "verification_wall": 92.56026308401488
+    },
+    "verifier_timeout_count": 0,
+    "verifier_timeout_semantics": "unsuccessful_proof_outcome",
+    "workload_id": "minif2f-valid-dev16-v1"
+  },
+  "full": {
+    "candidate_count": 976,
+    "candidates_per_task": 4,
+    "category_counts": {
+      "empty_candidate": 0,
+      "generation_error": 0,
+      "lean_rejected": 901,
+      "verified": 70,
+      "verifier_error": 0,
+      "verifier_timeout": 5
+    },
+    "category_fractions": {
+      "empty_candidate": 0.0,
+      "generation_error": 0.0,
+      "lean_rejected": 0.923155737704918,
+      "verified": 0.07172131147540983,
+      "verifier_error": 0.0,
+      "verifier_timeout": 0.005122950819672131
+    },
+    "execution_identity": {
+      "benchmark_repository": "google-deepmind/miniF2F",
+      "benchmark_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+      "benchmark_split": "validation",
+      "generation_settings": {
+        "adapter": null,
+        "candidates_per_task": 4,
+        "chat_template": null,
+        "do_sample": true,
+        "dtype": "bfloat16",
+        "enforce_eager": true,
+        "gpu_memory_utilization": 0.95,
+        "language_model_only": true,
+        "max_model_len": 2048,
+        "max_new_tokens": 1024,
+        "max_num_seqs": 32,
+        "model_artifact_resolution": "pinned_local_snapshot",
+        "prompt_transformation": null,
+        "quantization": null,
+        "seed": 0,
+        "stop": "tokenizer_eos_or_token_limit",
+        "temperature": 0.8,
+        "tensor_parallel_size": 1,
+        "top_k": -1,
+        "top_p": 0.95
+      },
+      "inference_execution": "local_cuda",
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+      "model_id": "Qwen/Qwen3.5-4B-Base",
+      "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "prompt_format_id": "whole-proof-v1",
+      "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+      "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "verifier_environment": {
+        "dependencies": {
+          "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+          "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+        },
+        "lean_toolchain": "leanprover/lean4:v4.27.0",
+        "project": "google-deepmind/miniF2F",
+        "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+      },
+      "vllm_environment": {
+        "VLLM_USE_FLASHINFER_SAMPLER": "0",
+        "VLLM_WORKER_MULTIPROC_METHOD": "spawn"
+      }
+    },
+    "finish_reason_counts": {
+      "eos": 744,
+      "token_limit": 232
+    },
+    "generated_tokens": {
+      "maximum": 1024,
+      "mean": 329.23975409836066,
+      "median": 89.5,
+      "minimum": 2,
+      "total": 321338
+    },
+    "generation_identity_sha256": "d2f426b75e2850aec91491f6549ad415efa4ee298fb723bb79e00845fa98fc54",
+    "gpu": {
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_total_memory_bytes": 20989804544,
+      "gpu_memory_measurement": "device memory.used sampled with nvidia-smi",
+      "gpu_memory_sample_count": 1700,
+      "gpu_memory_sampling_interval_seconds": 1.0,
+      "peak_gpu_memory_bytes": 20159922176,
+      "peak_gpu_memory_mib": 19226
+    },
+    "inference_stack": {
+      "engine": "vllm",
+      "engine_version": "0.27.2rc1.dev203+g41f179b57",
+      "huggingface_hub": "1.27.0",
+      "python": "3.12.14",
+      "torch": "2.13.0+cu132",
+      "torch_cuda_version": "13.2",
+      "transformers": "5.15.0",
+      "vllm_source_revision": "41f179b57aa8ab6f634f508128ce1f1efadd0eb1"
+    },
+    "infrastructure_error_count": 0,
+    "pass_at_k": {
+      "pass@1": 0.07172131147540983,
+      "pass@4": 0.18442622950819673
+    },
+    "schema_version": "qwen35-4b-base-workload-v1",
+    "task_count": 244,
+    "tasks_with_verified_candidate": {
+      "count": 45,
+      "fraction": 0.18442622950819673
+    },
+    "throughput": {
+      "candidates_per_second": 1.955556068224963,
+      "generated_tokens_per_second": 643.8467990279438
+    },
+    "timing_seconds": {
+      "generation_candidate_latency_mean": 1.9999937894343796,
+      "generation_wall": 499.0907782490249,
+      "generation_wall_per_solved_task": 11.090906183311663,
+      "run_wall": 1745.8935580879916,
+      "run_wall_per_solved_task": 38.79763462417759,
+      "verification_candidate_latency_mean": 10.199825692085023,
+      "verification_wall": 1246.8027798389667
+    },
+    "verifier_timeout_count": 5,
+    "verifier_timeout_semantics": "unsuccessful_proof_outcome",
+    "workload_id": "minif2f-valid-v1"
+  },
+  "schema_version": "qwen35-4b-base-assessment-v1",
+  "strict_lane": {
+    "candidate_handling": "raw_continuation_no_extraction_repair_or_feedback",
+    "chat_template": null,
+    "prompt_format_id": "whole-proof-v1",
+    "sampling": {
+      "candidates_per_task": 4,
+      "do_sample": true,
+      "max_new_tokens": 1024,
+      "seed": 0,
+      "stop": "tokenizer_eos_or_token_limit",
+      "temperature": 0.8,
+      "top_k": -1,
+      "top_p": 0.95
+    },
+    "verifier_timeout_seconds": 30.0,
+    "verifier_timeout_semantics": "unsuccessful_proof_outcome"
+  }
+}
