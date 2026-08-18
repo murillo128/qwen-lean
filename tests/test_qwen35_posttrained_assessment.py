@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from qwen_lean.qwen35_assessment import (
+from qwen_lean.qwen35_posttrained_assessment import (
     ENGINE_VERSION,
     EXPECTED_SAMPLING,
     MODEL_ID,

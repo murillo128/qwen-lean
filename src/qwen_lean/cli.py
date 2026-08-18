@@ -85,11 +85,11 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
-from .qwen35_assessment import (
+from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
-    run_assessment as run_qwen35_assessment,
-    run_preflight as run_qwen35_preflight,
-    write_compact_evidence as write_qwen35_evidence,
+    run_assessment as run_qwen35_posttrained_assessment,
+    run_preflight as run_qwen35_posttrained_preflight,
+    write_compact_evidence as write_qwen35_posttrained_evidence,
 )
 from .riemann_data import (
     RiemannAtlasConfig,
@@ -978,7 +978,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "qwen35-2b-preflight":
-        preflight = run_qwen35_preflight(
+        preflight = run_qwen35_posttrained_preflight(
             Qwen35AssessmentConfig.load(args.config),
             args.benchmark_root,
             args.output_dir,
@@ -990,7 +990,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.verification_workers < 1:
             print("--verification-workers must be positive")
             return 2
-        _, _, summary = run_qwen35_assessment(
+        _, _, summary = run_qwen35_posttrained_assessment(
             Qwen35AssessmentConfig.load(args.config),
             args.benchmark_root,
             args.workload,
@@ -1002,7 +1002,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if summary["complete"] else 1
 
     if args.command == "qwen35-2b-evidence":
-        comparison = write_qwen35_evidence(
+        comparison = write_qwen35_posttrained_evidence(
             Qwen35AssessmentConfig.load(args.config),
             args.preflight_dir,
             args.dev16_dir,
