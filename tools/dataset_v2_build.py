@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import gc
+import gzip
 import hashlib
+import io
 import json
 import os
 import pickle
@@ -16,6 +18,9 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+
+FULL_CACHE_VERSION = "dataset-v2-full-cache-v1"
+COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 
 from qwen_lean.dataset_v2 import (  # noqa: E402
     assign_synthetic_roles,
@@ -52,9 +57,11 @@ from qwen_lean.dataset_v2_pipeline import (  # noqa: E402
     PRIME_FAMILIES,
     annotate_candidate,
     build_prime_coverage_manifest,
+    build_source_dispositions,
     composition_pools,
     dataset_manifest,
     distribute_prime_counts,
+    historical_source_crosswalk,
     load_riemann_metadata,
     read_jsonl,
     select_train_probe,
@@ -98,6 +105,11 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="reuse local preflight extraction/verification caches from this output directory",
     )
+    parser.add_argument(
+        "--resume-full",
+        action="store_true",
+        help="reuse completed full-build stages from this output directory",
+    )
     return parser
 
 
@@ -114,6 +126,16 @@ def _write_jsonl(path: Path, values: list[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8", newline="\n") as handle:
         for value in values:
             handle.write(json.dumps(value, sort_keys=True, ensure_ascii=False) + "\n")
+
+
+def _write_jsonl_gz(path: Path, values: list[dict[str, Any]]) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as raw:
+        with gzip.GzipFile(fileobj=raw, mode="wb", filename="", mtime=0) as compressed:
+            with io.TextIOWrapper(compressed, encoding="utf-8", newline="\n") as handle:
+                for value in values:
+                    handle.write(json.dumps(value, sort_keys=True, ensure_ascii=False) + "\n")
+    return sha256_file(path)
 
 
 def _source_equivalence(
@@ -324,7 +346,24 @@ def _synthetic_records(
     def verify_batch(indexed_batch: tuple[int, list[Any]]) -> tuple[int, Any, Any, dict[str, Any]]:
         batch_index, batch = indexed_batch
         composition_path = lean_dir / f"Composition-{batch_index:04d}.lean"
-        composition_path.write_text(render_composition_source(batch), encoding="utf-8")
+        composition_source = render_composition_source(batch)
+        composition_path.write_text(composition_source, encoding="utf-8")
+        batch_digest = hashlib.sha256(
+            f"{COMPOSITION_BATCH_CACHE_VERSION}\0{composition_source}".encode()
+        ).hexdigest()
+        cache_dir = output_dir / ".composition-batch-cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_path = cache_dir / f"{batch_index:04d}-{batch_digest}.pkl"
+        if cache_path.is_file():
+            with cache_path.open("rb") as handle:
+                run, shortcut_run, audit_summary = pickle.load(handle)
+            shortcut_source, _ = render_shortcut_gate_source(
+                batch, {audit.name: audit for audit in run.audits}
+            )
+            (lean_dir / f"ShortcutGate-{batch_index:04d}.lean").write_text(
+                shortcut_source, encoding="utf-8"
+            )
+            return batch_index, run, shortcut_run, audit_summary
         run = run_composition_source(composition_path, target_root=target_root)
         if run.status != "accepted":
             raise RuntimeError(f"composition batch {batch_index} failed: {run.diagnostic}")
@@ -341,6 +380,14 @@ def _synthetic_records(
             raise RuntimeError(
                 f"shortcut batch {batch_index} infrastructure failure: {shortcut_run.diagnostic}"
             )
+        temporary_cache = cache_path.with_suffix(".tmp")
+        with temporary_cache.open("wb") as handle:
+            pickle.dump(
+                (run, shortcut_run, audit_summary),
+                handle,
+                protocol=pickle.HIGHEST_PROTOCOL,
+            )
+        temporary_cache.replace(cache_path)
         return batch_index, run, shortcut_run, audit_summary
 
     with ThreadPoolExecutor(max_workers=min(workers, len(batches))) as executor:
@@ -661,6 +708,12 @@ def main() -> int:
         or args.composition_batch_size < 1
     ):
         raise SystemExit("worker and batch counts must be positive")
+    if args.resume_preflight and args.resume_full:
+        raise SystemExit("select only one resume mode")
+    if args.resume_preflight and args.mode != "preflight":
+        raise SystemExit("--resume-preflight requires --mode preflight")
+    if args.resume_full and args.mode != "full":
+        raise SystemExit("--resume-full requires --mode full")
     config = DatasetV2Config.load(args.config.resolve())
     target_root = args.target_root.resolve()
     trace_root = args.trace_root.resolve()
@@ -680,14 +733,27 @@ def main() -> int:
     source_equivalence = _source_equivalence(
         trace_root=trace_root, target_mathlib=target_mathlib, config=config
     )
+    metadata = load_riemann_metadata(ROOT / "data/riemann")
     extraction_cache = output_dir / ".extraction-cache.pkl"
     if args.resume_preflight:
-        if args.mode != "preflight" or not extraction_cache.is_file():
+        if not extraction_cache.is_file():
             raise RuntimeError("--resume-preflight requires an existing preflight cache")
         with extraction_cache.open("rb") as handle:
             mathlib_candidates, diagnostics, pnt_candidates, pnt_audit = pickle.load(handle)
+    elif args.resume_full:
+        if not extraction_cache.is_file():
+            raise RuntimeError("--resume-full requires an existing extraction cache")
+        with extraction_cache.open("rb") as handle:
+            (
+                cache_version,
+                mathlib_candidates,
+                diagnostics,
+                pnt_candidates,
+                pnt_audit,
+            ) = pickle.load(handle)
+        if cache_version != FULL_CACHE_VERSION:
+            raise RuntimeError("full extraction cache version mismatch")
     else:
-        metadata = load_riemann_metadata(ROOT / "data/riemann")
         mathlib_candidates, diagnostics = extract_traced_files(
             _iter_mathlib_traces(
                 trace_root,
@@ -709,6 +775,19 @@ def main() -> int:
             with extraction_cache.open("wb") as handle:
                 pickle.dump(
                     (mathlib_candidates, diagnostics, pnt_candidates, pnt_audit),
+                    handle,
+                    protocol=pickle.HIGHEST_PROTOCOL,
+                )
+        else:
+            with extraction_cache.open("wb") as handle:
+                pickle.dump(
+                    (
+                        FULL_CACHE_VERSION,
+                        mathlib_candidates,
+                        diagnostics,
+                        pnt_candidates,
+                        pnt_audit,
+                    ),
                     handle,
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
@@ -761,20 +840,39 @@ def main() -> int:
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
     else:
-        all_candidates = mathlib_candidates + pnt_candidates
-        verified, file_verification = verify_transformed_candidates(
-            all_candidates,
-            source_roots={
-                (str(config.environment["mathlib_repository"]), str(config.environment["mathlib_revision"])): target_mathlib,
-                (str(config.environment["host_repository"]), str(config.environment["host_revision"])): target_root,
-            },
-            target_root=target_root,
-            environment_id=str(config.environment["environment_id"]),
-            evidence_id="dataset-v2-full-term-reconstruction-v1",
-            workers=args.workers,
-            timeout_seconds=args.verification_timeout,
-        )
-        real_candidates = [item for item in verified if item.verification_status == "accepted"]
+        verification_cache = output_dir / ".verification-cache.pkl"
+        if args.resume_full and verification_cache.is_file():
+            with verification_cache.open("rb") as handle:
+                cache_version, classified_candidates, file_verification = pickle.load(
+                    handle
+                )
+            if cache_version != FULL_CACHE_VERSION:
+                raise RuntimeError("full verification cache version mismatch")
+        else:
+            all_candidates = mathlib_candidates + pnt_candidates
+            classified_candidates, file_verification = verify_transformed_candidates(
+                all_candidates,
+                source_roots={
+                    (str(config.environment["mathlib_repository"]), str(config.environment["mathlib_revision"])): target_mathlib,
+                    (str(config.environment["host_repository"]), str(config.environment["host_revision"])): target_root,
+                },
+                target_root=target_root,
+                environment_id=str(config.environment["environment_id"]),
+                evidence_id="dataset-v2-full-term-reconstruction-v1",
+                workers=args.workers,
+                timeout_seconds=args.verification_timeout,
+            )
+            with verification_cache.open("wb") as handle:
+                pickle.dump(
+                    (FULL_CACHE_VERSION, classified_candidates, file_verification),
+                    handle,
+                    protocol=pickle.HIGHEST_PROTOCOL,
+                )
+        real_candidates = [
+            item
+            for item in classified_candidates
+            if item.verification_status == "accepted"
+        ]
         unchanged = {"files": 0, "accepted": 0, "results": [], "evidence": "frozen target build"}
         pnt_unchanged = unchanged
         requested_counts = {
@@ -787,17 +885,31 @@ def main() -> int:
 
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
-    synthetic, synthetic_evidence = _synthetic_records(
-        candidates=mathlib_candidates + pnt_candidates,
-        requested_counts=requested_counts,
-        seed=(seed if args.mode == "preflight" else str(config.value["synthetic"]["split_seed"])),
-        output_dir=output_dir,
-        target_root=target_root,
-        environment=environment,
-        batch_size=args.composition_batch_size,
-        workers=args.composition_workers,
-        forbidden_statement_ids={statement_id(item.declaration) for item in real_candidates},
-    )
+    synthetic_cache = output_dir / ".synthetic-cache.pkl"
+    if args.resume_full and synthetic_cache.is_file():
+        with synthetic_cache.open("rb") as handle:
+            cache_version, synthetic, synthetic_evidence = pickle.load(handle)
+        if cache_version != FULL_CACHE_VERSION:
+            raise RuntimeError("full synthetic cache version mismatch")
+    else:
+        synthetic, synthetic_evidence = _synthetic_records(
+            candidates=mathlib_candidates + pnt_candidates,
+            requested_counts=requested_counts,
+            seed=(seed if args.mode == "preflight" else str(config.value["synthetic"]["split_seed"])),
+            output_dir=output_dir,
+            target_root=target_root,
+            environment=environment,
+            batch_size=args.composition_batch_size,
+            workers=args.composition_workers,
+            forbidden_statement_ids={statement_id(item.declaration) for item in real_candidates},
+        )
+        if args.mode == "full":
+            with synthetic_cache.open("wb") as handle:
+                pickle.dump(
+                    (FULL_CACHE_VERSION, synthetic, synthetic_evidence),
+                    handle,
+                    protocol=pickle.HIGHEST_PROTOCOL,
+                )
     real_records = [candidate_to_record(item, config=config) for item in real_candidates]
     records = merge_statement_records([*real_records, *synthetic])
     role_validation = validate_role_isolation(records)
@@ -814,11 +926,67 @@ def main() -> int:
     benchmark = _benchmark_outputs(
         mini_root=mini_root, config=config, records=records, output_dir=output_dir
     )
+    if args.mode == "full":
+        disposition_candidates = classified_candidates
+    else:
+        verified_by_source = {
+            (item.source_repository, item.source_revision, item.file_path, item.declaration_name): item
+            for item in real_candidates
+        }
+        disposition_candidates = [
+            verified_by_source.get(
+                (
+                    item.source_repository,
+                    item.source_revision,
+                    item.file_path,
+                    item.declaration_name,
+                ),
+                item,
+            )
+            for item in mathlib_candidates + pnt_candidates
+        ]
+    source_dispositions = build_source_dispositions(
+        disposition_candidates,
+        diagnostics=diagnostics,
+        config=config.value,
+        topic_metadata=metadata,
+    )
+    source_dispositions_path = output_dir / "source-dispositions.jsonl.gz"
+    source_dispositions_sha = _write_jsonl_gz(
+        source_dispositions_path, source_dispositions
+    )
+    crosswalk_path: Path | None = None
+    crosswalk: dict[str, Any] | None = None
+    if args.mode == "full":
+        historical_records = [
+            value
+            for split in ("train", "validation", "heldout")
+            for value in read_jsonl(
+                ROOT / f"data/mathlib-whole-proof-v1/{split}.jsonl.gz"
+            )
+        ]
+        membership_inventories = {
+            path.parent.name: read_jsonl(path)
+            for path in sorted(
+                (ROOT / "data/riemann/corpora").glob("*/membership.jsonl")
+            )
+        }
+        crosswalk = historical_source_crosswalk(
+            source_dispositions,
+            historical_records=historical_records,
+            membership_inventories=membership_inventories,
+        )
+        crosswalk_path = output_dir / "historical-crosswalk.json"
+        _write_json(crosswalk_path, crosswalk)
     source_manifest = json.loads(
         (ROOT / config.value["pnt_plus"]["accepted_declarations_manifest"]).read_text(encoding="utf-8")
     )
     coverage = build_prime_coverage_manifest(
-        records, config=config.value, pnt_source_manifest=source_manifest
+        records,
+        config=config.value,
+        pnt_source_manifest=source_manifest,
+        source_dispositions=source_dispositions,
+        atlas_entries=read_jsonl(ROOT / "data/riemann/atlas/entries.jsonl"),
     )
     coverage_path = output_dir / "prime-coverage.json"
     _write_json(coverage_path, coverage)
@@ -868,6 +1036,15 @@ def main() -> int:
         "pnt_dependency_audit": {
             key: value for key, value in pnt_audit.items() if key != "latency_seconds"
         },
+        "source_dispositions": {
+            "entries": len(source_dispositions),
+            "dispositions": dict(
+                sorted(Counter(item["disposition"] for item in source_dispositions).items())
+            ),
+            "reasons": dict(
+                sorted(Counter(item["reason"] for item in source_dispositions).items())
+            ),
+        },
         "synthetic": synthetic_evidence,
         "role_isolation": role_validation,
         "loader": {
@@ -877,6 +1054,8 @@ def main() -> int:
         },
         "benchmark": benchmark,
     }
+    if crosswalk is not None:
+        verification["historical_crosswalk"] = crosswalk
     if args.mode == "full":
         probe = select_train_probe(
             records,
@@ -896,9 +1075,18 @@ def main() -> int:
     _write_json(verification_path, verification)
     files = {
         records_path.name: {"sha256": records_sha, "bytes": records_path.stat().st_size},
+        source_dispositions_path.name: {
+            "sha256": source_dispositions_sha,
+            "bytes": source_dispositions_path.stat().st_size,
+        },
         coverage_path.name: {"sha256": sha256_file(coverage_path), "bytes": coverage_path.stat().st_size},
         verification_path.name: {"sha256": sha256_file(verification_path), "bytes": verification_path.stat().st_size},
     }
+    if crosswalk_path is not None:
+        files[crosswalk_path.name] = {
+            "sha256": sha256_file(crosswalk_path),
+            "bytes": crosswalk_path.stat().st_size,
+        }
     for split in ("valid", "test"):
         path = output_dir / f"minif2f-{split}-clean-v2.jsonl"
         files[path.name] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}

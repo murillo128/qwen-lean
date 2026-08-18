@@ -13,7 +13,7 @@ from .dataset_v2 import validate_prime_coverage
 from .dataset_v2_composition import CompositionSource
 from .dataset_v2_contract import statement_id
 from .phase2_corpus import _lex_lean
-from .dataset_v2_extraction import SourceCandidate
+from .dataset_v2_extraction import ExtractionDiagnostics, SourceCandidate
 from .dataset_v2_schema import (
     DATASET_V2_MANIFEST_SCHEMA_VERSION,
     PRIME_COVERAGE_SCHEMA_VERSION,
@@ -185,37 +185,254 @@ def distribute_prime_counts(total: int) -> dict[str, int]:
     }
 
 
+def _source_disposition_id(
+    repository: str, revision: str, file_path: str, declaration_name: str
+) -> str:
+    payload = "\0".join(
+        (
+            "dataset-v2-source-disposition-v1",
+            repository,
+            revision,
+            file_path,
+            declaration_name,
+        )
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def build_source_dispositions(
+    candidates: Sequence[SourceCandidate],
+    *,
+    diagnostics: ExtractionDiagnostics,
+    config: Mapping[str, Any],
+    topic_metadata: Mapping[tuple[str, str], Mapping[str, Sequence[str]]],
+) -> list[dict[str, Any]]:
+    """Account for every extracted or explicitly rejected real-source declaration."""
+
+    entries: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for candidate in candidates:
+        key = (
+            candidate.source_repository,
+            candidate.source_revision,
+            candidate.file_path,
+            candidate.declaration_name,
+        )
+        if key in seen:
+            raise ValueError(f"duplicate source disposition identity: {key}")
+        seen.add(key)
+        accepted = candidate.verification_status == "accepted"
+        entries.append(
+            {
+                "source_disposition_id": _source_disposition_id(*key),
+                "source_repository": candidate.source_repository,
+                "source_revision": candidate.source_revision,
+                "file_path": candidate.file_path,
+                "declaration_name": candidate.declaration_name,
+                "provenance": candidate.provenance,
+                "memberships": list(candidate.memberships),
+                "topic_tags": list(candidate.topic_tags),
+                "prime_families": list(
+                    prime_families_for(
+                        file_path=candidate.file_path,
+                        declaration_name=candidate.declaration_name,
+                        memberships=candidate.memberships,
+                        topic_tags=candidate.topic_tags,
+                        pnt_plus=candidate.provenance == "external-lean",
+                    )
+                ),
+                "transformation_kind": candidate.transformation_kind,
+                "verification_status": candidate.verification_status,
+                "verification_method": candidate.verification_method,
+                "verification_diagnostic": candidate.verification_diagnostic,
+                "disposition": (
+                    "included-training" if accepted else "source-integrity-blocked"
+                ),
+                "reason": (
+                    "accepted-canonical-proof"
+                    if accepted
+                    else "canonical-proof-verification-failed"
+                ),
+                "statement_ids": [statement_id(candidate.declaration)] if accepted else [],
+            }
+        )
+
+    environment = config["target_environment"]
+    repository = str(environment["mathlib_repository"])
+    revision = str(environment["mathlib_revision"])
+    for exclusion in diagnostics.exclusions:
+        file_path = str(exclusion["file_path"])
+        declaration_name = str(exclusion.get("declaration_name", ""))
+        key = (repository, revision, file_path, declaration_name)
+        if key in seen:
+            raise ValueError(f"source exclusion duplicates an extracted candidate: {key}")
+        seen.add(key)
+        metadata = topic_metadata.get((file_path, declaration_name), {})
+        memberships = tuple(str(item) for item in metadata.get("memberships", ()))
+        topic_tags = tuple(str(item) for item in metadata.get("topic_tags", ()))
+        reason = str(exclusion["reason"])
+        disposition = (
+            "placeholder/axiom-policy-blocked"
+            if reason.startswith("proof-placeholder")
+            else "source-integrity-blocked"
+        )
+        entries.append(
+            {
+                "source_disposition_id": _source_disposition_id(*key),
+                "source_repository": repository,
+                "source_revision": revision,
+                "file_path": file_path,
+                "declaration_name": declaration_name,
+                "provenance": "real-mathlib",
+                "memberships": list(memberships),
+                "topic_tags": list(topic_tags),
+                "prime_families": list(
+                    prime_families_for(
+                        file_path=file_path,
+                        declaration_name=declaration_name,
+                        memberships=memberships,
+                        topic_tags=topic_tags,
+                    )
+                ),
+                "transformation_kind": None,
+                "verification_status": "excluded-before-canonical-verification",
+                "verification_method": "classified-extraction-exclusion",
+                "verification_diagnostic": str(exclusion.get("detail", "")),
+                "disposition": disposition,
+                "reason": reason,
+                "statement_ids": [],
+            }
+        )
+    return sorted(
+        entries,
+        key=lambda item: (
+            str(item["source_repository"]),
+            str(item["file_path"]),
+            str(item["declaration_name"]),
+        ),
+    )
+
+
+def historical_source_crosswalk(
+    source_dispositions: Sequence[Mapping[str, Any]],
+    *,
+    historical_records: Sequence[Mapping[str, Any]],
+    membership_inventories: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> dict[str, Any]:
+    """Map historical v1 and Riemann identities to Dataset-v2 dispositions."""
+
+    by_source = {
+        (str(item["file_path"]), str(item["declaration_name"])): item
+        for item in source_dispositions
+        if item.get("declaration_name")
+    }
+
+    def summarize(values: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+        counts: Counter[str] = Counter()
+        missing: list[dict[str, str]] = []
+        missing_count = 0
+        for value in values:
+            key = (str(value["file_path"]), str(value["declaration_name"]))
+            disposition = by_source.get(key)
+            if disposition is None:
+                counts["source-integrity-blocked"] += 1
+                missing_count += 1
+                if len(missing) < 100:
+                    missing.append(
+                        {
+                            "file_path": key[0],
+                            "declaration_name": key[1],
+                            "reason": "historical-source-identity-not-recovered",
+                        }
+                    )
+            else:
+                counts[str(disposition["disposition"])] += 1
+        return {
+            "records": len(values),
+            "dispositions": dict(sorted(counts.items())),
+            "missing_source_identities": missing_count,
+            "missing_examples": missing,
+        }
+
+    return {
+        "schema_version": "dataset-v2-historical-crosswalk-v1",
+        "mathlib_v1": summarize(historical_records),
+        "riemann_inventories": {
+            name: summarize(values)
+            for name, values in sorted(membership_inventories.items())
+        },
+    }
+
+
 def build_prime_coverage_manifest(
     records: Sequence[DatasetV2Record],
     *,
     config: Mapping[str, Any],
     pnt_source_manifest: Mapping[str, Any],
+    source_dispositions: Sequence[Mapping[str, Any]] = (),
+    atlas_entries: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     entries: list[dict[str, Any]] = []
-    for record in sorted(records, key=lambda item: item.statement_id):
-        if record.role != "training" or record.provenance == "synthetic":
+    disposition_by_source = {
+        (str(item["file_path"]), str(item["declaration_name"])): item
+        for item in source_dispositions
+        if item.get("declaration_name")
+    }
+    for source in source_dispositions:
+        families = [str(item) for item in source.get("prime_families", [])]
+        if not families or not source.get("declaration_name"):
             continue
-        families = sorted(
-            tag.removeprefix("prime-family:")
-            for tag in record.topic_tags
-            if tag.startswith("prime-family:")
-        )
-        if not families:
-            continue
+        included = source["disposition"] == "included-training"
         entries.append(
             {
-                "coverage_id": f"statement:{record.statement_id}",
-                "source": record.environment.repository,
-                "source_revision": record.environment.revision,
-                "declaration_names": sorted(
-                    {item.source_declaration_name for item in record.proof_variants}
-                ),
+                "coverage_id": f"source:{source['source_disposition_id']}",
+                "source": source["source_repository"],
+                "source_revision": source["source_revision"],
+                "declaration_names": [source["declaration_name"]],
                 "prime_families": families,
-                "verified_lean": True,
+                "verified_lean": included,
                 "legally_usable": True,
-                "target_compatible": True,
-                "disposition": "included-training",
-                "statement_ids": [record.statement_id],
+                "target_compatible": included,
+                "disposition": source["disposition"],
+                "reason": source["reason"],
+                "statement_ids": list(source.get("statement_ids", [])),
+            }
+        )
+    for atlas in atlas_entries:
+        formalization = atlas.get("formalization") or {}
+        file_path = str(formalization.get("file_path", ""))
+        declaration_name = str(formalization.get("declaration_name", ""))
+        mapped = disposition_by_source.get((file_path, declaration_name))
+        if mapped is not None:
+            included = mapped["disposition"] == "included-training"
+            disposition = str(mapped["disposition"])
+            reason = "mapped-exact-lean-identity"
+            statement_ids = list(mapped.get("statement_ids", []))
+        else:
+            included = False
+            statement_ids = []
+            if declaration_name:
+                disposition = "source-integrity-blocked"
+                reason = "atlas-lean-identity-not-recovered"
+            elif atlas.get("formalization_status") == "other-prover":
+                disposition = "not-verified-lean"
+                reason = "formalized-outside-lean"
+            else:
+                disposition = "unproved/knowledge-only"
+                reason = "atlas-entry-has-no-exact-verified-lean-identity"
+        entries.append(
+            {
+                "coverage_id": f"atlas:{atlas['id']}",
+                "source": str(formalization.get("repository", "riemann-atlas")),
+                "source_revision": str(formalization.get("revision", "")),
+                "declaration_names": [declaration_name] if declaration_name else [],
+                "prime_families": [],
+                "verified_lean": included,
+                "legally_usable": True,
+                "target_compatible": included,
+                "disposition": disposition,
+                "reason": reason,
+                "statement_ids": statement_ids,
             }
         )
     for project in pnt_source_manifest.get("projects", []):
