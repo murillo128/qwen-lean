@@ -200,6 +200,15 @@ def run_phase1_baseline(
             "quantization": config.engine["quantization"],
             "chat_template": None,
             "prompt_transformation": None,
+            **(
+                {
+                    "limit_mm_per_prompt": dict(
+                        config.engine["limit_mm_per_prompt"]
+                    )
+                }
+                if "limit_mm_per_prompt" in config.engine
+                else {}
+            ),
             "adapter": None if adapter is None else adapter.metadata(),
         },
         runtime=runtime,
@@ -470,6 +479,8 @@ def vllm_engine_kwargs(
         "seed": int(sampling["seed"]),
         "trust_remote_code": False,
     }
+    if "limit_mm_per_prompt" in engine:
+        kwargs["limit_mm_per_prompt"] = dict(engine["limit_mm_per_prompt"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(
