@@ -45,6 +45,7 @@ Use these decision markers exactly in design notes: `ACCEPTED`, `OPEN`, `SPECULA
 Load skills lazily by role:
 
 - design authority: `.agents/skills/design-github-issue/SKILL.md`;
+- multi-issue orchestration: `.agents/skills/codex-issue-orchestrator/SKILL.md`;
 - main executor: `.agents/skills/spec-driven-codex-loop/SKILL.md`;
 - Git and GitHub mutation or publication: `.agents/skills/codex-github-operations/SKILL.md`;
 - independent checkpoint or final review: `.agents/skills/codex-independent-review/SKILL.md`.
