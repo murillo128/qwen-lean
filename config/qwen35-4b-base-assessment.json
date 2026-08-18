@@ -1,0 +1,85 @@
+{
+  "schema_version": "phase1-config-v1",
+  "assessment": {
+    "id": "qwen35-4b-base-foundation-v1",
+    "compatibility_requirement": "requirements/qwen35-4b-base.txt",
+    "vllm_source_revision": "41f179b57aa8ab6f634f508128ce1f1efadd0eb1"
+  },
+  "benchmark": {
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "source_path": "MiniF2F/Valid.lean",
+    "primary_task_manifest": "minif2f-valid-task-ids.txt",
+    "split": "validation",
+    "expected_primary_task_count": 244,
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "license": "Apache-2.0",
+    "attribution": "Copyright (c) 2021 OpenAI; authors Kunhao Zheng, Stanislas Polu, David Renshaw, OpenAI GPT-f"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": {
+      "selection": "explicit_ids",
+      "selection_rule": "first 16 primary task IDs in ascending Unicode code-point order",
+      "expected_task_count": 16,
+      "task_ids": [
+        "aimeII_2001_p3",
+        "aimeII_2020_p6",
+        "aimeI_2000_p7",
+        "aime_1983_p9",
+        "aime_1984_p15",
+        "aime_1984_p5",
+        "aime_1987_p8",
+        "aime_1988_p3",
+        "aime_1988_p4",
+        "aime_1990_p2",
+        "aime_1991_p1",
+        "aime_1991_p6",
+        "aime_1994_p4",
+        "aime_1996_p5",
+        "aime_1997_p11",
+        "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i"
+      ]
+    },
+    "minif2f-valid-v1": {
+      "selection": "all",
+      "expected_task_count": 244
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.27.2rc1.dev203+g41f179b57",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_num_seqs": 32,
+    "enforce_eager": true,
+    "language_model_only": true,
+    "resolve_pinned_snapshot": true,
+    "use_flashinfer_sampler": false,
+    "worker_multiproc_method": "spawn",
+    "quantization": null,
+    "expected_cuda_device_name_fragment": "Ada"
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "known_valid_candidate": "ring"
+  }
+}

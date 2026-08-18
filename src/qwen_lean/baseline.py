@@ -3,6 +3,7 @@ from __future__ import annotations
 import gc
 import importlib.metadata
 import json
+import os
 import platform
 import threading
 import time
@@ -239,14 +240,46 @@ def run_phase1_baseline(
             "gpu_memory_utilization": float(config.engine["gpu_memory_utilization"]),
             "enforce_eager": bool(config.engine["enforce_eager"]),
             "quantization": config.engine["quantization"],
-            "language_model_only": bool(
-                config.engine.get("language_model_only", False)
+            **(
+                {"language_model_only": bool(config.engine["language_model_only"])}
+                if "language_model_only" in config.engine
+                else {}
             ),
-            "use_flashinfer_sampler": bool(
-                config.engine.get("use_flashinfer_sampler", True)
+            **(
+                {
+                    "use_flashinfer_sampler": bool(
+                        config.engine["use_flashinfer_sampler"]
+                    )
+                }
+                if "use_flashinfer_sampler" in config.engine
+                else {}
             ),
-            "chat_template": None,
+            **(
+                {"sampler_backend": "native"}
+                if config.engine.get("use_flashinfer_sampler") is False
+                else {}
+            ),
+            **(
+                {"add_special_tokens": bool(config.model["add_special_tokens"])}
+                if "add_special_tokens" in config.model
+                else {}
+            ),
+            "chat_template": config.model.get("chat_template"),
+            **(
+                {"model_artifact_resolution": "pinned_local_snapshot"}
+                if config.engine.get("resolve_pinned_snapshot", False)
+                else {}
+            ),
             "prompt_transformation": None,
+            **(
+                {
+                    "limit_mm_per_prompt": dict(
+                        config.engine["limit_mm_per_prompt"]
+                    )
+                }
+                if "limit_mm_per_prompt" in config.engine
+                else {}
+            ),
             "adapter": None if adapter is None else adapter.metadata(),
         },
         runtime=runtime,
@@ -389,6 +422,8 @@ def _generate_candidates(
     sampling: Mapping[str, Any] | None = None,
     adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[list[GeneratedCandidate], str]:
+    if config.engine.get("use_flashinfer_sampler") is False:
+        os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
     try:
         import vllm
         from vllm import LLM, SamplingParams
@@ -517,11 +552,32 @@ def vllm_engine_kwargs(
     adapter: LoRAAdapterSpec | None,
 ) -> dict[str, Any]:
     engine = config.engine
+    model_id = str(config.model["model_id"])
+    tokenizer_id = str(config.model["tokenizer_id"])
+    model_revision = str(config.model["model_revision"])
+    tokenizer_revision = str(config.model["tokenizer_revision"])
+    if engine.get("resolve_pinned_snapshot", False):
+        if model_id != tokenizer_id or model_revision != tokenizer_revision:
+            raise ValueError(
+                "pinned local snapshot resolution requires one model/tokenizer repo "
+                "and revision"
+            )
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError as error:
+            raise RuntimeError(
+                "pinned local snapshot resolution requires huggingface_hub"
+            ) from error
+        snapshot = snapshot_download(repo_id=model_id, revision=model_revision)
+        model_path = tokenizer_path = snapshot
+    else:
+        model_path = model_id
+        tokenizer_path = tokenizer_id
     kwargs: dict[str, Any] = {
-        "model": str(config.model["model_id"]),
-        "revision": str(config.model["model_revision"]),
-        "tokenizer": str(config.model["tokenizer_id"]),
-        "tokenizer_revision": str(config.model["tokenizer_revision"]),
+        "model": model_path,
+        "revision": model_revision,
+        "tokenizer": tokenizer_path,
+        "tokenizer_revision": tokenizer_revision,
         "dtype": str(engine["dtype"]),
         "tensor_parallel_size": int(engine["tensor_parallel_size"]),
         "gpu_memory_utilization": float(engine["gpu_memory_utilization"]),
@@ -532,6 +588,10 @@ def vllm_engine_kwargs(
         "seed": int(sampling["seed"]),
         "trust_remote_code": False,
     }
+    if "language_model_only" in engine:
+        kwargs["language_model_only"] = bool(engine["language_model_only"])
+    if "limit_mm_per_prompt" in engine:
+        kwargs["limit_mm_per_prompt"] = dict(engine["limit_mm_per_prompt"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(

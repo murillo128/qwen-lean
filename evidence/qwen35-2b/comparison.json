@@ -1,0 +1,37 @@
+{
+  "comparison_caveat": "Both lanes use whole-proof-v1, the same miniF2F validation tasks, temperature 0.8, top-p 0.95, no top-k, max_new_tokens 1024, seed 0, and unchanged Lean verification. Qwen3.5-2B uses the issue-mandated four candidates per task, while the retained reference-sft-v1 evidence uses eight.",
+  "delta_qwen35_2b_minus_reference_sft_v1": {
+    "pass@1": -0.03637295081967214,
+    "pass@4": -0.09086651053864168
+  },
+  "qwen35_2b": {
+    "candidates_per_task": 4,
+    "model_id": "Qwen/Qwen3.5-2B",
+    "model_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+    "pass_at_k": {
+      "pass@1": 0.0030737704918032786,
+      "pass@4": 0.012295081967213115
+    },
+    "tasks_with_verified_candidate": 3
+  },
+  "ratio_qwen35_2b_over_reference_sft_v1": {
+    "pass@1": 0.07792207792207792,
+    "pass@4": 0.1191827468785471
+  },
+  "reference_sft_v1": {
+    "adapter_hub_revision": "5a5fadc8ecfd46b31c7c6c2f3b8c00f1bcea6af5",
+    "adapter_id": "phase5-train-full-v1-lora",
+    "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+    "candidates_per_task": 8,
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "pass_at_k": {
+      "pass@1": 0.03944672131147541,
+      "pass@4": 0.1031615925058548
+    },
+    "source_evidence": "evidence/phase5/minif2f.json",
+    "tasks_with_verified_candidate": 35
+  },
+  "schema_version": "qwen35-2b-assessment-evidence-v1",
+  "status": "passed",
+  "workload_id": "minif2f-valid-v1"
+}
