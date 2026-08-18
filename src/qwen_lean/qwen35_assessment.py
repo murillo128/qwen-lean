@@ -8,6 +8,7 @@ import json
 import os
 import platform
 import subprocess
+import sys
 import threading
 import time
 from pathlib import Path
@@ -428,6 +429,7 @@ def _runtime_versions() -> dict[str, Any]:
     for name in (
         "bitsandbytes",
         "huggingface-hub",
+        "ninja",
         "nvidia-cuda-nvcc",
         "torch",
         "transformers",
@@ -458,6 +460,12 @@ def _runtime_versions() -> dict[str, Any]:
 
 
 def _configure_cuda_home() -> None:
+    executable_directory = str(Path(sys.executable).resolve().parent)
+    path_entries = os.environ.get("PATH", "").split(os.pathsep)
+    if executable_directory not in path_entries:
+        os.environ["PATH"] = os.pathsep.join(
+            [executable_directory, *path_entries]
+        )
     if os.environ.get("CUDA_HOME"):
         return
     namespace = importlib.util.find_spec("nvidia")

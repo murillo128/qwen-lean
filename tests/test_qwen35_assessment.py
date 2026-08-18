@@ -1,4 +1,6 @@
 import json
+import os
+import sys
 from pathlib import Path
 
 import pytest
@@ -12,6 +14,7 @@ from qwen_lean.qwen35_assessment import (
     _load_preflight_state,
     _numeric_summary,
     _classify_preflight_failure,
+    _configure_cuda_home,
     config_for_lane,
     validate_assessment_contract,
 )
@@ -110,6 +113,18 @@ def test_preflight_failure_classification_distinguishes_memory() -> None:
         _classify_preflight_failure("Could not find nvcc")
         == "compatibility_or_runtime"
     )
+
+
+def test_local_jit_tools_are_exposed_to_subprocesses(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("CUDA_HOME", raising=False)
+
+    _configure_cuda_home()
+
+    assert os.environ["PATH"].split(os.pathsep)[0] == str(
+        Path(sys.executable).resolve().parent
+    )
+    assert Path(os.environ["CUDA_HOME"], "bin", "nvcc").is_file()
 
 
 def test_numeric_summary_records_totals_and_percentiles() -> None:

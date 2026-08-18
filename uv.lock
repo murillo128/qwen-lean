@@ -3831,6 +3831,7 @@ phase2 = [
 ]
 qwen35 = [
     { name = "bitsandbytes", version = "0.49.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "ninja" },
     { name = "nvidia-cuda-nvcc" },
     { name = "vllm", version = "0.21.0", source = { registry = "https://pypi.org/simple" } },
 ]
@@ -3857,6 +3858,7 @@ requires-dist = [
     { name = "bitsandbytes", marker = "extra == 'training'", specifier = "==0.47.0" },
     { name = "datasets", marker = "extra == 'phase2'", specifier = "==4.0.0" },
     { name = "datasets", marker = "extra == 'training'", specifier = "==4.0.0" },
+    { name = "ninja", marker = "extra == 'qwen35'", specifier = "==1.13.0" },
     { name = "nvidia-cuda-nvcc", marker = "extra == 'qwen35'", specifier = "==13.0.48" },
     { name = "peft", marker = "extra == 'training'", specifier = "==0.17.1" },
     { name = "torch", marker = "extra == 'model'", specifier = "==2.8.0" },
