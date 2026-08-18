@@ -97,6 +97,15 @@ from .riemann_data import (
     materialize_riemann_data,
     validate_materialized_riemann_data,
 )
+from .qwen35_assessment import (
+    run_assessment as run_qwen35_assessment,
+)
+from .qwen35_assessment import (
+    run_preflight as run_qwen35_preflight,
+)
+from .qwen35_assessment import (
+    write_compact_evidence as write_qwen35_evidence,
+)
 from .sft2 import SFT2Config
 from .sft2_evidence import (
     write_sft2_checkpoint_a_evidence,
@@ -178,6 +187,52 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-preflight",
+        help="prove pinned Qwen3.5 BF16/text-only compatibility and GPU memory",
+    )
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_preflight.add_argument(
+        "--output", type=Path, default=root / "artifacts/qwen35-2b-base/preflight.json"
+    )
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-assess", help="run the strict local-GPU Qwen3.5 assessment"
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--timeout", type=float)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-evidence", help="write compact Qwen3.5 assessment evidence"
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight", type=Path, default=root / "artifacts/qwen35-2b-base/preflight.json"
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-2b-base/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-2b-base/full"
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-2b-base"
+    )
 
     gpt53_preflight = subparsers.add_parser(
         "gpt53-spark-preflight",
@@ -948,6 +1003,43 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-preflight":
+        summary = run_qwen35_preflight(Phase1Config.load(args.config), args.output)
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = run_qwen35_assessment(
+            config,
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            timeout_seconds=timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-evidence":
+        outputs = write_qwen35_evidence(
+            Phase1Config.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(outputs, indent=2))
+        return 0
 
     if args.command == "gpt53-spark-preflight":
         summary = run_preflight(GPT53Config.load(args.config), args.output_dir)

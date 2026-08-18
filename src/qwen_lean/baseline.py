@@ -216,6 +216,15 @@ def run_phase1_baseline(
             ),
             "chat_template": config.model.get("chat_template"),
             "prompt_transformation": None,
+            **(
+                {
+                    "limit_mm_per_prompt": dict(
+                        config.engine["limit_mm_per_prompt"]
+                    )
+                }
+                if "limit_mm_per_prompt" in config.engine
+                else {}
+            ),
             "adapter": None if adapter is None else adapter.metadata(),
         },
         runtime=runtime,
@@ -490,6 +499,8 @@ def vllm_engine_kwargs(
     }
     if "language_model_only" in engine:
         kwargs["language_model_only"] = bool(engine["language_model_only"])
+    if "limit_mm_per_prompt" in engine:
+        kwargs["limit_mm_per_prompt"] = dict(engine["limit_mm_per_prompt"])
     if adapter is not None:
         adapter.validate(config)
         kwargs.update(
