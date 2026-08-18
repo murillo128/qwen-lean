@@ -27,13 +27,6 @@ training = [
   "transformers==4.55.4",
   "trl==0.22.2",
 ]
-qwen35 = [
-  "bitsandbytes==0.49.2",
-  "ninja==1.13.0",
-  "nvidia-cuda-crt==13.0.48",
-  "nvidia-cuda-nvcc==13.0.48",
-  "vllm==0.21.0",
-]
 
 [dependency-groups]
 dev = [
@@ -53,19 +46,3 @@ testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/qwen_lean"]
-
-[tool.uv]
-conflicts = [
-  [
-    { extra = "baseline" },
-    { extra = "qwen35" },
-  ],
-  [
-    { extra = "model" },
-    { extra = "qwen35" },
-  ],
-  [
-    { extra = "training" },
-    { extra = "qwen35" },
-  ],
-]
