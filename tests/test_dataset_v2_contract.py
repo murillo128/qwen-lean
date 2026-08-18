@@ -2,6 +2,9 @@ from qwen_lean.dataset_v2_contract import (
     canonicalize_proof_expression,
     derivation_family_fingerprint,
     proof_fingerprint,
+    proof_variant_id,
+    statement_fingerprint_v2,
+    statement_id,
 )
 
 
@@ -64,3 +67,24 @@ def test_derivation_family_changes_with_dag_or_generator_family() -> None:
         normalized_proof_dag="root(branch(a,b))",
         generator_family="branching-v2",
     )
+
+
+def test_statement_identity_ignores_name_kind_comments_and_binder_alpha_renaming() -> None:
+    left = "theorem first (x : Nat) (h : x = x) : x = x"
+    right = "lemma second (value : Nat) (proof : value = value) : value = value -- same"
+
+    assert statement_fingerprint_v2(left) == statement_fingerprint_v2(right)
+    assert statement_id(left) == statement_id(right)
+
+
+def test_proof_variant_identity_is_scoped_to_statement() -> None:
+    proof = "by\n  exact h"
+    assert proof_variant_id("statement-a", proof) == proof_variant_id("statement-a", proof)
+    assert proof_variant_id("statement-a", proof) != proof_variant_id("statement-b", proof)
+
+
+def test_statement_identity_normalizes_quantified_and_lambda_binders() -> None:
+    left = "theorem first : (∀ x y : Nat, x = y → y = x) → (fun z => z) = id"
+    right = "lemma second : (∀ a b : Nat, a = b → b = a) → (fun value => value) = id"
+
+    assert statement_fingerprint_v2(left) == statement_fingerprint_v2(right)

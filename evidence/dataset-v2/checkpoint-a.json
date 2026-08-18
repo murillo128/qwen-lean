@@ -1,0 +1,89 @@
+{
+  "schema_version": "dataset-v2-checkpoint-a-v1",
+  "issue": 56,
+  "status": "OBSERVED",
+  "command": "artifacts/phase2/tooling/venv/bin/python tools/dataset_v2_build.py --mode preflight --output-dir artifacts/dataset-v2/preflight --workers 8 --composition-batch-size 256",
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "source_equivalence": {
+    "historical_trace_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "target_mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+    "changed_mathlib_source_files": 0,
+    "position_reuse": "accepted-byte-identical-source"
+  },
+  "real_proof_preflight": {
+    "mathlib_trace_files": 17,
+    "mathlib_candidates": 377,
+    "mathlib_term_rewrites_retained": 64,
+    "mathlib_by_proofs_retained": 16,
+    "pnt_plus_retained": 4,
+    "pnt_plus_accepted_inventory": 22,
+    "pnt_plus_dependency_audits": 22,
+    "pnt_plus_empty_dependency_audits": 0,
+    "ordinary_by_source_files_accepted": 15,
+    "pnt_source_files_accepted": 4,
+    "term_reconstruction_attempts": 81,
+    "term_reconstruction_accepted": 80,
+    "term_reconstruction_rejected_reserve_candidates": 1,
+    "rejected_reserve_candidate_ids": [
+      "e4a00747733490643439b972fae9075fc7736dfba33074130613cfba4ac06366"
+    ],
+    "term_reconstruction_files": {
+      "accepted": 8,
+      "partial_with_isolated_rejection": 1
+    }
+  },
+  "synthetic_preflight": {
+    "accepted_statements": 128,
+    "accepted_prime_statements": 32,
+    "generated_with_reserve": 296,
+    "resolved_after_constant_presence_audit": 281,
+    "unresolved_source_constants": 10,
+    "shortcut_rejections": 96,
+    "unique_statements": 128,
+    "unique_source_lemma_sets": 128,
+    "unique_derivation_families": 128,
+    "structural_classes": {
+      "direct": 48,
+      "branching": 43,
+      "deep": 37
+    },
+    "prime_families": {
+      "prime-arithmetic-divisibility": 8,
+      "arithmetic-functions": 7,
+      "prime-counting-pnt": 6,
+      "zeta-analytic-number-theory": 1,
+      "riemann-core-bubble": 6,
+      "pnt-plus": 4
+    }
+  },
+  "dataset_preflight": {
+    "records": 212,
+    "proof_variants": 212,
+    "roles": {
+      "training": 189,
+      "validation": 10,
+      "test": 13
+    },
+    "cross_role_statements": 0,
+    "cross_role_derivation_families": 0,
+    "cross_role_proofs": 0,
+    "optimizer_visible_evaluation_statements": 0,
+    "deterministic_records_rebuild_byte_equal": true,
+    "verified_legal_target_compatible_prime_omissions": 0,
+    "minif2f_valid_source": 244,
+    "minif2f_valid_retained": 244,
+    "minif2f_test_source": 244,
+    "minif2f_test_retained": 244
+  },
+  "artifact_sha256": {
+    "manifest.json": "4d0ccbbb8ffa5bc4286e9685387c0493ffbf3c86b98e2a76b5c023451db20cb3",
+    "verification.json": "cf63f89ad9c21c296a6dd1f8dff19e917f865f28f486a5d5d314fab6c46aeb33",
+    "records.jsonl.gz": "cd8de0e462c0a47ff0d61d98c5ce9c2f8f1ee7c76336e50218274fcd729684b6",
+    "prime-coverage.json": "6828555c9a5371d1123617126ba333d74ffb32492b5e0e14d8b32c938578aede"
+  }
+}
