@@ -182,6 +182,17 @@ def _iter_mathlib_traces(trace_root: Path, selected_files: list[str] | None = No
             self.dependencies: dict[str, object] = {}
 
     streamed = StreamedRepo()
+
+    class FailedTracedFile:
+        def __init__(self, path: Path, error: Exception) -> None:
+            self.path = path
+            self.error = error
+
+        def get_traced_theorems(self) -> list[Any]:
+            raise RuntimeError(
+                f"trace-deserialization-error:{type(self.error).__name__}:{self.error}"
+            ) from self.error
+
     source_paths = (
         [trace_root / item for item in sorted(selected_files)]
         if selected_files is not None
@@ -193,8 +204,17 @@ def _iter_mathlib_traces(trace_root: Path, selected_files: list[str] | None = No
         dep_path = trace_root / ".lake/build/ir" / relative.with_suffix(".dep_paths")
         if not ast_path.is_file() or not dep_path.is_file():
             raise RuntimeError(f"incomplete historical trace for {relative}")
-        traced = TracedFile.from_traced_file(trace_root, ast_path, repo)
-        traced.traced_repo = streamed
+        try:
+            traced = TracedFile.from_traced_file(trace_root, ast_path, repo)
+            traced.traced_repo = streamed
+        except Exception as error:  # noqa: BLE001 - preserve an explicit file disposition.
+            print(
+                f"Dataset v2: classified trace deserialization failure for {relative}: "
+                f"{type(error).__name__}",
+                file=sys.stderr,
+                flush=True,
+            )
+            traced = FailedTracedFile(relative, error)
         if index % 500 == 0:
             print(f"Dataset v2: read {index} traced Mathlib files", file=sys.stderr, flush=True)
         yield traced
