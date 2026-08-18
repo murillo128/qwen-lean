@@ -160,6 +160,31 @@ def test_where_theorem_is_recovered_as_an_explicit_structure_proof() -> None:
     assert "mpr h := h" in reconstructed
 
 
+def test_where_theorem_recovery_crosses_comments_before_first_field() -> None:
+    source = (
+        "theorem identity (P : Prop) : P ↔ P where\n"
+        "  -- the trace starts at the first field, after this comment\n"
+        "  mp h := h\n"
+        "  mpr h := h\n"
+    )
+    theorem = _Theorem(
+        proof_start=_Pos(3, 3),
+        proof_end=_Pos(4, len("  mpr h := h") + 1),
+    )
+    candidate = candidate_from_traced_theorem(
+        theorem,
+        source=source,
+        file_path="Mathlib/Test.lean",
+        source_repository="https://github.com/leanprover-community/mathlib4",
+        source_revision="a" * 40,
+        provenance="real-mathlib",
+    )
+
+    assert candidate.transformation_kind == "where-to-structure-exact"
+    assert "-- the trace starts" in candidate.source_expression
+    assert candidate.canonical_proof.startswith("by\n  exact {")
+
+
 def test_outer_assignment_recovers_complete_term_when_trace_points_inside_it() -> None:
     source = (
         "theorem identity : Function.Injective (fun n : Nat => n) :=\n"

@@ -178,10 +178,10 @@ def _contains_placeholder(value: str) -> bool:
     )
 
 
-def _top_level_assignment_indices(value: str) -> list[int]:
-    """Locate proof-assignment tokens outside comments, strings, and brackets."""
+def _top_level_token_indices(value: str, token: str) -> list[int]:
+    """Locate a token outside comments, strings, and brackets."""
 
-    assignments: list[int] = []
+    indices: list[int] = []
     closing_stack: list[str] = []
     block_comment_depth = 0
     in_line_comment = False
@@ -228,16 +228,31 @@ def _top_level_assignment_indices(value: str) -> list[int]:
             in_string = True
             index += 1
             continue
+        word_token = token[0].isalnum()
+        token_boundary = not word_token or (
+            (index == 0 or not (value[index - 1].isalnum() or value[index - 1] in "_'†"))
+            and (
+                index + len(token) >= len(value)
+                or not (
+                    value[index + len(token)].isalnum()
+                    or value[index + len(token)] in "_'†"
+                )
+            )
+        )
+        if (
+            not closing_stack
+            and token_boundary
+            and value.startswith(token, index)
+        ):
+            indices.append(index)
+            index += len(token)
+            continue
         if char in opening:
             closing_stack.append(opening[char])
         elif closing_stack and char == closing_stack[-1]:
             closing_stack.pop()
-        elif pair == ":=" and not closing_stack:
-            assignments.append(index)
-            index += 2
-            continue
         index += 1
-    return assignments
+    return indices
 
 
 def _proof_dependencies(proof_node: Any) -> tuple[str, ...]:
@@ -442,8 +457,9 @@ def candidate_from_traced_theorem(
     ):
         raise ValueError("private")
     recovered_assignment = False
-    if raw_declaration.rstrip().endswith("where"):
-        where_offset = raw_declaration.rstrip().rfind("where")
+    where_indices = _top_level_token_indices(raw_declaration, "where")
+    if where_indices:
+        where_offset = where_indices[-1]
         absolute_where_offset = (
             position_offset(source, source_span.start) + where_offset
         )
@@ -452,7 +468,7 @@ def candidate_from_traced_theorem(
         proof_span = SourceSpan(where_position, source_span.end)
         raw_declaration = source_slice(source, declaration_span)
     elif not raw_declaration.rstrip().endswith(":="):
-        assignments = _top_level_assignment_indices(raw_declaration)
+        assignments = _top_level_token_indices(raw_declaration, ":=")
         if assignments:
             recovered_assignment = True
             assignment_offset = assignments[-1]
