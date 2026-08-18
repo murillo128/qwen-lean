@@ -45,7 +45,7 @@ Use label replacements for execution-time returns:
 
 `completed` is a post-merge state. The Codex executor must not set `completed` or close the controlling issue as part of implementation delivery. After an explicit user/ChatGPT review accepts and merges the ready PR, the user-facing merge workflow may set `completed` and close the issue after observing the merge.
 
-Add comments only when a material reason, technical finding, contract amendment, exact checkpoint target/verdict, blocker capability, or final handoff must be preserved.
+By default, add comments only when a material reason, technical finding, contract amendment, exact checkpoint target/verdict, blocker capability, or final handoff must be preserved. A calling workflow may explicitly request additional progress-observability comments; when it does, follow that narrow reporting policy without treating progress comments as checkpoints or technical evidence.
 
 ## Execution loop
 
@@ -89,9 +89,9 @@ Do not add workflow bookkeeping to technical artifacts unless it is itself relev
 
 Publish when remote preservation, collaboration, a checkpoint, or PR review requires it. Exact SHAs are useful for review targets and dependency pins, not routine progress prose.
 
-## Material comments
+## Comments and progress observability
 
-Comment only when:
+By default, comment only when:
 
 - a checkpoint is ready;
 - scope or acceptance changes;
@@ -110,6 +110,16 @@ Use:
 ```
 
 At a checkpoint, include the exact published target and any dependency revision needed for review.
+
+When a calling workflow explicitly requests progress observability, concise progress comments are additionally allowed or required at the phase boundaries defined by that caller. Such comments must remain operational rather than evidentiary: they report what is running, what just finished, coarse progress when cheaply available, and what comes next.
+
+Progress-observability comments:
+
+- do not require a published review target;
+- do not trigger independent review;
+- do not change issue scope, acceptance, or workflow state;
+- do not replace normal checkpoint, blocker, design/investigation-return, or final-handoff comments;
+- should not reproduce logs or emit per-item/per-step chatter.
 
 ## Review checkpoints
 
