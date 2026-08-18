@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import platform
+import shutil
 import statistics
 import subprocess
 import threading
@@ -129,6 +130,7 @@ class Qwen35BaseAssessmentConfig:
             or runtime["inference_engine_version"] != "0.23.0"
             or runtime["expected_cuda_device_name"]
             != "NVIDIA RTX 4000 Ada Generation"
+            or runtime["cuda_toolkit_source"] != "isolated-python-runtime"
             or runtime["vllm_enable_v1_multiprocessing"] is not False
             or runtime["vllm_worker_multiproc_method"] != "spawn"
         ):
@@ -979,6 +981,7 @@ def _render_evidence_readme(payload: dict[str, Any]) -> str:
 
 
 def _configure_vllm_environment(config: Qwen35BaseAssessmentConfig) -> None:
+    _configure_cuda_toolkit(config)
     expected_mp = "0" if not config.runtime["vllm_enable_v1_multiprocessing"] else "1"
     requested = {
         "VLLM_ENABLE_V1_MULTIPROCESSING": expected_mp,
@@ -993,6 +996,30 @@ def _configure_vllm_environment(config: Qwen35BaseAssessmentConfig) -> None:
                 f"{name}={current!r} conflicts with frozen runtime value {expected!r}"
             )
         os.environ[name] = expected
+
+
+def _configure_cuda_toolkit(config: Qwen35BaseAssessmentConfig) -> None:
+    if config.runtime["cuda_toolkit_source"] != "isolated-python-runtime":
+        raise RuntimeError("unsupported CUDA toolkit source")
+    import sysconfig
+
+    cuda_home = Path(sysconfig.get_paths()["purelib"]) / "nvidia" / "cu13"
+    nvcc = cuda_home / "bin" / "nvcc"
+    if not nvcc.is_file():
+        raise RuntimeError(f"isolated runtime CUDA compiler is missing: {nvcc}")
+    requested = str(cuda_home.resolve())
+    existing = os.environ.get("CUDA_HOME")
+    if existing is not None and Path(existing).resolve() != cuda_home.resolve():
+        raise RuntimeError(
+            f"CUDA_HOME={existing!r} conflicts with isolated runtime {requested!r}"
+        )
+    os.environ["CUDA_HOME"] = requested
+    bin_path = str((cuda_home / "bin").resolve())
+    path_entries = os.environ.get("PATH", "").split(os.pathsep)
+    if bin_path not in path_entries:
+        os.environ["PATH"] = os.pathsep.join([bin_path, *path_entries])
+    if shutil.which("nvcc") != str(nvcc.resolve()):
+        raise RuntimeError("isolated runtime nvcc is not first on PATH")
 
 
 def _validate_runtime_versions(
@@ -1032,6 +1059,11 @@ def _local_runtime(config: Qwen35BaseAssessmentConfig) -> dict[str, Any]:
             "issue #43 requires NVIDIA RTX 4000 Ada Generation; "
             f"detected {properties.name!r}"
         )
+    nvcc = subprocess.run(
+        ["nvcc", "--version"], text=True, capture_output=True, check=False
+    )
+    if nvcc.returncode != 0:
+        raise RuntimeError(f"nvcc version probe failed: {nvcc.stderr.strip()}")
     return {
         "python": platform.python_version(),
         "torch": torch.__version__,
@@ -1039,6 +1071,8 @@ def _local_runtime(config: Qwen35BaseAssessmentConfig) -> dict[str, Any]:
         "transformers": transformers.__version__,
         "vllm": vllm.__version__,
         "bitsandbytes": bitsandbytes.__version__,
+        "cuda_toolkit_source": config.runtime["cuda_toolkit_source"],
+        "nvcc_version": nvcc.stdout.strip().splitlines()[-1],
         "cuda_device_index": index,
         "cuda_device": properties.name,
         "cuda_device_capability": [properties.major, properties.minor],
