@@ -7,7 +7,7 @@ import pytest
 from qwen_lean.artifacts import write_artifacts
 from qwen_lean.baseline import vllm_engine_kwargs
 from qwen_lean.metrics import summarize_results
-from qwen_lean.qwen35_assessment import (
+from qwen_lean.qwen35_4b_posttrained_assessment import (
     DEV16_WORKLOAD_ID,
     FULL_WORKLOAD_ID,
     MODEL_ID,

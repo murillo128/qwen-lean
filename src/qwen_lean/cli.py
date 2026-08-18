@@ -85,7 +85,7 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
-from .qwen35_assessment import (
+from .qwen35_4b_posttrained_assessment import (
     load_assessment_config as load_qwen35_assessment_config,
     run_preflight as run_qwen35_preflight,
     run_strict_assessment as run_qwen35_strict_assessment,
