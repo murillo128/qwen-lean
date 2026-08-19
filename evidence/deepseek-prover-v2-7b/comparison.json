@@ -1,0 +1,101 @@
+{
+  "accepted_anchors": {
+    "qwen35_4b_base": {
+      "candidate_count": 976,
+      "candidates_per_task": 4,
+      "id": "Qwen/Qwen3.5-4B-Base",
+      "pass_at_k": {
+        "pass@1": 0.07172131147540983,
+        "pass@4": 0.18442622950819673
+      },
+      "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+      "source": "evidence/qwen35-4b-base/full.json"
+    },
+    "qwen3_8b_base": {
+      "candidate_count": 1952,
+      "candidates_per_task": 8,
+      "id": "Qwen/Qwen3-8B-Base",
+      "pass_at_k": {
+        "pass@1": 0.012807377049180328,
+        "pass@4": 0.04771662763466042
+      },
+      "revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "source": "evidence/phase1/baseline"
+    },
+    "qwen3_8b_posttrained": {
+      "candidate_count": 976,
+      "candidates_per_task": 4,
+      "id": "Qwen/Qwen3-8B",
+      "pass_at_k": {
+        "pass@1": 0.004098360655737705,
+        "pass@4": 0.01639344262295082
+      },
+      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "source": "evidence/qwen3-8b-posttrained/full.json"
+    },
+    "reference_sft_v1": {
+      "adapter_id": "phase5-train-full-v1-lora",
+      "base_model_id": "Qwen/Qwen3-8B-Base",
+      "base_model_revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+      "candidate_count": 1952,
+      "candidates_per_task": 8,
+      "id": "reference-sft-v1",
+      "pass_at_k": {
+        "pass@1": 0.03944672131147541,
+        "pass@4": 0.1031615925058548
+      },
+      "source": "evidence/phase5/minif2f.json"
+    }
+  },
+  "anchors_regenerated": false,
+  "candidate_budget_caveat": "The strict DeepSeek, Qwen3-8B post-trained, and Qwen3.5-4B-Base lanes use four candidates per task. The historical Qwen3-8B-Base and reference-sft-v1 anchors use eight; their pass@1/pass@4 values use the same estimator and verifier but have a different finite sampling budget.",
+  "execution_limitations": [
+    "Concurrent non-assessment Lean work was observed on the shared host during full verification. Generation timing is unaffected, but verification and total wall time are descriptive system measurements; all frozen 30-second verifier_timeout outcomes remain unsuccessful proofs and were not retried."
+  ],
+  "goedel_comparison": {
+    "id": "Goedel-LM/Goedel-Prover-V2-8B",
+    "reason": "No accepted qwen-lean-measured Goedel-Prover-V2-8B evidence is present in the authoritative repository; failed or partial sibling-run observations are not imported.",
+    "source": null,
+    "status": "unavailable"
+  },
+  "metrics": {
+    "pass@1": {
+      "deepseek_prover_v2_7b": 0.15163934426229508,
+      "delta_deepseek_minus_qwen35_4b_base": 0.07991803278688525,
+      "delta_deepseek_minus_qwen3_8b_base": 0.13883196721311475,
+      "delta_deepseek_minus_qwen3_8b_posttrained": 0.14754098360655737,
+      "delta_deepseek_minus_reference_sft_v1": 0.11219262295081966,
+      "qwen35_4b_base": 0.07172131147540983,
+      "qwen3_8b_base": 0.012807377049180328,
+      "qwen3_8b_posttrained": 0.004098360655737705,
+      "reference_sft_v1": 0.03944672131147541
+    },
+    "pass@4": {
+      "deepseek_prover_v2_7b": 0.3319672131147541,
+      "delta_deepseek_minus_qwen35_4b_base": 0.14754098360655735,
+      "delta_deepseek_minus_qwen3_8b_base": 0.28425058548009363,
+      "delta_deepseek_minus_qwen3_8b_posttrained": 0.31557377049180324,
+      "delta_deepseek_minus_reference_sft_v1": 0.22880562060889928,
+      "qwen35_4b_base": 0.18442622950819673,
+      "qwen3_8b_base": 0.04771662763466042,
+      "qwen3_8b_posttrained": 0.01639344262295082,
+      "reference_sft_v1": 0.1031615925058548
+    }
+  },
+  "schema_version": "deepseek-prover-v2-7b-comparison-v1",
+  "status": "passed",
+  "strict_execution_integrity": {
+    "candidate_count": 976,
+    "chat_template": null,
+    "infrastructure_error_count": 0,
+    "proof_extraction": false,
+    "raw_continuation": true,
+    "repair": false,
+    "task_count": 244,
+    "verifier_feedback": false,
+    "verifier_timeout_count": 251
+  },
+  "strict_model": "deepseek-ai/DeepSeek-Prover-V2-7B",
+  "strict_model_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+  "workload_id": "minif2f-valid-v1"
+}

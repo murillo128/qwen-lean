@@ -1,0 +1,151 @@
+{
+  "benchmark": {
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "split": "validation",
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    }
+  },
+  "candidate_count": 976,
+  "candidates_per_task": 4,
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 577,
+    "verified": 148,
+    "verifier_error": 0,
+    "verifier_timeout": 251
+  },
+  "compute_per_solved_task": {
+    "generated_tokens": 7090.691358024691,
+    "generation_wall_seconds": 44.437563722012534,
+    "run_wall_seconds": 76.2007639129879,
+    "unavailable_reason": null
+  },
+  "execution_limitations": [
+    "Concurrent non-assessment Lean work was observed on the shared host during full verification. Generation timing is unaffected, but verification and total wall time are descriptive system measurements; all frozen 30-second verifier_timeout outcomes remain unsuccessful proofs and were not retried."
+  ],
+  "finish_reason_counts": {
+    "eos": 533,
+    "token_limit": 443
+  },
+  "generated_token_counts": {
+    "maximum": 1024,
+    "mean": 588.469262295082,
+    "median": 534.0,
+    "minimum": 12,
+    "total": 574346
+  },
+  "generation_identity_sha256": "6ba1555be3e21409eddf76651096d9f4a2911e02b2e14f16b502a30a4490ff97",
+  "generation_settings": {
+    "adapter": null,
+    "candidates_per_task": 4,
+    "chat_template": null,
+    "do_sample": true,
+    "dtype": "bfloat16",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_new_tokens": 1024,
+    "max_num_seqs": 8,
+    "prompt_transformation": null,
+    "quantization": null,
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit",
+    "temperature": 0.8,
+    "tensor_parallel_size": 1,
+    "top_k": -1,
+    "top_p": 0.95
+  },
+  "identity_checks": {
+    "ada_gpu": true,
+    "bf16": true,
+    "candidate_budget": true,
+    "inference_engine": true,
+    "inference_engine_version": true,
+    "local_cuda": true,
+    "model_id": true,
+    "model_revision": true,
+    "no_quantization": true,
+    "prompt_format_id": true,
+    "raw_continuation": true,
+    "strict_sampling": true,
+    "tokenizer_id": true,
+    "tokenizer_revision": true,
+    "workload_id": true
+  },
+  "infrastructure_error_count": 0,
+  "model": {
+    "id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "license": "MIT",
+    "revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+    "tokenizer_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "tokenizer_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b"
+  },
+  "pass_at_k": {
+    "pass@1": 0.15163934426229508,
+    "pass@4": 0.3319672131147541
+  },
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "environment_probe_timeout_seconds": 120.0,
+    "generation_wall_time_seconds": 3599.4426614830154,
+    "gpu_memory_monitoring": "unavailable",
+    "inference_engine": "vllm",
+    "inference_engine_version": "0.10.2",
+    "inference_execution": "local_cuda",
+    "package_versions": {
+      "torch": "2.8.0",
+      "transformers": "4.55.4",
+      "vllm": "0.10.2"
+    },
+    "post_generation_environment_probe_timeout_seconds": 120.0,
+    "post_generation_environment_probe_wall_time_seconds": 40.233714665984735,
+    "python": "3.12.14",
+    "sampling_backend": "vllm_pytorch_native_fallback",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8",
+    "verification_wall_time_seconds": 2532.5855008030194,
+    "verification_workers": 8
+  },
+  "schema_version": "deepseek-prover-v2-7b-run-evidence-v1",
+  "status": "passed",
+  "task_count": 244,
+  "tasks_with_verified_candidate": {
+    "count": 81,
+    "fraction": 0.3319672131147541
+  },
+  "throughput": {
+    "candidates_per_generation_second": 0.27115309001696275,
+    "generated_tokens_per_second": 159.565258851314
+  },
+  "timing_seconds": {
+    "candidate_total_latency_mean": 35.301686365029916,
+    "candidate_total_latency_sum": 34454.4458922692,
+    "generation_candidate_latency_mean": 14.723295107782775,
+    "generation_candidate_latency_sum": 14369.936025195988,
+    "generation_wall": 3599.4426614830154,
+    "run_wall": 6172.2618769520195,
+    "verification_latency_mean": 20.578391257247144,
+    "verification_latency_sum": 20084.50986707321,
+    "verification_wall": 2532.5855008030194
+  },
+  "verifier_timeout_count": 251,
+  "verifier_timeout_semantics": "unsuccessful_proof_outcome",
+  "workload_id": "minif2f-valid-v1"
+}
