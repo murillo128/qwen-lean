@@ -30,6 +30,16 @@ from .gpt53_assessment import (
     write_compact_evidence as write_gpt53_evidence,
 )
 from .minif2f import Phase1Config
+from .olmo3_assessment import (
+    load_assessment_config as load_olmo3_config,
+)
+from .olmo3_assessment import run_preflight as run_olmo3_preflight
+from .olmo3_assessment import (
+    run_strict_assessment as run_olmo3_assessment,
+)
+from .olmo3_assessment import (
+    write_compact_evidence as write_olmo3_evidence,
+)
 from .qwen3_posttrained_assessment import (
     load_assessment_config as load_qwen3_posttrained_config,
 )
@@ -344,6 +354,59 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/deepseek-prover-v2-7b",
+    )
+
+    olmo3_preflight = subparsers.add_parser(
+        "olmo3-preflight",
+        help="run the local BF16 OLMo 3 7B compatibility preflight",
+    )
+    olmo3_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_preflight.add_argument(
+        "--output", type=Path, default=root / "artifacts/olmo3-7b/preflight.json"
+    )
+
+    olmo3_assess = subparsers.add_parser(
+        "olmo3-assess", help="run the strict OLMo 3 7B miniF2F assessment"
+    )
+    olmo3_assess.add_argument("--benchmark-root", type=Path, required=True)
+    olmo3_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    olmo3_assess.add_argument("--output-dir", type=Path, required=True)
+    olmo3_assess.add_argument("--verification-workers", type=int, default=8)
+
+    olmo3_evidence = subparsers.add_parser(
+        "olmo3-evidence", help="write compact OLMo 3 7B assessment evidence"
+    )
+    olmo3_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/olmo3-7b/preflight.json",
+    )
+    olmo3_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/olmo3-7b/dev16"
+    )
+    olmo3_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/olmo3-7b/full"
+    )
+    olmo3_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/olmo3-7b"
     )
 
     qwen35_9b_posttrained_preflight = subparsers.add_parser(
@@ -1485,6 +1548,38 @@ def main(argv: list[str] | None = None) -> int:
             evidence_dir=args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "olmo3-preflight":
+        evidence = run_olmo3_preflight(
+            load_olmo3_config(args.config), args.output
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "olmo3-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_olmo3_assessment(
+            load_olmo3_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "olmo3-evidence":
+        evidence = write_olmo3_evidence(
+            load_olmo3_config(args.config),
+            preflight_path=args.preflight,
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
         return 0
 
     if args.command == "qwen35-9b-preflight":

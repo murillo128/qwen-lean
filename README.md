@@ -188,6 +188,31 @@ memory, pass@1/pass@4, all evaluator categories and finish reasons, generated
 tokens, timing, throughput, and compute per solved task when defined. Raw
 candidates, weights, caches, and logs remain ignored under `artifacts/`.
 
+## OLMo 3 7B Base strict casting assessment
+
+OLMo 3 requires a newer inference stack than the Phase 1 baseline. Its locked
+vLLM 0.12.0 / Transformers 4.57.3 runtime remains isolated while reusing the
+same pinned miniF2F checkout, raw `whole-proof-v1` continuation, and Lean
+verifier. Run the BF16 compatibility/memory preflight, dev16 smoke, complete
+244-by-4 assessment, and compact-evidence writer in order on the project Ada GPU:
+
+```bash
+uv sync --frozen --project tools/olmo3-assessment
+uv run --frozen --project tools/olmo3-assessment qwen-lean olmo3-preflight
+uv run --frozen --project tools/olmo3-assessment qwen-lean olmo3-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/olmo3-7b/dev16
+uv run --frozen --project tools/olmo3-assessment qwen-lean olmo3-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/olmo3-7b/full
+uv run --frozen --project tools/olmo3-assessment qwen-lean olmo3-evidence
+```
+
+Only compact evidence is committed. Weights, caches, raw candidates, and bulky
+logs remain outside Git under the ignored `artifacts/` namespace.
+
 ## Phase 2 verified mathlib corpus
 
 Phase 2 uses LeanDojo-v2 at the revision pinned in

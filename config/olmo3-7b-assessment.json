@@ -1,0 +1,98 @@
+{
+  "schema_version": "phase1-config-v1",
+  "benchmark": {
+    "repository": "google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "source_path": "MiniF2F/Valid.lean",
+    "primary_task_manifest": "minif2f-valid-task-ids.txt",
+    "split": "validation",
+    "expected_primary_task_count": 244,
+    "lean_toolchain": "leanprover/lean4:v4.27.0",
+    "license": "Apache-2.0",
+    "attribution": "Copyright (c) 2021 OpenAI; authors Kunhao Zheng, Stanislas Polu, David Renshaw, OpenAI GPT-f"
+  },
+  "workloads": {
+    "minif2f-valid-dev16-v1": {
+      "selection": "explicit_ids",
+      "selection_rule": "first 16 primary task IDs in ascending Unicode code-point order",
+      "expected_task_count": 16,
+      "task_ids": [
+        "aimeII_2001_p3",
+        "aimeII_2020_p6",
+        "aimeI_2000_p7",
+        "aime_1983_p9",
+        "aime_1984_p15",
+        "aime_1984_p5",
+        "aime_1987_p8",
+        "aime_1988_p3",
+        "aime_1988_p4",
+        "aime_1990_p2",
+        "aime_1991_p1",
+        "aime_1991_p6",
+        "aime_1994_p4",
+        "aime_1996_p5",
+        "aime_1997_p11",
+        "algebra_2complexrootspoly_xsqp49eqxp7itxpn7i"
+      ]
+    },
+    "minif2f-valid-v1": {
+      "selection": "all",
+      "expected_task_count": 244
+    }
+  },
+  "model": {
+    "model_id": "allenai/Olmo-3-1025-7B",
+    "model_revision": "a81bae42db3975be1671e27b9c9a56da1a9f980f",
+    "tokenizer_id": "allenai/Olmo-3-1025-7B",
+    "tokenizer_revision": "a81bae42db3975be1671e27b9c9a56da1a9f980f",
+    "chat_template": null
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.12.0",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_num_seqs": 8,
+    "enforce_eager": true,
+    "quantization": null,
+    "use_flashinfer_sampler": false,
+    "vllm_enable_v1_multiprocessing": false,
+    "require_gpu_memory_monitor": true,
+    "required_runtime_packages": [
+      "huggingface-hub",
+      "nvidia-ml-py",
+      "transformers",
+      "vllm"
+    ],
+    "expected_cuda_device_name_fragment": "Ada"
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "known_valid_candidate": "ring"
+  },
+  "assessment": {
+    "id": "olmo3-7b-whole-proof-v1",
+    "prompt_format_id": "whole-proof-v1",
+    "chat_template": null,
+    "proof_extraction": false,
+    "verifier_feedback": false,
+    "repair": false,
+    "environment_probe_timeout_seconds": 120.0,
+    "preflight_max_new_tokens": 32,
+    "model_license": "Apache-2.0",
+    "runtime_isolation": "tools/olmo3-assessment"
+  }
+}
