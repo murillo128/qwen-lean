@@ -30,6 +30,13 @@ from .gpt53_assessment import (
     write_compact_evidence as write_gpt53_evidence,
 )
 from .minif2f import Phase1Config
+from .ministral3_assessment import (
+    Ministral3AssessmentConfig,
+    reverify_assessment as reverify_ministral3_assessment,
+    run_assessment as run_ministral3_assessment,
+    run_preflight as run_ministral3_preflight,
+    write_compact_evidence as write_ministral3_evidence,
+)
 from .olmo3_assessment import (
     load_assessment_config as load_olmo3_config,
 )
@@ -729,6 +736,87 @@ def _parser() -> argparse.ArgumentParser:
     )
     gpt53_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/gpt53-spark"
+    )
+
+    ministral_preflight = subparsers.add_parser(
+        "ministral3-8b-base-preflight",
+        help="freeze the local BF16 or NF4 Ministral 3 assessment lane",
+    )
+    ministral_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    ministral_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    ministral_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/ministral3-8b-base-assessment.json",
+    )
+    ministral_preflight.add_argument(
+        "--output",
+        type=Path,
+        default=root / "artifacts/ministral3-8b-base/preflight.json",
+    )
+
+    ministral_assess = subparsers.add_parser(
+        "ministral3-8b-base-assess",
+        help="run strict local Ministral 3 whole-proof assessment",
+    )
+    ministral_assess.add_argument("--benchmark-root", type=Path, required=True)
+    ministral_assess.add_argument("--model-snapshot", type=Path, required=True)
+    ministral_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/ministral3-8b-base-assessment.json",
+    )
+    ministral_assess.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/ministral3-8b-base/preflight.json",
+    )
+    ministral_assess.add_argument(
+        "--workload", required=True, choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1")
+    )
+    ministral_assess.add_argument("--output-dir", type=Path, required=True)
+
+    ministral_reverify = subparsers.add_parser(
+        "ministral3-8b-base-reverify",
+        help="reverify unchanged Ministral 3 candidates after an environment failure",
+    )
+    ministral_reverify.add_argument("--benchmark-root", type=Path, required=True)
+    ministral_reverify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/ministral3-8b-base-assessment.json",
+    )
+    ministral_reverify.add_argument("--input-dir", type=Path, required=True)
+    ministral_reverify.add_argument("--output-dir", type=Path, required=True)
+
+    ministral_evidence = subparsers.add_parser(
+        "ministral3-8b-base-evidence",
+        help="write compact Ministral 3 assessment evidence",
+    )
+    ministral_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/ministral3-8b-base-assessment.json",
+    )
+    ministral_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/ministral3-8b-base/preflight.json",
+    )
+    ministral_evidence.add_argument(
+        "--dev16-dir",
+        type=Path,
+        default=root / "artifacts/ministral3-8b-base/dev16",
+    )
+    ministral_evidence.add_argument(
+        "--full-dir",
+        type=Path,
+        default=root / "artifacts/ministral3-8b-base/full",
+    )
+    ministral_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/ministral3-8b-base",
     )
 
     qwen35_9b_preflight = subparsers.add_parser(
@@ -1800,6 +1888,49 @@ def main(argv: list[str] | None = None) -> int:
             evidence_dir=args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "ministral3-8b-base-preflight":
+        evidence = run_ministral3_preflight(
+            Ministral3AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "ministral3-8b-base-assess":
+        _, _, summary = run_ministral3_assessment(
+            Ministral3AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "ministral3-8b-base-reverify":
+        _, _, summary = reverify_ministral3_assessment(
+            Ministral3AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.input_dir,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "ministral3-8b-base-evidence":
+        evidence = write_ministral3_evidence(
+            Ministral3AssessmentConfig.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
         return 0
 
     if args.command == "qwen35-9b-base-preflight":

@@ -1,0 +1,100 @@
+{
+  "accepted_lane": "bf16-text-only-v1",
+  "assessment_id": "ministral3-8b-base-whole-proof-v1",
+  "benchmark_environment": {
+    "benchmark_split": "validation",
+    "known_valid_candidate_category": "verified",
+    "known_valid_candidate_lean_exit_code": 0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "placeholder_candidate_category": "lean_rejected",
+    "placeholder_candidate_lean_exit_code": 0,
+    "preamble": "import MiniF2F.ProblemImports\n\nopen scoped Real\nopen scoped Nat\nopen scoped Topology\nopen scoped Polynomial",
+    "primary_task_count": 244,
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    }
+  },
+  "bf16_attempt": {
+    "candidate_count": 4,
+    "candidate_sha256": [
+      "cbfdeb610f26d1fcb16f471c1677d59998d8a8104765c33799c3a09f5a758fc1",
+      "90096d970b2d5e5b9fc1d33b9291d3374dbe24421201052a15dfcec398db944d",
+      "bea273a589365e1c230b6d37bb5bb7423214544eaf37f7217220b45ef364ea07",
+      "d555af3f669716d4041e2cfe8739f1af34d04b3fa1e3d9381a8c8b2f7b35b0b3"
+    ],
+    "error": null,
+    "expected_candidate_count": 4,
+    "finish_reason_counts": {
+      "token_limit": 4
+    },
+    "generated_token_count": 4096,
+    "generation_seconds": 52.475095845991746,
+    "lane": {
+      "cpu_offload_gb": 0,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "gpu_memory_utilization": 0.95,
+      "lane_id": "bf16-text-only-v1",
+      "language_model_only": true,
+      "load_format": "auto",
+      "max_model_len": 2048,
+      "max_num_seqs": 16,
+      "quantization": null,
+      "tensor_parallel_size": 1,
+      "tokenizer_mode": "mistral"
+    },
+    "load_seconds": 115.91108842298854,
+    "memory_failure": false,
+    "peak_cuda_allocated_bytes": 19078232576,
+    "peak_cuda_reserved_bytes": 19123929088,
+    "peak_device_memory_used_mib": 18468,
+    "prompt_count": 1,
+    "status": "passed",
+    "wall_seconds": 172.97704103100114
+  },
+  "chat_template": null,
+  "config_sha256": "d56217fb3132a5bf05b8b12bfb5bc7585a667cc1c7ddb67e13f63eab9bcb5d90",
+  "fallback_attempt": null,
+  "model": {
+    "model_id": "mistralai/Ministral-3-8B-Base-2512",
+    "model_revision": "d4883f9b36aa2e5d775730d3fdba3d30de51a8ef",
+    "tokenizer_id": "mistralai/Ministral-3-8B-Base-2512",
+    "tokenizer_revision": "d4883f9b36aa2e5d775730d3fdba3d30de51a8ef"
+  },
+  "model_snapshot": {
+    "local_cache_used": true,
+    "path_committed": false,
+    "revision": "d4883f9b36aa2e5d775730d3fdba3d30de51a8ef"
+  },
+  "prompt_format_id": "whole-proof-v1",
+  "prompt_transformation": null,
+  "runtime": {
+    "bitsandbytes": "0.49.1",
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cuda_linker_layout": "python-wheel-lib64-compat-v1",
+    "cuda_toolkit_source": "isolated-python-runtime",
+    "mistral_common": "1.11.7",
+    "nvcc_version": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "python": "3.12.14",
+    "torch": "2.11.0+cu130",
+    "torch_cuda_version": "13.0",
+    "transformers": "5.15.0",
+    "vllm": "0.23.0",
+    "vllm_enable_v1_multiprocessing": false,
+    "vllm_worker_multiproc_method": "spawn"
+  },
+  "schema_version": "ministral3-8b-base-preflight-v1",
+  "status": "passed"
+}

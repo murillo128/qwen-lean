@@ -66,7 +66,6 @@ def test_timed_out_preamble_is_a_verifier_error(tmp_path: Path) -> None:
     assert outcome.category == "verifier_error"
     assert "verifier environment probe failed" in outcome.diagnostics["stderr"]
 
-
 def test_zero_exit_error_diagnostic_is_rejected(tmp_path: Path) -> None:
     fake_lake = tmp_path / "fake-lake"
     fake_lake.write_text(
