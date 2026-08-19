@@ -246,6 +246,44 @@ prompt, extract a proof from prose, retry generation, or expose Lean feedback to
 the model. The optional native-prover/self-correction diagnostic is separate and
 is not part of the strict score.
 
+## Ministral 3 8B Base strict casting assessment
+
+The Ministral assessment pins model and tokenizer
+`mistralai/Ministral-3-8B-Base-2512` at revision
+`d4883f9b36aa2e5d775730d3fdba3d30de51a8ef`. Its isolated vLLM 0.23.0
+runtime uses the native Mistral tokenizer backend and text-only language-model
+path. The accepted preflight lane is unquantized BF16; the configured NF4 lane
+is only a memory-failure fallback and was not exercised. With the pinned model
+snapshot available locally, reproduce the preflight, dev16 gate, full 244-by-4
+assessment, and compact evidence on the project Ada GPU:
+
+```bash
+uv sync --frozen --project tools/ministral3-8b-base-eval
+uv run --frozen --project tools/ministral3-8b-base-eval qwen-lean \
+  ministral3-8b-base-preflight \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --model-snapshot /path/to/pinned-ministral-snapshot
+uv run --frozen --project tools/ministral3-8b-base-eval qwen-lean \
+  ministral3-8b-base-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --model-snapshot /path/to/pinned-ministral-snapshot \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/ministral3-8b-base/dev16
+uv run --frozen --project tools/ministral3-8b-base-eval qwen-lean \
+  ministral3-8b-base-assess \
+  --benchmark-root /tmp/qwen-lean-minif2f \
+  --model-snapshot /path/to/pinned-ministral-snapshot \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/ministral3-8b-base/full
+uv run --frozen --project tools/ministral3-8b-base-eval qwen-lean \
+  ministral3-8b-base-evidence
+```
+
+The compact evidence records the accepted lane and runtime, exact revisions,
+peak memory, pass metrics, evaluator categories, finish reasons, generated
+tokens, timing, throughput, and compute per solved task when defined. Raw
+candidates, weights, caches, and bulky logs remain ignored under `artifacts/`.
+
 ## Phase 2 verified mathlib corpus
 
 Phase 2 uses LeanDojo-v2 at the revision pinned in

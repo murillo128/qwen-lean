@@ -67,7 +67,6 @@ def test_timed_out_preamble_is_a_verifier_error(tmp_path: Path) -> None:
     assert outcome.category == "verifier_error"
     assert "verifier environment probe failed" in outcome.diagnostics["stderr"]
 
-
 def test_timeout_kills_child_process(tmp_path: Path) -> None:
     child_pid_path = tmp_path / "child.pid"
     fake_lake = tmp_path / "slow-lake"
