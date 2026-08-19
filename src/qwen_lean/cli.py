@@ -21,6 +21,11 @@ from .deepseek_prover_assessment import (
 from .deepseek_prover_assessment import (
     write_compact_evidence as write_deepseek_prover_evidence,
 )
+from .goedel_assessment import (
+    run_assessment as run_goedel_assessment,
+    run_preflight as run_goedel_preflight,
+    write_compact_evidence as write_goedel_evidence,
+)
 from .gpt53_assessment import (
     GPT53Config,
     run_assessment,
@@ -833,6 +838,74 @@ def _parser() -> argparse.ArgumentParser:
     )
     qwen35_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/qwen35-2b"
+    )
+
+    goedel_preflight = subparsers.add_parser(
+        "goedel-preflight",
+        help="validate the pinned Goedel-Prover snapshot and strict environment",
+    )
+    goedel_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    goedel_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    goedel_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/goedel-prover-v2-assessment.json",
+    )
+    goedel_preflight.add_argument(
+        "--output",
+        type=Path,
+        default=root / "artifacts/goedel-prover-v2/preflight.json",
+    )
+
+    goedel_assess = subparsers.add_parser(
+        "goedel-assess",
+        help="run strict local Goedel-Prover-V2 miniF2F generation and verification",
+    )
+    goedel_assess.add_argument("--benchmark-root", type=Path, required=True)
+    goedel_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/goedel-prover-v2-assessment.json",
+    )
+    goedel_assess.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/goedel-prover-v2/preflight.json",
+    )
+    goedel_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    goedel_assess.add_argument("--output-dir", type=Path, required=True)
+
+    goedel_evidence = subparsers.add_parser(
+        "goedel-evidence", help="write compact Goedel-Prover-V2 assessment evidence"
+    )
+    goedel_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/goedel-prover-v2-assessment.json",
+    )
+    goedel_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/goedel-prover-v2/preflight.json",
+    )
+    goedel_evidence.add_argument(
+        "--dev16-dir",
+        type=Path,
+        default=root / "artifacts/goedel-prover-v2/dev16",
+    )
+    goedel_evidence.add_argument(
+        "--full-dir",
+        type=Path,
+        default=root / "artifacts/goedel-prover-v2/full",
+    )
+    goedel_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/goedel-prover-v2",
     )
 
     phase2_loader = subparsers.add_parser(
@@ -1867,6 +1940,38 @@ def main(argv: list[str] | None = None) -> int:
             args.full_dir,
             args.evidence_dir,
             args.reference_sft_evidence,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "goedel-preflight":
+        value = run_goedel_preflight(
+            Phase1Config.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(value, indent=2))
+        return 0
+
+    if args.command == "goedel-assess":
+        _, _, summary = run_goedel_assessment(
+            Phase1Config.load(args.config),
+            args.benchmark_root,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "goedel-evidence":
+        comparison = write_goedel_evidence(
+            Phase1Config.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
         return 0
