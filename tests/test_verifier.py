@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -65,6 +66,32 @@ def test_timed_out_preamble_is_a_verifier_error(tmp_path: Path) -> None:
 
     assert outcome.category == "verifier_error"
     assert "verifier environment probe failed" in outcome.diagnostics["stderr"]
+
+
+def test_timeout_kills_child_process(tmp_path: Path) -> None:
+    child_pid_path = tmp_path / "child.pid"
+    fake_lake = tmp_path / "slow-lake"
+    fake_lake.write_text(
+        "#!/bin/sh\n"
+        "sleep 30 &\n"
+        f"echo $! > {child_pid_path}\n"
+        "wait\n",
+        encoding="utf-8",
+    )
+    fake_lake.chmod(0o755)
+
+    outcome = LeanVerifier(
+        ROOT, timeout_seconds=0.05, lake_command=str(fake_lake)
+    ).verify(CORE_TASK, "exact h")
+
+    assert outcome.category == "verifier_error"
+    child_pid = int(child_pid_path.read_text(encoding="utf-8"))
+    child_proc = Path(f"/proc/{child_pid}")
+    for _ in range(100):
+        if not child_proc.exists():
+            break
+        time.sleep(0.01)
+    assert not child_proc.exists()
 
 
 def test_zero_exit_error_diagnostic_is_rejected(tmp_path: Path) -> None:

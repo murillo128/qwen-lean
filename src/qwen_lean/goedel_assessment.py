@@ -48,6 +48,7 @@ def validate_assessment_contract(config: Phase1Config) -> None:
         ("engine", "dtype"): "bfloat16",
         ("engine", "quantization"): None,
         ("engine", "max_model_len"): 2048,
+        ("verifier", "verification_workers"): 1,
         ("goedel_assessment", "prompt_format_id"): PROMPT_FORMAT_ID,
         ("goedel_assessment", "raw_continuation"): True,
         ("goedel_assessment", "chat_template"): None,
@@ -55,6 +56,7 @@ def validate_assessment_contract(config: Phase1Config) -> None:
         ("goedel_assessment", "lean_guided_retry"): False,
         ("goedel_assessment", "self_correction"): False,
         ("goedel_assessment", "native_lane_run"): False,
+        ("goedel_assessment", "environment_probe_timeout_seconds"): 120.0,
     }
     for (section, key), wanted in expected.items():
         actual = config.value[section][key]
@@ -72,8 +74,6 @@ def validate_assessment_contract(config: Phase1Config) -> None:
         raise ValueError("Goedel assessment must use 244 miniF2F validation tasks")
     if float(config.value["verifier"]["timeout_seconds"]) != 30.0:
         raise ValueError("Goedel verifier timeout must remain 30 seconds")
-    if int(config.value["verifier"]["verification_workers"]) < 1:
-        raise ValueError("verification_workers must be positive")
 
 
 def validate_model_snapshot(config: Phase1Config, snapshot: Path) -> dict[str, Any]:
@@ -124,7 +124,11 @@ def run_preflight(
     environment = validate_minif2f_environment(
         config,
         benchmark_root,
-        timeout_seconds=float(config.value["verifier"]["timeout_seconds"]),
+        timeout_seconds=float(
+            config.value["goedel_assessment"][
+                "environment_probe_timeout_seconds"
+            ]
+        ),
     )
     tasks = materialize_benchmark_tasks(config, benchmark_root)
     dev16 = config.select_workload("minif2f-valid-dev16-v1", tasks)
@@ -176,6 +180,12 @@ def run_assessment(
         output_dir,
         timeout_seconds=float(config.value["verifier"]["timeout_seconds"]),
         verification_workers=int(config.value["verifier"]["verification_workers"]),
+        report_progress=True,
+        environment_probe_timeout_seconds=float(
+            config.value["goedel_assessment"][
+                "environment_probe_timeout_seconds"
+            ]
+        ),
     )
     return metadata, results, summary
 
@@ -238,6 +248,8 @@ def write_compact_evidence(
         "comparison_limitations": [
             "The strict lane uses four candidates per task while both accepted anchors use eight; pass@1/pass@4 estimators are shown without importing published Pass@32 claims.",
             "This assessment uses qwen-lean's Lean 4.27 verifier, not the model card's Lean 4.9 environment.",
+            "Verification used one worker under concurrent shared-host load; this preserves proof outcomes but makes verification and total wall-time comparisons host-load-dependent.",
+            "Peak GPU memory was not measured because the optional NVML monitor package was unavailable.",
         ],
     }
     evidence_dir.mkdir(parents=True, exist_ok=True)
@@ -342,6 +354,11 @@ def _compact_run(
             "generation_gpu_seconds": None if solved == 0 else generation_wall / solved,
             "run_wall_seconds": None if solved == 0 else run_wall / solved,
         },
+        "execution_notes": [
+            "Verification used one worker to avoid timeout distortion from a concurrent shared-host Dataset v2 build; the 30-second per-candidate timeout and verifier acceptance semantics were unchanged.",
+            "Verification and total wall times reflect concurrent shared-host load; generation wall time was measured separately during local GPU inference.",
+            "Peak GPU memory was unavailable because the optional NVML monitor package was not installed; the GPU identity, total memory, and configured utilization are retained in runtime and generation settings.",
+        ],
         "verifier_timeout_semantics": "unsuccessful_proof_outcome_not_infrastructure_error",
         "candidate_results_retained_outside_git": True,
     }
@@ -461,5 +478,9 @@ def _render_readme(
         "wrapper, proof extraction, verifier-guided retry, or self-correction. "
         "Raw candidates, model weights, caches, and bulky logs remain outside Git. "
         "The optional native-prover diagnostic was not run and is not mixed into "
-        "these scores.\n"
+        "these scores. Verification used one worker to avoid timeout distortion "
+        "from a concurrent shared-host Dataset v2 build; verifier semantics were "
+        "unchanged, but verification and total wall times are host-load-dependent. "
+        "Peak GPU memory was not measured because the optional NVML monitor package "
+        "was unavailable.\n"
     )

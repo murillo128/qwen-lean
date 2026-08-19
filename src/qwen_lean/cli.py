@@ -905,7 +905,7 @@ def _parser() -> argparse.ArgumentParser:
     goedel_evidence.add_argument(
         "--evidence-dir",
         type=Path,
-        default=root / "evidence/goedel-prover-v2",
+        default=root / "evidence/goedel-prover-v2-8b",
     )
 
     phase2_loader = subparsers.add_parser(

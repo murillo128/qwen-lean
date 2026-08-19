@@ -71,7 +71,7 @@
   },
   "verifier": {
     "timeout_seconds": 30.0,
-    "verification_workers": 4,
+    "verification_workers": 1,
     "known_valid_task_id": "mathd_algebra_182",
     "known_valid_candidate": "ring"
   },
@@ -84,6 +84,7 @@
     "lean_guided_retry": false,
     "self_correction": false,
     "native_lane_run": false,
+    "environment_probe_timeout_seconds": 120.0,
     "reference_sft_evidence": "evidence/phase6/minif2f-validation.json",
     "qwen_base_evidence": "evidence/phase1/baseline/summary.json"
   }

@@ -26,6 +26,7 @@ def test_frozen_assessment_contract() -> None:
     config = Phase1Config.load(CONFIG)
     validate_assessment_contract(config)
     assert config.sampling["candidates_per_task"] == 4
+    assert config.value["verifier"]["verification_workers"] == 1
     assert config.value["goedel_assessment"] == {
         "id": "goedel-prover-v2-8b-strict-casting-v1",
         "prompt_format_id": "whole-proof-v1",
@@ -35,6 +36,7 @@ def test_frozen_assessment_contract() -> None:
         "lean_guided_retry": False,
         "self_correction": False,
         "native_lane_run": False,
+        "environment_probe_timeout_seconds": 120.0,
         "reference_sft_evidence": "evidence/phase6/minif2f-validation.json",
         "qwen_base_evidence": "evidence/phase1/baseline/summary.json",
     }
@@ -243,3 +245,5 @@ def test_compact_evidence_preserves_timeout_as_unsuccessful_proof(
         full["verifier_timeout_semantics"]
         == "unsuccessful_proof_outcome_not_infrastructure_error"
     )
+    assert "one worker" in full["execution_notes"][0]
+    assert "host-load-dependent" in comparison["comparison_limitations"][2]
