@@ -1,0 +1,96 @@
+{
+  "schema_version": "riemann-domain-breakdown-v1",
+  "classification_input": "committed Phase 2 file_path and declaration_name metadata only",
+  "string_matching": "case-insensitive substring",
+  "ordered_primary_domain_rules": [
+    {
+      "id": "prime-counting-pnt",
+      "path_contains": [
+        "/PrimeCounting",
+        "/Chebyshev",
+        "/SumPrimeReciprocals"
+      ],
+      "declaration_contains": [
+        "primeCounting",
+        "Chebyshev.theta",
+        "Chebyshev.psi"
+      ]
+    },
+    {
+      "id": "arithmetic-functions",
+      "path_contains": [
+        "/ArithmeticFunction/"
+      ],
+      "declaration_contains": [
+        "moebius",
+        "vonMangoldt"
+      ]
+    },
+    {
+      "id": "zeta-analytic-number-theory",
+      "path_contains": [
+        "/LSeries/",
+        "/EulerProduct/",
+        "/ZetaValues",
+        "/ModularForms/"
+      ],
+      "declaration_contains": [
+        "riemannZeta",
+        "completedRiemannZeta",
+        "zetaZeros"
+      ]
+    },
+    {
+      "id": "prime-arithmetic-divisibility",
+      "path_contains": [
+        "/Nat/Prime/",
+        "/Primes/",
+        "/Prime/"
+      ],
+      "declaration_contains": []
+    },
+    {
+      "id": "real-complex-analysis",
+      "path_contains": [
+        "Mathlib/Analysis/",
+        "Mathlib/Topology/Algebra/InfiniteSum/",
+        "Mathlib/Topology/Instances/ENNReal"
+      ],
+      "declaration_contains": []
+    },
+    {
+      "id": "broad-number-theory",
+      "path_contains": [
+        "Mathlib/NumberTheory/"
+      ],
+      "declaration_contains": []
+    },
+    {
+      "id": "shared-formal-prerequisite",
+      "fallback": true
+    }
+  ],
+  "riemann_bubble_classes": [
+    "core",
+    "premise-1",
+    "premise-2",
+    "user-1",
+    "user-2",
+    "source-neighborhood"
+  ],
+  "relevance_distance": {
+    "core": 0,
+    "premise-1": 1,
+    "premise-2": 2,
+    "user-1": 1,
+    "user-2": 2,
+    "source-neighborhood": "source-neighborhood",
+    "number-theory-control": "number-theory-control",
+    "component-associated": "component-associated"
+  },
+  "component_inclusion_precedence": [
+    "component-contains-core",
+    "component-contains-riemann-bubble",
+    "component-contains-number-theory-control"
+  ]
+}
