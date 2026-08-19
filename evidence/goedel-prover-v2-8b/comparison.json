@@ -1,0 +1,52 @@
+{
+  "anchors": {
+    "Qwen/Qwen3-8B-Base": {
+      "candidates_per_task": 8,
+      "pass_at_k": {
+        "pass@1": 0.012807377049180328,
+        "pass@4": 0.04771662763466042
+      },
+      "source": "evidence/phase1/baseline/summary.json"
+    },
+    "reference-sft-v1": {
+      "candidates_per_task": 8,
+      "pass_at_k": {
+        "pass@1": 0.03944672131147541,
+        "pass@4": 0.1031615925058548
+      },
+      "source": "evidence/phase6/minif2f-validation.json"
+    }
+  },
+  "assessment_id": "goedel-prover-v2-8b-strict-casting-v1",
+  "comparison_limitations": [
+    "The strict lane uses four candidates per task while both accepted anchors use eight; pass@1/pass@4 estimators are shown without importing published Pass@32 claims.",
+    "This assessment uses qwen-lean's Lean 4.27 verifier, not the model card's Lean 4.9 environment.",
+    "Verification used one worker under concurrent shared-host load; this preserves proof outcomes but makes verification and total wall-time comparisons host-load-dependent.",
+    "Peak GPU memory was not measured because the optional NVML monitor package was unavailable."
+  ],
+  "delta_strict_minus_anchor": {
+    "Qwen/Qwen3-8B-Base": {
+      "pass@1": 0.007684426229508195,
+      "pass@4": 0.030152224824355978
+    },
+    "reference-sft-v1": {
+      "pass@1": -0.01895491803278689,
+      "pass@4": -0.025292740046838402
+    }
+  },
+  "native_prover_diagnostic": {
+    "reason": "optional lane omitted; its chat prompt and verifier-guided self-correction are materially distinct from the required one-shot contract",
+    "run": false
+  },
+  "schema_version": "goedel-prover-v2-assessment-v1",
+  "status": "OBSERVED",
+  "strict_lane": {
+    "candidates_per_task": 4,
+    "model_id": "Goedel-LM/Goedel-Prover-V2-8B",
+    "model_revision": "dfd02e6271a58375dfbf3ece0175277cf6b6a89a",
+    "pass_at_k": {
+      "pass@1": 0.020491803278688523,
+      "pass@4": 0.0778688524590164
+    }
+  }
+}

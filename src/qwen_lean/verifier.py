@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import signal
 import subprocess
 import tempfile
 import threading
@@ -97,7 +99,7 @@ class LeanVerifier:
             with tempfile.TemporaryDirectory(prefix="qwen-lean-") as temporary_dir:
                 source_path = Path(temporary_dir) / "Candidate.lean"
                 source_path.write_text(source, encoding="utf-8", newline="\n")
-                completed = subprocess.run(
+                process = subprocess.Popen(
                     [
                         self.lake_command,
                         "env",
@@ -108,24 +110,27 @@ class LeanVerifier:
                     ],
                     cwd=self.project_root,
                     text=True,
-                    capture_output=True,
-                    timeout=(
-                        self.timeout_seconds
-                        if timeout_seconds is None
-                        else timeout_seconds
-                    ),
-                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    start_new_session=True,
                 )
-        except subprocess.TimeoutExpired as error:
-            return VerificationOutcome(
-                category="verifier_timeout",
-                lean_exit_code=None,
-                diagnostics={
-                    "stdout": _decode_timeout_stream(error.stdout),
-                    "stderr": _decode_timeout_stream(error.stderr),
-                },
-                latency_seconds=time.perf_counter() - started,
-            )
+                try:
+                    stdout, stderr = process.communicate(
+                        timeout=(
+                            self.timeout_seconds
+                            if timeout_seconds is None
+                            else timeout_seconds
+                        )
+                    )
+                except subprocess.TimeoutExpired:
+                    _terminate_process_group(process)
+                    stdout, stderr = process.communicate()
+                    return VerificationOutcome(
+                        category="verifier_timeout",
+                        lean_exit_code=None,
+                        diagnostics={"stdout": stdout, "stderr": stderr},
+                        latency_seconds=time.perf_counter() - started,
+                    )
         except (OSError, ValueError) as error:
             return VerificationOutcome(
                 category="verifier_error",
@@ -135,8 +140,8 @@ class LeanVerifier:
             )
 
         diagnostics = {
-            "stdout": completed.stdout.replace(str(source_path), "Candidate.lean"),
-            "stderr": completed.stderr.replace(str(source_path), "Candidate.lean"),
+            "stdout": stdout.replace(str(source_path), "Candidate.lean"),
+            "stderr": stderr.replace(str(source_path), "Candidate.lean"),
         }
         has_error_diagnostic = any(
             ": error:" in line
@@ -145,18 +150,19 @@ class LeanVerifier:
         )
         category: ResultCategory = (
             "verified"
-            if completed.returncode == 0 and not has_error_diagnostic
+            if process.returncode == 0 and not has_error_diagnostic
             else "lean_rejected"
         )
         return VerificationOutcome(
             category=category,
-            lean_exit_code=completed.returncode,
+            lean_exit_code=process.returncode,
             diagnostics=diagnostics,
             latency_seconds=time.perf_counter() - started,
         )
 
 
-def _decode_timeout_stream(value: str | bytes | None) -> str:
-    if value is None:
-        return ""
-    return value.decode(errors="replace") if isinstance(value, bytes) else value
+def _terminate_process_group(process: subprocess.Popen[str]) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        process.kill()
