@@ -1,0 +1,52 @@
+{
+  "chat_template": null,
+  "model": {
+    "chat_template": null,
+    "model_id": "allenai/Olmo-3-1025-7B",
+    "model_revision": "a81bae42db3975be1671e27b9c9a56da1a9f980f",
+    "tokenizer_id": "allenai/Olmo-3-1025-7B",
+    "tokenizer_revision": "a81bae42db3975be1671e27b9c9a56da1a9f980f"
+  },
+  "probe": {
+    "finish_reason": "token_limit",
+    "generated_token_count": 32
+  },
+  "prompt_format_id": "whole-proof-v1",
+  "raw_continuation": true,
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "dtype": "bfloat16",
+    "gpu_memory_before_bytes": 483917824,
+    "gpu_memory_headroom_at_peak_bytes": 973930496,
+    "gpu_memory_monitoring": "nvml_device_used_bytes",
+    "gpu_memory_peak_bytes": 20015874048,
+    "gpu_memory_peak_delta_bytes": 19531956224,
+    "gpu_memory_sample_count": 1203,
+    "gpu_memory_sampling_interval_seconds": 0.05,
+    "inference_engine": "vllm",
+    "inference_engine_version": "0.12.0",
+    "inference_execution": "local_cuda",
+    "package_versions": {
+      "flashinfer-python": "0.5.3",
+      "huggingface-hub": "0.36.2",
+      "nvidia-ml-py": "13.610.43",
+      "torch": "2.9.0",
+      "transformers": "4.57.3",
+      "vllm": "0.12.0"
+    },
+    "python": "3.12.14",
+    "quantization": null,
+    "sampling_backend": "vllm_pytorch_native",
+    "torch": "2.9.0+cu128",
+    "torch_cuda_version": "12.8",
+    "vllm_enable_v1_multiprocessing": false
+  },
+  "schema_version": "olmo3-7b-preflight-v1",
+  "status": "passed"
+}
