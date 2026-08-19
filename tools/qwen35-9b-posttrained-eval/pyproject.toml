@@ -1,0 +1,18 @@
+[project]
+name = "qwen35-9b-posttrained-eval-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "bitsandbytes==0.49.2",
+  "huggingface-hub==1.28.0",
+  "ninja==1.13.0",
+  "nvidia-cuda-crt==13.0.48",
+  "nvidia-cuda-nvcc==13.0.48",
+  "qwen-lean",
+  "torch==2.11.0",
+  "transformers==5.15.0",
+  "vllm==0.21.0",
+]
+
+[tool.uv.sources]
+qwen-lean = { path = "../..", editable = true }

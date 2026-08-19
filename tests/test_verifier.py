@@ -66,6 +66,23 @@ def test_timed_out_preamble_is_a_verifier_error(tmp_path: Path) -> None:
     assert outcome.category == "verifier_error"
     assert "verifier environment probe failed" in outcome.diagnostics["stderr"]
 
+def test_zero_exit_error_diagnostic_is_rejected(tmp_path: Path) -> None:
+    fake_lake = tmp_path / "fake-lake"
+    fake_lake.write_text(
+        "#!/bin/sh\n"
+        "if grep -q '#check True' \"$5\"; then exit 0; fi\n"
+        "printf '%s:1:1: error: declaration uses '\"'\"'sorry'\"'\"'\\n' \"$5\"\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    fake_lake.chmod(0o755)
+
+    outcome = LeanVerifier(ROOT, lake_command=str(fake_lake)).verify(CORE_TASK, "sorry")
+
+    assert outcome.category == "lean_rejected"
+    assert outcome.lean_exit_code == 0
+    assert "error: declaration uses 'sorry'" in outcome.diagnostics["stdout"]
+
 
 def test_concurrent_candidates_share_one_preamble_probe(tmp_path: Path) -> None:
     probe_log = tmp_path / "probes.log"
@@ -106,24 +123,6 @@ def test_preamble_can_be_primed_outside_candidate_timeout(tmp_path: Path) -> Non
 
     assert outcome.category == "verified"
     assert probe_log.read_text(encoding="utf-8").splitlines() == ["probe"]
-
-
-def test_zero_exit_error_diagnostic_is_rejected(tmp_path: Path) -> None:
-    fake_lake = tmp_path / "fake-lake"
-    fake_lake.write_text(
-        "#!/bin/sh\n"
-        "if grep -q '#check True' \"$5\"; then exit 0; fi\n"
-        "printf '%s:1:1: error: declaration uses '\"'\"'sorry'\"'\"'\\n' \"$5\"\n"
-        "exit 0\n",
-        encoding="utf-8",
-    )
-    fake_lake.chmod(0o755)
-
-    outcome = LeanVerifier(ROOT, lake_command=str(fake_lake)).verify(CORE_TASK, "sorry")
-
-    assert outcome.category == "lean_rejected"
-    assert outcome.lean_exit_code == 0
-    assert "error: declaration uses 'sorry'" in outcome.diagnostics["stdout"]
 
 
 def test_mathlib_candidate_uses_pinned_dependency() -> None:

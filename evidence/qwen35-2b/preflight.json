@@ -1,0 +1,83 @@
+{
+  "benchmark_environment": {
+    "benchmark_split": "validation",
+    "known_valid_candidate_category": "verified",
+    "known_valid_candidate_lean_exit_code": 0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "placeholder_candidate_category": "lean_rejected",
+    "placeholder_candidate_lean_exit_code": 0,
+    "preamble": "import MiniF2F.ProblemImports\n\nopen scoped Real\nopen scoped Nat\nopen scoped Topology\nopen scoped Polynomial",
+    "primary_task_count": 244,
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    }
+  },
+  "engine": {
+    "dtype": "bfloat16",
+    "language_model_only": true,
+    "name": "vllm",
+    "sampler_backend": "native",
+    "version": "0.23.0"
+  },
+  "generation_probe": {
+    "finish_reason": "token_limit",
+    "generated_token_count": 32,
+    "max_new_tokens": 32,
+    "prompt_token_count": 206,
+    "task_id": "aimeII_2001_p3"
+  },
+  "model": {
+    "id": "Qwen/Qwen3.5-2B",
+    "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+    "tokenizer_id": "Qwen/Qwen3.5-2B",
+    "tokenizer_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc"
+  },
+  "packages": {
+    "huggingface-hub": "1.27.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.11.0",
+    "transformers": "5.15.0",
+    "vllm": "0.23.0"
+  },
+  "runtime": {
+    "bf16_supported": true,
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "gpu_memory": {
+      "baseline_used_mib": 4,
+      "device_index": 0,
+      "device_total_mib": 20475,
+      "peak_incremental_mib": 17942,
+      "peak_used_mib": 17946,
+      "sample_count": 59,
+      "sample_interval_seconds": 0.5
+    },
+    "inference_execution": "local_cuda",
+    "python": "3.12.14",
+    "torch": "2.11.0+cu130",
+    "torch_cuda_version": "13.0"
+  },
+  "schema_version": "qwen35-2b-assessment-evidence-v1",
+  "status": "passed",
+  "strict_lane": {
+    "add_special_tokens": false,
+    "chat_template": null,
+    "prompt_format_id": "whole-proof-v1",
+    "prompt_transformation": null,
+    "proof_extraction": false,
+    "repair": false,
+    "tokenizer_default_matches_add_special_tokens_false": true,
+    "verifier_feedback": false
+  }
+}

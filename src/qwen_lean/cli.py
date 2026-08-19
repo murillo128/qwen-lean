@@ -12,6 +12,15 @@ from .baseline import (
 )
 from .evaluator import load_fixture_set, run_fixture_evaluation
 from .generation import run_model_smoke
+from .deepseek_prover_assessment import (
+    load_assessment_config as load_deepseek_prover_config,
+)
+from .deepseek_prover_assessment import (
+    run_strict_assessment as run_deepseek_prover_assessment,
+)
+from .deepseek_prover_assessment import (
+    write_compact_evidence as write_deepseek_prover_evidence,
+)
 from .gpt53_assessment import (
     GPT53Config,
     run_assessment,
@@ -27,6 +36,25 @@ from .ministral3_assessment import (
     run_assessment as run_ministral3_assessment,
     run_preflight as run_ministral3_preflight,
     write_compact_evidence as write_ministral3_evidence,
+)
+from .olmo3_assessment import (
+    load_assessment_config as load_olmo3_config,
+)
+from .olmo3_assessment import run_preflight as run_olmo3_preflight
+from .olmo3_assessment import (
+    run_strict_assessment as run_olmo3_assessment,
+)
+from .olmo3_assessment import (
+    write_compact_evidence as write_olmo3_evidence,
+)
+from .qwen3_posttrained_assessment import (
+    load_assessment_config as load_qwen3_posttrained_config,
+)
+from .qwen3_posttrained_assessment import (
+    run_strict_assessment as run_qwen3_posttrained_assessment,
+)
+from .qwen3_posttrained_assessment import (
+    write_compact_evidence as write_qwen3_posttrained_evidence,
 )
 from .phase2_corpus import load_phase2_dataset
 from .phase2_extraction import Phase2Config, write_compact_evidence
@@ -92,11 +120,61 @@ from .phase6_evidence import (
     write_phase6_final_evidence,
 )
 from .phase6_inference import run_phase6_minif2f_test, run_phase6_train
+from .qwen35_9b_posttrained_assessment import (
+    run_assessment as run_qwen35_9b_posttrained_assessment,
+)
+from .qwen35_9b_posttrained_assessment import (
+    run_precision_preflight as run_qwen35_9b_posttrained_preflight,
+)
+from .qwen35_9b_posttrained_assessment import (
+    write_compact_evidence as write_qwen35_9b_posttrained_evidence,
+)
+from .qwen36_27b_assessment import (
+    Qwen36AssessmentConfig,
+    run_assessment as run_qwen36_27b_assessment,
+    run_preflight as run_qwen36_27b_preflight,
+    write_blocker_evidence as write_qwen36_27b_blocker_evidence,
+    write_compact_evidence as write_qwen36_27b_evidence,
+)
+from .qwen35_4b_posttrained_assessment import (
+    load_assessment_config as load_qwen35_assessment_config,
+    run_preflight as run_qwen35_preflight,
+    run_strict_assessment as run_qwen35_strict_assessment,
+    write_compact_evidence as write_qwen35_evidence,
+)
+from .qwen35_4b_base_assessment import (
+    run_assessment as run_qwen35_4b_base_assessment,
+)
+from .qwen35_4b_base_assessment import (
+    write_compact_evidence as write_qwen35_4b_base_evidence,
+)
+from .qwen35_posttrained_assessment import (
+    Qwen35AssessmentConfig,
+    run_assessment as run_qwen35_posttrained_assessment,
+    run_preflight as run_qwen35_posttrained_preflight,
+    write_compact_evidence as write_qwen35_posttrained_evidence,
+)
+from .qwen35_9b_base_assessment import (
+    Qwen35BaseAssessmentConfig,
+    WORKLOADS,
+    run_assessment as run_qwen35_9b_base_assessment,
+    run_preflight as run_qwen35_9b_base_preflight,
+    write_compact_evidence as write_qwen35_9b_base_evidence,
+)
 from .riemann_data import (
     RiemannAtlasConfig,
     RiemannDataConfig,
     materialize_riemann_data,
     validate_materialized_riemann_data,
+)
+from .qwen35_assessment import (
+    run_assessment as run_qwen35_base_assessment,
+)
+from .qwen35_assessment import (
+    run_preflight as run_qwen35_base_preflight,
+)
+from .qwen35_assessment import (
+    write_compact_evidence as write_qwen35_base_evidence,
 )
 from .sft2 import SFT2Config
 from .sft2_evidence import (
@@ -179,6 +257,432 @@ def _parser() -> argparse.ArgumentParser:
     reverify.add_argument("--output-dir", type=Path, required=True)
     reverify.add_argument("--timeout", type=float)
     reverify.add_argument("--verification-workers", type=int, default=8)
+
+    qwen3_assess = subparsers.add_parser(
+        "qwen3-posttrained-assess",
+        help="run the strict Qwen3-8B official post-trained assessment",
+    )
+    qwen3_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen3_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen3-8b-posttrained-assessment.json",
+    )
+    qwen3_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen3_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen3_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen3_evidence = subparsers.add_parser(
+        "qwen3-posttrained-evidence",
+        help="write compact Qwen3-8B post-trained comparison evidence",
+    )
+    qwen3_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen3-8b-posttrained-assessment.json",
+    )
+    qwen3_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen3-8b/dev16"
+    )
+    qwen3_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen3-8b/full"
+    )
+    qwen3_evidence.add_argument(
+        "--base-dir", type=Path, default=root / "evidence/phase1/baseline"
+    )
+    qwen3_evidence.add_argument(
+        "--reference",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    qwen3_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen3-8b-posttrained"
+    )
+
+    deepseek_assess = subparsers.add_parser(
+        "deepseek-prover-assess",
+        help="run the strict DeepSeek-Prover-V2-7B Lean assessment",
+    )
+    deepseek_assess.add_argument("--benchmark-root", type=Path, required=True)
+    deepseek_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-assessment.json",
+    )
+    deepseek_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    deepseek_assess.add_argument("--output-dir", type=Path, required=True)
+    deepseek_assess.add_argument("--verification-workers", type=int, default=8)
+
+    deepseek_evidence = subparsers.add_parser(
+        "deepseek-prover-evidence",
+        help="write compact DeepSeek-Prover-V2-7B comparison evidence",
+    )
+    deepseek_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-assessment.json",
+    )
+    deepseek_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/deepseek-prover/dev16"
+    )
+    deepseek_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/deepseek-prover/full"
+    )
+    deepseek_evidence.add_argument(
+        "--base-dir", type=Path, default=root / "evidence/phase1/baseline"
+    )
+    deepseek_evidence.add_argument(
+        "--reference", type=Path, default=root / "evidence/phase5/minif2f.json"
+    )
+    deepseek_evidence.add_argument(
+        "--qwen3-posttrained",
+        type=Path,
+        default=root / "evidence/qwen3-8b-posttrained/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--qwen35-4b-base",
+        type=Path,
+        default=root / "evidence/qwen35-4b-base/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--goedel",
+        type=Path,
+        default=root / "evidence/goedel-prover-v2-8b/full.json",
+    )
+    deepseek_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/deepseek-prover-v2-7b",
+    )
+
+    olmo3_preflight = subparsers.add_parser(
+        "olmo3-preflight",
+        help="run the local BF16 OLMo 3 7B compatibility preflight",
+    )
+    olmo3_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_preflight.add_argument(
+        "--output", type=Path, default=root / "artifacts/olmo3-7b/preflight.json"
+    )
+
+    olmo3_assess = subparsers.add_parser(
+        "olmo3-assess", help="run the strict OLMo 3 7B miniF2F assessment"
+    )
+    olmo3_assess.add_argument("--benchmark-root", type=Path, required=True)
+    olmo3_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    olmo3_assess.add_argument("--output-dir", type=Path, required=True)
+    olmo3_assess.add_argument("--verification-workers", type=int, default=8)
+
+    olmo3_evidence = subparsers.add_parser(
+        "olmo3-evidence", help="write compact OLMo 3 7B assessment evidence"
+    )
+    olmo3_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/olmo3-7b-assessment.json",
+    )
+    olmo3_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "artifacts/olmo3-7b/preflight.json",
+    )
+    olmo3_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/olmo3-7b/dev16"
+    )
+    olmo3_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/olmo3-7b/full"
+    )
+    olmo3_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/olmo3-7b"
+    )
+
+    qwen35_9b_posttrained_preflight = subparsers.add_parser(
+        "qwen35-9b-preflight",
+        help="establish the BF16 or frozen 4-bit Qwen3.5-9B precision lane",
+    )
+    qwen35_9b_posttrained_preflight.add_argument(
+        "--benchmark-root", type=Path, required=True
+    )
+    qwen35_9b_posttrained_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_9b_posttrained_preflight.add_argument(
+        "--lane", required=True, choices=("bf16", "bitsandbytes-4bit")
+    )
+    qwen35_9b_posttrained_preflight.add_argument(
+        "--output", type=Path, required=True
+    )
+
+    qwen35_9b_posttrained_assess = subparsers.add_parser(
+        "qwen35-9b-assess",
+        help="run the strict Qwen3.5-9B miniF2F casting lane",
+    )
+    qwen35_9b_posttrained_assess.add_argument(
+        "--benchmark-root", type=Path, required=True
+    )
+    qwen35_9b_posttrained_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_9b_posttrained_assess.add_argument(
+        "--preflight", type=Path, required=True
+    )
+    qwen35_9b_posttrained_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_9b_posttrained_assess.add_argument(
+        "--output-dir", type=Path, required=True
+    )
+    qwen35_9b_posttrained_assess.add_argument("--timeout", type=float)
+    qwen35_9b_posttrained_assess.add_argument(
+        "--verification-workers", type=int, default=8
+    )
+
+    qwen35_9b_posttrained_evidence = subparsers.add_parser(
+        "qwen35-9b-evidence",
+        help="write compact strict-lane Qwen3.5-9B comparison evidence",
+    )
+    qwen35_9b_posttrained_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-9b-assessment.json"
+    )
+    qwen35_9b_posttrained_evidence.add_argument(
+        "--preflight", type=Path, default=root / "artifacts/qwen35-9b/preflight.json"
+    )
+    qwen35_9b_posttrained_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-9b/dev16"
+    )
+    qwen35_9b_posttrained_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-9b/full"
+    )
+    qwen35_9b_posttrained_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-9b"
+    )
+
+    qwen36_27b_preflight = subparsers.add_parser(
+        "qwen36-27b-preflight",
+        help="run the frozen Qwen3.6-27B 4-bit local-Ada preflight",
+    )
+    qwen36_27b_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen36_27b_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    qwen36_27b_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_preflight.add_argument("--output", type=Path, required=True)
+
+    qwen36_27b_assess = subparsers.add_parser(
+        "qwen36-27b-assess",
+        help="run the frozen Qwen3.6-27B 4-bit strict miniF2F assessment",
+    )
+    qwen36_27b_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen36_27b_assess.add_argument("--model-snapshot", type=Path, required=True)
+    qwen36_27b_assess.add_argument("--preflight", type=Path, required=True)
+    qwen36_27b_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen36_27b_assess.add_argument("--output-dir", type=Path, required=True)
+
+    qwen36_27b_evidence = subparsers.add_parser(
+        "qwen36-27b-evidence",
+        help="write compact Qwen3.6-27B 4-bit comparison evidence",
+    )
+    qwen36_27b_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_evidence.add_argument("--preflight", type=Path, required=True)
+    qwen36_27b_evidence.add_argument("--dev16-dir", type=Path, required=True)
+    qwen36_27b_evidence.add_argument("--full-dir", type=Path, required=True)
+    qwen36_27b_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen36-27b"
+    )
+
+    qwen36_27b_blocker_evidence = subparsers.add_parser(
+        "qwen36-27b-blocker-evidence",
+        help="write compact evidence for a frozen-lane Stage 0 hardware blocker",
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--preflight", type=Path, required=True
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen36-27b"
+    )
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-4b-preflight",
+        help="run the frozen one-task Qwen3.5-4B BF16 compatibility preflight",
+    )
+    qwen35_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_preflight.add_argument("--output-dir", type=Path, required=True)
+    qwen35_preflight.add_argument("--verification-workers", type=int, default=1)
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-4b-assess",
+        help="run the frozen Qwen3.5-4B strict raw-continuation assessment",
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_assess.add_argument(
+        "--workload",
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+        required=True,
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-4b-evidence",
+        help="write compact Qwen3.5-4B casting evidence from retained local runs",
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-4b-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight-dir",
+        type=Path,
+        default=root / "artifacts/qwen35-4b/preflight",
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-4b/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-4b/full"
+    )
+    qwen35_evidence.add_argument(
+        "--reference-summary",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-4b"
+    )
+
+    qwen35_4b_base_assess = subparsers.add_parser(
+        "qwen35-4b-base-assess",
+        help="run the strict local-GPU Qwen3.5-4B-Base foundation assessment",
+    )
+    qwen35_4b_base_assess.add_argument(
+        "--benchmark-root", type=Path, required=True
+    )
+    qwen35_4b_base_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-base-assessment.json",
+    )
+    qwen35_4b_base_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_4b_base_assess.add_argument(
+        "--output-dir", type=Path, required=True
+    )
+    qwen35_4b_base_assess.add_argument(
+        "--verification-workers", type=int, default=8
+    )
+
+    qwen35_4b_base_evidence = subparsers.add_parser(
+        "qwen35-4b-base-evidence",
+        help="write compact Qwen3.5-4B-Base assessment evidence",
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--benchmark-root", type=Path, required=True
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-base-assessment.json",
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--environment-validation", type=Path, required=True
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--dev16-dir", type=Path, required=True
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--full-dir", type=Path, required=True
+    )
+    qwen35_4b_base_evidence.add_argument(
+        "--evidence-dir", type=Path, required=True
+    )
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-preflight",
+        help="prove pinned Qwen3.5 BF16/text-only compatibility and GPU memory",
+    )
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_preflight.add_argument(
+        "--output", type=Path, default=root / "artifacts/qwen35-2b-base/preflight.json"
+    )
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-assess", help="run the strict local-GPU Qwen3.5 assessment"
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--timeout", type=float)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-evidence", help="write compact Qwen3.5 assessment evidence"
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-base-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight", type=Path, default=root / "artifacts/qwen35-2b-base/preflight.json"
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-2b-base/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-2b-base/full"
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-2b-base"
+    )
 
     gpt53_preflight = subparsers.add_parser(
         "gpt53-spark-preflight",
@@ -313,6 +817,110 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/ministral3-8b-base",
+    )
+
+    qwen35_9b_preflight = subparsers.add_parser(
+        "qwen35-9b-base-preflight",
+        help="resolve the BF16/4-bit local-Ada lane for Qwen3.5-9B-Base",
+    )
+    qwen35_9b_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_9b_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    qwen35_9b_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_preflight.add_argument("--output", type=Path, required=True)
+
+    qwen35_9b_assess = subparsers.add_parser(
+        "qwen35-9b-base-assess",
+        help="run the strict Qwen3.5-9B-Base miniF2F assessment",
+    )
+    qwen35_9b_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_9b_assess.add_argument("--model-snapshot", type=Path, required=True)
+    qwen35_9b_assess.add_argument("--preflight", type=Path, required=True)
+    qwen35_9b_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_assess.add_argument(
+        "--workload", required=True, choices=WORKLOADS
+    )
+    qwen35_9b_assess.add_argument("--output-dir", type=Path, required=True)
+
+    qwen35_9b_evidence = subparsers.add_parser(
+        "qwen35-9b-base-evidence",
+        help="write compact evidence from the strict Qwen3.5-9B-Base run",
+    )
+    qwen35_9b_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-base-assessment.json",
+    )
+    qwen35_9b_evidence.add_argument("--preflight", type=Path, required=True)
+    qwen35_9b_evidence.add_argument("--dev16-dir", type=Path, required=True)
+    qwen35_9b_evidence.add_argument("--full-dir", type=Path, required=True)
+    qwen35_9b_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-9b-base",
+    )
+
+    qwen35_preflight = subparsers.add_parser(
+        "qwen35-2b-preflight",
+        help="run the real BF16 Qwen3.5-2B compatibility and memory preflight",
+    )
+    qwen35_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-assessment.json"
+    )
+    qwen35_preflight.add_argument(
+        "--output-dir", type=Path, default=root / "artifacts/qwen35-2b/preflight"
+    )
+
+    qwen35_assess = subparsers.add_parser(
+        "qwen35-2b-assess",
+        help="run strict raw-continuation Qwen3.5-2B miniF2F generation",
+    )
+    qwen35_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen35_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-assessment.json"
+    )
+    qwen35_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen35_assess.add_argument(
+        "--preflight-dir", type=Path, default=root / "artifacts/qwen35-2b/preflight"
+    )
+    qwen35_assess.add_argument("--output-dir", type=Path, required=True)
+    qwen35_assess.add_argument("--verification-workers", type=int, default=8)
+
+    qwen35_evidence = subparsers.add_parser(
+        "qwen35-2b-evidence",
+        help="write compact Qwen3.5-2B assessment and reference comparison",
+    )
+    qwen35_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen35-2b-assessment.json"
+    )
+    qwen35_evidence.add_argument(
+        "--preflight-dir", type=Path, default=root / "artifacts/qwen35-2b/preflight"
+    )
+    qwen35_evidence.add_argument(
+        "--dev16-dir", type=Path, default=root / "artifacts/qwen35-2b/dev16"
+    )
+    qwen35_evidence.add_argument(
+        "--full-dir", type=Path, default=root / "artifacts/qwen35-2b/full"
+    )
+    qwen35_evidence.add_argument(
+        "--reference-sft-evidence",
+        type=Path,
+        default=root / "evidence/phase5/minif2f.json",
+    )
+    qwen35_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen35-2b"
     )
 
     phase2_loader = subparsers.add_parser(
@@ -975,6 +1583,285 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(summary, indent=2))
         return 0 if summary["complete"] else 1
 
+    if args.command == "qwen3-posttrained-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen3_posttrained_assessment(
+            load_qwen3_posttrained_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen3-posttrained-evidence":
+        comparison = write_qwen3_posttrained_evidence(
+            load_qwen3_posttrained_config(args.config),
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            base_dir=args.base_dir,
+            reference_path=args.reference,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "deepseek-prover-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_deepseek_prover_assessment(
+            load_deepseek_prover_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "deepseek-prover-evidence":
+        comparison = write_deepseek_prover_evidence(
+            load_deepseek_prover_config(args.config),
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            base_dir=args.base_dir,
+            reference_path=args.reference,
+            qwen3_posttrained_path=args.qwen3_posttrained,
+            qwen35_4b_base_path=args.qwen35_4b_base,
+            goedel_path=args.goedel,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "olmo3-preflight":
+        evidence = run_olmo3_preflight(
+            load_olmo3_config(args.config), args.output
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "olmo3-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_olmo3_assessment(
+            load_olmo3_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "olmo3-evidence":
+        evidence = write_olmo3_evidence(
+            load_olmo3_config(args.config),
+            preflight_path=args.preflight,
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-9b-preflight":
+        state = run_qwen35_9b_posttrained_preflight(
+            Phase1Config.load(args.config),
+            args.benchmark_root,
+            args.output,
+            lane=args.lane,
+        )
+        print(json.dumps(state, indent=2))
+        return 0 if state["status"] == "passed" else 1
+
+    if args.command == "qwen35-9b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = run_qwen35_9b_posttrained_assessment(
+            config,
+            args.benchmark_root,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+            timeout_seconds=timeout,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-evidence":
+        comparison = write_qwen35_9b_posttrained_evidence(
+            Phase1Config.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen36-27b-preflight":
+        evidence = run_qwen36_27b_preflight(
+            Qwen36AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen36-27b-assess":
+        _, _, summary = run_qwen36_27b_assessment(
+            Qwen36AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen36-27b-evidence":
+        comparison = write_qwen36_27b_evidence(
+            Qwen36AssessmentConfig.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen36-27b-blocker-evidence":
+        evidence = write_qwen36_27b_blocker_evidence(
+            Qwen36AssessmentConfig.load(args.config),
+            args.preflight,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-4b-preflight":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen35_preflight(
+            load_qwen35_assessment_config(args.config),
+            args.benchmark_root,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen35_strict_assessment(
+            load_qwen35_assessment_config(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-evidence":
+        comparison = write_qwen35_evidence(
+            load_qwen35_assessment_config(args.config),
+            preflight_dir=args.preflight_dir,
+            dev16_dir=args.dev16_dir,
+            full_dir=args.full_dir,
+            reference_summary_path=args.reference_summary,
+            evidence_dir=args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen35-4b-base-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = float(config.value["verifier"]["timeout_seconds"])
+        _, _, summary = run_qwen35_4b_base_assessment(
+            config,
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            timeout_seconds=timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-4b-base-evidence":
+        comparison = write_qwen35_4b_base_evidence(
+            Phase1Config.load(args.config),
+            args.benchmark_root,
+            args.environment_validation,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen35-preflight":
+        summary = run_qwen35_base_preflight(
+            Phase1Config.load(args.config), args.output
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        config = Phase1Config.load(args.config)
+        timeout = (
+            float(config.value["verifier"]["timeout_seconds"])
+            if args.timeout is None
+            else args.timeout
+        )
+        _, _, summary = run_qwen35_base_assessment(
+            config,
+            args.benchmark_root,
+            args.workload,
+            args.output_dir,
+            timeout_seconds=timeout,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-evidence":
+        outputs = write_qwen35_base_evidence(
+            Phase1Config.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(outputs, indent=2))
+        return 0
+
     if args.command == "gpt53-spark-preflight":
         summary = run_preflight(GPT53Config.load(args.config), args.output_dir)
         print(json.dumps(summary, indent=2))
@@ -1044,6 +1931,75 @@ def main(argv: list[str] | None = None) -> int:
             args.evidence_dir,
         )
         print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-9b-base-preflight":
+        evidence = run_qwen35_9b_base_preflight(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen35-9b-base-assess":
+        _, _, summary = run_qwen35_9b_base_assessment(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-base-evidence":
+        evidence = write_qwen35_9b_base_evidence(
+            Qwen35BaseAssessmentConfig.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence["full"], indent=2))
+        return 0
+
+    if args.command == "qwen35-2b-preflight":
+        preflight = run_qwen35_posttrained_preflight(
+            Qwen35AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.output_dir,
+        )
+        print(json.dumps(preflight, indent=2))
+        return 0
+
+    if args.command == "qwen35-2b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_qwen35_posttrained_assessment(
+            Qwen35AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.workload,
+            args.preflight_dir,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-2b-evidence":
+        comparison = write_qwen35_posttrained_evidence(
+            Qwen35AssessmentConfig.load(args.config),
+            args.preflight_dir,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+            args.reference_sft_evidence,
+        )
+        print(json.dumps(comparison, indent=2))
         return 0
 
     if args.command == "phase2-loader-smoke":
