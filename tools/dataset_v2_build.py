@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
+FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v4"
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 
 from qwen_lean.dataset_v2 import (  # noqa: E402
@@ -866,7 +867,7 @@ def main() -> int:
                 cache_version, classified_candidates, file_verification = pickle.load(
                     handle
                 )
-            if cache_version != FULL_CACHE_VERSION:
+            if cache_version != FULL_VERIFICATION_CACHE_VERSION:
                 raise RuntimeError("full verification cache version mismatch")
         else:
             all_candidates = mathlib_candidates + pnt_candidates
@@ -881,10 +882,15 @@ def main() -> int:
                 evidence_id="dataset-v2-full-term-reconstruction-v1",
                 workers=args.workers,
                 timeout_seconds=args.verification_timeout,
+                group_cache_dir=output_dir / ".verification-group-cache",
             )
             with verification_cache.open("wb") as handle:
                 pickle.dump(
-                    (FULL_CACHE_VERSION, classified_candidates, file_verification),
+                    (
+                        FULL_VERIFICATION_CACHE_VERSION,
+                        classified_candidates,
+                        file_verification,
+                    ),
                     handle,
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )

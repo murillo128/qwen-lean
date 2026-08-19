@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
@@ -9,7 +10,9 @@ from qwen_lean.dataset_v2_extraction import (
     select_candidates,
     split_whole_declaration,
     substitute_proofs,
+    verify_transformed_candidates,
 )
+from qwen_lean import dataset_v2_extraction
 
 
 @dataclass(frozen=True)
@@ -224,6 +227,84 @@ def test_deterministic_selection_requires_requested_transformation_population() 
         select_candidates(
             [term], count=2, seed="preflight", transformation_kind="term-to-exact"
         )
+
+
+def _verify_candidate(
+    candidate,
+    *,
+    source_root: Path,
+    cache_dir: Path | None = None,
+):
+    return verify_transformed_candidates(
+        [candidate],
+        source_roots={
+            (candidate.source_repository, candidate.source_revision): source_root
+        },
+        target_root=source_root,
+        environment_id="test-environment",
+        evidence_id="test-evidence",
+        workers=1,
+        timeout_seconds=1,
+        group_cache_dir=cache_dir,
+    )
+
+
+def test_verification_rejects_candidate_when_unchanged_source_is_not_reconstructible(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = "theorem identity (P : Prop) : P → P := fun h => h\n"
+    candidate = _candidate(source)
+    source_path = tmp_path / candidate.file_path
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text(source, encoding="utf-8")
+    calls = 0
+
+    def reject_source(*args, **kwargs):
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        return "rejected", 1, 0.01, "unrelated source failure"
+
+    monkeypatch.setattr(dataset_v2_extraction, "_run_reconstructed_file", reject_source)
+    verified, files = _verify_candidate(candidate, source_root=tmp_path)
+
+    assert calls == 2
+    assert verified[0].verification_status == "baseline-rejected"
+    assert verified[0].verification_method == "source-file-baseline-verification"
+    assert files[0].status == "baseline-rejected"
+    assert len(files[0].rejected_candidate_ids) == 1
+
+
+def test_verification_group_cache_survives_across_invocations(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = "theorem identity (P : Prop) : P → P := fun h => h\n"
+    candidate = _candidate(source)
+    source_path = tmp_path / candidate.file_path
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text(source, encoding="utf-8")
+    cache_dir = tmp_path / "cache"
+
+    monkeypatch.setattr(
+        dataset_v2_extraction,
+        "_run_reconstructed_file",
+        lambda *args, **kwargs: ("accepted", 0, 0.01, ""),
+    )
+    first = _verify_candidate(candidate, source_root=tmp_path, cache_dir=cache_dir)
+
+    def unexpected_verification(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("cached group was verified again")
+
+    monkeypatch.setattr(
+        dataset_v2_extraction,
+        "_run_reconstructed_file",
+        unexpected_verification,
+    )
+    second = _verify_candidate(candidate, source_root=tmp_path, cache_dir=cache_dir)
+
+    assert second == first
+    assert len(list(cache_dir.glob("*.pkl"))) == 1
 
 
 def test_split_whole_declaration_recovers_outer_calc_proof() -> None:

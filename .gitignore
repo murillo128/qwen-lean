@@ -10,4 +10,5 @@ artifacts/
 # Regenerable Dataset-v2 execution caches and Lean audit scratch files.
 data/lean-whole-proof-v2/.*-cache.pkl
 data/lean-whole-proof-v2/.composition-batch-cache/
+data/lean-whole-proof-v2/.verification-group-cache/
 data/lean-whole-proof-v2/lean/

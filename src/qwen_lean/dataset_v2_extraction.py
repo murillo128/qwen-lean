@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 import re
 import subprocess
 import tempfile
@@ -41,6 +42,9 @@ from .phase2_corpus import (
 
 
 DATASET_V2_CONFIG_SCHEMA_VERSION = "dataset-v2-config-v1"
+DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION = (
+    "dataset-v2-group-verification-cache-v2"
+)
 
 
 @dataclass(frozen=True)
@@ -712,16 +716,64 @@ def verify_transformed_candidates(
     evidence_id: str,
     workers: int = 8,
     timeout_seconds: float = 300.0,
+    group_cache_dir: Path | None = None,
 ) -> tuple[list[SourceCandidate], list[FileVerification]]:
     pending = [item for item in candidates if item.transformation_kind != "none"]
     grouped: dict[tuple[str, str, str], list[SourceCandidate]] = defaultdict(list)
     for item in pending:
         grouped[(item.source_repository, item.source_revision, item.file_path)].append(item)
 
-    def verify_group(key_group: tuple[tuple[str, str, str], list[SourceCandidate]]) -> tuple[list[SourceCandidate], FileVerification]:
+    if group_cache_dir is not None:
+        group_cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def verify_group_cache_path(
+        key: tuple[str, str, str], group: list[SourceCandidate], source: str
+    ) -> Path | None:
+        if group_cache_dir is None:
+            return None
+        repository, revision, file_path = key
+        cache_identity = {
+            "version": DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION,
+            "repository": repository,
+            "revision": revision,
+            "file_path": file_path,
+            "source_sha256": hashlib.sha256(source.encode()).hexdigest(),
+            "environment_id": environment_id,
+            "evidence_id": evidence_id,
+            "timeout_seconds": timeout_seconds,
+            "candidates": [
+                {
+                    "id": _candidate_id(item),
+                    "source_expression": item.source_expression,
+                    "canonical_proof": item.canonical_proof,
+                    "transformation_kind": item.transformation_kind,
+                    "proof_span": {
+                        "start": [item.proof_span.start.line, item.proof_span.start.column],
+                        "end": [item.proof_span.end.line, item.proof_span.end.column],
+                    },
+                }
+                for item in group
+            ],
+        }
+        digest = hashlib.sha256(
+            json.dumps(cache_identity, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        return group_cache_dir / f"{digest}.pkl"
+
+    def verify_group(
+        key_group: tuple[tuple[str, str, str], list[SourceCandidate]],
+    ) -> tuple[list[SourceCandidate], FileVerification]:
         (repository, revision, file_path), group = key_group
         source_root = source_roots[(repository, revision)]
         source = (source_root / file_path).read_text(encoding="utf-8")
+        cache_path = verify_group_cache_path(
+            (repository, revision, file_path), group, source
+        )
+        if cache_path is not None and cache_path.is_file():
+            with cache_path.open("rb") as handle:
+                cache_version, cached_result = pickle.load(handle)
+            if cache_version == DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION:
+                return cached_result
         transformed = substitute_proofs(source, group)
         status, exit_code, latency, diagnostic = _run_reconstructed_file(
             transformed, target_root=target_root, timeout_seconds=timeout_seconds
@@ -737,7 +789,7 @@ def verify_transformed_candidates(
                 )
                 for item in group
             ]
-            return accepted, FileVerification(
+            result = accepted, FileVerification(
                 file_path=file_path,
                 candidate_ids=tuple(_candidate_id(item) for item in group),
                 rejected_candidate_ids=(),
@@ -746,10 +798,60 @@ def verify_transformed_candidates(
                 latency_seconds=latency,
                 diagnostic="",
             )
+            if cache_path is not None:
+                temporary_cache = cache_path.with_suffix(".tmp")
+                with temporary_cache.open("wb") as handle:
+                    pickle.dump(
+                        (DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION, result),
+                        handle,
+                        protocol=pickle.HIGHEST_PROTOCOL,
+                    )
+                temporary_cache.replace(cache_path)
+            return result
+
+        baseline_status, baseline_exit_code, baseline_latency, baseline_diagnostic = (
+            _run_reconstructed_file(
+                source, target_root=target_root, timeout_seconds=timeout_seconds
+            )
+        )
+        if baseline_status != "accepted":
+            baseline_rejected = [
+                replace(
+                    item,
+                    verification_status=f"baseline-{baseline_status}",
+                    verification_method="source-file-baseline-verification",
+                    verification_evidence_id=evidence_id,
+                    verification_diagnostic=baseline_diagnostic,
+                )
+                for item in group
+            ]
+            result = baseline_rejected, FileVerification(
+                file_path=file_path,
+                candidate_ids=tuple(_candidate_id(item) for item in group),
+                rejected_candidate_ids=tuple(_candidate_id(item) for item in group),
+                status=f"baseline-{baseline_status}",
+                exit_code=baseline_exit_code,
+                latency_seconds=latency + baseline_latency,
+                diagnostic=(
+                    diagnostic + "\nbaseline=" + baseline_diagnostic
+                )[-4000:],
+            )
+            if cache_path is not None:
+                temporary_cache = cache_path.with_suffix(".tmp")
+                with temporary_cache.open("wb") as handle:
+                    pickle.dump(
+                        (DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION, result),
+                        handle,
+                        protocol=pickle.HIGHEST_PROTOCOL,
+                    )
+                temporary_cache.replace(cache_path)
+            return result
 
         attempts: list[str] = []
 
         def classify(subgroup: list[SourceCandidate]) -> list[SourceCandidate]:
+            if not subgroup:
+                return []
             subgroup_source = substitute_proofs(source, subgroup)
             subgroup_status, _, _, subgroup_diagnostic = _run_reconstructed_file(
                 subgroup_source,
@@ -781,15 +883,27 @@ def verify_transformed_candidates(
             midpoint = len(subgroup) // 2
             return classify(subgroup[:midpoint]) + classify(subgroup[midpoint:])
 
-        midpoint = len(group) // 2
-        classified = classify(group[:midpoint]) + classify(group[midpoint:])
+        if len(group) == 1:
+            attempts.append(f"1:{status}")
+            classified = [
+                replace(
+                    group[0],
+                    verification_status=status,
+                    verification_method="source-position-term-canonicalization",
+                    verification_evidence_id=evidence_id,
+                    verification_diagnostic=diagnostic,
+                )
+            ]
+        else:
+            midpoint = len(group) // 2
+            classified = classify(group[:midpoint]) + classify(group[midpoint:])
         accepted_count = sum(item.verification_status == "accepted" for item in classified)
         rejected_candidate_ids = tuple(
             _candidate_id(item)
             for item in classified
             if item.verification_status != "accepted"
         )
-        return classified, FileVerification(
+        result = classified, FileVerification(
             file_path=file_path,
             candidate_ids=tuple(_candidate_id(item) for item in group),
             rejected_candidate_ids=rejected_candidate_ids,
@@ -802,6 +916,16 @@ def verify_transformed_candidates(
             latency_seconds=latency,
             diagnostic=(diagnostic + "\nbisection=" + ", ".join(attempts))[-4000:],
         )
+        if cache_path is not None:
+            temporary_cache = cache_path.with_suffix(".tmp")
+            with temporary_cache.open("wb") as handle:
+                pickle.dump(
+                    (DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION, result),
+                    handle,
+                    protocol=pickle.HIGHEST_PROTOCOL,
+                )
+            temporary_cache.replace(cache_path)
+        return result
 
     ordered_groups = sorted(grouped.items(), key=lambda item: item[0])
     with ThreadPoolExecutor(max_workers=workers) as executor:
