@@ -113,6 +113,8 @@ def test_compact_evidence_checks_counts_and_uses_accepted_anchors(
     )
     assert comparison["goedel_comparison"]["status"] == "unavailable"
     assert "goedel_prover_v2_8b" not in comparison["metrics"]["pass@1"]
+    assert "shared host" in comparison["execution_limitations"][0]
+    assert "shared host" in full["execution_limitations"][0]
     assert full["generated_token_counts"]["total"] == 9760
     assert full["verifier_timeout_semantics"] == "unsuccessful_proof_outcome"
 

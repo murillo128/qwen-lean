@@ -147,6 +147,16 @@ def write_compact_evidence(
         assessment_name="DeepSeek-Prover-V2-7B",
         run_evidence_schema="deepseek-prover-v2-7b-run-evidence-v1",
     )
+    execution_limitations = [
+        (
+            "Concurrent non-assessment Lean work was observed on the shared host "
+            "during full verification. Generation timing is unaffected, but "
+            "verification and total wall time are descriptive system measurements; "
+            "all frozen 30-second verifier_timeout outcomes remain unsuccessful "
+            "proofs and were not retried."
+        )
+    ]
+    full["execution_limitations"] = execution_limitations
     anchors = {
         "qwen3_8b_base": _load_base_anchor(base_dir),
         "qwen3_8b_posttrained": _load_qwen3_posttrained_anchor(
@@ -187,6 +197,7 @@ def write_compact_evidence(
         "metrics": metrics,
         "accepted_anchors": anchors,
         "goedel_comparison": goedel,
+        "execution_limitations": execution_limitations,
         "strict_execution_integrity": {
             "task_count": full["task_count"],
             "candidate_count": full["candidate_count"],
@@ -343,6 +354,11 @@ pass@1/pass@4 of {dev_pass}. Both runs contain zero unresolved generation or
 verifier infrastructure errors. The full run retains
 {full['verifier_timeout_count']} `verifier_timeout` outcomes as unsuccessful
 proofs. Compute per solved task was {compute_text}.
+
+Concurrent non-assessment Lean work was observed on the shared host during full
+verification. Generation timing is unaffected, but verification and total wall
+time are descriptive system measurements. The frozen 30-second verifier
+timeouts were not retried or reclassified.
 
 **ACCEPTED:** the primary score uses exact `whole-proof-v1` raw continuation,
 four candidates per task, temperature 0.8, top-p 0.95, no top-k, 1,024 new
