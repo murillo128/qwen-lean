@@ -249,7 +249,7 @@ def validate_model_snapshot(config: Qwen35BaseAssessmentConfig, snapshot: Path) 
 def vllm_engine_kwargs(
     config: Qwen35BaseAssessmentConfig, snapshot: Path, lane: Mapping[str, Any]
 ) -> dict[str, Any]:
-    return {
+    kwargs = {
         "model": str(snapshot),
         "tokenizer": str(snapshot),
         "runner": "generate",
@@ -270,6 +270,9 @@ def vllm_engine_kwargs(
         "mm_processor_cache_gb": 0,
         "disable_log_stats": True,
     }
+    if "swap_space" in lane:
+        kwargs["swap_space"] = float(lane["swap_space"])
+    return kwargs
 
 
 def vllm_sampling_kwargs(sampling: Mapping[str, Any]) -> dict[str, Any]:

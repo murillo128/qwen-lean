@@ -1,0 +1,120 @@
+{
+  "accepted_lane": null,
+  "assessment_id": "qwen36-27b-4bit-ada-whole-proof-v1",
+  "benchmark_environment": {
+    "benchmark_split": "validation",
+    "known_valid_candidate_category": "verified",
+    "known_valid_candidate_lean_exit_code": 0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "placeholder_candidate_category": "lean_rejected",
+    "placeholder_candidate_lean_exit_code": 0,
+    "preamble": "import MiniF2F.ProblemImports\n\nopen scoped Real\nopen scoped Nat\nopen scoped Topology\nopen scoped Polynomial",
+    "primary_task_count": 244,
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    }
+  },
+  "benchmark_generation_started": false,
+  "chat_template": null,
+  "config_sha256": "0d985b067b04bc0efbb622f72cfb24a69e3a60e1b9d9a982f18d3e3c026d766e",
+  "configuration_changed_after_failure": false,
+  "engine_log_observations": {
+    "model_loading_report": {
+      "memory_gib": 17.93,
+      "seconds": 63.727833,
+      "source": "vllm engine log emitted during this preflight"
+    }
+  },
+  "failed_gate": "stage0_real_generation",
+  "fully_gpu_resident_contract": {
+    "cpu_weight_offload_gb": 0,
+    "hosted_inference": false,
+    "kv_swap_space_gb": 0,
+    "single_project_gpu": true
+  },
+  "model": {
+    "license": "Apache-2.0",
+    "model_id": "Qwen/Qwen3.6-27B",
+    "model_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+    "tokenizer_id": "Qwen/Qwen3.6-27B",
+    "tokenizer_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+  },
+  "model_snapshot": {
+    "local_cache_used": true,
+    "path_committed": false,
+    "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9"
+  },
+  "prompt_format_id": "whole-proof-v1",
+  "prompt_transformation": null,
+  "quantized_attempt": {
+    "candidate_count": 0,
+    "candidate_sha256": [],
+    "error": "OutOfMemoryError: CUDA out of memory. Tried to allocate 272.00 MiB. GPU 0 has a total capacity of 19.55 GiB of which 216.38 MiB is free. Including non-PyTorch memory, this process has 19.33 GiB memory in use. Of the allocated memory 19.02 GiB is allocated by PyTorch, and 90.48 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "expected_candidate_count": 4,
+    "finish_reason_counts": {},
+    "generated_token_count": 0,
+    "generation_seconds": null,
+    "lane": {
+      "cpu_offload_gb": 0,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "gpu_memory_utilization": 0.9,
+      "lane_id": "bitsandbytes-fp4-online-w4a32-v1",
+      "language_model_only": true,
+      "load_format": "bitsandbytes",
+      "max_model_len": 2048,
+      "max_num_seqs": 4,
+      "quantization": "bitsandbytes",
+      "quantization_metadata": {
+        "activation_dtype": "bfloat16",
+        "bits": 4,
+        "compute_dtype": "float32",
+        "conversion": "vllm online from pinned official BF16 safetensors",
+        "double_quantization": false,
+        "prequantized_checkpoint": false,
+        "quant_storage": "uint8",
+        "quant_type": "fp4",
+        "source_checkpoint_dtype": "bfloat16"
+      },
+      "swap_space": 0,
+      "tensor_parallel_size": 1
+    },
+    "load_seconds": null,
+    "memory_failure": true,
+    "peak_cuda_allocated_bytes": 20425753088,
+    "peak_cuda_reserved_bytes": 20661141504,
+    "peak_device_memory_used_mib": 19840,
+    "prompt_count": 1,
+    "status": "failed",
+    "wall_seconds": 169.12806036201073
+  },
+  "result": "hardware_infeasible_under_frozen_fully_gpu_resident_lane",
+  "runtime": {
+    "bitsandbytes": "0.49.1",
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cuda_linker_layout": "python-wheel-lib64-compat-v1",
+    "cuda_toolkit_source": "isolated-python-runtime",
+    "nvcc_version": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "python": "3.12.14",
+    "torch": "2.11.0+cu130",
+    "torch_cuda_version": "13.0",
+    "transformers": "5.15.0",
+    "vllm": "0.23.0",
+    "vllm_enable_v1_multiprocessing": false,
+    "vllm_worker_multiproc_method": "spawn"
+  },
+  "schema_version": "qwen36-27b-hardware-blocker-v1",
+  "status": "BLOCKED"
+}

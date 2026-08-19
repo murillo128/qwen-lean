@@ -112,6 +112,13 @@ from .qwen35_9b_posttrained_assessment import (
 from .qwen35_9b_posttrained_assessment import (
     write_compact_evidence as write_qwen35_9b_posttrained_evidence,
 )
+from .qwen36_27b_assessment import (
+    Qwen36AssessmentConfig,
+    run_assessment as run_qwen36_27b_assessment,
+    run_preflight as run_qwen36_27b_preflight,
+    write_blocker_evidence as write_qwen36_27b_blocker_evidence,
+    write_compact_evidence as write_qwen36_27b_evidence,
+)
 from .qwen35_4b_posttrained_assessment import (
     load_assessment_config as load_qwen35_assessment_config,
     run_preflight as run_qwen35_preflight,
@@ -400,6 +407,62 @@ def _parser() -> argparse.ArgumentParser:
     )
     qwen35_9b_posttrained_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/qwen35-9b"
+    )
+
+    qwen36_27b_preflight = subparsers.add_parser(
+        "qwen36-27b-preflight",
+        help="run the frozen Qwen3.6-27B 4-bit local-Ada preflight",
+    )
+    qwen36_27b_preflight.add_argument("--benchmark-root", type=Path, required=True)
+    qwen36_27b_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    qwen36_27b_preflight.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_preflight.add_argument("--output", type=Path, required=True)
+
+    qwen36_27b_assess = subparsers.add_parser(
+        "qwen36-27b-assess",
+        help="run the frozen Qwen3.6-27B 4-bit strict miniF2F assessment",
+    )
+    qwen36_27b_assess.add_argument("--benchmark-root", type=Path, required=True)
+    qwen36_27b_assess.add_argument("--model-snapshot", type=Path, required=True)
+    qwen36_27b_assess.add_argument("--preflight", type=Path, required=True)
+    qwen36_27b_assess.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_assess.add_argument(
+        "--workload",
+        required=True,
+        choices=("minif2f-valid-dev16-v1", "minif2f-valid-v1"),
+    )
+    qwen36_27b_assess.add_argument("--output-dir", type=Path, required=True)
+
+    qwen36_27b_evidence = subparsers.add_parser(
+        "qwen36-27b-evidence",
+        help="write compact Qwen3.6-27B 4-bit comparison evidence",
+    )
+    qwen36_27b_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_evidence.add_argument("--preflight", type=Path, required=True)
+    qwen36_27b_evidence.add_argument("--dev16-dir", type=Path, required=True)
+    qwen36_27b_evidence.add_argument("--full-dir", type=Path, required=True)
+    qwen36_27b_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen36-27b"
+    )
+
+    qwen36_27b_blocker_evidence = subparsers.add_parser(
+        "qwen36-27b-blocker-evidence",
+        help="write compact evidence for a frozen-lane Stage 0 hardware blocker",
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--config", type=Path, default=root / "config/qwen36-27b-assessment.json"
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--preflight", type=Path, required=True
+    )
+    qwen36_27b_blocker_evidence.add_argument(
+        "--evidence-dir", type=Path, default=root / "evidence/qwen36-27b"
     )
 
     qwen35_preflight = subparsers.add_parser(
@@ -1465,6 +1528,48 @@ def main(argv: list[str] | None = None) -> int:
             args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen36-27b-preflight":
+        evidence = run_qwen36_27b_preflight(
+            Qwen36AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen36-27b-assess":
+        _, _, summary = run_qwen36_27b_assessment(
+            Qwen36AssessmentConfig.load(args.config),
+            args.benchmark_root,
+            args.model_snapshot,
+            args.preflight,
+            args.workload,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen36-27b-evidence":
+        comparison = write_qwen36_27b_evidence(
+            Qwen36AssessmentConfig.load(args.config),
+            args.preflight,
+            args.dev16_dir,
+            args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen36-27b-blocker-evidence":
+        evidence = write_qwen36_27b_blocker_evidence(
+            Qwen36AssessmentConfig.load(args.config),
+            args.preflight,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
         return 0
 
     if args.command == "qwen35-4b-preflight":
