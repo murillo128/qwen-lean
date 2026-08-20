@@ -41,6 +41,6 @@ component-associated prerequisite views remain separate in `full.json` and
 far holdouts were not loaded. Raw generations, model caches, and bulky logs stay
 outside Git.
 
-`OBSERVED`: paired against the accepted Qwen3.5-4B-Base task vector, both solved 10 tasks, DeepSeek-Prover-V2-7B alone solved 166, and Qwen alone solved 3 (exact two-sided McNemar p=2.15053e-45). The Qwen3.5-9B-Base comparison remains explicitly unavailable until an accepted artifact exists on the authoritative independent base.
+`OBSERVED`: Paired against the accepted Qwen3.5-4B-Base task vector, both solved 10 tasks, DeepSeek-Prover-V2-7B alone solved 166, and Qwen3.5-4B-Base alone solved 3 (exact two-sided McNemar p=2.15053e-45). Paired against the accepted Qwen3.5-9B-Base task vector, both solved 5 tasks, DeepSeek-Prover-V2-7B alone solved 171, and Qwen3.5-9B-Base alone solved 0 (exact two-sided McNemar p=6.68191e-52).
 
 `OBSERVED`: Concurrent non-assessment Lean 4.32.2 verification was observed on the shared host during full verification. Generation timing is unaffected; verification and total wall time are descriptive and contention may have contributed to frozen 30-second verifier_timeout outcomes, which were not retried or reclassified.

@@ -322,12 +322,22 @@
       "task_count": 556
     },
     "qwen35-9b-base": {
-      "reason": "No accepted Qwen3.5-9B-Base Riemann task-outcome artifact is present on this issue's authoritative independent base; unmerged sibling results are not imported.",
+      "contingency": {
+        "both_solved": 5,
+        "current_only": 171,
+        "neither_solved": 380,
+        "reference_only": 0
+      },
+      "exact_mcnemar_two_sided_p": 6.681911775230489e-52,
+      "paired_wins_current_minus_reference": 171,
       "reference_identity": {
         "model_id": "Qwen/Qwen3.5-9B-Base",
         "model_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404"
       },
-      "status": "unavailable"
+      "reference_task_outcomes": "evidence/qwen35-9b-riemann/task-outcomes.jsonl",
+      "reference_task_outcomes_sha256": "cb3f053679329c1ff55ec0eaf36ce1c50f91e4f3dd549927cdefc29b1b59b52a",
+      "status": "available",
+      "task_count": 556
     }
   },
   "relevance_distance_breakdown": [

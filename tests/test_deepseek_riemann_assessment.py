@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -80,3 +81,74 @@ def test_deepseek_uses_exact_frozen_workload_and_qwen4_pairing() -> None:
     assert qwen4["exact_mcnemar_two_sided_p"] == 0.000244140625
     assert paired["qwen35-9b-base"]["status"] == "unavailable"
     assert _exact_mcnemar(0, 0) == 1.0
+
+
+def test_pairing_accepts_committed_qwen9_compact_schema(tmp_path: Path) -> None:
+    config = Phase1Config.load(CONFIG_PATH)
+    domains = load_domain_config(DOMAIN_CONFIG_PATH)
+    records, _ = load_validation_workload(config, ROOT, domains)
+    current = [{"task_id": record.id, "solved": False} for record in records]
+
+    reference_dir = tmp_path / "qwen35-9b-riemann"
+    reference_dir.mkdir()
+    outcomes = QWEN4_OUTCOMES.read_bytes()
+    outcomes_path = reference_dir / "task-outcomes.jsonl"
+    outcomes_path.write_bytes(outcomes)
+    (reference_dir / "full.json").write_text(
+        json.dumps(
+            {
+                "workload_id": "riemann-specialist-validation-v1",
+                "task_count": 556,
+                "candidate_count": 2224,
+                "infrastructure_error_count": 0,
+                "lane_id": "bf16-text-only-v1",
+                "precision": "bfloat16",
+                "quantization": None,
+                "task_outcomes": {
+                    "rows": 556,
+                    "sha256": hashlib.sha256(outcomes).hexdigest(),
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    (reference_dir / "preflight.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "accepted_lane": "bf16-text-only-v1",
+                "prompt_format_id": "whole-proof-v1",
+                "chat_template": None,
+                "prompt_transformation": None,
+                "model": {
+                    "model_id": "Qwen/Qwen3.5-9B-Base",
+                    "model_revision": (
+                        "68c46c4b3498877f3ef123c856ecfde50c39f404"
+                    ),
+                    "tokenizer_id": "Qwen/Qwen3.5-9B-Base",
+                    "tokenizer_revision": (
+                        "68c46c4b3498877f3ef123c856ecfde50c39f404"
+                    ),
+                },
+                "workload": {
+                    "corpus_id": "riemann-specialist-validation-v1",
+                    "loaded_task_count": 556,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    paired = _paired_analysis(
+        current,
+        {"qwen35-9b-base": outcomes_path},
+        {},
+    )
+
+    assert paired["qwen35-9b-base"]["status"] == "available"
+    assert paired["qwen35-9b-base"]["contingency"] == {
+        "both_solved": 0,
+        "current_only": 0,
+        "reference_only": 13,
+        "neither_solved": 543,
+    }

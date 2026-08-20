@@ -1285,19 +1285,67 @@ def _paired_analysis(
         full_path = path.parent / "full.json"
         full = json.loads(full_path.read_text(encoding="utf-8"))
         identity = full.get("execution_identity", {})
-        if any(identity.get(key) != value for key, value in expected_identity.items()):
-            raise ValueError(f"paired Riemann reference {reference_id} identity differs")
-        workload = full.get("workload", {})
-        if (
-            full.get("status") != "passed"
-            or workload.get("id") != WORKLOAD_ID
-            or workload.get("task_count") != EXPECTED_TASKS
-            or workload.get("candidate_count") != EXPECTED_CANDIDATES
-            or workload.get("protected_holdouts_used") is not False
-        ):
+        if identity:
+            if any(
+                identity.get(key) != value
+                for key, value in expected_identity.items()
+            ):
+                raise ValueError(
+                    f"paired Riemann reference {reference_id} identity differs"
+                )
+            workload = full.get("workload", {})
+            complete = (
+                full.get("status") == "passed"
+                and workload.get("id") == WORKLOAD_ID
+                and workload.get("task_count") == EXPECTED_TASKS
+                and workload.get("candidate_count") == EXPECTED_CANDIDATES
+                and workload.get("protected_holdouts_used") is False
+            )
+        elif reference_id == "qwen35-9b-base":
+            preflight = json.loads(
+                (path.parent / "preflight.json").read_text(encoding="utf-8")
+            )
+            model = preflight.get("model", {})
+            if (
+                any(
+                    model.get(key) != value
+                    for key, value in expected_identity.items()
+                )
+                or model.get("tokenizer_id") != expected_identity["model_id"]
+                or model.get("tokenizer_revision")
+                != expected_identity["model_revision"]
+            ):
+                raise ValueError(
+                    f"paired Riemann reference {reference_id} identity differs"
+                )
+            workload = preflight.get("workload", {})
+            complete = (
+                preflight.get("status") == "passed"
+                and preflight.get("accepted_lane") == "bf16-text-only-v1"
+                and preflight.get("prompt_format_id") == PROMPT_FORMAT_ID
+                and preflight.get("chat_template") is None
+                and preflight.get("prompt_transformation") is None
+                and workload.get("corpus_id") == WORKLOAD_ID
+                and workload.get("loaded_task_count") == EXPECTED_TASKS
+                and full.get("workload_id") == WORKLOAD_ID
+                and full.get("task_count") == EXPECTED_TASKS
+                and full.get("candidate_count") == EXPECTED_CANDIDATES
+                and full.get("infrastructure_error_count") == 0
+                and full.get("lane_id") == "bf16-text-only-v1"
+                and full.get("precision") == "bfloat16"
+                and full.get("quantization") is None
+            )
+        else:
+            raise ValueError(
+                f"paired Riemann reference {reference_id} identity differs"
+            )
+        if not complete:
             raise ValueError(f"paired Riemann reference {reference_id} is incomplete")
         task_outcomes = full.get("task_outcomes", {})
-        if task_outcomes.get("sha256") != _sha256_file(path):
+        if (
+            task_outcomes.get("rows") != EXPECTED_TASKS
+            or task_outcomes.get("sha256") != _sha256_file(path)
+        ):
             raise ValueError(f"paired Riemann reference {reference_id} hash differs")
         rows = _read_jsonl(path)
         reference = {str(row["task_id"]): bool(row["solved"]) for row in rows}
@@ -1493,25 +1541,28 @@ def _readme(full: Mapping[str, Any], profile: AssessmentProfile) -> str:
         if limitations
         else ""
     )
-    paired = full.get("paired_analysis", {}).get("qwen35-4b-base")
-    paired_text = ""
-    if paired and paired.get("status") == "available":
-        counts = paired["contingency"]
-        qwen9 = full.get("paired_analysis", {}).get("qwen35-9b-base", {})
-        qwen9_text = (
-            "The Qwen3.5-9B-Base comparison remains explicitly unavailable "
-            "until an accepted artifact exists on the authoritative independent base."
-            if qwen9.get("status") == "unavailable"
-            else "The Qwen3.5-9B-Base comparison is recorded in `full.json`."
-        )
-        paired_text = (
-            "\n\n`OBSERVED`: paired against the accepted Qwen3.5-4B-Base task "
-            f"vector, both solved {counts['both_solved']} tasks, "
-            f"{profile.display_name} alone "
-            f"solved {counts['current_only']}, and Qwen alone solved "
-            f"{counts['reference_only']} (exact two-sided McNemar p="
-            f"{paired['exact_mcnemar_two_sided_p']:.6g}). {qwen9_text}"
-        )
+    paired_parts = []
+    for reference_id, display_name in (
+        ("qwen35-4b-base", "Qwen3.5-4B-Base"),
+        ("qwen35-9b-base", "Qwen3.5-9B-Base"),
+    ):
+        paired = full.get("paired_analysis", {}).get(reference_id)
+        if paired and paired.get("status") == "available":
+            counts = paired["contingency"]
+            paired_parts.append(
+                f"Paired against the accepted {display_name} task vector, both "
+                f"solved {counts['both_solved']} tasks, {profile.display_name} "
+                f"alone solved {counts['current_only']}, and {display_name} alone "
+                f"solved {counts['reference_only']} (exact two-sided McNemar p="
+                f"{paired['exact_mcnemar_two_sided_p']:.6g})."
+            )
+        elif paired and paired.get("status") == "unavailable":
+            paired_parts.append(
+                f"The {display_name} comparison is unavailable: {paired['reason']}"
+            )
+    paired_text = (
+        "\n\n`OBSERVED`: " + " ".join(paired_parts) if paired_parts else ""
+    )
     return f"""# {profile.display_name} Riemann casting
 
 `OBSERVED`: the frozen `{WORKLOAD_ID}` assessment completed all 556 validation
