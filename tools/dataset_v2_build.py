@@ -22,6 +22,15 @@ sys.path.insert(0, str(ROOT / "src"))
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
 FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v4"
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
+FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS = {
+    "generic": (1, 3),
+    "prime-arithmetic-divisibility": (1, 5),
+    "arithmetic-functions": (1, 5),
+    "prime-counting-pnt": (2, 7),
+    "zeta-analytic-number-theory": (1, 8),
+    "riemann-core-bubble": (2, 7),
+    "pnt-plus": (1, 2),
+}
 
 from qwen_lean.dataset_v2 import (  # noqa: E402
     assign_synthetic_roles,
@@ -300,6 +309,7 @@ def _synthetic_records(
     batch_size: int,
     workers: int,
     forbidden_statement_ids: set[str],
+    full_scale_reserve: bool = False,
 ) -> tuple[list[Any], dict[str, Any]]:
     pools = composition_pools(candidates)
     missing = {name: len(pools.get(name, [])) for name in requested_counts if len(pools.get(name, [])) < 4}
@@ -310,6 +320,20 @@ def _synthetic_records(
         for name, count in requested_counts.items()
     }
     plans = build_composition_plans(pools, reserve_counts, seed=seed)
+    supplemental_reserve_counts: dict[str, int] = {}
+    if full_scale_reserve:
+        for name, count in requested_counts.items():
+            numerator, denominator = FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS[name]
+            target = (count * denominator + numerator - 1) // numerator
+            supplemental_reserve_counts[name] = max(0, target - reserve_counts[name])
+        plans.extend(
+            build_composition_plans(
+                pools,
+                supplemental_reserve_counts,
+                seed=f"{seed}\0supplemental-reserve-v1",
+                name_prefix="dataset_v2_synthetic_reserve",
+            )
+        )
     generated_plan_count = len(plans)
     all_audits: dict[str, Any] = {}
     rejected_names: set[str] = set()
@@ -442,6 +466,7 @@ def _synthetic_records(
     selected_statement_ids: set[str] = set()
     selected_source_sets: set[tuple[str, ...]] = set()
     selected_derivation_families: set[str] = set()
+    shortfalls: dict[str, tuple[int, int, int, int]] = {}
     for family, requested in requested_counts.items():
         eligible = [
             plan
@@ -468,11 +493,26 @@ def _synthetic_records(
             if len(family_selected) == requested:
                 break
         if len(family_selected) < requested:
-            raise RuntimeError(
-                "synthetic regeneration reserve exhausted after shortcut/dedup gates "
-                f"for {family}: {len(family_selected)} < {requested}"
+            resolved = sum(plan.domain_family == family for plan in plans)
+            shortfalls[family] = (
+                len(family_selected),
+                requested,
+                len(eligible),
+                resolved,
             )
         selected.extend(family_selected)
+    if shortfalls:
+        rendered = ", ".join(
+            (
+                f"{family}=accepted:{accepted}/requested:{requested}"
+                f"/shortcut-eligible:{eligible}/presence-resolved:{resolved}"
+            )
+            for family, (accepted, requested, eligible, resolved) in shortfalls.items()
+        )
+        raise RuntimeError(
+            "synthetic regeneration reserve exhausted after shortcut/dedup gates: "
+            + rendered
+        )
     shortcut_status = {
         plan.synthetic_name: (
             "assumption:no-closure",
@@ -508,6 +548,8 @@ def _synthetic_records(
     return assigned, {
         "requested": sum(requested_counts.values()),
         "generated_with_reserve": generated_plan_count,
+        "initial_reserve_counts": reserve_counts,
+        "supplemental_reserve_counts": supplemental_reserve_counts,
         "resolved_after_presence_audit": len(plans),
         "shortcut_rejected": len(rejected_names),
         "unresolved_source_constants": len(missing_constants),
@@ -940,6 +982,7 @@ def main() -> int:
             batch_size=args.composition_batch_size,
             workers=args.composition_workers,
             forbidden_statement_ids={statement_id(item.declaration) for item in real_candidates},
+            full_scale_reserve=args.mode == "full",
         )
         if args.mode == "full":
             with synthetic_cache.open("wb") as handle:
