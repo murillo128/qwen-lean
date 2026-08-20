@@ -54,7 +54,8 @@ def test_rendered_composition_uses_graph_grounded_iff_and_explicit_oracle() -> N
     assert " ↔ " in source
     assert "Nonempty" not in source
     assert "exact ⟨fun _ =>" in source
-    assert "by simpa only using (@Source.pnt_" in source
+    assert "by first | simpa only using (@Source.pnt_" in source
+    assert "| exact @Source.pnt_" in source
     assert "datasetV2Audit" in source
     assert all(plan.relation_edges for plan in plans)
 
