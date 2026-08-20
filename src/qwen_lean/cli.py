@@ -172,6 +172,13 @@ from .riemann_data import (
     materialize_riemann_data,
     validate_materialized_riemann_data,
 )
+from .riemann_assessment import (
+    run_assessment as run_riemann_qwen35_4b_assessment,
+)
+from .riemann_assessment import run_preflight as run_riemann_qwen35_4b_preflight
+from .riemann_assessment import (
+    write_compact_evidence as write_riemann_qwen35_4b_evidence,
+)
 from .qwen35_assessment import (
     run_assessment as run_qwen35_base_assessment,
 )
@@ -640,6 +647,76 @@ def _parser() -> argparse.ArgumentParser:
         "--full-dir", type=Path, required=True
     )
     qwen35_4b_base_evidence.add_argument(
+        "--evidence-dir", type=Path, required=True
+    )
+
+    riemann_qwen35_4b_preflight = subparsers.add_parser(
+        "riemann-qwen35-4b-preflight",
+        help="validate the frozen Qwen3.5-4B-Base Riemann casting inputs",
+    )
+    riemann_qwen35_4b_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-base-riemann-assessment.json",
+    )
+    riemann_qwen35_4b_preflight.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_qwen35_4b_preflight.add_argument(
+        "--mathlib-root", type=Path, required=True
+    )
+    riemann_qwen35_4b_preflight.add_argument("--output", type=Path, required=True)
+
+    riemann_qwen35_4b_assess = subparsers.add_parser(
+        "riemann-qwen35-4b-assess",
+        help="run the complete local-GPU Qwen3.5-4B-Base Riemann casting",
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-base-riemann-assessment.json",
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--mathlib-root", type=Path, required=True
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--preflight", type=Path, required=True
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--output-dir", type=Path, required=True
+    )
+    riemann_qwen35_4b_assess.add_argument(
+        "--verification-workers", type=int, default=8
+    )
+
+    riemann_qwen35_4b_evidence = subparsers.add_parser(
+        "riemann-qwen35-4b-evidence",
+        help="write compact Qwen3.5-4B-Base Riemann casting evidence",
+    )
+    riemann_qwen35_4b_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-base-riemann-assessment.json",
+    )
+    riemann_qwen35_4b_evidence.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_qwen35_4b_evidence.add_argument(
+        "--preflight", type=Path, required=True
+    )
+    riemann_qwen35_4b_evidence.add_argument(
+        "--artifact-dir", type=Path, required=True
+    )
+    riemann_qwen35_4b_evidence.add_argument(
         "--evidence-dir", type=Path, required=True
     )
 
@@ -1894,6 +1971,45 @@ def main(argv: list[str] | None = None) -> int:
             args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "riemann-qwen35-4b-preflight":
+        evidence = run_riemann_qwen35_4b_preflight(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.mathlib_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "riemann-qwen35-4b-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_riemann_qwen35_4b_assessment(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.mathlib_root,
+            args.preflight,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "riemann-qwen35-4b-evidence":
+        evidence = write_riemann_qwen35_4b_evidence(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.preflight,
+            args.artifact_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
         return 0
 
     if args.command == "qwen35-preflight":
