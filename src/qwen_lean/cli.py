@@ -172,6 +172,13 @@ from .riemann_data import (
     materialize_riemann_data,
     validate_materialized_riemann_data,
 )
+from .qwen35_9b_riemann_assessment import (
+    RiemannAssessmentConfig,
+    run_generation as run_riemann_generation,
+    run_preflight as run_riemann_preflight,
+    run_verification as run_riemann_verification,
+    write_compact_evidence as write_riemann_evidence,
+)
 from .riemann_assessment import (
     run_assessment as run_riemann_qwen35_4b_assessment,
 )
@@ -947,6 +954,75 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/qwen35-9b-base",
+    )
+
+    riemann_preflight = subparsers.add_parser(
+        "qwen35-9b-riemann-preflight",
+        help="preflight the frozen Qwen3.5-9B-Base Riemann assessment",
+    )
+    riemann_preflight.add_argument("--repository-root", type=Path, default=root)
+    riemann_preflight.add_argument("--mathlib-root", type=Path, required=True)
+    riemann_preflight.add_argument("--lean-environment-root", type=Path, required=True)
+    riemann_preflight.add_argument("--model-snapshot", type=Path, required=True)
+    riemann_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-riemann-assessment.json",
+    )
+    riemann_preflight.add_argument("--output", type=Path, required=True)
+
+    riemann_generate = subparsers.add_parser(
+        "qwen35-9b-riemann-generate",
+        help="generate the frozen 556 by 4 Riemann continuations",
+    )
+    riemann_generate.add_argument("--repository-root", type=Path, default=root)
+    riemann_generate.add_argument("--model-snapshot", type=Path, required=True)
+    riemann_generate.add_argument("--preflight", type=Path, required=True)
+    riemann_generate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-riemann-assessment.json",
+    )
+    riemann_generate.add_argument("--output-dir", type=Path, required=True)
+
+    riemann_verify = subparsers.add_parser(
+        "qwen35-9b-riemann-verify",
+        help="verify a frozen Riemann generation artifact without regeneration",
+    )
+    riemann_verify.add_argument("--repository-root", type=Path, default=root)
+    riemann_verify.add_argument("--mathlib-root", type=Path, required=True)
+    riemann_verify.add_argument("--lean-environment-root", type=Path, required=True)
+    riemann_verify.add_argument("--preflight", type=Path, required=True)
+    riemann_verify.add_argument("--generation-dir", type=Path, required=True)
+    riemann_verify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-riemann-assessment.json",
+    )
+    riemann_verify.add_argument("--output-dir", type=Path, required=True)
+
+    riemann_evidence = subparsers.add_parser(
+        "qwen35-9b-riemann-evidence",
+        help="write compact domain-aware evidence from the frozen Riemann run",
+    )
+    riemann_evidence.add_argument("--repository-root", type=Path, default=root)
+    riemann_evidence.add_argument("--preflight", type=Path, required=True)
+    riemann_evidence.add_argument("--generation-dir", type=Path, required=True)
+    riemann_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    riemann_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-9b-riemann-assessment.json",
+    )
+    riemann_evidence.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-9b-riemann",
     )
 
     qwen35_preflight = subparsers.add_parser(
@@ -2150,6 +2226,55 @@ def main(argv: list[str] | None = None) -> int:
             args.preflight,
             args.dev16_dir,
             args.full_dir,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence["full"], indent=2))
+        return 0
+
+    if args.command == "qwen35-9b-riemann-preflight":
+        evidence = run_riemann_preflight(
+            RiemannAssessmentConfig.load(args.config),
+            args.repository_root,
+            args.mathlib_root,
+            args.lean_environment_root,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen35-9b-riemann-generate":
+        generation = run_riemann_generation(
+            RiemannAssessmentConfig.load(args.config),
+            args.repository_root,
+            args.model_snapshot,
+            args.preflight,
+            args.output_dir,
+        )
+        print(json.dumps(generation, indent=2))
+        return 0
+
+    if args.command == "qwen35-9b-riemann-verify":
+        summary = run_riemann_verification(
+            RiemannAssessmentConfig.load(args.config),
+            args.repository_root,
+            args.mathlib_root,
+            args.lean_environment_root,
+            args.preflight,
+            args.generation_dir,
+            args.output_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "qwen35-9b-riemann-evidence":
+        evidence = write_riemann_evidence(
+            RiemannAssessmentConfig.load(args.config),
+            args.repository_root,
+            args.domain_config,
+            args.preflight,
+            args.generation_dir,
+            args.artifact_dir,
             args.evidence_dir,
         )
         print(json.dumps(evidence["full"], indent=2))
