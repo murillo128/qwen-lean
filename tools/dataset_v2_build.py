@@ -323,6 +323,7 @@ def _synthetic_records(
         for source in plan.source_lemmas + plan.retrieval_lemmas
     }
     missing_constants: set[str] = set()
+    universe_arguments: dict[str, tuple[str, ...]] = {}
     for pnt_plus in (False, True):
         sources = [
             source
@@ -331,18 +332,29 @@ def _synthetic_records(
         ]
         if not sources:
             continue
-        missing_constants.update(
-            find_missing_constants(
-                sources,
-                source_path=lean_dir / f"ConstantPresence-{'pnt' if pnt_plus else 'mathlib'}.lean",
-                target_root=target_root,
-            )
+        missing, grounding = find_missing_constants(
+            sources,
+            source_path=lean_dir / f"ConstantPresence-{'pnt' if pnt_plus else 'mathlib'}.lean",
+            target_root=target_root,
         )
+        missing_constants.update(missing)
+        universe_arguments.update(grounding)
+
+    def ground_unconstrained_universes(source: Any) -> Any:
+        return replace(
+            source,
+            universe_arguments=universe_arguments.get(source.declaration_name, ()),
+        )
+
     plans = [
         replace(
             plan,
+            source_lemmas=tuple(
+                ground_unconstrained_universes(source)
+                for source in plan.source_lemmas
+            ),
             retrieval_lemmas=tuple(
-                source
+                ground_unconstrained_universes(source)
                 for source in plan.retrieval_lemmas
                 if source.declaration_name not in missing_constants
             ),

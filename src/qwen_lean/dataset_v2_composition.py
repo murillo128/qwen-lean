@@ -31,6 +31,7 @@ from .dataset_v2_schema import (
 
 AUDIT_PREFIX = "DATASET_V2_AUDIT\t"
 MISSING_PREFIX = "DATASET_V2_MISSING\t"
+UNIVERSE_GROUNDING_PREFIX = "DATASET_V2_UNIVERSE_GROUNDING\t"
 STRUCTURAL_ARITY = {"direct": 2, "branching": 3, "deep": 4}
 CONSTANT_PRESENCE_BATCH_SIZE = 256
 
@@ -45,6 +46,7 @@ class CompositionSource:
     canonical_declaration: str = ""
     resolved_dependencies: tuple[str, ...] = ()
     type_head: str = "other"
+    universe_arguments: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -390,13 +392,14 @@ def _type_expression(plan: CompositionPlan) -> str:
 
 
 def _oracle_expression(plan: CompositionPlan) -> str:
-    names = [
-        (
-            f"(by first | simpa only using (@{item.declaration_name}) "
-            f"| exact @{item.declaration_name})"
+    names = []
+    for item in plan.source_lemmas:
+        suffix = (
+            ".{" + ", ".join(item.universe_arguments) + "}"
+            if item.universe_arguments
+            else ""
         )
-        for item in plan.source_lemmas
-    ]
+        names.append(f"@{item.declaration_name}{suffix}")
     final_only = plan.generator_family.startswith("final-only:")
     if plan.structural_class == "direct" and not final_only:
         return f"⟨{names[0]}, {names[1]}⟩"
@@ -451,7 +454,7 @@ syntax "source_type% " ident : term
 elab_rules : term
   | `(source_type% $id:ident) => do
       let info ← getConstInfo id.getId
-      let levels ← info.levelParams.mapM fun _ => mkFreshLevelMVar
+      let levels := info.levelParams.map fun _ => Level.zero
       let type ← inferType (mkConst info.name levels)
       unless ← isProp type do
         throwError "Dataset-v2 composition source is not proposition-valued"
@@ -542,8 +545,17 @@ open Lean Elab Command
 def datasetV2Presence (names : Array Name) : CommandElabM Unit := do
   let env ← getEnv
   for name in names do
-    unless env.contains name do
+    if !env.contains name then
       logInfo ("{MISSING_PREFIX}" ++ name.toString)
+    else
+      let info ← getConstInfo name
+      let arguments := info.levelParams.map fun _ => "0"
+      if !arguments.isEmpty then
+        let value := Json.mkObj [
+          ("name", Json.str name.toString),
+          ("arguments", toJson arguments)
+        ]
+        logInfo ("{UNIVERSE_GROUNDING_PREFIX}" ++ value.compress)
 
 {commands}
 '''
@@ -555,7 +567,7 @@ def find_missing_constants(
     source_path: Path,
     target_root: Path,
     timeout_seconds: float = 1800.0,
-) -> tuple[str, ...]:
+) -> tuple[tuple[str, ...], dict[str, tuple[str, ...]]]:
     source_path.parent.mkdir(parents=True, exist_ok=True)
     source_path.write_text(render_constant_presence_source(sources), encoding="utf-8")
     completed = subprocess.run(
@@ -569,13 +581,21 @@ def find_missing_constants(
     output = completed.stdout + "\n" + completed.stderr
     if completed.returncode != 0:
         raise RuntimeError(f"constant presence audit failed: {output[-8000:]}")
-    return tuple(
+    missing = tuple(
         sorted(
             line.split(MISSING_PREFIX, 1)[1].strip()
             for line in output.splitlines()
             if MISSING_PREFIX in line
         )
     )
+    grounding: dict[str, tuple[str, ...]] = {}
+    for line in output.splitlines():
+        marker = line.find(UNIVERSE_GROUNDING_PREFIX)
+        if marker == -1:
+            continue
+        value = json.loads(line[marker + len(UNIVERSE_GROUNDING_PREFIX) :])
+        grounding[str(value["name"])] = tuple(str(item) for item in value["arguments"])
+    return missing, grounding
 
 
 def parse_audits(output: str) -> tuple[CompositionAudit, ...]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 from qwen_lean.dataset_v2_composition import (
     AUDIT_PREFIX,
@@ -54,8 +55,7 @@ def test_rendered_composition_uses_graph_grounded_iff_and_explicit_oracle() -> N
     assert " ↔ " in source
     assert "Nonempty" not in source
     assert "exact ⟨fun _ =>" in source
-    assert "by first | simpa only using (@Source.pnt_" in source
-    assert "| exact @Source.pnt_" in source
+    assert "exact ⟨fun _ => @Source.pnt_" in source
     assert "datasetV2Audit" in source
     assert all(plan.relation_edges for plan in plans)
 
@@ -77,6 +77,20 @@ def test_constant_presence_audit_batches_large_name_arrays() -> None:
     source = render_constant_presence_source(_pool("generic", size=513))
 
     assert source.count("run_cmd datasetV2Presence") == 3
+
+
+def test_rendered_composition_uses_audited_explicit_universes() -> None:
+    plan = build_composition_plans(
+        {"generic": _pool("generic")}, {"generic": 1}, seed="pilot"
+    )[0]
+    sources = tuple(
+        replace(source, universe_arguments=("0", "0"))
+        for source in plan.source_lemmas
+    )
+    source = render_composition_source([replace(plan, source_lemmas=sources)])
+
+    assert ".{0, 0}" in source
+    assert 'map fun _ => "0"' in render_constant_presence_source(_pool("generic")[:1])
 
 
 def test_audit_validation_requires_every_planned_source_in_elaborated_proof() -> None:
