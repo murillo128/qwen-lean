@@ -770,6 +770,7 @@ def write_compact_evidence(
     *,
     paired_reference_paths: Mapping[str, Path] | None = None,
     unavailable_paired_references: Mapping[str, str] | None = None,
+    execution_limitations: Sequence[str] = (),
 ) -> dict[str, Any]:
     profile = assessment_profile(config)
     domain_config = load_domain_config(domain_config_path)
@@ -941,6 +942,7 @@ def write_compact_evidence(
             ],
         },
         "generation_identity_sha256": _generation_digest(results),
+        "execution_limitations": list(execution_limitations),
     }
     if paired_reference_paths or unavailable_paired_references:
         full["paired_analysis"] = _paired_analysis(
@@ -1485,6 +1487,31 @@ def _readme(full: Mapping[str, Any], profile: AssessmentProfile) -> str:
         if profile.selection_role == "specialist-parent-comparator"
         else "For epic #63 this is a general Base/pre-trained foundation result."
     )
+    limitations = full.get("execution_limitations", [])
+    limitation_text = (
+        "\n\n`OBSERVED`: " + " ".join(str(item) for item in limitations)
+        if limitations
+        else ""
+    )
+    paired = full.get("paired_analysis", {}).get("qwen35-4b-base")
+    paired_text = ""
+    if paired and paired.get("status") == "available":
+        counts = paired["contingency"]
+        qwen9 = full.get("paired_analysis", {}).get("qwen35-9b-base", {})
+        qwen9_text = (
+            "The Qwen3.5-9B-Base comparison remains explicitly unavailable "
+            "until an accepted artifact exists on the authoritative independent base."
+            if qwen9.get("status") == "unavailable"
+            else "The Qwen3.5-9B-Base comparison is recorded in `full.json`."
+        )
+        paired_text = (
+            "\n\n`OBSERVED`: paired against the accepted Qwen3.5-4B-Base task "
+            f"vector, both solved {counts['both_solved']} tasks, "
+            f"{profile.display_name} alone "
+            f"solved {counts['current_only']}, and Qwen alone solved "
+            f"{counts['reference_only']} (exact two-sided McNemar p="
+            f"{paired['exact_mcnemar_two_sided_p']:.6g}). {qwen9_text}"
+        )
     return f"""# {profile.display_name} Riemann casting
 
 `OBSERVED`: the frozen `{WORKLOAD_ID}` assessment completed all 556 validation
@@ -1520,7 +1547,7 @@ Direct graph relevance, relevance distance, component inclusion, and
 component-associated prerequisite views remain separate in `full.json` and
 `task-outcomes.jsonl`; model outputs never define a category. Protected near and
 far holdouts were not loaded. Raw generations, model caches, and bulky logs stay
-outside Git.
+outside Git.{paired_text}{limitation_text}
 """
 
 

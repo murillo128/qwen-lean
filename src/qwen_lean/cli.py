@@ -786,6 +786,9 @@ def _parser() -> argparse.ArgumentParser:
     riemann_deepseek_evidence.add_argument(
         "--qwen35-9b-outcomes", type=Path
     )
+    riemann_deepseek_evidence.add_argument(
+        "--execution-limitation", action="append", default=[]
+    )
 
     qwen35_preflight = subparsers.add_parser(
         "qwen35-preflight",
@@ -2058,6 +2061,7 @@ def main(argv: list[str] | None = None) -> int:
             args.evidence_dir,
             paired_reference_paths=references,
             unavailable_paired_references=unavailable,
+            execution_limitations=args.execution_limitation,
         )
         print(json.dumps(evidence, indent=2))
         return 0
