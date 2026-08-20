@@ -1,0 +1,93 @@
+{
+  "assessment_id": "qwen35-4b-base-riemann-casting-v1",
+  "config_sha256": "edd03b8b952144f80121497fbd6037f781a960174bb088fe51dfa9579eee36a3",
+  "domain_config_sha256": "b5c19a9c6d134c39751f391b88840c506d889cf370fc4931949c3627bc323d2a",
+  "domain_task_counts": {
+    "broad-number-theory": 54,
+    "prime-arithmetic-divisibility": 19,
+    "real-complex-analysis": 57,
+    "shared-formal-prerequisite": 409,
+    "zeta-analytic-number-theory": 17
+  },
+  "mathlib_environment": {
+    "lean_environment_root_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "lean_version": "Lean (version 4.32.0, x86_64-unknown-linux-gnu, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35, Release)",
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "source_worktree_clean": true
+  },
+  "model": {
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "model_snapshot_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+  "prompt": {
+    "chat_template": null,
+    "max_model_len": 2048,
+    "max_prompt_plus_generation_tokens": 1197,
+    "prompt_format_id": "whole-proof-v1",
+    "prompt_token_counts": {
+      "count": 556,
+      "maximum": 173,
+      "mean": 71.01079136690647,
+      "median": 65.0,
+      "minimum": 41,
+      "p95": 111,
+      "p99": 148
+    },
+    "raw_continuation": true
+  },
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "huggingface_hub": "1.27.0",
+    "inference_execution": "local_cuda",
+    "package_versions": {
+      "flashinfer-python": "0.6.16.post3",
+      "nvidia-ml-py": "13.610.43",
+      "torch": "2.13.0+cu132",
+      "transformers": "5.15.0",
+      "vllm": "0.27.2rc1.dev203+g41f179b57"
+    },
+    "python": "3.12.14",
+    "sampling_backend": "vllm_pytorch_native",
+    "torch": "2.13.0+cu132",
+    "torch_cuda_version": "13.2",
+    "transformers": "5.15.0",
+    "vllm": "0.27.2rc1.dev203+g41f179b57",
+    "vllm_source_revision": "41f179b57aa8ab6f634f508128ce1f1efadd0eb1"
+  },
+  "schema_version": "qwen35-4b-base-riemann-preflight-v1",
+  "source_identity": {
+    "expected_records": 556,
+    "matched_records": 556,
+    "original_source_span_reconstruction": true
+  },
+  "status": "passed",
+  "verifier_probe": {
+    "known_valid_candidate_category": "accepted",
+    "known_valid_candidate_exit_code": 0,
+    "placeholder_candidate_category": "rejected",
+    "placeholder_candidate_exit_code": 1,
+    "record_id": "00171d0d4339cb46513719b700a427041d7408de9113a550177cd86335092fb1"
+  },
+  "workload": {
+    "candidate_count": 2224,
+    "candidates_per_task": 4,
+    "id": "riemann-specialist-validation-v1",
+    "membership_sha256": "2f611cf4fe0b45d8aff904212a53666e52e7e6e0471843d8e2efd33dd1783ec2",
+    "protected_holdouts_loaded": false,
+    "record_store_sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c",
+    "task_ids_sha256": "746cc51878ba7099a01d00f2ffd3d02965b216856766816cbe62d8af98887f4b",
+    "tasks": 556
+  }
+}
