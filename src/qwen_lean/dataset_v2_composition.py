@@ -32,6 +32,7 @@ from .dataset_v2_schema import (
 AUDIT_PREFIX = "DATASET_V2_AUDIT\t"
 MISSING_PREFIX = "DATASET_V2_MISSING\t"
 STRUCTURAL_ARITY = {"direct": 2, "branching": 3, "deep": 4}
+CONSTANT_PRESENCE_BATCH_SIZE = 256
 
 
 @dataclass(frozen=True)
@@ -520,8 +521,14 @@ def render_constant_presence_source(sources: Sequence[CompositionSource]) -> str
         if pnt == {True}
         else tuple(sorted({source.source_module for source in sources}))
     )
-    names = ", ".join(f"`{source.declaration_name}" for source in sources)
+    names = [f"`{source.declaration_name}" for source in sources]
     imports = "\n".join(f"import {module}" for module in modules)
+    commands = "\n".join(
+        "run_cmd datasetV2Presence #["
+        + ", ".join(names[start : start + CONSTANT_PRESENCE_BATCH_SIZE])
+        + "]"
+        for start in range(0, len(names), CONSTANT_PRESENCE_BATCH_SIZE)
+    )
     return f'''{imports}
 
 open Lean Elab Command
@@ -532,7 +539,7 @@ def datasetV2Presence (names : Array Name) : CommandElabM Unit := do
     unless env.contains name do
       logInfo ("{MISSING_PREFIX}" ++ name.toString)
 
-run_cmd datasetV2Presence #[{names}]
+{commands}
 '''
 
 

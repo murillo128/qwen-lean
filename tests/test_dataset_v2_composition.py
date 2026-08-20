@@ -71,6 +71,12 @@ def test_constant_presence_audit_uses_exact_mathlib_modules() -> None:
     assert "DATASET_V2_MISSING" in source
 
 
+def test_constant_presence_audit_batches_large_name_arrays() -> None:
+    source = render_constant_presence_source(_pool("generic", size=513))
+
+    assert source.count("run_cmd datasetV2Presence") == 3
+
+
 def test_audit_validation_requires_every_planned_source_in_elaborated_proof() -> None:
     plan = build_composition_plans(
         {"generic": _pool("generic")}, {"generic": 1}, seed="pilot"
