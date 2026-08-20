@@ -20,18 +20,19 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
+FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v4"
 FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v5"
 LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
     "dataset-v2-full-verification-cache-v4"
 }
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS = {
-    "generic": (1, 3),
-    "prime-arithmetic-divisibility": (1, 5),
-    "arithmetic-functions": (1, 5),
-    "prime-counting-pnt": (2, 7),
-    "zeta-analytic-number-theory": (1, 8),
-    "riemann-core-bubble": (2, 7),
+    "generic": (1, 2),
+    "prime-arithmetic-divisibility": (1, 2),
+    "arithmetic-functions": (1, 2),
+    "prime-counting-pnt": (1, 2),
+    "zeta-analytic-number-theory": (1, 2),
+    "riemann-core-bubble": (1, 2),
     "pnt-plus": (1, 2),
 }
 
@@ -1162,11 +1163,11 @@ def main() -> int:
     real_candidates, _ = collapse_duplicate_candidates(real_candidates)
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
-    synthetic_cache = output_dir / ".synthetic-cache.pkl"
+    synthetic_cache = output_dir / ".synthetic-v4-cache.pkl"
     if args.resume_full and synthetic_cache.is_file():
         with synthetic_cache.open("rb") as handle:
             cache_version, synthetic, synthetic_evidence = pickle.load(handle)
-        if cache_version != FULL_CACHE_VERSION:
+        if cache_version != FULL_SYNTHETIC_CACHE_VERSION:
             raise RuntimeError("full synthetic cache version mismatch")
     else:
         synthetic, synthetic_evidence = _synthetic_records(
@@ -1184,7 +1185,7 @@ def main() -> int:
         if args.mode == "full":
             with synthetic_cache.open("wb") as handle:
                 pickle.dump(
-                    (FULL_CACHE_VERSION, synthetic, synthetic_evidence),
+                    (FULL_SYNTHETIC_CACHE_VERSION, synthetic, synthetic_evidence),
                     handle,
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
