@@ -8,6 +8,7 @@ from qwen_lean.dataset_v2_composition import (
     CompositionAudit,
     CompositionSource,
     build_composition_plans,
+    lean_name_key,
     parse_audits,
     render_constant_audit_source,
     render_constant_presence_source,
@@ -43,6 +44,10 @@ def test_composition_plans_are_unique_and_cover_structural_classes() -> None:
     assert len({tuple(sorted(item.statement_id for item in plan.source_lemmas)) for plan in plans}) == 12
     assert {plan.structural_class for plan in plans} == {"direct", "branching", "deep"}
     assert any(plan.generator_family.startswith("final-only:") for plan in plans)
+
+
+def test_lean_name_key_matches_quoted_keyword_audit_output() -> None:
+    assert lean_name_key("Sigma.«exists»") == "Sigma.exists"
 
 
 def test_rendered_composition_uses_graph_grounded_iff_and_explicit_oracle() -> None:

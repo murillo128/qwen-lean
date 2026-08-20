@@ -49,6 +49,7 @@ from qwen_lean.dataset_v2 import (  # noqa: E402
 from qwen_lean.dataset_v2_composition import (  # noqa: E402
     build_composition_plans,
     find_missing_constants,
+    lean_name_key,
     records_from_compositions,
     render_composition_source,
     render_constant_audit_source,
@@ -465,13 +466,18 @@ def _synthetic_records(
             source_path=lean_dir / f"ConstantPresence-{'pnt' if pnt_plus else 'mathlib'}.lean",
             target_root=target_root,
         )
-        missing_constants.update(missing)
-        universe_arguments.update(grounding)
+        missing_constants.update(lean_name_key(item) for item in missing)
+        universe_arguments.update(
+            (lean_name_key(name), arguments)
+            for name, arguments in grounding.items()
+        )
 
     def ground_unconstrained_universes(source: Any) -> Any:
         return replace(
             source,
-            universe_arguments=universe_arguments.get(source.declaration_name, ()),
+            universe_arguments=universe_arguments.get(
+                lean_name_key(source.declaration_name), ()
+            ),
         )
 
     plans = [
@@ -484,17 +490,18 @@ def _synthetic_records(
             retrieval_lemmas=tuple(
                 ground_unconstrained_universes(source)
                 for source in plan.retrieval_lemmas
-                if source.declaration_name not in missing_constants
+                if lean_name_key(source.declaration_name) not in missing_constants
             ),
             retrieval_index=tuple(
                 entry
                 for entry in plan.retrieval_index
-                if entry[0] not in missing_constants
+                if lean_name_key(entry[0]) not in missing_constants
             ),
         )
         for plan in plans
         if not any(
-            source.declaration_name in missing_constants for source in plan.source_lemmas
+            lean_name_key(source.declaration_name) in missing_constants
+            for source in plan.source_lemmas
         )
     ]
     batches: list[list[Any]] = []

@@ -34,6 +34,13 @@ MISSING_PREFIX = "DATASET_V2_MISSING\t"
 UNIVERSE_GROUNDING_PREFIX = "DATASET_V2_UNIVERSE_GROUNDING\t"
 STRUCTURAL_ARITY = {"direct": 2, "branching": 3, "deep": 4}
 CONSTANT_PRESENCE_BATCH_SIZE = 256
+_QUOTED_NAME_COMPONENT_RE = re.compile(r"«([^»]+)»")
+
+
+def lean_name_key(value: str) -> str:
+    """Match Lean syntax names with `Name.toString` audit output."""
+
+    return _QUOTED_NAME_COMPONENT_RE.sub(r"\1", value)
 
 
 @dataclass(frozen=True)
@@ -658,10 +665,16 @@ def validate_composition_audits(
     actual_counts: Counter[str] = Counter()
     for plan in plans:
         audit = by_name[plan.synthetic_name]
-        planned = {item.declaration_name for item in plan.source_lemmas}
-        actual = planned.intersection(audit.actual_dependencies)
-        if actual != planned:
-            missing = sorted(planned - actual)
+        planned = {
+            lean_name_key(item.declaration_name): item.declaration_name
+            for item in plan.source_lemmas
+        }
+        actual_keys = {lean_name_key(item) for item in audit.actual_dependencies}
+        actual = {name for key, name in planned.items() if key in actual_keys}
+        if len(actual) != len(planned):
+            missing = sorted(
+                name for key, name in planned.items() if key not in actual_keys
+            )
             raise ValueError(f"composition {plan.synthetic_name} omitted source lemmas: {missing}")
         if plan.structural_class == "direct" and len(actual) < 2:
             raise ValueError("direct composition has fewer than two actual source lemmas")
@@ -779,11 +792,14 @@ def records_from_compositions(
         declaration = f"theorem {plan.synthetic_name} : {audit.statement_type}"
         proof = f"by\n  exact {_oracle_expression(plan)}"
         identity = statement_id(declaration)
+        actual_dependency_keys = {
+            lean_name_key(item) for item in audit.actual_dependencies
+        }
         actual = tuple(
             sorted(
-                {item.declaration_name for item in plan.source_lemmas}.intersection(
-                    audit.actual_dependencies
-                )
+                item.declaration_name
+                for item in plan.source_lemmas
+                if lean_name_key(item.declaration_name) in actual_dependency_keys
             )
         )
         variant = ProofVariant(
