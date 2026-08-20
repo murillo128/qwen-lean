@@ -390,7 +390,10 @@ def _type_expression(plan: CompositionPlan) -> str:
 
 
 def _oracle_expression(plan: CompositionPlan) -> str:
-    names = [f"@{item.declaration_name}" for item in plan.source_lemmas]
+    names = [
+        f"(by simpa only using (@{item.declaration_name}))"
+        for item in plan.source_lemmas
+    ]
     final_only = plan.generator_family.startswith("final-only:")
     if plan.structural_class == "direct" and not final_only:
         return f"⟨{names[0]}, {names[1]}⟩"
