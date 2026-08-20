@@ -269,6 +269,7 @@ def _write_preflight(
         "schema_version": "qwen35-4b-base-riemann-preflight-v1",
         "status": "passed",
         "assessment_id": config.value["assessment"]["id"],
+        "selection_role": "general-foundation",
         "config_sha256": _sha256_file(CONFIG_PATH),
         "domain_config_sha256": _sha256_file(DOMAIN_CONFIG_PATH),
         "model": config.model,

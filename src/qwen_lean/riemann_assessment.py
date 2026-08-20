@@ -3,13 +3,14 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import math
 import os
 import platform
 import subprocess
 import time
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from statistics import fmean, median
 from typing import Any, Iterable, Mapping, Sequence
@@ -24,10 +25,10 @@ from .phase3 import render_sft_prompt
 from .phase3_verification import reconstruct_generated_proof
 from .prompt import PROMPT_FORMAT_ID, normalize_transport
 from .qwen35_4b_base_assessment import (
-    MODEL_ID,
-    MODEL_REVISION,
-    VLLM_SOURCE_REVISION,
-    VLLM_VERSION,
+    MODEL_ID as QWEN_MODEL_ID,
+    MODEL_REVISION as QWEN_MODEL_REVISION,
+    VLLM_SOURCE_REVISION as QWEN_VLLM_SOURCE_REVISION,
+    VLLM_VERSION as QWEN_VLLM_VERSION,
     _GpuMemorySampler,
 )
 from .schema import (
@@ -43,22 +44,110 @@ EXPECTED_TASKS = 556
 EXPECTED_CANDIDATES = EXPECTED_TASKS * 4
 DOMAIN_SCHEMA_VERSION = "riemann-domain-breakdown-v1"
 EVIDENCE_SCHEMA_VERSION = "qwen35-4b-base-riemann-assessment-v1"
+MODEL_ID = QWEN_MODEL_ID
+MODEL_REVISION = QWEN_MODEL_REVISION
+VLLM_SOURCE_REVISION = QWEN_VLLM_SOURCE_REVISION
+VLLM_VERSION = QWEN_VLLM_VERSION
+
+
+@dataclass(frozen=True)
+class AssessmentProfile:
+    assessment_id: str
+    display_name: str
+    model_id: str
+    model_revision: str
+    vllm_version: str
+    vllm_source_revision: str | None
+    preflight_schema_version: str
+    evidence_schema_version: str
+    selection_role: str
+    accepted_identity_issue: int
+    engine_requirements: Mapping[str, Any]
+    forbidden_engine_fields: tuple[str, ...] = ()
+
+
+QWEN_PROFILE = AssessmentProfile(
+    assessment_id="qwen35-4b-base-riemann-casting-v1",
+    display_name="Qwen3.5-4B-Base",
+    model_id=QWEN_MODEL_ID,
+    model_revision=QWEN_MODEL_REVISION,
+    vllm_version=QWEN_VLLM_VERSION,
+    vllm_source_revision=QWEN_VLLM_SOURCE_REVISION,
+    preflight_schema_version="qwen35-4b-base-riemann-preflight-v1",
+    evidence_schema_version=EVIDENCE_SCHEMA_VERSION,
+    selection_role="general-foundation",
+    accepted_identity_issue=44,
+    engine_requirements={
+        "name": "vllm",
+        "version": QWEN_VLLM_VERSION,
+        "dtype": "bfloat16",
+        "tensor_parallel_size": 1,
+        "quantization": None,
+        "language_model_only": True,
+        "resolve_pinned_snapshot": True,
+        "use_flashinfer_sampler": False,
+        "worker_multiproc_method": "spawn",
+    },
+)
+
+DEEPSEEK_PROFILE = AssessmentProfile(
+    assessment_id="deepseek-prover-v2-7b-riemann-casting-v1",
+    display_name="DeepSeek-Prover-V2-7B",
+    model_id="deepseek-ai/DeepSeek-Prover-V2-7B",
+    model_revision="a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+    vllm_version="0.10.2",
+    vllm_source_revision=None,
+    preflight_schema_version="deepseek-prover-v2-7b-riemann-preflight-v1",
+    evidence_schema_version="deepseek-prover-v2-7b-riemann-assessment-v1",
+    selection_role="specialist-parent-comparator",
+    accepted_identity_issue=31,
+    engine_requirements={
+        "name": "vllm",
+        "version": "0.10.2",
+        "dtype": "bfloat16",
+        "tensor_parallel_size": 1,
+        "gpu_memory_utilization": 0.95,
+        "max_model_len": 2048,
+        "max_num_seqs": 8,
+        "enforce_eager": True,
+        "quantization": None,
+        "expected_cuda_device_name_fragment": "Ada",
+    },
+    forbidden_engine_fields=(
+        "language_model_only",
+        "resolve_pinned_snapshot",
+        "use_flashinfer_sampler",
+        "worker_multiproc_method",
+    ),
+)
+
+ASSESSMENT_PROFILES = {
+    profile.assessment_id: profile for profile in (QWEN_PROFILE, DEEPSEEK_PROFILE)
+}
+
+
+def assessment_profile(config: Phase1Config) -> AssessmentProfile:
+    assessment_id = str(config.value.get("assessment", {}).get("id"))
+    try:
+        return ASSESSMENT_PROFILES[assessment_id]
+    except KeyError as error:
+        raise ValueError(f"unknown Riemann assessment profile: {assessment_id}") from error
 
 
 def validate_assessment_config(config: Phase1Config) -> None:
+    profile = assessment_profile(config)
     expected: tuple[tuple[str, ...], Any] = (
-        (("assessment", "id"), "qwen35-4b-base-riemann-casting-v1"),
-        (("assessment", "vllm_source_revision"), VLLM_SOURCE_REVISION),
+        (("assessment", "id"), profile.assessment_id),
         (("benchmark", "repository"), "https://github.com/leanprover-community/mathlib4"),
         (("benchmark", "revision"), "81a5d257c8e410db227a6665ed08f64fea08e997"),
         (("benchmark", "source_path"), f"data/riemann/corpora/{WORKLOAD_ID}"),
         (("benchmark", "split"), "validation"),
         (("benchmark", "expected_primary_task_count"), EXPECTED_TASKS),
         (("benchmark", "lean_toolchain"), "leanprover/lean4:v4.32.0"),
-        (("model", "model_id"), MODEL_ID),
-        (("model", "model_revision"), MODEL_REVISION),
-        (("model", "tokenizer_id"), MODEL_ID),
-        (("model", "tokenizer_revision"), MODEL_REVISION),
+        (("model", "model_id"), profile.model_id),
+        (("model", "model_revision"), profile.model_revision),
+        (("model", "tokenizer_id"), profile.model_id),
+        (("model", "tokenizer_revision"), profile.model_revision),
         (("model", "chat_template"), None),
         (("sampling", "candidates_per_task"), 4),
         (("sampling", "do_sample"), True),
@@ -68,15 +157,6 @@ def validate_assessment_config(config: Phase1Config) -> None:
         (("sampling", "max_new_tokens"), 1024),
         (("sampling", "stop"), "tokenizer_eos_or_token_limit"),
         (("sampling", "seed"), 0),
-        (("engine", "name"), "vllm"),
-        (("engine", "version"), VLLM_VERSION),
-        (("engine", "dtype"), "bfloat16"),
-        (("engine", "tensor_parallel_size"), 1),
-        (("engine", "quantization"), None),
-        (("engine", "language_model_only"), True),
-        (("engine", "resolve_pinned_snapshot"), True),
-        (("engine", "use_flashinfer_sampler"), False),
-        (("engine", "worker_multiproc_method"), "spawn"),
         (("verifier", "timeout_seconds"), 30.0),
         (
             ("verifier", "candidate_handling"),
@@ -95,6 +175,35 @@ def validate_assessment_config(config: Phase1Config) -> None:
                 f"Riemann assessment {'.'.join(path)} differs: "
                 f"{observed!r} != {wanted!r}"
             )
+    for key, wanted in profile.engine_requirements.items():
+        observed = config.engine.get(key)
+        if observed != wanted:
+            raise ValueError(
+                f"Riemann assessment engine.{key} differs: "
+                f"{observed!r} != {wanted!r}"
+            )
+    unexpected = [key for key in profile.forbidden_engine_fields if key in config.engine]
+    if unexpected:
+        raise ValueError(
+            "Riemann assessment engine contains fields outside the accepted "
+            f"{profile.display_name} lane: {unexpected}"
+        )
+    if profile.vllm_source_revision is not None and config.value["assessment"].get(
+        "vllm_source_revision"
+    ) != profile.vllm_source_revision:
+        raise ValueError("Riemann assessment vLLM source revision differs")
+    if profile is DEEPSEEK_PROFILE:
+        accepted = {
+            "accepted_identity_issue": 31,
+            "model_license": "MIT",
+            "selection_role": "specialist-parent-comparator",
+        }
+        for key, wanted in accepted.items():
+            if config.value["assessment"].get(key) != wanted:
+                raise ValueError(
+                    f"Riemann assessment assessment.{key} differs: "
+                    f"{config.value['assessment'].get(key)!r} != {wanted!r}"
+                )
 
 
 def load_domain_config(path: Path) -> dict[str, Any]:
@@ -290,6 +399,7 @@ def run_preflight(
     mathlib_root: Path,
     output_path: Path,
 ) -> dict[str, Any]:
+    profile = assessment_profile(config)
     domain_config = load_domain_config(domain_config_path)
     records, task_metadata = load_validation_workload(
         config, repository_root, domain_config
@@ -334,15 +444,17 @@ def run_preflight(
         from huggingface_hub import snapshot_download
         from transformers import AutoTokenizer
     except ImportError as error:
-        raise RuntimeError("Riemann model preflight requires the #44 runtime") from error
-    if vllm.__version__ != VLLM_VERSION:
         raise RuntimeError(
-            f"Riemann vLLM version differs: {vllm.__version__} != {VLLM_VERSION}"
+            f"Riemann model preflight requires the accepted #{profile.accepted_identity_issue} runtime"
+        ) from error
+    if vllm.__version__ != profile.vllm_version:
+        raise RuntimeError(
+            f"Riemann vLLM version differs: {vllm.__version__} != {profile.vllm_version}"
         )
     snapshot = Path(
-        snapshot_download(repo_id=MODEL_ID, revision=MODEL_REVISION)
+        snapshot_download(repo_id=profile.model_id, revision=profile.model_revision)
     ).resolve()
-    if snapshot.name != MODEL_REVISION:
+    if snapshot.name != profile.model_revision:
         raise ValueError("Riemann model snapshot did not resolve to the pinned revision")
     tokenizer = AutoTokenizer.from_pretrained(snapshot)
     prompt_token_counts = [
@@ -362,9 +474,10 @@ def run_preflight(
 
     runtime = _local_cuda_runtime(config)
     evidence = {
-        "schema_version": "qwen35-4b-base-riemann-preflight-v1",
+        "schema_version": profile.preflight_schema_version,
         "status": "passed",
         "assessment_id": config.value["assessment"]["id"],
+        "selection_role": profile.selection_role,
         "config_sha256": _sha256_file(config.path),
         "domain_config_sha256": _sha256_file(domain_config_path),
         "model": config.model,
@@ -374,7 +487,11 @@ def run_preflight(
             "transformers": transformers.__version__,
             "huggingface_hub": huggingface_hub.__version__,
             "vllm": vllm.__version__,
-            "vllm_source_revision": VLLM_SOURCE_REVISION,
+            **(
+                {"vllm_source_revision": profile.vllm_source_revision}
+                if profile.vllm_source_revision is not None
+                else {}
+            ),
         },
         "workload": {
             "id": WORKLOAD_ID,
@@ -427,6 +544,7 @@ def run_assessment(
     verification_workers: int,
     report_progress: bool = True,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
+    profile = assessment_profile(config)
     if verification_workers < 1:
         raise ValueError("Riemann verification workers must be positive")
     domain_config = load_domain_config(domain_config_path)
@@ -452,8 +570,24 @@ def run_assessment(
     prompts = [render_sft_prompt(record) for record in records]
 
     required_environment = {
-        "VLLM_USE_FLASHINFER_SAMPLER": "0",
-        "VLLM_WORKER_MULTIPROC_METHOD": "spawn",
+        **(
+            {
+                "VLLM_USE_FLASHINFER_SAMPLER": (
+                    "1" if config.engine["use_flashinfer_sampler"] else "0"
+                )
+            }
+            if "use_flashinfer_sampler" in config.engine
+            else {}
+        ),
+        **(
+            {
+                "VLLM_WORKER_MULTIPROC_METHOD": str(
+                    config.engine["worker_multiproc_method"]
+                )
+            }
+            if "worker_multiproc_method" in config.engine
+            else {}
+        ),
     }
     for key, value in required_environment.items():
         existing = os.environ.get(key)
@@ -575,10 +709,10 @@ def run_assessment(
         lean_toolchain=str(config.benchmark["lean_toolchain"]),
         mathlib_revision=str(config.benchmark["revision"]),
         verifier_timeout_seconds=float(config.value["verifier"]["timeout_seconds"]),
-        model_id=MODEL_ID,
-        tokenizer_id=MODEL_ID,
-        model_revision=MODEL_REVISION,
-        tokenizer_revision=MODEL_REVISION,
+        model_id=profile.model_id,
+        tokenizer_id=profile.model_id,
+        model_revision=profile.model_revision,
+        tokenizer_revision=profile.model_revision,
         workload_id=WORKLOAD_ID,
         benchmark_split="validation",
         benchmark_repository=str(config.benchmark["repository"]),
@@ -604,8 +738,16 @@ def run_assessment(
             "gpu_memory_utilization": config.engine["gpu_memory_utilization"],
             "enforce_eager": config.engine["enforce_eager"],
             "quantization": None,
-            "language_model_only": True,
-            "model_artifact_resolution": "pinned_local_snapshot",
+            **(
+                {"language_model_only": bool(config.engine["language_model_only"])}
+                if "language_model_only" in config.engine
+                else {}
+            ),
+            **(
+                {"model_artifact_resolution": "pinned_local_snapshot"}
+                if config.engine.get("resolve_pinned_snapshot", False)
+                else {}
+            ),
             "chat_template": None,
             "prompt_transformation": None,
             "proof_extraction": None,
@@ -625,7 +767,12 @@ def write_compact_evidence(
     preflight_path: Path,
     artifact_dir: Path,
     evidence_dir: Path,
+    *,
+    paired_reference_paths: Mapping[str, Path] | None = None,
+    unavailable_paired_references: Mapping[str, str] | None = None,
+    execution_limitations: Sequence[str] = (),
 ) -> dict[str, Any]:
+    profile = assessment_profile(config)
     domain_config = load_domain_config(domain_config_path)
     records, task_metadata = load_validation_workload(
         config, repository_root, domain_config
@@ -676,9 +823,16 @@ def write_compact_evidence(
         "none",
     ]
     full = {
-        "schema_version": EVIDENCE_SCHEMA_VERSION,
+        "schema_version": profile.evidence_schema_version,
         "status": "passed",
         "assessment_id": config.value["assessment"]["id"],
+        "selection_role": profile.selection_role,
+        "interpretation_boundary": (
+            "This specialist-parent comparator informs practical training-parent "
+            "selection and is not a like-for-like general-foundation result."
+            if profile.selection_role == "specialist-parent-comparator"
+            else "This result informs general Base/pre-trained foundation selection."
+        ),
         "config_sha256": _sha256_file(config.path),
         "domain_config": {
             "schema_version": DOMAIN_SCHEMA_VERSION,
@@ -710,7 +864,11 @@ def write_compact_evidence(
             "verifier_timeout_semantics": "unsuccessful_proof_outcome",
             "inference_engine": metadata.inference_engine,
             "inference_engine_version": metadata.inference_engine_version,
-            "vllm_source_revision": VLLM_SOURCE_REVISION,
+            **(
+                {"vllm_source_revision": profile.vllm_source_revision}
+                if profile.vllm_source_revision is not None
+                else {}
+            ),
         },
         "overall": {
             "verified_candidates": summary["category_counts"]["verified"],
@@ -784,11 +942,19 @@ def write_compact_evidence(
             ],
         },
         "generation_identity_sha256": _generation_digest(results),
+        "execution_limitations": list(execution_limitations),
     }
+    if paired_reference_paths or unavailable_paired_references:
+        full["paired_analysis"] = _paired_analysis(
+            outcome_rows,
+            paired_reference_paths or {},
+            unavailable_paired_references or {},
+        )
     compact_preflight = {
         "schema_version": preflight["schema_version"],
         "status": preflight["status"],
         "assessment_id": preflight["assessment_id"],
+        "selection_role": preflight["selection_role"],
         "config_sha256": preflight["config_sha256"],
         "domain_config_sha256": preflight["domain_config_sha256"],
         "model": preflight["model"],
@@ -804,7 +970,7 @@ def write_compact_evidence(
     _write_json(evidence_dir / "preflight.json", compact_preflight)
     _write_json(evidence_dir / "full.json", full)
     (evidence_dir / "README.md").write_text(
-        _readme(full), encoding="utf-8"
+        _readme(full, profile), encoding="utf-8"
     )
     return full
 
@@ -864,14 +1030,16 @@ def _validate_preflight(
     preflight: Mapping[str, Any],
     records: Sequence[MathlibProofRecord],
 ) -> None:
+    profile = assessment_profile(config)
     expected = {
-        "schema_version": "qwen35-4b-base-riemann-preflight-v1",
+        "schema_version": profile.preflight_schema_version,
         "status": "passed",
         "assessment_id": config.value["assessment"]["id"],
+        "selection_role": profile.selection_role,
         "config_sha256": _sha256_file(config.path),
         "domain_config_sha256": _sha256_file(domain_config_path),
         "model": config.model,
-        "model_snapshot_revision": MODEL_REVISION,
+        "model_snapshot_revision": profile.model_revision,
     }
     for key, wanted in expected.items():
         if preflight.get(key) != wanted:
@@ -896,7 +1064,7 @@ def _validate_preflight(
     runtime = preflight.get("runtime", {})
     if runtime.get("inference_execution") != "local_cuda":
         raise ValueError("Riemann preflight did not use local CUDA")
-    if runtime.get("vllm") != VLLM_VERSION:
+    if runtime.get("vllm") != profile.vllm_version:
         raise ValueError("Riemann preflight vLLM differs")
 
 
@@ -906,12 +1074,13 @@ def _validate_and_recompute_run(
     metadata: RunMetadata,
     results: Sequence[CandidateResult],
 ) -> dict[str, Any]:
+    profile = assessment_profile(config)
     expected = {
         "schema_version": PHASE1_RESULT_SCHEMA_VERSION,
-        "model_id": MODEL_ID,
-        "model_revision": MODEL_REVISION,
-        "tokenizer_id": MODEL_ID,
-        "tokenizer_revision": MODEL_REVISION,
+        "model_id": profile.model_id,
+        "model_revision": profile.model_revision,
+        "tokenizer_id": profile.model_id,
+        "tokenizer_revision": profile.model_revision,
         "workload_id": WORKLOAD_ID,
         "prompt_format_id": PROMPT_FORMAT_ID,
         "lean_toolchain": config.benchmark["lean_toolchain"],
@@ -919,7 +1088,7 @@ def _validate_and_recompute_run(
         "verifier_timeout_seconds": config.value["verifier"]["timeout_seconds"],
         "candidates_per_task": 4,
         "inference_engine": "vllm",
-        "inference_engine_version": VLLM_VERSION,
+        "inference_engine_version": profile.vllm_version,
         "adapter_enabled": False,
         "benchmark_split": "validation",
     }
@@ -931,7 +1100,11 @@ def _validate_and_recompute_run(
         **config.sampling,
         "dtype": "bfloat16",
         "quantization": None,
-        "language_model_only": True,
+        **(
+            {"language_model_only": bool(config.engine["language_model_only"])}
+            if "language_model_only" in config.engine
+            else {}
+        ),
         "chat_template": None,
         "prompt_transformation": None,
         "proof_extraction": None,
@@ -1077,6 +1250,147 @@ def _task_outcome_rows(
     return rows
 
 
+ACCEPTED_PAIRED_REFERENCES = {
+    "qwen35-4b-base": {
+        "model_id": "Qwen/Qwen3.5-4B-Base",
+        "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    },
+    "qwen35-9b-base": {
+        "model_id": "Qwen/Qwen3.5-9B-Base",
+        "model_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404",
+    },
+}
+
+
+def _paired_analysis(
+    current_rows: Sequence[Mapping[str, Any]],
+    reference_paths: Mapping[str, Path],
+    unavailable_references: Mapping[str, str],
+) -> dict[str, Any]:
+    current = {str(row["task_id"]): bool(row["solved"]) for row in current_rows}
+    if len(current) != EXPECTED_TASKS:
+        raise ValueError("current Riemann outcomes are not 556 unique tasks")
+    overlap = set(reference_paths) & set(unavailable_references)
+    if overlap:
+        raise ValueError(f"paired references are both available and unavailable: {overlap}")
+    unknown = (set(reference_paths) | set(unavailable_references)) - set(
+        ACCEPTED_PAIRED_REFERENCES
+    )
+    if unknown:
+        raise ValueError(f"unknown paired Riemann references: {sorted(unknown)}")
+
+    output: dict[str, Any] = {}
+    for reference_id, path in sorted(reference_paths.items()):
+        expected_identity = ACCEPTED_PAIRED_REFERENCES[reference_id]
+        full_path = path.parent / "full.json"
+        full = json.loads(full_path.read_text(encoding="utf-8"))
+        identity = full.get("execution_identity", {})
+        if identity:
+            if any(
+                identity.get(key) != value
+                for key, value in expected_identity.items()
+            ):
+                raise ValueError(
+                    f"paired Riemann reference {reference_id} identity differs"
+                )
+            workload = full.get("workload", {})
+            complete = (
+                full.get("status") == "passed"
+                and workload.get("id") == WORKLOAD_ID
+                and workload.get("task_count") == EXPECTED_TASKS
+                and workload.get("candidate_count") == EXPECTED_CANDIDATES
+                and workload.get("protected_holdouts_used") is False
+            )
+        elif reference_id == "qwen35-9b-base":
+            preflight = json.loads(
+                (path.parent / "preflight.json").read_text(encoding="utf-8")
+            )
+            model = preflight.get("model", {})
+            if (
+                any(
+                    model.get(key) != value
+                    for key, value in expected_identity.items()
+                )
+                or model.get("tokenizer_id") != expected_identity["model_id"]
+                or model.get("tokenizer_revision")
+                != expected_identity["model_revision"]
+            ):
+                raise ValueError(
+                    f"paired Riemann reference {reference_id} identity differs"
+                )
+            workload = preflight.get("workload", {})
+            complete = (
+                preflight.get("status") == "passed"
+                and preflight.get("accepted_lane") == "bf16-text-only-v1"
+                and preflight.get("prompt_format_id") == PROMPT_FORMAT_ID
+                and preflight.get("chat_template") is None
+                and preflight.get("prompt_transformation") is None
+                and workload.get("corpus_id") == WORKLOAD_ID
+                and workload.get("loaded_task_count") == EXPECTED_TASKS
+                and full.get("workload_id") == WORKLOAD_ID
+                and full.get("task_count") == EXPECTED_TASKS
+                and full.get("candidate_count") == EXPECTED_CANDIDATES
+                and full.get("infrastructure_error_count") == 0
+                and full.get("lane_id") == "bf16-text-only-v1"
+                and full.get("precision") == "bfloat16"
+                and full.get("quantization") is None
+            )
+        else:
+            raise ValueError(
+                f"paired Riemann reference {reference_id} identity differs"
+            )
+        if not complete:
+            raise ValueError(f"paired Riemann reference {reference_id} is incomplete")
+        task_outcomes = full.get("task_outcomes", {})
+        if (
+            task_outcomes.get("rows") != EXPECTED_TASKS
+            or task_outcomes.get("sha256") != _sha256_file(path)
+        ):
+            raise ValueError(f"paired Riemann reference {reference_id} hash differs")
+        rows = _read_jsonl(path)
+        reference = {str(row["task_id"]): bool(row["solved"]) for row in rows}
+        if len(reference) != EXPECTED_TASKS or set(reference) != set(current):
+            raise ValueError(f"paired Riemann reference {reference_id} task IDs differ")
+
+        both = sum(current[key] and reference[key] for key in current)
+        current_only = sum(current[key] and not reference[key] for key in current)
+        reference_only = sum(not current[key] and reference[key] for key in current)
+        neither = EXPECTED_TASKS - both - current_only - reference_only
+        output[reference_id] = {
+            "status": "available",
+            "reference_identity": expected_identity,
+            "reference_task_outcomes": "/".join(path.parts[-3:]),
+            "reference_task_outcomes_sha256": _sha256_file(path),
+            "task_count": EXPECTED_TASKS,
+            "contingency": {
+                "both_solved": both,
+                "current_only": current_only,
+                "reference_only": reference_only,
+                "neither_solved": neither,
+            },
+            "paired_wins_current_minus_reference": current_only - reference_only,
+            "exact_mcnemar_two_sided_p": _exact_mcnemar(current_only, reference_only),
+        }
+    for reference_id, reason in sorted(unavailable_references.items()):
+        output[reference_id] = {
+            "status": "unavailable",
+            "reference_identity": ACCEPTED_PAIRED_REFERENCES[reference_id],
+            "reason": reason,
+        }
+    return output
+
+
+def _exact_mcnemar(current_only: int, reference_only: int) -> float:
+    discordant = current_only + reference_only
+    if discordant == 0:
+        return 1.0
+    tail = sum(
+        math.comb(discordant, value)
+        for value in range(min(current_only, reference_only) + 1)
+    )
+    return min(1.0, 2.0 * tail / (2**discordant))
+
+
 def _breakdown(
     outcome_rows: Sequence[Mapping[str, Any]],
     key: str,
@@ -1184,7 +1498,7 @@ def _write_generation_artifact(
             stream.write(json.dumps(value, sort_keys=True) + "\n")
 
 
-def _readme(full: Mapping[str, Any]) -> str:
+def _readme(full: Mapping[str, Any], profile: AssessmentProfile) -> str:
     overall = full["overall"]
     domains = full["domain_breakdown"]
     domain_rows = "\n".join(
@@ -1214,7 +1528,42 @@ def _readme(full: Mapping[str, Any]) -> str:
             f"{efficiency['generation_wall_time_seconds']:.2f} generation seconds"
         )
     )
-    return f"""# Qwen3.5-4B-Base Riemann foundation casting
+    role_text = (
+        "For epic #63 this is a specialist-parent comparator for practical "
+        "training-parent selection; it is not a like-for-like general-foundation "
+        "result."
+        if profile.selection_role == "specialist-parent-comparator"
+        else "For epic #63 this is a general Base/pre-trained foundation result."
+    )
+    limitations = full.get("execution_limitations", [])
+    limitation_text = (
+        "\n\n`OBSERVED`: " + " ".join(str(item) for item in limitations)
+        if limitations
+        else ""
+    )
+    paired_parts = []
+    for reference_id, display_name in (
+        ("qwen35-4b-base", "Qwen3.5-4B-Base"),
+        ("qwen35-9b-base", "Qwen3.5-9B-Base"),
+    ):
+        paired = full.get("paired_analysis", {}).get(reference_id)
+        if paired and paired.get("status") == "available":
+            counts = paired["contingency"]
+            paired_parts.append(
+                f"Paired against the accepted {display_name} task vector, both "
+                f"solved {counts['both_solved']} tasks, {profile.display_name} "
+                f"alone solved {counts['current_only']}, and {display_name} alone "
+                f"solved {counts['reference_only']} (exact two-sided McNemar p="
+                f"{paired['exact_mcnemar_two_sided_p']:.6g})."
+            )
+        elif paired and paired.get("status") == "unavailable":
+            paired_parts.append(
+                f"The {display_name} comparison is unavailable: {paired['reason']}"
+            )
+    paired_text = (
+        "\n\n`OBSERVED`: " + " ".join(paired_parts) if paired_parts else ""
+    )
+    return f"""# {profile.display_name} Riemann casting
 
 `OBSERVED`: the frozen `{WORKLOAD_ID}` assessment completed all 556 validation
 tasks with four candidates per task and zero unresolved generation or verifier
@@ -1227,12 +1576,14 @@ solved {overall['solved_tasks']} tasks: pass@1
 | --- | ---: | ---: | ---: | ---: |
 {domain_rows}
 
-`ACCEPTED`: the run reused `Qwen/Qwen3.5-4B-Base` and its tokenizer at
-`{MODEL_REVISION}` exactly as accepted by issue #44: BF16, no quantization, the
-text-only lane, and no chat template. The common casting contract used raw
+`ACCEPTED`: the run reused `{profile.model_id}` and its tokenizer at
+`{profile.model_revision}` exactly as accepted by issue #{profile.accepted_identity_issue}:
+BF16, no quantization, and no chat template. The common casting contract used raw
 `whole-proof-v1` continuations, temperature 0.8, top-p 0.95, no top-k, four
 candidates, a 1,024-token limit, and seed 0. No extraction, semantic repair,
 Lean-feedback retry, or candidate regeneration was applied.
+
+`ACCEPTED`: {role_text}
 
 `OBSERVED`: generation took {full['timing_seconds']['generation_wall']:.2f}
 seconds, verification took {full['timing_seconds']['verification_wall']:.2f}
@@ -1247,7 +1598,7 @@ Direct graph relevance, relevance distance, component inclusion, and
 component-associated prerequisite views remain separate in `full.json` and
 `task-outcomes.jsonl`; model outputs never define a category. Protected near and
 far holdouts were not loaded. Raw generations, model caches, and bulky logs stay
-outside Git.
+outside Git.{paired_text}{limitation_text}
 """
 
 

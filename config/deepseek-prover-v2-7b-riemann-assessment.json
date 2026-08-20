@@ -1,0 +1,61 @@
+{
+  "schema_version": "phase1-config-v1",
+  "assessment": {
+    "id": "deepseek-prover-v2-7b-riemann-casting-v1",
+    "accepted_identity_issue": 31,
+    "compatibility_requirement": "pyproject.toml[baseline,model]",
+    "model_license": "MIT",
+    "selection_role": "specialist-parent-comparator"
+  },
+  "benchmark": {
+    "repository": "https://github.com/leanprover-community/mathlib4",
+    "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "source_path": "data/riemann/corpora/riemann-specialist-validation-v1",
+    "membership_sha256": "2f611cf4fe0b45d8aff904212a53666e52e7e6e0471843d8e2efd33dd1783ec2",
+    "record_store_sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c",
+    "split": "validation",
+    "expected_primary_task_count": 556,
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "license": "Apache-2.0"
+  },
+  "workloads": {
+    "riemann-specialist-validation-v1": {
+      "selection": "all",
+      "expected_task_count": 556
+    }
+  },
+  "model": {
+    "model_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "model_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+    "tokenizer_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "tokenizer_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+    "chat_template": null
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.10.2",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 2048,
+    "max_num_seqs": 8,
+    "enforce_eager": true,
+    "quantization": null,
+    "expected_cuda_device_name_fragment": "Ada"
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "candidate_handling": "raw_continuation_no_extraction_repair_or_feedback",
+    "regenerate_after_lean_feedback": false
+  }
+}
