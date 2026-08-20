@@ -172,7 +172,7 @@ from .riemann_data import (
     materialize_riemann_data,
     validate_materialized_riemann_data,
 )
-from .riemann_assessment import (
+from .qwen35_9b_riemann_assessment import (
     RiemannAssessmentConfig,
     run_generation as run_riemann_generation,
     run_preflight as run_riemann_preflight,

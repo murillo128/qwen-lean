@@ -9,7 +9,7 @@ from qwen_lean.baseline import GeneratedCandidate
 from qwen_lean.metrics import summarize_results
 from qwen_lean.phase2_schema import MathlibProofRecord
 from qwen_lean.prompt import PROMPT_FORMAT_ID, render_proof_request
-from qwen_lean.riemann_assessment import (
+from qwen_lean.qwen35_9b_riemann_assessment import (
     FROZEN_DOMAIN_CONFIG_SHA256,
     GENERATION_SCHEMA_VERSION,
     PREFLIGHT_SCHEMA_VERSION,
@@ -388,7 +388,9 @@ def test_verification_substitutes_exact_raw_continuation(monkeypatch: pytest.Mon
         captured["source"] = source_value
         return Check()
 
-    monkeypatch.setattr("qwen_lean.riemann_assessment.run_lean_source", fake_run)
+    monkeypatch.setattr(
+        "qwen_lean.qwen35_9b_riemann_assessment.run_lean_source", fake_run
+    )
     result = _verify_generated(
         generated,
         record,
