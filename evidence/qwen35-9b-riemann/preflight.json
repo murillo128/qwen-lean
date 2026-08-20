@@ -1,0 +1,116 @@
+{
+  "accepted_lane": "bf16-text-only-v1",
+  "assessment_id": "qwen35-9b-base-riemann-specialist-validation-v1",
+  "bf16_attempt": {
+    "candidate_count": 4,
+    "candidate_sha256": [
+      "6da0aa0d2b050d4a70f375b0ec5df34461f9ffd263356774180c2a842dac9b13",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "f61c3b27fcce6a4bb04d503510b1c35a9a28fd88bd746c2dbf24072fc9653f4a",
+      "932f184dda70e67a7e2490e77a09745365791f9c58df0d6cd8134a2ec8055c6e"
+    ],
+    "error": null,
+    "expected_candidate_count": 4,
+    "finish_reason_counts": {
+      "eos": 3,
+      "token_limit": 1
+    },
+    "generated_token_count": 1414,
+    "generation_seconds": 53.46632423001574,
+    "lane": {
+      "cpu_offload_gb": 0,
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "gpu_memory_utilization": 0.95,
+      "lane_id": "bf16-text-only-v1",
+      "language_model_only": true,
+      "load_format": "auto",
+      "max_model_len": 2048,
+      "max_num_seqs": 32,
+      "quantization": null,
+      "tensor_parallel_size": 1
+    },
+    "load_seconds": 93.1963528119959,
+    "memory_failure": false,
+    "peak_cuda_allocated_bytes": 19158751744,
+    "peak_cuda_reserved_bytes": 19862126592,
+    "peak_device_memory_used_mib": 19170,
+    "prompt_count": 1,
+    "status": "passed",
+    "wall_seconds": 149.9407583019929
+  },
+  "chat_template": null,
+  "config_sha256": "bbed0cb00eb1d272885882e4be1f4b068a46c6968eae99c9d5bced06a882ae32",
+  "model": {
+    "model_id": "Qwen/Qwen3.5-9B-Base",
+    "model_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404",
+    "tokenizer_id": "Qwen/Qwen3.5-9B-Base",
+    "tokenizer_revision": "68c46c4b3498877f3ef123c856ecfde50c39f404"
+  },
+  "model_snapshot": {
+    "local_cache_used": true,
+    "path_committed": false,
+    "revision": "68c46c4b3498877f3ef123c856ecfde50c39f404"
+  },
+  "prompt_format_id": "whole-proof-v1",
+  "prompt_transformation": null,
+  "runtime": {
+    "bitsandbytes": "0.49.1",
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cuda_linker_layout": "python-wheel-lib64-compat-v1",
+    "cuda_toolkit_source": "isolated-python-runtime",
+    "nvcc_version": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "python": "3.12.14",
+    "torch": "2.11.0+cu130",
+    "torch_cuda_version": "13.0",
+    "transformers": "5.15.0",
+    "vllm": "0.23.0",
+    "vllm_enable_v1_multiprocessing": false,
+    "vllm_worker_multiproc_method": "spawn"
+  },
+  "schema_version": "qwen35-9b-riemann-preflight-v1",
+  "status": "passed",
+  "verifier_controls": {
+    "controlled_invalid_status": "rejected",
+    "original_proof_status": "accepted",
+    "task_id": "00171d0d4339cb46513719b700a427041d7408de9113a550177cd86335092fb1",
+    "timeout_seconds": 30.0
+  },
+  "verifier_environment": {
+    "candidate_reconstruction": "phase2-source-proof-span-substitution-v1",
+    "has_sorry_disabled": true,
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "lean_version": "Lean (version 4.32.0, x86_64-unknown-linux-gnu, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35, Release)",
+    "mathlib_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "project": "murillo128/qwen-lean"
+  },
+  "workload": {
+    "corpus_id": "riemann-specialist-validation-v1",
+    "expected_task_count": 556,
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "loaded_task_count": 556,
+    "membership": "data/riemann/corpora/riemann-specialist-validation-v1/membership.jsonl",
+    "membership_sha256": "2f611cf4fe0b45d8aff904212a53666e52e7e6e0471843d8e2efd33dd1783ec2",
+    "prompt_token_statistics": {
+      "count": 556,
+      "maximum": 173,
+      "mean": 71.01079136690647,
+      "median": 65.0,
+      "minimum": 41,
+      "p95": 111,
+      "p99": 148,
+      "total": 39482
+    },
+    "record_store": "data/riemann/corpora/records.jsonl.gz",
+    "record_store_sha256": "70e2ccad24464c4fc228254ee347b2de56a30686453305d80e3798ed17cc917c",
+    "source_repository": "https://github.com/leanprover-community/mathlib4",
+    "source_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "split": "validation"
+  }
+}

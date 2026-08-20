@@ -1,0 +1,408 @@
+{
+  "candidate_count": 2224,
+  "candidate_text_sha256": "b4344300f631e0d68a6d533ba05e282e03c2d79eb9412a928cbe9376783ca85c",
+  "category_counts": {
+    "empty_candidate": 0,
+    "generation_error": 0,
+    "lean_rejected": 2218,
+    "verified": 5,
+    "verifier_error": 0,
+    "verifier_timeout": 1
+  },
+  "component_inclusion_breakdown": [
+    {
+      "candidate_count": 40,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 10,
+      "value": "component-contains-core",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 244,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 61,
+      "value": "component-contains-number-theory-control",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 1940,
+      "pass_at_k": {
+        "pass@1": 0.002577319587628866,
+        "pass@4": 0.010309278350515464
+      },
+      "solved_tasks": 5,
+      "task_count": 485,
+      "value": "component-contains-riemann-bubble",
+      "verified_candidates": 5
+    }
+  ],
+  "compute_per_solved_task": {
+    "generated_tokens": 136689.8,
+    "generation_gpu_seconds": 805.9569891297957
+  },
+  "direct_relevance_breakdown": [
+    {
+      "candidate_count": 24,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 6,
+      "value": "core",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 40,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 10,
+      "value": "premise-1",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 16,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 4,
+      "value": "premise-2",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 4,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 1,
+      "value": "user-1",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 0,
+      "pass_at_k": null,
+      "solved_tasks": 0,
+      "task_count": 0,
+      "value": "user-2",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 12,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 3,
+      "value": "source-neighborhood",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 244,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 61,
+      "value": "number-theory-control",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 1884,
+      "pass_at_k": {
+        "pass@1": 0.002653927813163482,
+        "pass@4": 0.010615711252653927
+      },
+      "solved_tasks": 5,
+      "task_count": 471,
+      "value": "none",
+      "verified_candidates": 5
+    }
+  ],
+  "domain_breakdown": [
+    {
+      "candidate_count": 0,
+      "pass_at_k": null,
+      "solved_tasks": 0,
+      "task_count": 0,
+      "value": "prime-counting-pnt",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 0,
+      "pass_at_k": null,
+      "solved_tasks": 0,
+      "task_count": 0,
+      "value": "arithmetic-functions",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 68,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 17,
+      "value": "zeta-analytic-number-theory",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 76,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 19,
+      "value": "prime-arithmetic-divisibility",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 228,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 57,
+      "value": "real-complex-analysis",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 216,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 54,
+      "value": "broad-number-theory",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 1636,
+      "pass_at_k": {
+        "pass@1": 0.003056234718826406,
+        "pass@4": 0.012224938875305624
+      },
+      "solved_tasks": 5,
+      "task_count": 409,
+      "value": "shared-formal-prerequisite",
+      "verified_candidates": 5
+    }
+  ],
+  "domain_config": {
+    "classification_input": "committed Phase 2 file_path and declaration_name metadata only",
+    "first_accepted_candidate": "issue-64-pr-73",
+    "legacy_generation_config_domain_views_used": false,
+    "model_outputs_used": false,
+    "schema_version": "riemann-domain-breakdown-v1",
+    "sha256": "b5c19a9c6d134c39751f391b88840c506d889cf370fc4931949c3627bc323d2a"
+  },
+  "engine_load_time_seconds": 30.85644218395464,
+  "finish_reason_counts": {
+    "eos": 1831,
+    "token_limit": 393
+  },
+  "generated_tokens": {
+    "count": 2224,
+    "maximum": 1024,
+    "mean": 307.30620503597123,
+    "median": 102.0,
+    "minimum": 2,
+    "p95": 1024,
+    "p99": 1024,
+    "total": 683449
+  },
+  "generation_checkpoint": {
+    "candidate_count": 2224,
+    "generations_sha256": "156afa6fbdc2fb264540747b68f70483ab52fb6ce1a732331e135d0346f13465",
+    "manifest_sha256": "9c75f0e3cbdcaec5733fe47a94167ce3b170941dba31700da9fbf592e0d6eca7",
+    "raw_continuations_committed": false,
+    "results_match_generation": true,
+    "schema_version": "qwen35-9b-riemann-generation-v1",
+    "task_count": 556
+  },
+  "generation_wall_time_seconds": 4029.7849456489785,
+  "inclusion_scope_breakdown": [
+    {
+      "candidate_count": 340,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 85,
+      "value": "direct",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 1884,
+      "pass_at_k": {
+        "pass@1": 0.002653927813163482,
+        "pass@4": 0.010615711252653927
+      },
+      "solved_tasks": 5,
+      "task_count": 471,
+      "value": "component-associated",
+      "verified_candidates": 5
+    }
+  ],
+  "infrastructure_error_count": 0,
+  "lane_id": "bf16-text-only-v1",
+  "pass_at_k": {
+    "pass@1": 0.0022482014388489208,
+    "pass@4": 0.008992805755395683
+  },
+  "precision": "bfloat16",
+  "quantization": null,
+  "relevance_distance_breakdown": [
+    {
+      "candidate_count": 24,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 6,
+      "value": "0",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 44,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 11,
+      "value": "1",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 16,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 4,
+      "value": "2",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 1884,
+      "pass_at_k": {
+        "pass@1": 0.002653927813163482,
+        "pass@4": 0.010615711252653927
+      },
+      "solved_tasks": 5,
+      "task_count": 471,
+      "value": "component-associated",
+      "verified_candidates": 5
+    },
+    {
+      "candidate_count": 244,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 61,
+      "value": "number-theory-control",
+      "verified_candidates": 0
+    },
+    {
+      "candidate_count": 12,
+      "pass_at_k": {
+        "pass@1": 0.0,
+        "pass@4": 0.0
+      },
+      "solved_tasks": 0,
+      "task_count": 3,
+      "value": "source-neighborhood",
+      "verified_candidates": 0
+    }
+  ],
+  "results_jsonl_sha256": "d9d6df7b788a3fd62ad723c3cea4bf572f074d6f6f0834f4c25da3f9b44fe712",
+  "run_wall_time_seconds": 6791.528175989923,
+  "runtime": {
+    "bitsandbytes": "0.49.1",
+    "config_sha256": "bbed0cb00eb1d272885882e4be1f4b068a46c6968eae99c9d5bced06a882ae32",
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "cuda_linker_layout": "python-wheel-lib64-compat-v1",
+    "cuda_toolkit_source": "isolated-python-runtime",
+    "engine_load_time_seconds": 30.85644218395464,
+    "generation_wall_time_seconds": 4029.7849456489785,
+    "inference_execution": "local_cuda",
+    "nvcc_version": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "peak_cuda_allocated_bytes": 19158751744,
+    "peak_cuda_reserved_bytes": 19862126592,
+    "peak_device_memory_used_mib": 19170,
+    "python": "3.12.14",
+    "torch": "2.11.0+cu130",
+    "torch_cuda_version": "13.0",
+    "transformers": "5.15.0",
+    "verification_wall_time_seconds": 2730.8867881569895,
+    "verification_workers": 8,
+    "vllm": "0.23.0",
+    "vllm_enable_v1_multiprocessing": false,
+    "vllm_worker_multiproc_method": "spawn"
+  },
+  "task_count": 556,
+  "task_outcomes": {
+    "paired_analysis_fields": [
+      "task_id",
+      "solved",
+      "verified_candidate_count",
+      "verified_candidate_indices"
+    ],
+    "path": "task-outcomes.jsonl",
+    "rows": 556,
+    "sha256": "cb3f053679329c1ff55ec0eaf36ce1c50f91e4f3dd549927cdefc29b1b59b52a",
+    "task_ids_sha256": "746cc51878ba7099a01d00f2ffd3d02965b216856766816cbe62d8af98887f4b"
+  },
+  "tasks_with_verified_candidate": {
+    "count": 5,
+    "fraction": 0.008992805755395683
+  },
+  "throughput": {
+    "candidates_per_second": 0.5518904929160767,
+    "generated_tokens_per_second": 169.59937297347108
+  },
+  "verification_wall_time_seconds": 2730.8867881569895,
+  "verified_candidate_count": 5,
+  "verifier_environment": {
+    "candidate_reconstruction": "phase2-source-proof-span-substitution-v1",
+    "has_sorry_disabled": true,
+    "lean_toolchain": "leanprover/lean4:v4.32.0",
+    "lean_version": "Lean (version 4.32.0, x86_64-unknown-linux-gnu, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35, Release)",
+    "mathlib_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "project": "murillo128/qwen-lean"
+  },
+  "verifier_timeout_count": 1,
+  "workload_id": "riemann-specialist-validation-v1"
+}
