@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import pytest
 
 from qwen_lean.dataset_v2_extraction import (
     candidate_from_traced_theorem,
+    collapse_duplicate_candidates,
+    collapse_duplicate_exclusions,
+    repair_candidate_declaration_names,
     select_candidates,
     split_whole_declaration,
     substitute_proofs,
@@ -227,6 +230,71 @@ def test_deterministic_selection_requires_requested_transformation_population() 
         select_candidates(
             [term], count=2, seed="preflight", transformation_kind="term-to-exact"
         )
+
+
+def test_duplicate_source_candidates_collapse_only_when_identical() -> None:
+    candidate = _candidate("theorem identity (P : Prop) : P → P := fun h => h")
+
+    unique, duplicates = collapse_duplicate_candidates([candidate, candidate])
+
+    assert unique == [candidate]
+    assert duplicates == 1
+    with pytest.raises(ValueError, match="conflicting duplicate source candidate"):
+        collapse_duplicate_candidates(
+            [candidate, replace(candidate, canonical_proof="by\n  assumption")]
+        )
+
+
+def test_duplicate_exclusions_are_counted_once() -> None:
+    exclusion = {
+        "file_path": "Mathlib/Test.lean",
+        "declaration_name": "private_name",
+        "reason": "private",
+    }
+
+    unique, duplicates = collapse_duplicate_exclusions([exclusion, exclusion])
+
+    assert unique == [exclusion]
+    assert duplicates == 1
+
+
+def test_declaration_names_follow_source_namespace_scope(tmp_path: Path) -> None:
+    source = (
+        "namespace Left\n"
+        "theorem duplicate : True := by trivial\n"
+        "end Left\n"
+        "namespace Right\n"
+        "theorem duplicate : True := by trivial\n"
+        "end Right\n"
+        "theorem duplicate : True := by trivial\n"
+    )
+    source_path = tmp_path / "Mathlib/Test.lean"
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text(source, encoding="utf-8")
+    candidate = _candidate("theorem duplicate : True := by trivial")
+
+    def at_line(line: int):
+        position = dataset_v2_extraction.SourcePosition(line, 1)
+        span = dataset_v2_extraction.SourceSpan(position, position)
+        return replace(
+            candidate,
+            declaration_name="Left.Right.duplicate",
+            declaration="theorem duplicate : True",
+            source_span=span,
+            declaration_span=span,
+            proof_span=span,
+        )
+
+    repaired, count = repair_candidate_declaration_names(
+        [at_line(2), at_line(5), at_line(7)], source_root=tmp_path
+    )
+
+    assert [item.declaration_name for item in repaired] == [
+        "Left.duplicate",
+        "Right.duplicate",
+        "duplicate",
+    ]
+    assert count == 3
 
 
 def _verify_candidate(

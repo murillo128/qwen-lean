@@ -36,8 +36,10 @@ from .dataset_v2_schema import (
 from .phase2_corpus import (
     _lex_lean,
     canonical_declaration,
+    declaration_identifier,
     position_offset,
     source_slice,
+    strip_lean_comments,
 )
 
 
@@ -133,6 +135,9 @@ class ExtractionDiagnostics:
     transformation_counts: dict[str, int]
     exclusion_counts: dict[str, int]
     exclusions: tuple[dict[str, str], ...]
+    duplicate_candidates: int = 0
+    repaired_declaration_names: int = 0
+    duplicate_exclusions: int = 0
 
 
 @dataclass(frozen=True)
@@ -144,6 +149,111 @@ class FileVerification:
     exit_code: int | None
     latency_seconds: float
     diagnostic: str
+
+
+def collapse_duplicate_candidates(
+    candidates: Sequence[SourceCandidate],
+) -> tuple[list[SourceCandidate], int]:
+    """Collapse repeated trace occurrences while rejecting conflicting identities."""
+
+    unique: list[SourceCandidate] = []
+    by_identity: dict[tuple[str, str, str, str], SourceCandidate] = {}
+    duplicates = 0
+    for candidate in candidates:
+        identity = (
+            candidate.source_repository,
+            candidate.source_revision,
+            candidate.file_path,
+            candidate.declaration_name,
+        )
+        previous = by_identity.get(identity)
+        if previous is None:
+            by_identity[identity] = candidate
+            unique.append(candidate)
+        elif previous == candidate:
+            duplicates += 1
+        else:
+            raise ValueError(f"conflicting duplicate source candidate: {identity}")
+    return unique, duplicates
+
+
+def collapse_duplicate_exclusions(
+    exclusions: Sequence[Mapping[str, str]],
+) -> tuple[list[dict[str, str]], int]:
+    unique: list[dict[str, str]] = []
+    seen: set[str] = set()
+    duplicates = 0
+    for exclusion in exclusions:
+        identity = json.dumps(exclusion, sort_keys=True, separators=(",", ":"))
+        if identity in seen:
+            duplicates += 1
+            continue
+        seen.add(identity)
+        unique.append(dict(exclusion))
+    return unique, duplicates
+
+
+_SCOPE_START_RE = re.compile(
+    r"^\s*(?:(?:public|private|noncomputable)\s+)*(namespace|section|mutual)"
+    r"(?:\s+([^\s]+))?\s*$"
+)
+_SCOPE_END_RE = re.compile(r"^\s*end(?:\s+([^\s]+))?\s*$")
+
+
+def _namespace_prefixes(source: str) -> list[str]:
+    lines = strip_lean_comments(source).splitlines()
+    prefixes = [""] * (len(lines) + 2)
+    scopes: list[tuple[str, str]] = []
+    namespace = ""
+    for line_number, line in enumerate(lines, start=1):
+        prefixes[line_number] = namespace
+        start = _SCOPE_START_RE.match(line)
+        if start is not None:
+            kind, raw_name = start.groups()
+            previous = namespace
+            if kind == "namespace" and raw_name:
+                if raw_name.startswith("_root_."):
+                    namespace = raw_name.removeprefix("_root_.")
+                else:
+                    namespace = ".".join(part for part in (namespace, raw_name) if part)
+            scopes.append((kind, previous))
+            continue
+        if _SCOPE_END_RE.match(line) is not None and scopes:
+            kind, previous = scopes.pop()
+            if kind == "namespace":
+                namespace = previous
+    prefixes[len(lines) + 1] = namespace
+    return prefixes
+
+
+def repair_candidate_declaration_names(
+    candidates: Sequence[SourceCandidate], *, source_root: Path
+) -> tuple[list[SourceCandidate], int]:
+    """Recover declaration names from source namespace scope, not trace carry-over."""
+
+    grouped: dict[str, list[tuple[int, SourceCandidate]]] = defaultdict(list)
+    for index, candidate in enumerate(candidates):
+        grouped[candidate.file_path].append((index, candidate))
+    repaired = list(candidates)
+    repair_count = 0
+    for file_path, indexed in grouped.items():
+        source = (source_root / file_path).read_text(encoding="utf-8")
+        prefixes = _namespace_prefixes(source)
+        for index, candidate in indexed:
+            declaration_tokens = _lex_lean(candidate.declaration)
+            if any(token == "private" for _, token in declaration_tokens):
+                continue
+            local_name = declaration_identifier(candidate.declaration)
+            if local_name.startswith("_root_."):
+                resolved = local_name.removeprefix("_root_.")
+            else:
+                line = candidate.declaration_span.start.line
+                prefix = prefixes[line] if line < len(prefixes) else prefixes[-1]
+                resolved = ".".join(part for part in (prefix, local_name) if part)
+            if resolved != candidate.declaration_name:
+                repaired[index] = replace(candidate, declaration_name=resolved)
+                repair_count += 1
+    return repaired, repair_count
 
 
 def _position(value: Any) -> SourcePosition:
@@ -290,6 +400,10 @@ def _candidate_id(candidate: SourceCandidate) -> str:
         )
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def source_candidate_id(candidate: SourceCandidate) -> str:
+    return _candidate_id(candidate)
 
 
 def split_whole_declaration(source_text: str) -> tuple[str, str]:
@@ -599,14 +713,17 @@ def extract_traced_files(
                 continue
             candidates.append(candidate)
             counts[f"transformation:{candidate.transformation_kind}"] += 1
-    transformations = {
-        key.removeprefix("transformation:"): value
-        for key, value in counts.items()
-        if key.startswith("transformation:")
-    }
-    exclusions_count = {
-        key: value for key, value in counts.items() if not key.startswith("transformation:")
-    }
+    candidates, repaired_declaration_names = repair_candidate_declaration_names(
+        candidates, source_root=source_root
+    )
+    candidates, duplicate_candidates = collapse_duplicate_candidates(candidates)
+    transformations = dict(
+        sorted(Counter(candidate.transformation_kind for candidate in candidates).items())
+    )
+    exclusions, duplicate_exclusions = collapse_duplicate_exclusions(exclusions)
+    exclusions_count = dict(
+        sorted(Counter(item["reason"].split(":", 1)[0] for item in exclusions).items())
+    )
     return candidates, ExtractionDiagnostics(
         source_files=source_files,
         traced_declarations=traced_declarations,
@@ -614,6 +731,9 @@ def extract_traced_files(
         transformation_counts=dict(sorted(transformations.items())),
         exclusion_counts=dict(sorted(exclusions_count.items())),
         exclusions=tuple(exclusions),
+        duplicate_candidates=duplicate_candidates,
+        repaired_declaration_names=repaired_declaration_names,
+        duplicate_exclusions=duplicate_exclusions,
     )
 
 

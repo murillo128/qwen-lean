@@ -326,14 +326,24 @@ def historical_source_crosswalk(
         for item in source_dispositions
         if item.get("declaration_name")
     }
+    by_name: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    for item in source_dispositions:
+        if item.get("declaration_name"):
+            by_name[str(item["declaration_name"])].append(item)
 
     def summarize(values: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         counts: Counter[str] = Counter()
         missing: list[dict[str, str]] = []
         missing_count = 0
         for value in values:
-            key = (str(value["file_path"]), str(value["declaration_name"]))
-            disposition = by_source.get(key)
+            declaration_name = str(value["declaration_name"])
+            file_path = str(value.get("file_path", ""))
+            key = (file_path, declaration_name)
+            disposition = by_source.get(key) if file_path else None
+            if disposition is None and not file_path:
+                matches = by_name.get(declaration_name, [])
+                if len(matches) == 1:
+                    disposition = matches[0]
             if disposition is None:
                 counts["source-integrity-blocked"] += 1
                 missing_count += 1

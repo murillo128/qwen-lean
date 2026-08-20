@@ -126,3 +126,29 @@ def test_historical_crosswalk_reports_mapped_and_missing_identities() -> None:
     assert crosswalk["riemann_inventories"]["riemann-core-v1"][
         "missing_source_identities"
     ] == 0
+
+
+def test_historical_crosswalk_maps_unique_name_only_inventory_rows() -> None:
+    dispositions = build_source_dispositions(
+        [_candidate()],
+        diagnostics=ExtractionDiagnostics(1, 1, 1, {"none": 1}, {}, ()),
+        config={
+            "target_environment": {
+                "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+                "mathlib_revision": "a" * 40,
+            }
+        },
+        topic_metadata={},
+    )
+
+    crosswalk = historical_source_crosswalk(
+        dispositions,
+        historical_records=[],
+        membership_inventories={
+            "name-only": [{"declaration_name": "PrimeCounting.fixture"}]
+        },
+    )
+
+    assert crosswalk["riemann_inventories"]["name-only"]["dispositions"] == {
+        "included-training": 1
+    }

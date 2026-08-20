@@ -10,7 +10,7 @@ import os
 import pickle
 import subprocess
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -20,7 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
-FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v4"
+FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v5"
+LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
+    "dataset-v2-full-verification-cache-v4"
+}
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS = {
     "generic": (1, 3),
@@ -59,8 +62,12 @@ from qwen_lean.dataset_v2_extraction import (  # noqa: E402
     DatasetV2Config,
     candidate_from_external_record,
     candidate_to_record,
+    collapse_duplicate_candidates,
+    collapse_duplicate_exclusions,
     extract_traced_files,
+    repair_candidate_declaration_names,
     select_candidates,
+    source_candidate_id,
     verify_transformed_candidates,
 )
 from qwen_lean.dataset_v2_pipeline import (  # noqa: E402
@@ -174,6 +181,102 @@ def _source_equivalence(
         "changed_mathlib_source_files": 0,
         "position_reuse": "accepted-byte-identical-source",
     }
+
+
+def _candidate_source_span_key(candidate: Any) -> tuple[Any, ...]:
+    return (
+        candidate.source_repository,
+        candidate.source_revision,
+        candidate.file_path,
+        candidate.declaration_span.start.line,
+        candidate.declaration_span.start.column,
+        candidate.declaration_span.end.line,
+        candidate.declaration_span.end.column,
+        candidate.source_expression,
+    )
+
+
+def _transfer_cached_verification(
+    candidates: list[Any], cached: list[Any]
+) -> tuple[list[Any], list[int]]:
+    cached_by_span = {
+        _candidate_source_span_key(item): item
+        for item in cached
+    }
+    transferred: list[Any] = []
+    missing_indexes: list[int] = []
+    for candidate in candidates:
+        previous = cached_by_span.get(_candidate_source_span_key(candidate))
+        if previous is None and candidate.transformation_kind != "none":
+            missing_indexes.append(len(transferred))
+            transferred.append(candidate)
+            continue
+        if previous is None:
+            transferred.append(candidate)
+            continue
+        transferred.append(
+            replace(
+                candidate,
+                verification_status=previous.verification_status,
+                verification_method=previous.verification_method,
+                verification_evidence_id=previous.verification_evidence_id,
+                verification_diagnostic=previous.verification_diagnostic,
+            )
+        )
+    return transferred, missing_indexes
+
+
+def _rebuild_file_verification(
+    candidates: list[Any], previous: list[Any], supplemental: list[Any]
+) -> list[Any]:
+    previous_by_file = {item.file_path: item for item in previous}
+    supplemental_by_file = {item.file_path: item for item in supplemental}
+    pending_by_file: dict[str, list[Any]] = defaultdict(list)
+    for candidate in candidates:
+        if candidate.transformation_kind != "none":
+            pending_by_file[candidate.file_path].append(candidate)
+    rebuilt: list[Any] = []
+    for file_path, group in sorted(pending_by_file.items()):
+        prior = previous_by_file.get(file_path)
+        extra = supplemental_by_file.get(file_path)
+        rejected = [item for item in group if item.verification_status != "accepted"]
+        status = (
+            "accepted"
+            if not rejected
+            else "rejected"
+            if len(rejected) == len(group)
+            else "partial"
+        )
+        diagnostics = [
+            item
+            for item in (
+                getattr(prior, "diagnostic", ""),
+                getattr(extra, "diagnostic", ""),
+                *(item.verification_diagnostic for item in rejected),
+            )
+            if item
+        ]
+        rebuilt.append(
+            type(prior or extra)(
+                file_path=file_path,
+                candidate_ids=tuple(source_candidate_id(item) for item in group),
+                rejected_candidate_ids=tuple(
+                    source_candidate_id(item) for item in rejected
+                ),
+                status=status,
+                exit_code=(
+                    0
+                    if status == "accepted"
+                    else getattr(extra or prior, "exit_code", None)
+                ),
+                latency_seconds=(
+                    float(getattr(prior, "latency_seconds", 0.0))
+                    + float(getattr(extra, "latency_seconds", 0.0))
+                ),
+                diagnostic="\n".join(diagnostics)[-4000:],
+            )
+        )
+    return rebuilt
 
 
 def _iter_mathlib_traces(trace_root: Path, selected_files: list[str] | None = None):
@@ -866,8 +969,60 @@ def main() -> int:
                     handle,
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
+    mathlib_candidates, repaired_mathlib_names = repair_candidate_declaration_names(
+        mathlib_candidates, source_root=target_mathlib
+    )
+    mathlib_candidates, duplicate_mathlib_candidates = collapse_duplicate_candidates(
+        mathlib_candidates
+    )
+    unique_exclusions, duplicate_exclusions = collapse_duplicate_exclusions(
+        diagnostics.exclusions
+    )
+    diagnostics = replace(
+        diagnostics,
+        candidates=len(mathlib_candidates),
+        transformation_counts=dict(
+            sorted(Counter(item.transformation_kind for item in mathlib_candidates).items())
+        ),
+        duplicate_candidates=(
+            getattr(diagnostics, "duplicate_candidates", 0)
+            + duplicate_mathlib_candidates
+        ),
+        repaired_declaration_names=(
+            getattr(diagnostics, "repaired_declaration_names", 0)
+            + repaired_mathlib_names
+        ),
+        exclusions=tuple(unique_exclusions),
+        exclusion_counts=dict(
+            sorted(
+                Counter(
+                    item["reason"].split(":", 1)[0]
+                    for item in unique_exclusions
+                ).items()
+            )
+        ),
+        duplicate_exclusions=(
+            getattr(diagnostics, "duplicate_exclusions", 0)
+            + duplicate_exclusions
+        ),
+    )
+    pnt_candidates, duplicate_pnt_candidates = collapse_duplicate_candidates(pnt_candidates)
+    pnt_audit = {
+        **pnt_audit,
+        "duplicate_candidates_collapsed": (
+            int(pnt_audit.get("duplicate_candidates_collapsed", 0))
+            + duplicate_pnt_candidates
+        ),
+    }
     print(
-        f"Dataset v2: extracted {len(mathlib_candidates)} Mathlib and {len(pnt_candidates)} PNT+ candidates",
+        (
+            f"Dataset v2: extracted {len(mathlib_candidates)} unique Mathlib and "
+            f"{len(pnt_candidates)} unique PNT+ candidates "
+            f"({diagnostics.duplicate_candidates + duplicate_pnt_candidates} duplicate "
+            f"trace occurrences collapsed; {diagnostics.repaired_declaration_names} "
+            f"declaration names repaired; {diagnostics.duplicate_exclusions} duplicate "
+            "exclusions collapsed)"
+        ),
         file=sys.stderr,
         flush=True,
     )
@@ -916,15 +1071,55 @@ def main() -> int:
                 )
     else:
         verification_cache = output_dir / ".verification-cache.pkl"
+        all_candidates = mathlib_candidates + pnt_candidates
         if args.resume_full and verification_cache.is_file():
             with verification_cache.open("rb") as handle:
-                cache_version, classified_candidates, file_verification = pickle.load(
+                cache_version, cached_candidates, cached_file_verification = pickle.load(
                     handle
                 )
-            if cache_version != FULL_VERIFICATION_CACHE_VERSION:
+            if cache_version not in {
+                FULL_VERIFICATION_CACHE_VERSION,
+                *LEGACY_FULL_VERIFICATION_CACHE_VERSIONS,
+            }:
                 raise RuntimeError("full verification cache version mismatch")
+            classified_candidates, missing_indexes = _transfer_cached_verification(
+                all_candidates, cached_candidates
+            )
+            supplemental_files: list[Any] = []
+            if missing_indexes:
+                missing = [classified_candidates[index] for index in missing_indexes]
+                verified_missing, supplemental_files = verify_transformed_candidates(
+                    missing,
+                    source_roots={
+                        (str(config.environment["mathlib_repository"]), str(config.environment["mathlib_revision"])): target_mathlib,
+                        (str(config.environment["host_repository"]), str(config.environment["host_revision"])): target_root,
+                    },
+                    target_root=target_root,
+                    environment_id=str(config.environment["environment_id"]),
+                    evidence_id="dataset-v2-full-term-reconstruction-v1",
+                    workers=args.workers,
+                    timeout_seconds=args.verification_timeout,
+                    group_cache_dir=output_dir / ".verification-group-cache",
+                )
+                for index, verified in zip(missing_indexes, verified_missing, strict=True):
+                    classified_candidates[index] = verified
+            file_verification = _rebuild_file_verification(
+                classified_candidates,
+                cached_file_verification,
+                supplemental_files,
+            )
+            if cache_version != FULL_VERIFICATION_CACHE_VERSION or missing_indexes:
+                with verification_cache.open("wb") as handle:
+                    pickle.dump(
+                        (
+                            FULL_VERIFICATION_CACHE_VERSION,
+                            classified_candidates,
+                            file_verification,
+                        ),
+                        handle,
+                        protocol=pickle.HIGHEST_PROTOCOL,
+                    )
         else:
-            all_candidates = mathlib_candidates + pnt_candidates
             classified_candidates, file_verification = verify_transformed_candidates(
                 all_candidates,
                 source_roots={
@@ -948,6 +1143,7 @@ def main() -> int:
                     handle,
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
+        classified_candidates, _ = collapse_duplicate_candidates(classified_candidates)
         real_candidates = [
             item
             for item in classified_candidates
@@ -963,6 +1159,7 @@ def main() -> int:
             distribute_prime_counts(int(config.value["synthetic"]["prime_domain_statements"]))
         )
 
+    real_candidates, _ = collapse_duplicate_candidates(real_candidates)
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
     synthetic_cache = output_dir / ".synthetic-cache.pkl"
