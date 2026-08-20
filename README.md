@@ -212,6 +212,39 @@ uv run --frozen --project tools/olmo3-assessment qwen-lean olmo3-evidence
 
 Only compact evidence is committed. Weights, caches, raw candidates, and bulky
 logs remain outside Git under the ignored `artifacts/` namespace.
+## Goedel-Prover-V2-8B strict casting assessment
+
+Issue #30 evaluates the immutable Goedel-Prover-V2-8B checkpoint under the same
+raw `whole-proof-v1` miniF2F validation contract. Download the pinned snapshot,
+validate it and the local Lean/GPU environment, then run dev16 before the full
+244-task workload:
+
+```bash
+hf download Goedel-LM/Goedel-Prover-V2-8B \
+  --revision dfd02e6271a58375dfbf3ece0175277cf6b6a89a
+
+uv run --extra baseline qwen-lean goedel-preflight \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --model-snapshot /path/to/huggingface/snapshots/dfd02e6271a58375dfbf3ece0175277cf6b6a89a
+
+uv run --extra baseline qwen-lean goedel-assess \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --workload minif2f-valid-dev16-v1 \
+  --output-dir artifacts/goedel-prover-v2/dev16
+
+uv run --extra baseline qwen-lean goedel-assess \
+  --benchmark-root /path/to/built/pinned/miniF2F \
+  --workload minif2f-valid-v1 \
+  --output-dir artifacts/goedel-prover-v2/full
+
+uv run qwen-lean goedel-evidence
+```
+
+The assessed lane uses four sampled candidates per task at temperature 0.8,
+top-p 0.95, no top-k, and 1,024 new tokens. It does not apply the model-card chat
+prompt, extract a proof from prose, retry generation, or expose Lean feedback to
+the model. The optional native-prover/self-correction diagnostic is separate and
+is not part of the strict score.
 
 ## Ministral 3 8B Base strict casting assessment
 

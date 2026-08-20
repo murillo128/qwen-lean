@@ -1,0 +1,75 @@
+{
+  "assessment_id": "goedel-prover-v2-8b-strict-casting-v1",
+  "benchmark_environment": {
+    "benchmark_split": "validation",
+    "known_valid_candidate_category": "verified",
+    "known_valid_candidate_lean_exit_code": 0,
+    "known_valid_task_id": "mathd_algebra_182",
+    "placeholder_candidate_category": "lean_rejected",
+    "placeholder_candidate_lean_exit_code": 0,
+    "preamble": "import MiniF2F.ProblemImports\n\nopen scoped Real\nopen scoped Nat\nopen scoped Topology\nopen scoped Polynomial",
+    "primary_task_count": 244,
+    "verifier_environment": {
+      "dependencies": {
+        "formal_conjectures": "f564f8d7a6d28bfeea4deeb0c12aa81348da6d73",
+        "mathlib": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "project": "google-deepmind/miniF2F",
+      "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    }
+  },
+  "candidate_artifacts_retained_outside_git": true,
+  "config_sha256": "de3ef5e01278dfffe260a6e3c0bd1816f94ca258ce3be8c8cc28076953845cbb",
+  "model": {
+    "license": "Apache-2.0",
+    "model_id": "Goedel-LM/Goedel-Prover-V2-8B",
+    "model_revision": "dfd02e6271a58375dfbf3ece0175277cf6b6a89a",
+    "tokenizer_id": "Goedel-LM/Goedel-Prover-V2-8B",
+    "tokenizer_revision": "dfd02e6271a58375dfbf3ece0175277cf6b6a89a"
+  },
+  "prompt_contract": {
+    "chat_template": null,
+    "dev16_prompt_count": 16,
+    "dev16_prompts_sha256": "bbf235bbe4a63c374fcb654a5f5518425220628686ac17e3c2019a1d0077271d",
+    "lean_guided_retry": false,
+    "prompt_format_id": "whole-proof-v1",
+    "proof_extraction": false,
+    "raw_continuation": true,
+    "self_correction": false
+  },
+  "runtime": {
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "inference_execution": "local_cuda",
+    "package_versions": {
+      "torch": "2.8.0",
+      "transformers": "4.55.4",
+      "vllm": "0.10.2"
+    },
+    "packages": {
+      "huggingface-hub": "0.36.2",
+      "torch": "2.8.0",
+      "transformers": "4.55.4",
+      "vllm": "0.10.2"
+    },
+    "python": "3.12.14",
+    "sampling_backend": "vllm_pytorch_native_fallback",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_version": "12.8"
+  },
+  "schema_version": "goedel-prover-v2-preflight-v1",
+  "snapshot": {
+    "architecture": "Qwen3ForCausalLM",
+    "revision": "dfd02e6271a58375dfbf3ece0175277cf6b6a89a",
+    "source_dtype": "bfloat16",
+    "weight_bytes": 16381516824,
+    "weight_shard_count": 4
+  },
+  "status": "passed"
+}
