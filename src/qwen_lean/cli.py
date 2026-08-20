@@ -715,6 +715,78 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir", type=Path, required=True
     )
 
+    riemann_deepseek_preflight = subparsers.add_parser(
+        "riemann-deepseek-preflight",
+        help="validate the frozen DeepSeek specialist-parent Riemann inputs",
+    )
+    riemann_deepseek_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-riemann-assessment.json",
+    )
+    riemann_deepseek_preflight.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_deepseek_preflight.add_argument(
+        "--mathlib-root", type=Path, required=True
+    )
+    riemann_deepseek_preflight.add_argument("--output", type=Path, required=True)
+
+    riemann_deepseek_assess = subparsers.add_parser(
+        "riemann-deepseek-assess",
+        help="run the complete local-GPU DeepSeek specialist-parent Riemann casting",
+    )
+    riemann_deepseek_assess.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-riemann-assessment.json",
+    )
+    riemann_deepseek_assess.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_deepseek_assess.add_argument(
+        "--mathlib-root", type=Path, required=True
+    )
+    riemann_deepseek_assess.add_argument("--preflight", type=Path, required=True)
+    riemann_deepseek_assess.add_argument("--output-dir", type=Path, required=True)
+    riemann_deepseek_assess.add_argument(
+        "--verification-workers", type=int, default=8
+    )
+
+    riemann_deepseek_evidence = subparsers.add_parser(
+        "riemann-deepseek-evidence",
+        help="write compact DeepSeek specialist-parent Riemann casting evidence",
+    )
+    riemann_deepseek_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/deepseek-prover-v2-7b-riemann-assessment.json",
+    )
+    riemann_deepseek_evidence.add_argument(
+        "--domain-config",
+        type=Path,
+        default=root / "config/riemann-domain-breakdown.json",
+    )
+    riemann_deepseek_evidence.add_argument("--preflight", type=Path, required=True)
+    riemann_deepseek_evidence.add_argument(
+        "--artifact-dir", type=Path, required=True
+    )
+    riemann_deepseek_evidence.add_argument(
+        "--evidence-dir", type=Path, required=True
+    )
+    riemann_deepseek_evidence.add_argument(
+        "--qwen35-4b-outcomes",
+        type=Path,
+        default=root / "evidence/riemann-qwen35-4b-base/task-outcomes.jsonl",
+    )
+    riemann_deepseek_evidence.add_argument(
+        "--qwen35-9b-outcomes", type=Path
+    )
+
     qwen35_preflight = subparsers.add_parser(
         "qwen35-preflight",
         help="prove pinned Qwen3.5 BF16/text-only compatibility and GPU memory",
@@ -1935,6 +2007,57 @@ def main(argv: list[str] | None = None) -> int:
             args.preflight,
             args.artifact_dir,
             args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "riemann-deepseek-preflight":
+        evidence = run_riemann_qwen35_4b_preflight(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.mathlib_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "riemann-deepseek-assess":
+        if args.verification_workers < 1:
+            print("--verification-workers must be positive")
+            return 2
+        _, _, summary = run_riemann_qwen35_4b_assessment(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.mathlib_root,
+            args.preflight,
+            args.output_dir,
+            verification_workers=args.verification_workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["complete"] else 1
+
+    if args.command == "riemann-deepseek-evidence":
+        references = {"qwen35-4b-base": args.qwen35_4b_outcomes}
+        unavailable = {}
+        if args.qwen35_9b_outcomes is None:
+            unavailable["qwen35-9b-base"] = (
+                "No accepted Qwen3.5-9B-Base Riemann task-outcome artifact is "
+                "present on this issue's authoritative independent base; unmerged "
+                "sibling results are not imported."
+            )
+        else:
+            references["qwen35-9b-base"] = args.qwen35_9b_outcomes
+        evidence = write_riemann_qwen35_4b_evidence(
+            Phase1Config.load(args.config),
+            _project_root(),
+            args.domain_config,
+            args.preflight,
+            args.artifact_dir,
+            args.evidence_dir,
+            paired_reference_paths=references,
+            unavailable_paired_references=unavailable,
         )
         print(json.dumps(evidence, indent=2))
         return 0
