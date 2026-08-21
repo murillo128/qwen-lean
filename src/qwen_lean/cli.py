@@ -34,6 +34,11 @@ from .gpt53_assessment import (
 from .gpt53_assessment import (
     write_compact_evidence as write_gpt53_evidence,
 )
+from .generalist_v2 import GeneralistV2Config
+from .generalist_v2_training import (
+    run_architecture_load_preflight,
+    run_runtime_preparation_smoke,
+)
 from .minif2f import Phase1Config
 from .ministral3_assessment import (
     Ministral3AssessmentConfig,
@@ -1806,11 +1811,53 @@ def _parser() -> argparse.ArgumentParser:
     sft2_evidence.add_argument(
         "--config", type=Path, default=root / "config/sft2-ablation.json"
     )
+
+    generalist_architecture = subparsers.add_parser(
+        "generalist-v2-architecture-preflight",
+        help="validate the pinned text-only Qwen3.5 architecture and LoRA targets",
+    )
+    generalist_architecture.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_architecture.add_argument("--model-snapshot", type=Path)
+    generalist_architecture.add_argument("--output", type=Path, required=True)
+
+    generalist_runtime = subparsers.add_parser(
+        "generalist-v2-runtime-preparation-smoke",
+        help="attach the text-only LoRA under the automatically selected precision lane",
+    )
+    generalist_runtime.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_runtime.add_argument("--model-snapshot", type=Path)
+    generalist_runtime.add_argument("--output", type=Path, required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "generalist-v2-architecture-preflight":
+        evidence = run_architecture_load_preflight(
+            GeneralistV2Config.load(args.config),
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-runtime-preparation-smoke":
+        evidence = run_runtime_preparation_smoke(
+            GeneralistV2Config.load(args.config),
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
     if args.command == "fixture":
         _, results, mismatches = run_fixture_evaluation(
             args.fixtures,

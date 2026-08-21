@@ -1,0 +1,157 @@
+{
+  "schema_version": "generalist-v2-config-v1",
+  "artifact_id": "qwen-lean-generalist-v2",
+  "model": {
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "text_only": true,
+    "architecture_class": "Qwen3_5ForCausalLM",
+    "add_special_tokens": false,
+    "chat_template": null
+  },
+  "dataset": {
+    "package_id": "lean-whole-proof-v2",
+    "training_membership": "general-train-v2",
+    "validation_memberships": {
+      "fresh_composition": "fresh-composition-valid-v2",
+      "minif2f": "minif2f-valid-clean-v2"
+    },
+    "test_memberships": {
+      "fresh_composition": "fresh-composition-test-v2",
+      "minif2f": "minif2f-test-clean-v2"
+    },
+    "training_probe": "dataset-v2-train-probe"
+  },
+  "serialization": {
+    "id": "lean-sft-v2",
+    "interface": "raw-whole-proof-continuation-after-by",
+    "supervise_prompt": false,
+    "supervise_eos": true,
+    "terminal_eos_count": 1,
+    "packing": false,
+    "truncation": false
+  },
+  "weighting": {
+    "statement_normalized_variants": true,
+    "synthetic_target_mass_fraction": 0.1,
+    "synthetic_max_statement_multiplier": 4.0,
+    "synthetic_balance_dimensions": [
+      "generator_family",
+      "composition_class"
+    ],
+    "domain_multipliers": {}
+  },
+  "precision": {
+    "preferred": {
+      "lane": "bf16-lora",
+      "minimum_vram_bytes": 51539607552,
+      "base_dtype": "bfloat16",
+      "compute_dtype": "bfloat16"
+    },
+    "fallback": {
+      "lane": "nf4-qlora",
+      "load_in_4bit": true,
+      "quantization_type": "nf4",
+      "double_quantization": true,
+      "compute_dtype": "bfloat16"
+    }
+  },
+  "lora": {
+    "task_type": "CAUSAL_LM",
+    "target_regex": "^model\\.layers\\.\\d+\\.(?:self_attn\\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\\.(?:in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)|mlp\\.(?:gate_proj|up_proj|down_proj))$",
+    "target_suffixes": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "in_proj_qkv",
+      "in_proj_z",
+      "in_proj_a",
+      "in_proj_b",
+      "out_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "expected_module_counts": {
+      "q_proj": 8,
+      "k_proj": 8,
+      "v_proj": 8,
+      "o_proj": 8,
+      "in_proj_qkv": 24,
+      "in_proj_z": 24,
+      "in_proj_a": 24,
+      "in_proj_b": 24,
+      "out_proj": 24,
+      "gate_proj": 32,
+      "up_proj": 32,
+      "down_proj": 32
+    },
+    "r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "bias": "none",
+    "modules_to_save": null
+  },
+  "training": {
+    "trainer": "trl-sft-weighted",
+    "per_device_micro_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "optimizer": "paged_adamw_8bit",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 1.0,
+    "lr_schedule": "cosine",
+    "warmup_fraction": 0.03125,
+    "seed": 0,
+    "data_seed": 0,
+    "gradient_checkpointing": true,
+    "packing": false,
+    "truncation": false,
+    "complete_passes": 1,
+    "context_choices": [
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "checkpoint_fractions": {
+      "Q1": 0.25,
+      "Q2": 0.5,
+      "Q3": 0.75,
+      "Q4": 1.0
+    }
+  },
+  "evaluation": {
+    "candidates_per_task": 8,
+    "primary_metric": "pass@8",
+    "reported_metrics": [
+      "pass@1",
+      "pass@4",
+      "pass@8"
+    ],
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 0,
+    "checkpoint_selection_uses": [
+      "fresh-composition-valid-v2",
+      "minif2f-valid-clean-v2"
+    ],
+    "checkpoint_selection_excludes": [
+      "all-test-workloads",
+      "riemann-fresh-valid-v2",
+      "riemann-fresh-test-v2",
+      "riemann-specialist-validation-v1"
+    ]
+  },
+  "riemann": {
+    "checkpoint_selection_role": "diagnostic-only",
+    "historical_workload": "riemann-specialist-validation-v1",
+    "historical_clean_generalization": false,
+    "validation_view": "riemann-fresh-valid-v2",
+    "test_view": "riemann-fresh-test-v2",
+    "training_stream": null,
+    "domain_oversampling": false
+  }
+}
