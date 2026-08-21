@@ -17,13 +17,13 @@ from qwen_lean.generalist_v2 import (
     final_evaluation_plan,
     materialize_fresh_riemann_views,
     normalized_example_loss_scales,
+    normalized_riemann_domain_tags,
     one_pass_trajectory,
     select_context_length,
     select_generalist_checkpoint,
     tokenize_generalist_variant,
     validation_evaluation_plan,
 )
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -97,6 +97,9 @@ def test_generalist_config_freezes_issue_78_contract() -> None:
     assert config.serialization["id"] == GENERALIST_SERIALIZATION_ID
     assert config.weighting["domain_multipliers"] == {}
     assert config.training["context_choices"] == [4096, 8192, 16384, 32768]
+    assert config.training["resolved_context_tokens"] == 32768
+    assert config.weighting["resolved_synthetic_statement_multiplier"] == 4.0
+    assert config.evaluation["sampling"]["temperature"] == 0.8
     assert config.value["riemann"]["training_stream"] is None
 
 
@@ -151,6 +154,22 @@ def test_serialization_rejects_in_band_eos_and_never_truncates() -> None:
             example_weight=1.0,
             maximum_sequence_tokens=8,
         )
+
+
+def test_placeholder_check_ignores_comments_but_rejects_active_code() -> None:
+    commented = replace(
+        _record(1),
+        completion=(
+            "/- This proof does not admit a shortcut. -/\n"
+            "-- sorry was considered here\n"
+            "trivial"
+        ),
+    )
+    commented.validate()
+
+    for completion in ("sorry", "by\n  admit"):
+        with pytest.raises(ValueError, match="placeholder"):
+            replace(_record(1), completion=completion).validate()
 
 
 def test_statement_weights_normalize_variants_and_target_ten_percent_synthetic_mass() -> (
@@ -366,3 +385,27 @@ def test_fresh_riemann_views_are_deterministic_and_leakage_free() -> None:
             training_statement_ids=set(),
             training_derivation_family_ids={"training-family"},
         )
+
+
+def test_dataset_v2_namespaced_prime_tags_expand_to_frozen_riemann_tags() -> None:
+    assert normalized_riemann_domain_tags(
+        (
+            "prime-family:zeta-analytic-number-theory",
+            "prime-family:prime-counting-pnt",
+            "prime-family:pnt-plus",
+            "prime-family:arithmetic-functions",
+            "prime-family:prime-arithmetic-divisibility",
+            "prime-family:riemann-core-bubble",
+        )
+    ) == {
+        "zeta",
+        "analytic-number-theory",
+        "prime-counting",
+        "pnt",
+        "pnt-plus",
+        "arithmetic-functions",
+        "prime-arithmetic",
+        "divisibility",
+        "riemann-core",
+        "riemann-bubble",
+    }

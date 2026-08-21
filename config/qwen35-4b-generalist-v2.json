@@ -22,7 +22,16 @@
       "fresh_composition": "fresh-composition-test-v2",
       "minif2f": "minif2f-test-clean-v2"
     },
-    "training_probe": "dataset-v2-train-probe"
+    "training_probe": "dataset-v2-train-probe",
+    "binding": {
+      "manifest_sha256": "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e",
+      "canonical_records_sha256": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c",
+      "general_train_sha256": "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367",
+      "training_statements": 181531,
+      "training_proof_variants": 182812,
+      "fresh_composition_valid_statements": 406,
+      "fresh_composition_test_statements": 415
+    }
   },
   "serialization": {
     "id": "lean-sft-v2",
@@ -37,6 +46,8 @@
     "statement_normalized_variants": true,
     "synthetic_target_mass_fraction": 0.1,
     "synthetic_max_statement_multiplier": 4.0,
+    "resolved_synthetic_statement_multiplier": 4.0,
+    "resolved_synthetic_mass_fraction": 0.06845878885428207,
     "synthetic_balance_dimensions": [
       "generator_family",
       "composition_class"
@@ -117,6 +128,7 @@
       16384,
       32768
     ],
+    "resolved_context_tokens": 32768,
     "checkpoint_fractions": {
       "Q1": 0.25,
       "Q2": 0.5,
@@ -134,6 +146,16 @@
     ],
     "bootstrap_resamples": 10000,
     "bootstrap_seed": 0,
+    "sampling": {
+      "do_sample": true,
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "top_k": -1,
+      "max_new_tokens": 1024,
+      "stop": "tokenizer_eos_or_token_limit",
+      "seed": 0
+    },
+    "verifier_timeout_seconds": 30.0,
     "checkpoint_selection_uses": [
       "fresh-composition-valid-v2",
       "minif2f-valid-clean-v2"

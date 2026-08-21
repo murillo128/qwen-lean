@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass
@@ -14,7 +15,6 @@ from .metrics import pass_at_k
 from .phase3 import IGNORE_INDEX
 from .phase6 import paired_task_bootstrap
 from .prompt import normalize_transport, render_proof_request
-
 
 GENERALIST_CONFIG_SCHEMA_VERSION = "generalist-v2-config-v1"
 GENERALIST_SERIALIZATION_ID = "lean-sft-v2"
@@ -162,6 +162,11 @@ class GeneralistV2Config:
             (("weighting", "statement_normalized_variants"), True),
             (("weighting", "synthetic_target_mass_fraction"), 0.1),
             (("weighting", "synthetic_max_statement_multiplier"), 4.0),
+            (("weighting", "resolved_synthetic_statement_multiplier"), 4.0),
+            (
+                ("weighting", "resolved_synthetic_mass_fraction"),
+                0.06845878885428207,
+            ),
             (("weighting", "domain_multipliers"), {}),
             (("precision", "preferred", "lane"), "bf16-lora"),
             (("precision", "preferred", "minimum_vram_bytes"), 48 * 1024**3),
@@ -192,10 +197,22 @@ class GeneralistV2Config:
             (("training", "packing"), False),
             (("training", "truncation"), False),
             (("training", "complete_passes"), 1),
+            (("training", "resolved_context_tokens"), 32768),
             (("evaluation", "candidates_per_task"), 8),
             (("evaluation", "primary_metric"), "pass@8"),
             (("evaluation", "bootstrap_resamples"), 10000),
             (("evaluation", "bootstrap_seed"), 0),
+            (("evaluation", "sampling", "do_sample"), True),
+            (("evaluation", "sampling", "temperature"), 0.8),
+            (("evaluation", "sampling", "top_p"), 0.95),
+            (("evaluation", "sampling", "top_k"), -1),
+            (("evaluation", "sampling", "max_new_tokens"), 1024),
+            (
+                ("evaluation", "sampling", "stop"),
+                "tokenizer_eos_or_token_limit",
+            ),
+            (("evaluation", "sampling", "seed"), 0),
+            (("evaluation", "verifier_timeout_seconds"), 30.0),
         )
         for path, wanted in expected:
             observed: Any = self.value
@@ -214,6 +231,24 @@ class GeneralistV2Config:
             raise ValueError("generalist-v2 expected LoRA module counts differ")
         if tuple(self.training["context_choices"]) != CONTEXT_CHOICES:
             raise ValueError("generalist-v2 context choices differ")
+        binding = self.dataset.get("binding", {})
+        expected_binding = {
+            "manifest_sha256": (
+                "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e"
+            ),
+            "canonical_records_sha256": (
+                "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c"
+            ),
+            "general_train_sha256": (
+                "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367"
+            ),
+            "training_statements": 181531,
+            "training_proof_variants": 182812,
+            "fresh_composition_valid_statements": 406,
+            "fresh_composition_test_statements": 415,
+        }
+        if binding != expected_binding:
+            raise ValueError("generalist-v2 Dataset-v2 binding differs")
         if (
             self.value.get("riemann", {}).get("checkpoint_selection_role")
             != "diagnostic-only"
@@ -294,10 +329,74 @@ class GeneralistProofVariant:
                 )
             if self.composition_class not in COMPOSITION_CLASSES:
                 raise ValueError("synthetic record has an unknown composition class")
-        normalized = normalize_transport(self.completion)
-        forbidden = ("sorry", "admit")
-        if any(token in normalized.split() for token in forbidden):
+        active_code = _lean_code_without_comments_and_strings(
+            normalize_transport(self.completion)
+        )
+        if re.search(r"\b(?:sorry|admit)\b", active_code):
             raise ValueError("generalist-v2 completion contains a placeholder")
+
+
+def _lean_code_without_comments_and_strings(value: str) -> str:
+    """Retain active Lean code while masking comments and string contents."""
+
+    output: list[str] = []
+    index = 0
+    block_depth = 0
+    line_comment = False
+    in_string = False
+    escaped = False
+    while index < len(value):
+        pair = value[index : index + 2]
+        character = value[index]
+        if line_comment:
+            if character == "\n":
+                line_comment = False
+                output.append(character)
+            else:
+                output.append(" ")
+            index += 1
+            continue
+        if block_depth:
+            if pair == "/-":
+                block_depth += 1
+                output.extend("  ")
+                index += 2
+            elif pair == "-/":
+                block_depth -= 1
+                output.extend("  ")
+                index += 2
+            else:
+                output.append("\n" if character == "\n" else " ")
+                index += 1
+            continue
+        if in_string:
+            output.append("\n" if character == "\n" else " ")
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            index += 1
+            continue
+        if pair == "--":
+            line_comment = True
+            output.extend("  ")
+            index += 2
+        elif pair == "/-":
+            block_depth = 1
+            output.extend("  ")
+            index += 2
+        elif character == '"':
+            in_string = True
+            output.append(" ")
+            index += 1
+        else:
+            output.append(character)
+            index += 1
+    if block_depth or in_string:
+        raise ValueError("generalist-v2 completion has unterminated Lean syntax")
+    return "".join(output)
 
 
 @dataclass(frozen=True)
@@ -683,7 +782,7 @@ def deterministic_training_order(
             (
                 f"generalist-v2-one-pass-v1\0{seed}\0{record.statement_id}\0"
                 f"{record.proof_variant_id}"
-            ).encode("utf-8")
+            ).encode()
         ).digest(),
     )
 
@@ -721,9 +820,7 @@ def one_pass_membership_trajectory(
     if not membership_is_ordered:
         ordered_membership.sort(
             key=lambda item: hashlib.sha256(
-                (f"generalist-v2-one-pass-v1\0{0}\0{item[0]}\0{item[1]}").encode(
-                    "utf-8"
-                )
+                (f"generalist-v2-one-pass-v1\0{0}\0{item[0]}\0{item[1]}").encode()
             ).digest()
         )
     row_count = len(ordered_membership)
@@ -973,6 +1070,30 @@ def _normalized_tag(value: str) -> str:
     return value.strip().lower().replace("_", "-").replace("+", "-plus")
 
 
+def normalized_riemann_domain_tags(values: Iterable[str]) -> frozenset[str]:
+    """Map Dataset-v2 namespaced topic tags onto the frozen Riemann view tags."""
+
+    normalized = {_normalized_tag(value) for value in values}
+    expanded: set[str] = set()
+    family_expansions = {
+        "zeta-analytic-number-theory": {"zeta", "analytic-number-theory"},
+        "riemann-core-bubble": {"riemann-core", "riemann-bubble"},
+        "prime-counting-pnt": {"prime-counting", "pnt"},
+        "pnt-plus": {"pnt-plus"},
+        "arithmetic-functions": {"arithmetic-functions"},
+        "prime-arithmetic-divisibility": {"prime-arithmetic", "divisibility"},
+    }
+    for tag in normalized:
+        if tag in RIEMANN_DOMAIN_TAGS:
+            expanded.add(tag)
+        namespace, separator, value = tag.partition(":")
+        if separator and namespace == "prime-family":
+            expanded.update(family_expansions.get(value, ()))
+        if tag == "riemann-relevance:core":
+            expanded.add("riemann-core")
+    return frozenset(expanded)
+
+
 def materialize_fresh_riemann_views(
     records: Iterable[GeneralistProofVariant],
     *,
@@ -989,7 +1110,7 @@ def materialize_fresh_riemann_views(
     family_splits: dict[str, str] = {}
     for record in records:
         record.validate()
-        tags = {_normalized_tag(tag) for tag in record.domain_tags}
+        tags = normalized_riemann_domain_tags(record.domain_tags)
         if not tags & RIEMANN_DOMAIN_TAGS:
             continue
         if record.source_kind != "synthetic" or record.optimizer_eligible:
@@ -1039,10 +1160,7 @@ def materialize_fresh_riemann_views(
                     Counter(
                         tag
                         for item in ordered
-                        for tag in {
-                            _normalized_tag(value) for value in item.domain_tags
-                        }
-                        if tag in RIEMANN_DOMAIN_TAGS
+                        for tag in normalized_riemann_domain_tags(item.domain_tags)
                     ).items()
                 )
             ),

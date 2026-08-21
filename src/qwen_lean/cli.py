@@ -1835,6 +1835,57 @@ def _parser() -> argparse.ArgumentParser:
     )
     generalist_runtime.add_argument("--model-snapshot", type=Path)
     generalist_runtime.add_argument("--output", type=Path, required=True)
+
+    generalist_dataset = subparsers.add_parser(
+        "generalist-v2-bind-dataset",
+        help="bind the accepted Dataset-v2 package and freeze generalist context",
+    )
+    generalist_dataset.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_dataset.add_argument(
+        "--package-root",
+        type=Path,
+        default=root / "data/lean-whole-proof-v2",
+    )
+    generalist_dataset.add_argument("--model-snapshot", type=Path)
+    generalist_dataset.add_argument("--view-dir", type=Path, required=True)
+    generalist_dataset.add_argument("--output", type=Path, required=True)
+
+    generalist_q0_generate = subparsers.add_parser(
+        "generalist-v2-q0-generate",
+        help="generate one Q0 Dataset-v2 workload on local CUDA",
+    )
+    generalist_q0_generate.add_argument("--config", type=Path, required=True)
+    generalist_q0_generate.add_argument(
+        "--base-evaluation-config", type=Path, required=True
+    )
+    generalist_q0_generate.add_argument("--workload", required=True)
+    generalist_q0_generate.add_argument("--package-root", type=Path, required=True)
+    generalist_q0_generate.add_argument("--view-dir", type=Path, required=True)
+    generalist_q0_generate.add_argument("--output-dir", type=Path, required=True)
+
+    generalist_q0_verify = subparsers.add_parser(
+        "generalist-v2-q0-verify", help="verify one stored Q0 workload"
+    )
+    generalist_q0_verify.add_argument("--config", type=Path, required=True)
+    generalist_q0_verify.add_argument("--workload", required=True)
+    generalist_q0_verify.add_argument("--package-root", type=Path, required=True)
+    generalist_q0_verify.add_argument("--view-dir", type=Path, required=True)
+    generalist_q0_verify.add_argument("--output-dir", type=Path, required=True)
+    generalist_q0_verify.add_argument("--lean-project-root", type=Path, required=True)
+    generalist_q0_verify.add_argument("--workers", type=int, default=8)
+
+    generalist_q0_evidence = subparsers.add_parser(
+        "generalist-v2-q0-evidence", help="write compact complete Q0 evidence"
+    )
+    generalist_q0_evidence.add_argument("--config", type=Path, required=True)
+    generalist_q0_evidence.add_argument(
+        "--evaluation-root", type=Path, required=True
+    )
+    generalist_q0_evidence.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -1854,6 +1905,59 @@ def main(argv: list[str] | None = None) -> int:
             GeneralistV2Config.load(args.config),
             args.output,
             model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-bind-dataset":
+        from .generalist_v2_dataset import write_dataset_binding_evidence
+
+        evidence = write_dataset_binding_evidence(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.view_dir,
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-generate":
+        from .generalist_v2_evaluation import run_q0_generation
+
+        evidence = run_q0_generation(
+            GeneralistV2Config.load(args.config),
+            args.base_evaluation_config,
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-verify":
+        from .generalist_v2_evaluation import run_q0_verification
+
+        evidence = run_q0_verification(
+            GeneralistV2Config.load(args.config),
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            args.lean_project_root,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-evidence":
+        from .generalist_v2_evaluation import compact_q0_evidence
+
+        evidence = compact_q0_evidence(
+            GeneralistV2Config.load(args.config),
+            args.evaluation_root,
+            args.output,
         )
         print(json.dumps(evidence, indent=2))
         return 0
