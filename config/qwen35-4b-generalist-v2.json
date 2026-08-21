@@ -148,9 +148,11 @@
   "riemann": {
     "checkpoint_selection_role": "diagnostic-only",
     "historical_workload": "riemann-specialist-validation-v1",
+    "historical_candidates_per_task": 4,
     "historical_clean_generalization": false,
     "validation_view": "riemann-fresh-valid-v2",
     "test_view": "riemann-fresh-test-v2",
+    "fresh_candidates_per_task": 8,
     "training_stream": null,
     "domain_oversampling": false
   }

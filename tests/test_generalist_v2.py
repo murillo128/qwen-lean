@@ -274,6 +274,9 @@ def test_evaluation_plans_keep_test_and_riemann_out_of_selection() -> None:
     assert final["selected_checkpoint_frozen"] == "Q3"
     assert final["test_workloads_consulted_after_checkpoint_freeze"] is True
     assert final["historical_riemann"]["clean_generalization"] is False
+    assert final["historical_riemann"]["candidates_per_task"] == 4
+    assert final["generic_candidates_per_task"] == 8
+    assert final["fresh_riemann_candidates_per_task"] == 8
     with pytest.raises(ValueError, match="frozen Q1-Q4"):
         final_evaluation_plan(config, selected_checkpoint="Q0")
 

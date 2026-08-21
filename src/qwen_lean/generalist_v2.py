@@ -219,6 +219,12 @@ class GeneralistV2Config:
             != "diagnostic-only"
         ):
             raise ValueError("Riemann validation must remain diagnostic-only")
+        if self.value["riemann"].get("historical_candidates_per_task") != 4:
+            raise ValueError(
+                "historical Riemann comparability must retain 4 candidates"
+            )
+        if self.value["riemann"].get("fresh_candidates_per_task") != 8:
+            raise ValueError("fresh Riemann evaluation must use 8 candidates")
 
 
 @dataclass(frozen=True)
@@ -804,8 +810,14 @@ def final_evaluation_plan(
             "workload": config.value["riemann"]["historical_workload"],
             "clean_generalization": False,
             "evaluate_checkpoint": selected_checkpoint,
+            "candidates_per_task": config.value["riemann"][
+                "historical_candidates_per_task"
+            ],
         },
-        "candidates_per_task": config.evaluation["candidates_per_task"],
+        "generic_candidates_per_task": config.evaluation["candidates_per_task"],
+        "fresh_riemann_candidates_per_task": config.value["riemann"][
+            "fresh_candidates_per_task"
+        ],
         "test_workloads_consulted_after_checkpoint_freeze": True,
     }
 
