@@ -1,0 +1,92 @@
+{
+  "canonical_records_file": "records.jsonl.gz",
+  "dataset_id": "lean-whole-proof-v2",
+  "schema_version": "dataset-v2-training-views-v1",
+  "semantics": {
+    "canonical_corpus_copies": 1,
+    "general": "all optimizer-eligible Dataset-v2 training statements",
+    "membership_only": true,
+    "oversampling_ratios_encoded": false,
+    "riemann": "prime/Riemann seeds, historical specialist memberships, prime synthetic compositions, and their resolved support neighborhood"
+  },
+  "validation": {
+    "canonical_proof_variant_references_missing": 0,
+    "canonical_statement_references_missing": 0,
+    "general_equals_optimizer_training": true,
+    "historical_membership_coverage": {
+      "number-theory-far-holdout-v1": {
+        "riemann_view_statements": 136,
+        "training_statements": 136
+      },
+      "number-theory-wide-v1": {
+        "riemann_view_statements": 3437,
+        "training_statements": 3437
+      },
+      "riemann-bubble-v1": {
+        "riemann_view_statements": 452,
+        "training_statements": 452
+      },
+      "riemann-core-v1": {
+        "riemann_view_statements": 165,
+        "training_statements": 165
+      },
+      "riemann-external-lean-v1": {
+        "riemann_view_statements": 22,
+        "training_statements": 22
+      },
+      "riemann-near-holdout-v1": {
+        "riemann_view_statements": 352,
+        "training_statements": 352
+      },
+      "riemann-specialist-validation-v1": {
+        "riemann_view_statements": 533,
+        "training_statements": 533
+      }
+    },
+    "pnt_plus_real_training_in_riemann": 22,
+    "pnt_plus_real_training_statements": 22,
+    "pnt_plus_synthetic_training_in_riemann": 141,
+    "pnt_plus_synthetic_training_statements": 141,
+    "pnt_plus_training_in_riemann": 163,
+    "pnt_plus_training_statements": 163,
+    "prime_training_in_general": 5627,
+    "prime_training_in_riemann": 5627,
+    "prime_training_statements": 5627,
+    "riemann_subset_general": true,
+    "support_neighborhood": {
+      "dependency_name_references": 17593,
+      "missing_source_lemma_statements": 0,
+      "resolved_dependency_statements": 12043,
+      "synthetic_prime_source_lemma_statements": 1348,
+      "synthetic_source_lemma_statements": 1348
+    },
+    "synthetic_prime_training_in_riemann": 820,
+    "synthetic_prime_training_statements": 820
+  },
+  "views": {
+    "general-train-v2": {
+      "bytes": 14044345,
+      "file": "general-train-v2.jsonl.gz",
+      "proof_variants": 182812,
+      "provenance": {
+        "external-lean": 22,
+        "real-mathlib": 178234,
+        "synthetic": 3275
+      },
+      "sha256": "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367",
+      "statements": 181531
+    },
+    "riemann-train-v2": {
+      "bytes": 1258125,
+      "file": "riemann-train-v2.jsonl.gz",
+      "proof_variants": 16309,
+      "provenance": {
+        "external-lean": 22,
+        "real-mathlib": 15267,
+        "synthetic": 820
+      },
+      "sha256": "4e9437221611418c6067d192a5cb1f46a9e87e580fa0ff3abb3f0e6b2be0317f",
+      "statements": 16109
+    }
+  }
+}

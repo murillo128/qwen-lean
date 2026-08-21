@@ -1,0 +1,141 @@
+{
+  "schema_version": "dataset-v2-checkpoint-b-v1",
+  "issue": 56,
+  "status": "OBSERVED",
+  "command": "tools/phase2-extractor/.venv/bin/python tools/dataset_v2_build.py --mode full --resume-full --workers 8 --composition-workers 4 --composition-batch-size 128 --trace-root /workspace/qwen-lean/.lake/packages/mathlib --mini-root /workspace/qwen-lean-issue28-local/miniF2F",
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "source_materialization": {
+    "mathlib_candidates": 184335,
+    "pnt_plus_candidates": 22,
+    "repaired_declaration_names": 55755,
+    "source_dispositions": 185988,
+    "included_training_dispositions": 180741,
+    "explicitly_blocked_dispositions": 5247,
+    "term_reconstruction_attempts": 95352,
+    "term_reconstruction_accepted": 91736,
+    "term_reconstruction_rejected": 3616,
+    "transient_verification_statuses": 0,
+    "stale_no_space_diagnostics": 0,
+    "retained_transformations": {
+      "equations-to-fun-exact": 1493,
+      "term-to-exact": 87949,
+      "where-to-structure-exact": 2294
+    },
+    "mathlib_v1_records_mapped_to_training": 88958,
+    "mathlib_v1_missing_source_identities": 0,
+    "riemann_inventory_missing_source_identities": 0,
+    "pnt_plus_dependency_audits": 22,
+    "pnt_plus_empty_dependency_audits": 0
+  },
+  "canonical_corpus": {
+    "records": 182352,
+    "proof_variants": 183633,
+    "roles": {
+      "training": 181531,
+      "validation": 406,
+      "test": 415
+    },
+    "provenance": {
+      "real-mathlib": 178234,
+      "external-lean": 22,
+      "synthetic": 4096
+    },
+    "cross_role_statements": 0,
+    "cross_role_derivation_families": 0,
+    "cross_role_proofs": 0,
+    "optimizer_visible_evaluation_statements": 0
+  },
+  "synthetic_corpus": {
+    "generated_with_reserve": 8192,
+    "resolved_after_constant_presence_audit": 8105,
+    "accepted_unique_statements": 4096,
+    "accepted_prime_statements": 1024,
+    "unique_source_lemma_sets": 4096,
+    "unique_derivation_families": 4096,
+    "actual_dependency_failures": 0,
+    "shortcut_rejections": 1601,
+    "inaccessible_private_statement_types": 23,
+    "oversized_persisted_statement_types": 557,
+    "max_persisted_statement_chars": 50000,
+    "stored_declaration_roundtrip_rejections": 6,
+    "shortcut_retrieval_candidates": 16270,
+    "source_lemma_references": 12137,
+    "missing_source_lemma_references": 0,
+    "missing_source_statement_ids": 0,
+    "structural_classes": {
+      "direct": 1443,
+      "branching": 1361,
+      "deep": 1292
+    },
+    "prime_families": {
+      "prime-arithmetic-divisibility": 171,
+      "arithmetic-functions": 171,
+      "prime-counting-pnt": 171,
+      "zeta-analytic-number-theory": 171,
+      "riemann-core-bubble": 170,
+      "pnt-plus": 170
+    },
+    "persisted_environment_context": {
+      "generic_mathlib_records": 3926,
+      "pnt_plus_records": 170,
+      "empty_import_contexts": 0,
+      "cross_package_context_mismatches": 0,
+      "unique_verified_contexts": 48,
+      "lean_verified_records": 4096,
+      "lean_verified_proof_variants": 4096,
+      "lean_verification_failures": 0,
+      "method": "lean-exact-persisted-import-context",
+      "stored_declaration_source": "record.canonical_declaration",
+      "stored_proof_source": "variant.canonical_proof",
+      "import_source": "record.environment.imports",
+      "generation_plan_statement_dependency": false
+    }
+  },
+  "prime_and_benchmark_gates": {
+    "prime_coverage_entries": 5240,
+    "verified_legal_target_compatible_prime_omissions": 0,
+    "minif2f_valid_source": 244,
+    "minif2f_valid_retained": 244,
+    "minif2f_valid_training_overlaps": 0,
+    "minif2f_test_source": 244,
+    "minif2f_test_retained": 244,
+    "minif2f_test_training_overlaps": 0,
+    "train_probe_records_per_stratum": 64
+  },
+  "training_views": {
+    "canonical_corpus_copies": 1,
+    "general_train_v2_statements": 181531,
+    "riemann_train_v2_statements": 16109,
+    "riemann_subset_general": true,
+    "prime_training_in_general": 5627,
+    "prime_training_in_riemann": 5627,
+    "synthetic_prime_training_in_riemann": 820,
+    "pnt_plus_real_training_in_riemann": 22,
+    "historical_membership_omissions": 0,
+    "canonical_statement_references_missing": 0,
+    "canonical_proof_variant_references_missing": 0,
+    "resolved_dependency_support_statements": 12043
+  },
+  "validation": {
+    "full_build_repeated_with_identical_hashes": true,
+    "pytest": "248 passed in 55.53s",
+    "diff_check": "passed"
+  },
+  "artifact_sha256": {
+    "manifest.json": "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e",
+    "records.jsonl.gz": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c",
+    "source-dispositions.jsonl.gz": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad",
+    "historical-crosswalk.json": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb",
+    "prime-coverage.json": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071",
+    "verification.json": "53344aedc80e1be9c2d7b105eba53ba315c9a84d94dd5941cdf3d6b283cedec8",
+    "general-train-v2.jsonl.gz": "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367",
+    "riemann-train-v2.jsonl.gz": "4e9437221611418c6067d192a5cb1f46a9e87e580fa0ff3abb3f0e6b2be0317f",
+    "training-views.json": "6177d96c1b30478442247ffafbccb39cb6e96dc1e824c48fc872b90b367c9c6a",
+    "train-probe.json": "2c268b091d1d586837a8c773d8d6b1df01f02c82ae68fef69bcbfc10033624ff"
+  }
+}

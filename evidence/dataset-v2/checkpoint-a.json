@@ -1,0 +1,130 @@
+{
+  "schema_version": "dataset-v2-checkpoint-a-v2",
+  "issue": 56,
+  "status": "OBSERVED",
+  "command": "artifacts/phase2/tooling/venv/bin/python tools/dataset_v2_build.py --mode preflight --output-dir artifacts/dataset-v2/preflight-v3 --workers 8 --composition-workers 2 --composition-batch-size 128",
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "source_equivalence": {
+    "historical_trace_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "target_mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+    "changed_mathlib_source_files": 0,
+    "position_reuse": "accepted-byte-identical-source"
+  },
+  "checkpoint_remediation": {
+    "equation_clause_candidate_recovered": "ArithmeticFunction.vonMangoldt_le_log",
+    "equation_clause_transformation": "equations-to-fun-exact",
+    "generated_statement_contract": "connected-source-proposition-graph-logic-v2",
+    "nonempty_wrappers": 0,
+    "shortcut_retrieval_indexes": [
+      "dependency-relevance-neighborhood",
+      "type-head"
+    ],
+    "statement_identity": "scope-aware-alpha-normalization-with-explicit-universes-v2"
+  },
+  "real_proof_preflight": {
+    "mathlib_trace_files": 17,
+    "mathlib_traced_declarations": 380,
+    "mathlib_candidates": 378,
+    "mathlib_equation_clause_rewrites_retained": 1,
+    "mathlib_term_rewrites_retained": 64,
+    "mathlib_by_proofs_retained": 16,
+    "pnt_plus_retained": 4,
+    "pnt_plus_accepted_inventory": 22,
+    "pnt_plus_dependency_audits": 22,
+    "pnt_plus_empty_dependency_audits": 0,
+    "ordinary_by_source_files_accepted": 15,
+    "pnt_source_files_accepted": 4,
+    "term_reconstruction_attempts": 82,
+    "term_reconstruction_accepted": 81,
+    "term_reconstruction_rejected_reserve_candidates": 1,
+    "rejected_reserve_candidate_ids": [
+      "e4a00747733490643439b972fae9075fc7736dfba33074130613cfba4ac06366"
+    ],
+    "term_reconstruction_files": {
+      "accepted": 8,
+      "partial_with_isolated_rejection": 1
+    }
+  },
+  "synthetic_preflight": {
+    "accepted_statements": 128,
+    "accepted_prime_statements": 32,
+    "generated_with_reserve": 296,
+    "resolved_after_constant_presence_audit": 289,
+    "unresolved_source_constants": 11,
+    "shortcut_rejections": 30,
+    "shortcut_retrieval_candidates": 495,
+    "unique_statements": 128,
+    "unique_source_lemma_sets": 128,
+    "unique_derivation_families": 128,
+    "source_relation_coverage": {
+      "direct-dependency": 4,
+      "same-source-module": 169,
+      "shared-dependency-neighborhood": 25,
+      "shared-relevance-neighborhood": 49
+    },
+    "shortcut_retrieval_index_coverage": {
+      "dependency-relevance-neighborhood:direct-dependency": 23,
+      "dependency-relevance-neighborhood:same-source-module": 366,
+      "dependency-relevance-neighborhood:shared-dependency-neighborhood": 86,
+      "dependency-relevance-neighborhood:shared-relevance-neighborhood": 162,
+      "type-head:and": 1,
+      "type-head:iff": 13
+    },
+    "generator_families": {
+      "branching-graph-logic-v2": 41,
+      "deep-graph-logic-v2": 34,
+      "direct-graph-logic-v2": 40,
+      "final-only:branching-graph-iff-v2": 4,
+      "final-only:deep-graph-iff-v2": 3,
+      "final-only:direct-graph-iff-v2": 6
+    },
+    "structural_classes": {
+      "direct": 46,
+      "branching": 45,
+      "deep": 37
+    },
+    "prime_families": {
+      "prime-arithmetic-divisibility": 8,
+      "arithmetic-functions": 7,
+      "prime-counting-pnt": 6,
+      "zeta-analytic-number-theory": 1,
+      "riemann-core-bubble": 6,
+      "pnt-plus": 4
+    }
+  },
+  "dataset_preflight": {
+    "records": 213,
+    "proof_variants": 213,
+    "roles": {
+      "training": 189,
+      "validation": 10,
+      "test": 14
+    },
+    "transformations": {
+      "equations-to-fun-exact": 1,
+      "none": 148,
+      "term-to-exact": 64
+    },
+    "cross_role_statements": 0,
+    "cross_role_derivation_families": 0,
+    "cross_role_proofs": 0,
+    "optimizer_visible_evaluation_statements": 0,
+    "deterministic_records_rebuild_byte_equal": true,
+    "verified_legal_target_compatible_prime_omissions": 0,
+    "minif2f_valid_source": 244,
+    "minif2f_valid_retained": 244,
+    "minif2f_test_source": 244,
+    "minif2f_test_retained": 244
+  },
+  "artifact_sha256": {
+    "manifest.json": "8429be9b7f186d1970f1f9b7b26209b2cf8bd37a645273a05dac23b28b7e764d",
+    "verification.json": "aadc4943bdfc7b91a2d502e06f1819af6ceeb2ed0384d8727da1ee67c6b670ec",
+    "records.jsonl.gz": "51ac56cc4ba9dc13aa4f46f646d598942894915ac4e80df61c4181e9a729bfb0",
+    "prime-coverage.json": "e6432c72e6193ec6fb5a13088366b59265e5417875629299ec323abb59adae53"
+  }
+}
