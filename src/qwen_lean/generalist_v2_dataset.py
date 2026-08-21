@@ -181,6 +181,52 @@ def generalist_variants(record: DatasetV2Record) -> tuple[GeneralistProofVariant
     return variants
 
 
+def load_bound_training_variants(package_root: Path) -> list[GeneralistProofVariant]:
+    """Load the exact canonical ``general-train-v2`` proof-variant membership."""
+    validate_canonical_package(package_root)
+    root = package_root.resolve()
+    membership = read_training_membership(root / "general-train-v2.jsonl.gz")
+    remaining = dict(membership)
+    training: list[GeneralistProofVariant] = []
+    statement_ids: set[str] = set()
+    variant_ids: set[str] = set()
+    provenance: Counter[str] = Counter()
+
+    for value in _iter_jsonl(root / "records.jsonl.gz"):
+        record = DatasetV2Record.from_dict(value)
+        if record.role != "training":
+            if record.statement_id in membership:
+                raise ValueError("validation/test statement is optimizer-visible")
+            continue
+        variants = generalist_variants(record)
+        observed_ids = tuple(item.proof_variant_id for item in variants)
+        expected_ids = remaining.pop(record.statement_id, None)
+        if expected_ids is None:
+            raise ValueError(
+                "training statement is absent from general-train-v2: "
+                f"{record.statement_id}"
+            )
+        if observed_ids != expected_ids:
+            raise ValueError(f"proof variants do not resolve for {record.statement_id}")
+        if variant_ids.intersection(observed_ids):
+            raise ValueError("general-train-v2 repeats a proof variant")
+        training.extend(variants)
+        statement_ids.add(record.statement_id)
+        variant_ids.update(observed_ids)
+        provenance[record.provenance] += 1
+
+    if remaining:
+        raise ValueError(f"general-train-v2 has {len(remaining)} unresolved statements")
+    observed = {
+        "statements": len(statement_ids),
+        "proof_variants": len(training),
+        "provenance": dict(sorted(provenance.items())),
+    }
+    if observed != EXPECTED_TRAINING_COUNTS:
+        raise ValueError("resolved general-train-v2 counts differ from issue #78")
+    return training
+
+
 def _write_id_view(path: Path, statement_ids: Iterable[str]) -> dict[str, Any]:
     ordered = sorted(statement_ids)
     if not ordered or len(set(ordered)) != len(ordered):

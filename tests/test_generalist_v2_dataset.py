@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import qwen_lean.generalist_v2_dataset as generalist_dataset
 from qwen_lean.dataset_v2_schema import DatasetV2Record
 from qwen_lean.generalist_v2_dataset import (
     dataset_record_preamble,
     generalist_variants,
+    load_bound_training_variants,
     read_training_membership,
 )
 
@@ -106,3 +108,34 @@ def test_training_membership_rejects_duplicate_variants(tmp_path: Path) -> None:
         assert "repeats proof variants" in str(error)
     else:
         raise AssertionError("duplicate proof variant was accepted")
+
+
+def test_bound_training_loader_preserves_exact_membership(
+    monkeypatch, tmp_path: Path
+) -> None:
+    record = _record()
+    monkeypatch.setattr(
+        generalist_dataset, "validate_canonical_package", lambda package_root: {}
+    )
+    monkeypatch.setattr(
+        generalist_dataset,
+        "read_training_membership",
+        lambda path: {"statement-1": ("proof-1",)},
+    )
+    monkeypatch.setattr(
+        generalist_dataset, "_iter_jsonl", lambda path: iter([record.to_dict()])
+    )
+    monkeypatch.setattr(
+        generalist_dataset,
+        "EXPECTED_TRAINING_COUNTS",
+        {
+            "statements": 1,
+            "proof_variants": 1,
+            "provenance": {"synthetic": 1},
+        },
+    )
+
+    variants = load_bound_training_variants(tmp_path)
+
+    assert [item.statement_id for item in variants] == ["statement-1"]
+    assert [item.proof_variant_id for item in variants] == ["proof-1"]
