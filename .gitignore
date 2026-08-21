@@ -11,4 +11,5 @@ artifacts/
 data/lean-whole-proof-v2/.*-cache.pkl
 data/lean-whole-proof-v2/.composition-batch-cache/
 data/lean-whole-proof-v2/.verification-group-cache/
+data/lean-whole-proof-v2/.synthetic-context-cache/
 data/lean-whole-proof-v2/lean/

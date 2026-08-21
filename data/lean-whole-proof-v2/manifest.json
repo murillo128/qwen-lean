@@ -22,8 +22,8 @@
       "sha256": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071"
     },
     "records.jsonl.gz": {
-      "bytes": 88030041,
-      "sha256": "417aa34bbe297da0231e30f41ae835969affae42f3274a2f0d6cb856a354f12d"
+      "bytes": 94258018,
+      "sha256": "3185b98615e33b8263426fa9503f305504c33900482076aa3347ba81554c1d5c"
     },
     "riemann-train-v2.jsonl.gz": {
       "bytes": 1258074,
@@ -38,8 +38,8 @@
       "sha256": "d8336e4747705a65eb394789bd44097c7f062c9123914f80333f4c758774f4bc"
     },
     "verification.json": {
-      "bytes": 11258595,
-      "sha256": "0b340cb3e81c91e4c0236a0fa010c38fbeb0753b2d0c5abcff8ba4bcd46054d5"
+      "bytes": 11259366,
+      "sha256": "73e94d973e14f579e9ca785e059de2252ce41fb72aeed64a4daa9bcdb5607a51"
     }
   },
   "identity_contract": {
@@ -91,6 +91,22 @@
       "cross_role_derivation_families": 0,
       "cross_role_proofs": 0,
       "cross_role_statements": 0
+    },
+    "synthetic_environment_imports": {
+      "cross_package_context_mismatches": 0,
+      "empty_import_contexts": 0,
+      "mathlib_context_records": 3926,
+      "pnt_plus_context_records": 170,
+      "synthetic_records": 4096
+    },
+    "synthetic_persisted_context": {
+      "accepted_proof_variants": 4096,
+      "accepted_records": 4096,
+      "context_failures": 0,
+      "context_groups": 45,
+      "method": "lean-exact-persisted-import-context",
+      "proof_variants": 4096,
+      "synthetic_records": 4096
     },
     "synthetic_shortcut_rejections": 1601,
     "synthetic_source_resolution": {

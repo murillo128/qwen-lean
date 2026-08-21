@@ -225,6 +225,45 @@ def validate_synthetic_source_resolvability(
     }
 
 
+def validate_synthetic_environment_imports(
+    records: Sequence[DatasetV2Record],
+) -> dict[str, int]:
+    """Require non-empty, package-correct persisted synthetic import contexts."""
+
+    synthetic = [record for record in records if record.provenance == "synthetic"]
+    pnt_contexts = 0
+    mathlib_contexts = 0
+    for record in synthetic:
+        pnt = "prime-family:pnt-plus" in record.topic_tags
+        declared = set(record.environment.imports)
+        if not declared:
+            raise ValueError(
+                "synthetic EnvironmentContext has no imports: "
+                f"{record.statement_id}"
+            )
+        if pnt:
+            pnt_contexts += 1
+            if record.environment.imports != ("PrimeNumberTheoremAnd",):
+                raise ValueError(
+                    "PNT+ synthetic context must use its pinned umbrella import"
+                )
+        else:
+            mathlib_contexts += 1
+            if "PrimeNumberTheoremAnd" in declared or any(
+                not module.startswith("Mathlib.") for module in declared
+            ):
+                raise ValueError(
+                    "Mathlib synthetic context contains a cross-package import"
+                )
+    return {
+        "synthetic_records": len(synthetic),
+        "mathlib_context_records": mathlib_contexts,
+        "pnt_plus_context_records": pnt_contexts,
+        "empty_import_contexts": 0,
+        "cross_package_context_mismatches": 0,
+    }
+
+
 def plan_training_examples(
     records: Sequence[DatasetV2Record],
     *,

@@ -75,6 +75,17 @@
       "zeta-analytic-number-theory": 171,
       "riemann-core-bubble": 170,
       "pnt-plus": 170
+    },
+    "persisted_environment_context": {
+      "generic_mathlib_records": 3926,
+      "pnt_plus_records": 170,
+      "empty_import_contexts": 0,
+      "cross_package_context_mismatches": 0,
+      "unique_verified_contexts": 45,
+      "lean_verified_records": 4096,
+      "lean_verified_proof_variants": 4096,
+      "lean_verification_failures": 0,
+      "method": "lean-exact-persisted-import-context"
     }
   },
   "prime_and_benchmark_gates": {
@@ -104,16 +115,16 @@
   },
   "validation": {
     "full_build_repeated_with_identical_hashes": true,
-    "pytest": "242 passed in 26.85s",
+    "pytest": "246 passed in 36.12s",
     "diff_check": "passed"
   },
   "artifact_sha256": {
-    "manifest.json": "96165c6cf514cd9fa2b4620afed3bc08fc80ea331c091a649a18e54754cde322",
-    "records.jsonl.gz": "417aa34bbe297da0231e30f41ae835969affae42f3274a2f0d6cb856a354f12d",
+    "manifest.json": "dd5647995c414596686c88835fc2063a2da354762c12faeaa4dbbdae3a79e985",
+    "records.jsonl.gz": "3185b98615e33b8263426fa9503f305504c33900482076aa3347ba81554c1d5c",
     "source-dispositions.jsonl.gz": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad",
     "historical-crosswalk.json": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb",
     "prime-coverage.json": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071",
-    "verification.json": "0b340cb3e81c91e4c0236a0fa010c38fbeb0753b2d0c5abcff8ba4bcd46054d5",
+    "verification.json": "73e94d973e14f579e9ca785e059de2252ce41fb72aeed64a4daa9bcdb5607a51",
     "general-train-v2.jsonl.gz": "e325a6336fb51b937228754e82cb2aa484caddef4e7e72441966ffceeaa69e95",
     "riemann-train-v2.jsonl.gz": "1c55980ec05cf535e1f0dfbee5ccfb3e17c8482c61ee2316f84a4494d4a884e6",
     "training-views.json": "d8336e4747705a65eb394789bd44097c7f062c9123914f80333f4c758774f4bc",

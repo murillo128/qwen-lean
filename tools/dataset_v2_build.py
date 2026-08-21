@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
-FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v5"
+FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v9"
 FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v7"
 LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
     "dataset-v2-full-verification-cache-v4",
@@ -47,12 +47,14 @@ from qwen_lean.dataset_v2 import (  # noqa: E402
     read_membership_view,
     sha256_file,
     validate_role_isolation,
+    validate_synthetic_environment_imports,
     validate_synthetic_source_resolvability,
     write_records,
     write_membership_view,
 )
 from qwen_lean.dataset_v2_composition import (  # noqa: E402
     build_composition_plans,
+    composition_imports,
     find_missing_constants,
     lean_name_key,
     records_from_compositions,
@@ -63,6 +65,7 @@ from qwen_lean.dataset_v2_composition import (  # noqa: E402
     run_shortcut_gate_source,
     summarize_compositions,
     validate_composition_audits,
+    verify_persisted_synthetic_contexts,
 )
 from qwen_lean.dataset_v2_contract import statement_id  # noqa: E402
 from qwen_lean.dataset_v2_extraction import (  # noqa: E402
@@ -575,7 +578,12 @@ def _synthetic_records(
 
     with ThreadPoolExecutor(max_workers=min(workers, len(batches))) as executor:
         batch_results = list(executor.map(verify_batch, enumerate(batches)))
+    verified_imports: dict[str, tuple[str, ...]] = {}
     for batch_index, run, shortcut_run, audit_summary in batch_results:
+        batch_imports = composition_imports(batches[batch_index])
+        verified_imports.update(
+            (plan.synthetic_name, batch_imports) for plan in batches[batch_index]
+        )
         all_audits.update({audit.name: audit for audit in run.audits})
         composition_runs.append(
             {"batch": batch_index, "status": run.status, **audit_summary}
@@ -659,6 +667,7 @@ def _synthetic_records(
         environment=environment,
         verification_evidence_id=f"composition-audit:{source_digest}",
         shortcut_status=shortcut_status,
+        verified_imports=verified_imports,
     )
     assigned = assign_synthetic_roles(records, seed=str(environment["split_seed"]))
     summary = summarize_compositions(assigned)
@@ -671,6 +680,13 @@ def _synthetic_records(
         )
     ):
         raise RuntimeError("synthetic uniqueness gate failed after record construction")
+    persisted_context = verify_persisted_synthetic_contexts(
+        assigned,
+        plans={plan.synthetic_name: plan for plan in selected},
+        output_dir=output_dir,
+        target_root=target_root,
+        workers=workers,
+    )
     return assigned, {
         "requested": sum(requested_counts.values()),
         "generated_with_reserve": generated_plan_count,
@@ -682,6 +698,7 @@ def _synthetic_records(
         "composition_runs": composition_runs,
         "shortcut_runs": shortcut_runs,
         "summary": summary,
+        "persisted_context": persisted_context,
         "pool_sizes": {name: len(pools.get(name, [])) for name in requested_counts},
         "source_module_coverage": {
             "unique_modules": len(
@@ -1185,7 +1202,7 @@ def main() -> int:
     real_candidates, _ = collapse_duplicate_candidates(real_candidates)
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
-    synthetic_cache = output_dir / ".synthetic-v5-cache.pkl"
+    synthetic_cache = output_dir / ".synthetic-v9-cache.pkl"
     if args.resume_full and synthetic_cache.is_file():
         with synthetic_cache.open("rb") as handle:
             cache_version, synthetic, synthetic_evidence = pickle.load(handle)
@@ -1215,6 +1232,12 @@ def main() -> int:
     records = merge_statement_records([*real_records, *synthetic])
     role_validation = validate_role_isolation(records)
     synthetic_source_resolution = validate_synthetic_source_resolvability(records)
+    synthetic_environment_imports = validate_synthetic_environment_imports(records)
+    synthetic_persisted_context = synthetic_evidence.get("persisted_context")
+    if not isinstance(synthetic_persisted_context, dict) or (
+        synthetic_persisted_context.get("accepted_records") != len(synthetic)
+    ):
+        raise RuntimeError("synthetic persisted-context gate evidence is incomplete")
     records_path = output_dir / "records.jsonl.gz"
     records_sha = write_records(records_path, records)
     loaded = read_records(records_path)
@@ -1357,6 +1380,8 @@ def main() -> int:
         },
         "synthetic": synthetic_evidence,
         "synthetic_source_resolution": synthetic_source_resolution,
+        "synthetic_environment_imports": synthetic_environment_imports,
+        "synthetic_persisted_context": synthetic_persisted_context,
         "role_isolation": role_validation,
         "loader": {
             "loaded_records": len(loaded),
@@ -1472,6 +1497,8 @@ def main() -> int:
             "prime_coverage_eligible_omissions": coverage["summary"]["verified_legal_target_compatible_omissions"],
             "synthetic_shortcut_rejections": synthetic_evidence["shortcut_rejected"],
             "synthetic_source_resolution": synthetic_source_resolution,
+            "synthetic_environment_imports": synthetic_environment_imports,
+            "synthetic_persisted_context": synthetic_persisted_context,
         },
     )
     _write_json(output_dir / "manifest.json", manifest)

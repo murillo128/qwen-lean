@@ -9066,6 +9066,15 @@
       "riemann-core-bubble": 298,
       "zeta-analytic-number-theory": 300
     },
+    "persisted_context": {
+      "accepted_proof_variants": 4096,
+      "accepted_records": 4096,
+      "context_failures": 0,
+      "context_groups": 45,
+      "method": "lean-exact-persisted-import-context",
+      "proof_variants": 4096,
+      "synthetic_records": 4096
+    },
     "pool_sizes": {
       "arithmetic-functions": 392,
       "generic": 180719,
@@ -12252,6 +12261,22 @@
       "zeta-analytic-number-theory": 42
     },
     "unresolved_source_constants": 139
+  },
+  "synthetic_environment_imports": {
+    "cross_package_context_mismatches": 0,
+    "empty_import_contexts": 0,
+    "mathlib_context_records": 3926,
+    "pnt_plus_context_records": 170,
+    "synthetic_records": 4096
+  },
+  "synthetic_persisted_context": {
+    "accepted_proof_variants": 4096,
+    "accepted_records": 4096,
+    "context_failures": 0,
+    "context_groups": 45,
+    "method": "lean-exact-persisted-import-context",
+    "proof_variants": 4096,
+    "synthetic_records": 4096
   },
   "synthetic_source_resolution": {
     "missing_source_lemma_references": 0,

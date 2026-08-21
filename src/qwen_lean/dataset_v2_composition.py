@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 import random
 import re
 import subprocess
 import time
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -34,6 +36,7 @@ MISSING_PREFIX = "DATASET_V2_MISSING\t"
 UNIVERSE_GROUNDING_PREFIX = "DATASET_V2_UNIVERSE_GROUNDING\t"
 STRUCTURAL_ARITY = {"direct": 2, "branching": 3, "deep": 4}
 CONSTANT_PRESENCE_BATCH_SIZE = 256
+PERSISTED_CONTEXT_CACHE_VERSION = "dataset-v2-persisted-context-v2"
 _QUOTED_NAME_COMPONENT_RE = re.compile(r"«([^»]+)»")
 
 
@@ -453,6 +456,14 @@ def _composition_imports(
     )
 
 
+def composition_imports(
+    plans: Sequence[CompositionPlan], *, include_retrieval: bool = False
+) -> tuple[str, ...]:
+    """Return the deterministic import context used to verify composition plans."""
+
+    return _composition_imports(plans, include_retrieval=include_retrieval)
+
+
 _LEAN_AUDIT_PRELUDE = r'''
 open Lean Elab Term Command Meta
 
@@ -785,10 +796,26 @@ def records_from_compositions(
     environment: Mapping[str, Any],
     verification_evidence_id: str,
     shortcut_status: Mapping[str, Sequence[str]],
+    verified_imports: Mapping[str, Sequence[str]] | None = None,
 ) -> list[DatasetV2Record]:
     records: list[DatasetV2Record] = []
     for plan in plans:
         audit = audits[plan.synthetic_name]
+        imports = tuple(
+            (verified_imports or {}).get(
+                plan.synthetic_name, composition_imports([plan])
+            )
+        )
+        required_imports = set(composition_imports([plan]))
+        if not required_imports <= set(imports):
+            raise ValueError(
+                f"verified imports omit source modules for {plan.synthetic_name}"
+            )
+        if plan.domain_family == "pnt-plus":
+            if imports != ("PrimeNumberTheoremAnd",):
+                raise ValueError("PNT+ composition must use its pinned umbrella import")
+        elif "PrimeNumberTheoremAnd" in imports:
+            raise ValueError("Mathlib composition cannot persist the PNT+ import context")
         declaration = f"theorem {plan.synthetic_name} : {audit.statement_type}"
         proof = f"by\n  exact {_oracle_expression(plan)}"
         identity = statement_id(declaration)
@@ -838,7 +865,7 @@ def records_from_compositions(
                 mathlib_revision=str(environment["mathlib_revision"]),
                 file_path="DatasetV2Generated.lean",
                 module="DatasetV2Generated",
-                imports=("PrimeNumberTheoremAnd",),
+                imports=imports,
                 source_span=None,
                 context_kind="generated-module",
                 target_compatibility="verified-target-environment",
@@ -874,6 +901,184 @@ def records_from_compositions(
         record.validate()
         records.append(record)
     return records
+
+
+def render_persisted_synthetic_context_source(
+    records: Sequence[DatasetV2Record],
+    plans: Mapping[str, CompositionPlan],
+) -> str:
+    """Reconstruct final generated theorems from their plans and persisted imports."""
+
+    if not records:
+        raise ValueError("persisted synthetic context source requires records")
+    imports = records[0].environment.imports
+    if not imports:
+        raise ValueError("synthetic EnvironmentContext has no imports")
+    if any(record.provenance != "synthetic" for record in records):
+        raise ValueError("persisted context verification accepts only synthetic records")
+    if any(record.environment.imports != imports for record in records):
+        raise ValueError("persisted context batch mixes distinct import sets")
+    lines = [
+        *(f"import {module}" for module in imports),
+        "",
+        _LEAN_AUDIT_PRELUDE,
+        "",
+    ]
+    audit_names: list[str] = []
+    for record in sorted(records, key=lambda item: item.statement_id):
+        declaration_prefix = "theorem "
+        if not record.canonical_declaration.startswith(declaration_prefix):
+            raise ValueError("synthetic canonical declaration is not a theorem")
+        name = record.canonical_declaration[len(declaration_prefix) :].split(
+            ":", 1
+        )[0].strip()
+        plan = plans.get(name)
+        if plan is None:
+            raise ValueError(f"missing persisted-context plan for {name}")
+        if (
+            tuple(item.statement_id for item in plan.source_lemmas)
+            != record.source_lemma_ids
+        ):
+            raise ValueError(f"persisted-context plan sources differ for {name}")
+        namespace = f"R{record.statement_id}"
+        lines.extend(
+            [
+                "namespace DatasetV2PersistedContext",
+                f"namespace {namespace}",
+            ]
+        )
+        for variant_index, variant in enumerate(record.proof_variants):
+            qualified_name = (
+                f"DatasetV2PersistedContext.{namespace}.V{variant_index}.{name}"
+            )
+            audit_names.append(qualified_name)
+            lines.extend(
+                [
+                    f"namespace V{variant_index}",
+                    f"theorem {name} : {_type_expression(plan)} := {variant.canonical_proof}",
+                    f"end V{variant_index}",
+                    "",
+                ]
+            )
+        lines.extend([f"end {namespace}", "end DatasetV2PersistedContext", ""])
+    rendered_names = ", ".join(f"`{name}" for name in audit_names)
+    lines.append(f"run_cmd datasetV2Audit #[{rendered_names}]")
+    return "\n".join(lines) + "\n"
+
+
+def verify_persisted_synthetic_contexts(
+    records: Sequence[DatasetV2Record],
+    *,
+    plans: Mapping[str, CompositionPlan],
+    output_dir: Path,
+    target_root: Path,
+    workers: int = 4,
+    timeout_seconds: float = 1800.0,
+) -> dict[str, int | str]:
+    """Lean-verify every final synthetic from only its persisted imports."""
+
+    synthetic = [record for record in records if record.provenance == "synthetic"]
+    if not synthetic:
+        raise ValueError("persisted context verification found no synthetic records")
+    grouped: dict[tuple[str, ...], list[DatasetV2Record]] = defaultdict(list)
+    for record in synthetic:
+        if not record.environment.imports:
+            raise ValueError(
+                f"synthetic record {record.statement_id} has no persisted imports"
+            )
+        grouped[record.environment.imports].append(record)
+
+    lean_dir = output_dir / "lean"
+    cache_dir = output_dir / ".synthetic-context-cache"
+    lean_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    groups = sorted(grouped.items())
+
+    def verify_group(
+        indexed: tuple[int, tuple[tuple[str, ...], list[DatasetV2Record]]],
+    ) -> tuple[int, int]:
+        index, (_, group) = indexed
+        source = render_persisted_synthetic_context_source(group, plans)
+        record_contract = "\0".join(
+            item.canonical_declaration
+            for item in sorted(group, key=lambda item: item.statement_id)
+        )
+        digest = hashlib.sha256(
+            f"{PERSISTED_CONTEXT_CACHE_VERSION}\0{source}\0{record_contract}".encode()
+        ).hexdigest()
+        source_path = lean_dir / f"PersistedContext-{index:04d}.lean"
+        source_path.write_text(source, encoding="utf-8")
+        cache_path = cache_dir / f"{digest}.pkl"
+        if cache_path.is_file():
+            with cache_path.open("rb") as handle:
+                cache_version, status = pickle.load(handle)
+            if (
+                cache_version == PERSISTED_CONTEXT_CACHE_VERSION
+                and status == "accepted"
+            ):
+                return len(group), sum(len(item.proof_variants) for item in group)
+        run = run_composition_source(
+            source_path,
+            target_root=target_root,
+            timeout_seconds=timeout_seconds,
+        )
+        if run.status != "accepted":
+            raise RuntimeError(
+                "persisted synthetic context verification failed for "
+                f"group {index}: {run.status}: {run.diagnostic}"
+            )
+        audited = {audit.name: audit for audit in run.audits}
+        expected_audits = sum(len(item.proof_variants) for item in group)
+        if len(audited) != expected_audits:
+            raise RuntimeError(
+                f"persisted context group {index} audited {len(audited)} "
+                f"of {expected_audits} proof variants"
+            )
+        for record in group:
+            name = record.canonical_declaration.removeprefix("theorem ").split(
+                ":", 1
+            )[0].strip()
+            stored_type = record.canonical_declaration.split(":", 1)[1]
+            for variant_index in range(len(record.proof_variants)):
+                qualified_name = (
+                    "DatasetV2PersistedContext."
+                    f"R{record.statement_id}.V{variant_index}.{name}"
+                )
+                audit = audited.get(qualified_name)
+                if (
+                    audit is None
+                    or _compact_type(audit.statement_type)
+                    != _compact_type(stored_type)
+                ):
+                    raise RuntimeError(
+                        "persisted context reconstruction changed the stored statement "
+                        f"for {record.statement_id} variant {variant_index}"
+                    )
+        temporary_cache = cache_path.with_suffix(".tmp")
+        with temporary_cache.open("wb") as handle:
+            pickle.dump(
+                (PERSISTED_CONTEXT_CACHE_VERSION, run.status),
+                handle,
+                protocol=pickle.HIGHEST_PROTOCOL,
+            )
+        temporary_cache.replace(cache_path)
+        return len(group), sum(len(item.proof_variants) for item in group)
+
+    with ThreadPoolExecutor(max_workers=min(workers, len(groups))) as executor:
+        accepted = list(executor.map(verify_group, enumerate(groups)))
+    accepted_records = sum(item[0] for item in accepted)
+    accepted_variants = sum(item[1] for item in accepted)
+    if accepted_records != len(synthetic):
+        raise RuntimeError("persisted context verification did not cover every synthetic")
+    return {
+        "method": "lean-exact-persisted-import-context",
+        "synthetic_records": len(synthetic),
+        "proof_variants": sum(len(item.proof_variants) for item in synthetic),
+        "context_groups": len(groups),
+        "accepted_records": accepted_records,
+        "accepted_proof_variants": accepted_variants,
+        "context_failures": 0,
+    }
 
 
 def summarize_compositions(records: Sequence[DatasetV2Record]) -> dict[str, Any]:

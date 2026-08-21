@@ -1,21 +1,29 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
+
+import pytest
 
 from qwen_lean.dataset_v2_composition import (
     AUDIT_PREFIX,
     CompositionAudit,
     CompositionSource,
+    LeanCompositionRun,
     build_composition_plans,
+    composition_imports,
     lean_name_key,
     parse_audits,
+    records_from_compositions,
     render_constant_audit_source,
     render_constant_presence_source,
     render_composition_source,
+    render_persisted_synthetic_context_source,
     render_shortcut_gate_source,
     run_shortcut_gate_source,
     validate_composition_audits,
+    verify_persisted_synthetic_contexts,
 )
 
 
@@ -63,6 +71,130 @@ def test_rendered_composition_uses_graph_grounded_iff_and_explicit_oracle() -> N
     assert "exact ⟨fun _ => @Source.pnt_" in source
     assert "datasetV2Audit" in source
     assert all(plan.relation_edges for plan in plans)
+
+
+def test_synthetic_record_persists_its_verified_import_context() -> None:
+    generic = build_composition_plans(
+        {"generic": _pool("generic")}, {"generic": 1}, seed="imports"
+    )[0]
+    audit = CompositionAudit(
+        generic.synthetic_name,
+        "True ∧ True",
+        tuple(item.declaration_name for item in generic.source_lemmas),
+        (),
+    )
+    verified = ("Mathlib.Extra", "Mathlib.Test")
+    record = records_from_compositions(
+        [generic],
+        {generic.synthetic_name: audit},
+        environment={
+            "environment_id": "fixture-env",
+            "lean_toolchain": "leanprover/lean4:v4.32.2",
+            "mathlib_revision": "a" * 40,
+        },
+        verification_evidence_id="fixture-evidence",
+        shortcut_status={},
+        verified_imports={generic.synthetic_name: verified},
+    )[0]
+
+    assert record.environment.imports == verified
+    assert "PrimeNumberTheoremAnd" not in record.environment.imports
+    rendered = render_persisted_synthetic_context_source(
+        [record], {generic.synthetic_name: generic}
+    )
+    assert rendered.startswith("import Mathlib.Extra\nimport Mathlib.Test\n")
+    assert f"theorem {generic.synthetic_name} :" in rendered
+    assert "source_type% Source.generic_" in rendered
+    assert record.proof_variants[0].canonical_proof in rendered
+
+    with pytest.raises(ValueError, match="omit source modules"):
+        records_from_compositions(
+            [generic],
+            {generic.synthetic_name: audit},
+            environment={
+                "environment_id": "fixture-env",
+                "lean_toolchain": "leanprover/lean4:v4.32.2",
+                "mathlib_revision": "a" * 40,
+            },
+            verification_evidence_id="fixture-evidence",
+            shortcut_status={},
+            verified_imports={generic.synthetic_name: ("Mathlib.Extra",)},
+        )
+
+
+def test_pnt_composition_uses_pinned_umbrella_import() -> None:
+    plan = build_composition_plans(
+        {"pnt-plus": _pool("pnt-plus")}, {"pnt-plus": 1}, seed="pnt-imports"
+    )[0]
+    plan = replace(
+        plan,
+        source_lemmas=tuple(
+            replace(source, source_module="PrimeNumberTheoremAnd.Test")
+            for source in plan.source_lemmas
+        ),
+    )
+    assert composition_imports([plan]) == ("PrimeNumberTheoremAnd",)
+
+
+def test_persisted_context_gate_covers_every_record(tmp_path, monkeypatch) -> None:
+    plans = build_composition_plans(
+        {"generic": _pool("generic")}, {"generic": 2}, seed="context-gate"
+    )
+    audits = {
+        plan.synthetic_name: CompositionAudit(
+            plan.synthetic_name,
+            "True ∧ True",
+            tuple(item.declaration_name for item in plan.source_lemmas),
+            (),
+        )
+        for plan in plans
+    }
+    imports = {
+        plans[0].synthetic_name: ("Mathlib.Test",),
+        plans[1].synthetic_name: ("Mathlib.Other", "Mathlib.Test"),
+    }
+    records = records_from_compositions(
+        plans,
+        audits,
+        environment={
+            "environment_id": "fixture-env",
+            "lean_toolchain": "leanprover/lean4:v4.32.2",
+            "mathlib_revision": "a" * 40,
+        },
+        verification_evidence_id="fixture-evidence",
+        shortcut_status={},
+        verified_imports=imports,
+    )
+
+    def accepted(source_path, **kwargs):
+        names = re.findall(
+            r"`(DatasetV2PersistedContext\.[^,\]]+)",
+            source_path.read_text(encoding="utf-8"),
+        )
+        return LeanCompositionRun(
+            "accepted",
+            0,
+            0.01,
+            "",
+            tuple(CompositionAudit(name, "True ∧ True", (), ()) for name in names),
+        )
+
+    monkeypatch.setattr(
+        "qwen_lean.dataset_v2_composition.run_composition_source", accepted
+    )
+
+    evidence = verify_persisted_synthetic_contexts(
+        records,
+        plans={plan.synthetic_name: plan for plan in plans},
+        output_dir=tmp_path,
+        target_root=tmp_path,
+        workers=2,
+    )
+
+    assert evidence["synthetic_records"] == 2
+    assert evidence["accepted_records"] == 2
+    assert evidence["context_groups"] == 2
+    assert evidence["context_failures"] == 0
 
 
 def test_constant_audit_imports_target_and_indexes_names() -> None:

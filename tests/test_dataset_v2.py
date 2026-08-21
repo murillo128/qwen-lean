@@ -13,6 +13,7 @@ from qwen_lean.dataset_v2 import (
     read_membership_view,
     validate_prime_coverage,
     validate_role_isolation,
+    validate_synthetic_environment_imports,
     validate_synthetic_source_resolvability,
     write_records,
     write_membership_view,
@@ -303,6 +304,39 @@ def test_synthetic_source_lemmas_must_resolve_to_canonical_training() -> None:
 
     with pytest.raises(ValueError, match="do not resolve"):
         validate_synthetic_source_resolvability([synthetic])
+
+
+def test_synthetic_environment_imports_cover_canonical_source_modules() -> None:
+    source = _record("environment_source")
+    synthetic = _record(
+        "environment_synthetic",
+        provenance="synthetic",
+        family="direct-family",
+        structural="direct",
+        proposition="False → False",
+    )
+    synthetic = replace(
+        synthetic,
+        environment=replace(synthetic.environment, imports=("Mathlib.Test",)),
+        source_lemma_ids=(source.statement_id,),
+        source_relation_edges=(),
+    )
+    assert validate_synthetic_environment_imports([source, synthetic]) == {
+        "synthetic_records": 1,
+        "mathlib_context_records": 1,
+        "pnt_plus_context_records": 0,
+        "empty_import_contexts": 0,
+        "cross_package_context_mismatches": 0,
+    }
+
+    wrong = replace(
+        synthetic,
+        environment=replace(
+            synthetic.environment, imports=("PrimeNumberTheoremAnd",)
+        ),
+    )
+    with pytest.raises(ValueError, match="cross-package import"):
+        validate_synthetic_environment_imports([source, wrong])
 
 
 def test_validation_proof_variant_cannot_reappear_in_training() -> None:
