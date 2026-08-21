@@ -1,0 +1,100 @@
+{
+  "mathlib_v1": {
+    "dispositions": {
+      "included-training": 88958
+    },
+    "missing_examples": [],
+    "missing_source_identities": 0,
+    "records": 88958,
+    "resolutions": {
+      "exact-file-and-declaration-name": 64043,
+      "immutable-source-span-start": 24915
+    }
+  },
+  "riemann_inventories": {
+    "number-theory-far-holdout-v1": {
+      "dispositions": {
+        "included-training": 136
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 136,
+      "resolutions": {
+        "exact-file-and-declaration-name": 59,
+        "immutable-source-span-start": 77
+      }
+    },
+    "number-theory-wide-v1": {
+      "dispositions": {
+        "included-training": 3446
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 3446,
+      "resolutions": {
+        "exact-file-and-declaration-name": 2488,
+        "immutable-source-span-start": 958
+      }
+    },
+    "riemann-bubble-v1": {
+      "dispositions": {
+        "included-training": 452
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 452,
+      "resolutions": {
+        "exact-file-and-declaration-name": 367,
+        "immutable-source-span-start": 85
+      }
+    },
+    "riemann-core-v1": {
+      "dispositions": {
+        "included-training": 165
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 165,
+      "resolutions": {
+        "exact-file-and-declaration-name": 117,
+        "immutable-source-span-start": 48
+      }
+    },
+    "riemann-external-lean-v1": {
+      "dispositions": {
+        "included-training": 22
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 22,
+      "resolutions": {
+        "unique-declaration-name": 22
+      }
+    },
+    "riemann-near-holdout-v1": {
+      "dispositions": {
+        "included-training": 356
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 356,
+      "resolutions": {
+        "exact-file-and-declaration-name": 247,
+        "immutable-source-span-start": 109
+      }
+    },
+    "riemann-specialist-validation-v1": {
+      "dispositions": {
+        "included-training": 556
+      },
+      "missing_examples": [],
+      "missing_source_identities": 0,
+      "records": 556,
+      "resolutions": {
+        "exact-file-and-declaration-name": 479,
+        "immutable-source-span-start": 77
+      }
+    }
+  },
+  "schema_version": "dataset-v2-historical-crosswalk-v1"
+}

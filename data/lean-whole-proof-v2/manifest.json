@@ -1,0 +1,119 @@
+{
+  "dataset_id": "lean-whole-proof-v2",
+  "files": {
+    "general-train-v2.jsonl.gz": {
+      "bytes": 14044345,
+      "sha256": "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367"
+    },
+    "historical-crosswalk.json": {
+      "bytes": 2549,
+      "sha256": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb"
+    },
+    "minif2f-test-clean-v2.jsonl": {
+      "bytes": 84220,
+      "sha256": "33bfe19509081f5b4d73a6ad7984cea63fae8c70a046b42af46f5709ddfe24dc"
+    },
+    "minif2f-valid-clean-v2.jsonl": {
+      "bytes": 95471,
+      "sha256": "c356b72bdfb8c9e95223f7c6daaddff64127093d5f5b200216eeff12474dbb90"
+    },
+    "prime-coverage.json": {
+      "bytes": 3649690,
+      "sha256": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071"
+    },
+    "records.jsonl.gz": {
+      "bytes": 97044400,
+      "sha256": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c"
+    },
+    "riemann-train-v2.jsonl.gz": {
+      "bytes": 1258125,
+      "sha256": "4e9437221611418c6067d192a5cb1f46a9e87e580fa0ff3abb3f0e6b2be0317f"
+    },
+    "source-dispositions.jsonl.gz": {
+      "bytes": 19258964,
+      "sha256": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad"
+    },
+    "training-views.json": {
+      "bytes": 3066,
+      "sha256": "6177d96c1b30478442247ffafbccb39cb6e96dc1e824c48fc872b90b367c9c6a"
+    },
+    "verification.json": {
+      "bytes": 11253127,
+      "sha256": "53344aedc80e1be9c2d7b105eba53ba315c9a84d94dd5941cdf3d6b283cedec8"
+    }
+  },
+  "identity_contract": {
+    "alpha_and_declaration_name_normalization": true,
+    "proof_variant_policy": "retain variants; one deterministic variant per optimizer encounter",
+    "sampling_unit": "normalized-statement"
+  },
+  "retention_contract": {
+    "long_context_status_recorded": true,
+    "silent_omission": false,
+    "silent_truncation": false
+  },
+  "schema_version": "lean-whole-proof-v2-manifest-v1",
+  "summary": {
+    "proof_variants": 183633,
+    "provenance": {
+      "external-lean": 22,
+      "real-mathlib": 178234,
+      "synthetic": 4096
+    },
+    "records": 182352,
+    "roles": {
+      "test": 415,
+      "training": 181531,
+      "validation": 406
+    },
+    "statements": 182352,
+    "transformations": {
+      "equations-to-fun-exact": 1489,
+      "none": 92784,
+      "term-to-exact": 87075,
+      "where-to-structure-exact": 2285
+    }
+  },
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "license": "Apache-2.0",
+    "mathlib_input_revision": "v4.32.2",
+    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "validation": {
+    "loader_evaluation_records_exposed": 0,
+    "prime_coverage_eligible_omissions": 0,
+    "role_isolation": {
+      "cross_role_derivation_families": 0,
+      "cross_role_proofs": 0,
+      "cross_role_statements": 0
+    },
+    "synthetic_environment_imports": {
+      "cross_package_context_mismatches": 0,
+      "empty_import_contexts": 0,
+      "mathlib_context_records": 3926,
+      "pnt_plus_context_records": 170,
+      "synthetic_records": 4096
+    },
+    "synthetic_persisted_context": {
+      "accepted_proof_variants": 4096,
+      "accepted_records": 4096,
+      "context_failures": 0,
+      "context_groups": 48,
+      "method": "lean-exact-persisted-import-context",
+      "proof_variants": 4096,
+      "synthetic_records": 4096
+    },
+    "synthetic_shortcut_rejections": 1601,
+    "synthetic_source_resolution": {
+      "missing_source_lemma_references": 0,
+      "missing_source_statement_ids": 0,
+      "source_lemma_references": 12137,
+      "synthetic_records": 4096
+    }
+  }
+}

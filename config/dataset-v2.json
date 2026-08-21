@@ -1,0 +1,163 @@
+{
+  "schema_version": "dataset-v2-config-v1",
+  "dataset": {
+    "id": "lean-whole-proof-v2",
+    "record_schema_version": "lean-whole-proof-v2",
+    "artifact_subdirectory": "dataset-v2/lean-whole-proof-v2",
+    "repository_snapshot": "data/lean-whole-proof-v2"
+  },
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "host_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+    "mathlib_input_revision": "v4.32.2",
+    "license": "Apache-2.0"
+  },
+  "extractor": {
+    "repository": "https://github.com/lean-dojo/LeanDojo-v2",
+    "revision": "baed5eae6e87a65a446d9f54af07aab2154e7599",
+    "build_dependencies": true,
+    "license": "MIT"
+  },
+  "historical_inputs": {
+    "mathlib_v1": "data/mathlib-whole-proof-v1",
+    "riemann_v1": "data/riemann",
+    "mathlib_v1_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+    "mathlib_v1_record_count": 88958,
+    "mathlib_v1_non_tactic_exclusions": 95351
+  },
+  "pnt_plus": {
+    "accepted_declarations_manifest": "data/riemann/sources/source-manifest.json",
+    "expected_accepted_declarations": 22,
+    "source_scope": "PrimeNumberTheoremAnd/**/*.lean"
+  },
+  "external_refresh": {
+    "snapshot_date": "2026-08-18",
+    "search_queries": [
+      "prime number theorem language:Lean",
+      "Riemann zeta language:Lean",
+      "prime theorem language:Lean"
+    ],
+    "candidate_limit": 5,
+    "candidates": [
+      {
+        "repository": "https://github.com/leanprover-community/flt-regular",
+        "revision": "7d321621eeacaae20b80d58ebc62e91294b5ae95",
+        "license": "Apache-2.0",
+        "native_toolchain": "leanprover/lean4:v4.34.0-rc1",
+        "native_mathlib_revision": "971f540b1b5f10f11d8f73b8d43986759b9f6dcd",
+        "disposition": "target-compatibility-blocked",
+        "reason": "Native source is newer than the frozen Dataset-v2 target; no unreviewed downgrade port is attempted in the bounded refresh."
+      },
+      {
+        "repository": "https://github.com/lyfar/egrs75-lean",
+        "revision": "a57f16fed45f21262dd990085510091624582ffc",
+        "license": "Apache-2.0",
+        "native_toolchain": "leanprover/lean4:v4.29.1",
+        "native_mathlib_revision": "5e932f97dd25535344f80f9dd8da3aab83df0fe6",
+        "disposition": "target-compatibility-blocked",
+        "reason": "Selected headline theorems are natively axiom-audited, but the project pins an older environment and contains separate sorry-bearing scaffold lanes."
+      },
+      {
+        "repository": "https://github.com/e-271828/riemann-von-mangoldt-formalized",
+        "revision": "2679596f4d2977221482b5cc827ab59dd3aebcd0",
+        "license": "Apache-2.0",
+        "source_file": "CombinedProof_v3_rev9.lean",
+        "disposition": "target-compatibility-blocked",
+        "reason": "The standalone source has no active placeholder token, but Lean 4.32.2/mathlib 905b958 target verification fails with API/type mismatches (first observed at line 124, with further failures through line 2905)."
+      },
+      {
+        "repository": "https://github.com/ashaffer/riemann-zeta",
+        "revision": "06a3fe3cac6e0b3f51b1865a01dde60dc30f2f4a",
+        "license": "Apache-2.0",
+        "native_toolchain": "leanprover/lean4:v4.32.1",
+        "native_mathlib_revision": "520045ab14e26149ee970e2e617ca04b09bde5d6",
+        "disposition": "source-integrity-blocked",
+        "reason": "The repository mixes clean instrument subprojects with thousands of literature/axiom bridge files; no project-wide accepted proof lane is declared at the bounded refresh boundary."
+      },
+      {
+        "repository": "https://github.com/mmew-2022/Riemann_zeta",
+        "revision": "59facc20c54e3e57af0311fdf7750d90767bacf2",
+        "license": "MIT",
+        "disposition": "target-compatibility-blocked",
+        "reason": "Unfinished Lean 3 source has no Lake/toolchain pin and is not compatible with the Lean 4 Dataset-v2 target."
+      }
+    ]
+  },
+  "preflight": {
+    "term_proof_sample": 64,
+    "equation_clause_sample": 1,
+    "by_proof_sample": 16,
+    "pnt_plus_sample": 4,
+    "synthetic_statements": 128,
+    "prime_synthetic_statements": 32,
+    "seed": "dataset-v2-preflight-v1",
+    "trace_files": [
+      "Mathlib/AlgebraicGeometry/Morphisms/IsIso.lean",
+      "Mathlib/AlgebraicGeometry/PointsPi.lean",
+      "Mathlib/Analysis/PSeriesComplex.lean",
+      "Mathlib/Condensed/Basic.lean",
+      "Mathlib/Data/Nat/Prime/Pow.lean",
+      "Mathlib/NumberTheory/AlmostPrime.lean",
+      "Mathlib/NumberTheory/ArithmeticFunction/Liouville.lean",
+      "Mathlib/NumberTheory/ArithmeticFunction/Moebius.lean",
+      "Mathlib/NumberTheory/ArithmeticFunction/VonMangoldt.lean",
+      "Mathlib/NumberTheory/Basic.lean",
+      "Mathlib/NumberTheory/DirichletCharacter/Bounds.lean",
+      "Mathlib/NumberTheory/EulerProduct/ExpLog.lean",
+      "Mathlib/NumberTheory/LSeries/ZetaZeros.lean",
+      "Mathlib/NumberTheory/ModularForms/Delta.lean",
+      "Mathlib/NumberTheory/ModularForms/LevelOne.lean",
+      "Mathlib/NumberTheory/PrimeCounting.lean",
+      "Mathlib/Order/Interval/Finset/Basic.lean"
+    ]
+  },
+  "synthetic": {
+    "unique_statements": 4096,
+    "prime_domain_statements": 1024,
+    "split_seed": "dataset-v2-derivation-split-v1",
+    "split_proportions": {
+      "training": 0.8,
+      "validation": 0.1,
+      "test": 0.1
+    },
+    "structural_classes": ["direct", "branching", "deep"],
+    "prime_families": [
+      "prime-arithmetic-divisibility",
+      "arithmetic-functions",
+      "prime-counting-pnt",
+      "zeta-analytic-number-theory",
+      "riemann-core-bubble",
+      "pnt-plus"
+    ],
+    "shortcut_suite": [
+      "assumption",
+      "rfl",
+      "simp",
+      "exact-indexed-single-theorem",
+      "simpa-using-indexed-single-theorem"
+    ]
+  },
+  "benchmark": {
+    "repository": "https://github.com/google-deepmind/miniF2F",
+    "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+    "license": "Apache-2.0",
+    "valid_source": "MiniF2F/Valid.lean",
+    "test_source": "MiniF2F/Test.lean",
+    "expected_primary_counts": {"valid": 244, "test": 244}
+  },
+  "train_probe": {
+    "id": "dataset-v2-train-probe",
+    "per_stratum": 64,
+    "seed": "dataset-v2-train-probe-v1",
+    "strata": [
+      "real-generic",
+      "real-prime-number-theory",
+      "synthetic-generic-composition",
+      "synthetic-prime-composition"
+    ]
+  }
+}
