@@ -2,8 +2,8 @@
   "dataset_id": "lean-whole-proof-v2",
   "files": {
     "general-train-v2.jsonl.gz": {
-      "bytes": 14017325,
-      "sha256": "648372a3e40f8f4b9456566667d51fb2d3859bb4c9dd74e5484363b5d0894864"
+      "bytes": 14044188,
+      "sha256": "e325a6336fb51b937228754e82cb2aa484caddef4e7e72441966ffceeaa69e95"
     },
     "historical-crosswalk.json": {
       "bytes": 2549,
@@ -18,28 +18,28 @@
       "sha256": "c356b72bdfb8c9e95223f7c6daaddff64127093d5f5b200216eeff12474dbb90"
     },
     "prime-coverage.json": {
-      "bytes": 3649504,
-      "sha256": "af1ebd0228a95366bff6ef5e375cf0c21c430651357f3ec4cb6134db97868041"
+      "bytes": 3649690,
+      "sha256": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071"
     },
     "records.jsonl.gz": {
-      "bytes": 87873259,
-      "sha256": "e35ad16a1aff7c08910c1febacb1f1605ebe845fa80c293091cefe03c36d8c75"
+      "bytes": 88030041,
+      "sha256": "417aa34bbe297da0231e30f41ae835969affae42f3274a2f0d6cb856a354f12d"
     },
     "riemann-train-v2.jsonl.gz": {
-      "bytes": 1257973,
-      "sha256": "341e621c1266c40712a9d6c1eacd4f1cdbfeee5b86f3965189d724644f81ef5b"
+      "bytes": 1258074,
+      "sha256": "1c55980ec05cf535e1f0dfbee5ccfb3e17c8482c61ee2316f84a4494d4a884e6"
     },
     "source-dispositions.jsonl.gz": {
-      "bytes": 19244220,
-      "sha256": "07c1a66fa0536ff6c0e67d5bb4f7d474399c15e1e4e9b2b57ee706f360c6f9b9"
+      "bytes": 19258964,
+      "sha256": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad"
     },
     "training-views.json": {
-      "bytes": 2967,
-      "sha256": "7904c9dd96937a15646969f0cb5b277402dc2a423cd6d2ce6ae6be2213ae2a3f"
+      "bytes": 3066,
+      "sha256": "d8336e4747705a65eb394789bd44097c7f062c9123914f80333f4c758774f4bc"
     },
     "verification.json": {
-      "bytes": 12659992,
-      "sha256": "47af01c03793aaa076527805c4e5227f9a5a64952d6d1fe3b68e47ae84318ed9"
+      "bytes": 11258595,
+      "sha256": "0b340cb3e81c91e4c0236a0fa010c38fbeb0753b2d0c5abcff8ba4bcd46054d5"
     }
   },
   "identity_contract": {
@@ -54,24 +54,24 @@
   },
   "schema_version": "lean-whole-proof-v2-manifest-v1",
   "summary": {
-    "proof_variants": 183280,
+    "proof_variants": 183633,
     "provenance": {
       "external-lean": 22,
-      "real-mathlib": 177896,
+      "real-mathlib": 178234,
       "synthetic": 4096
     },
-    "records": 182014,
+    "records": 182352,
     "roles": {
-      "test": 417,
-      "training": 181190,
+      "test": 415,
+      "training": 181530,
       "validation": 407
     },
-    "statements": 182014,
+    "statements": 182352,
     "transformations": {
       "equations-to-fun-exact": 1489,
       "none": 92784,
-      "term-to-exact": 86727,
-      "where-to-structure-exact": 2280
+      "term-to-exact": 87075,
+      "where-to-structure-exact": 2285
     }
   },
   "target_environment": {
@@ -92,6 +92,12 @@
       "cross_role_proofs": 0,
       "cross_role_statements": 0
     },
-    "synthetic_shortcut_rejections": 1613
+    "synthetic_shortcut_rejections": 1601,
+    "synthetic_source_resolution": {
+      "missing_source_lemma_references": 0,
+      "missing_source_statement_ids": 0,
+      "source_lemma_references": 12224,
+      "synthetic_records": 4096
+    }
   }
 }

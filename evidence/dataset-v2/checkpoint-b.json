@@ -14,15 +14,17 @@
     "pnt_plus_candidates": 22,
     "repaired_declaration_names": 55755,
     "source_dispositions": 185988,
-    "included_training_dispositions": 180345,
-    "explicitly_blocked_dispositions": 5643,
+    "included_training_dispositions": 180741,
+    "explicitly_blocked_dispositions": 5247,
     "term_reconstruction_attempts": 95352,
-    "term_reconstruction_accepted": 91340,
-    "term_reconstruction_rejected": 4012,
+    "term_reconstruction_accepted": 91736,
+    "term_reconstruction_rejected": 3616,
+    "transient_verification_statuses": 0,
+    "stale_no_space_diagnostics": 0,
     "retained_transformations": {
       "equations-to-fun-exact": 1493,
-      "term-to-exact": 87558,
-      "where-to-structure-exact": 2289
+      "term-to-exact": 87949,
+      "where-to-structure-exact": 2294
     },
     "mathlib_v1_records_mapped_to_training": 88958,
     "mathlib_v1_missing_source_identities": 0,
@@ -31,15 +33,15 @@
     "pnt_plus_empty_dependency_audits": 0
   },
   "canonical_corpus": {
-    "records": 182014,
-    "proof_variants": 183280,
+    "records": 182352,
+    "proof_variants": 183633,
     "roles": {
-      "training": 181190,
+      "training": 181530,
       "validation": 407,
-      "test": 417
+      "test": 415
     },
     "provenance": {
-      "real-mathlib": 177896,
+      "real-mathlib": 178234,
       "external-lean": 22,
       "synthetic": 4096
     },
@@ -50,18 +52,21 @@
   },
   "synthetic_corpus": {
     "generated_with_reserve": 8192,
-    "resolved_after_constant_presence_audit": 8116,
+    "resolved_after_constant_presence_audit": 8105,
     "accepted_unique_statements": 4096,
     "accepted_prime_statements": 1024,
     "unique_source_lemma_sets": 4096,
     "unique_derivation_families": 4096,
     "actual_dependency_failures": 0,
-    "shortcut_rejections": 1613,
-    "shortcut_retrieval_candidates": 16268,
+    "shortcut_rejections": 1601,
+    "shortcut_retrieval_candidates": 16270,
+    "source_lemma_references": 12224,
+    "missing_source_lemma_references": 0,
+    "missing_source_statement_ids": 0,
     "structural_classes": {
-      "direct": 1405,
-      "branching": 1373,
-      "deep": 1318
+      "direct": 1393,
+      "branching": 1374,
+      "deep": 1329
     },
     "prime_families": {
       "prime-arithmetic-divisibility": 171,
@@ -85,33 +90,33 @@
   },
   "training_views": {
     "canonical_corpus_copies": 1,
-    "general_train_v2_statements": 181190,
-    "riemann_train_v2_statements": 16105,
+    "general_train_v2_statements": 181530,
+    "riemann_train_v2_statements": 16107,
     "riemann_subset_general": true,
-    "prime_training_in_general": 5624,
-    "prime_training_in_riemann": 5624,
-    "synthetic_prime_training_in_riemann": 820,
+    "prime_training_in_general": 5625,
+    "prime_training_in_riemann": 5625,
+    "synthetic_prime_training_in_riemann": 818,
     "pnt_plus_real_training_in_riemann": 22,
     "historical_membership_omissions": 0,
     "canonical_statement_references_missing": 0,
     "canonical_proof_variant_references_missing": 0,
-    "resolved_dependency_support_statements": 12076
+    "resolved_dependency_support_statements": 12049
   },
   "validation": {
     "full_build_repeated_with_identical_hashes": true,
-    "pytest": "237 passed in 27.49s",
+    "pytest": "242 passed in 26.85s",
     "diff_check": "passed"
   },
   "artifact_sha256": {
-    "manifest.json": "71580462c4752711ff7ae55ed10e434f17df2b22833094fabaecdb138b2cc404",
-    "records.jsonl.gz": "e35ad16a1aff7c08910c1febacb1f1605ebe845fa80c293091cefe03c36d8c75",
-    "source-dispositions.jsonl.gz": "07c1a66fa0536ff6c0e67d5bb4f7d474399c15e1e4e9b2b57ee706f360c6f9b9",
+    "manifest.json": "96165c6cf514cd9fa2b4620afed3bc08fc80ea331c091a649a18e54754cde322",
+    "records.jsonl.gz": "417aa34bbe297da0231e30f41ae835969affae42f3274a2f0d6cb856a354f12d",
+    "source-dispositions.jsonl.gz": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad",
     "historical-crosswalk.json": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb",
-    "prime-coverage.json": "af1ebd0228a95366bff6ef5e375cf0c21c430651357f3ec4cb6134db97868041",
-    "verification.json": "47af01c03793aaa076527805c4e5227f9a5a64952d6d1fe3b68e47ae84318ed9",
-    "general-train-v2.jsonl.gz": "648372a3e40f8f4b9456566667d51fb2d3859bb4c9dd74e5484363b5d0894864",
-    "riemann-train-v2.jsonl.gz": "341e621c1266c40712a9d6c1eacd4f1cdbfeee5b86f3965189d724644f81ef5b",
-    "training-views.json": "7904c9dd96937a15646969f0cb5b277402dc2a423cd6d2ce6ae6be2213ae2a3f",
-    "train-probe.json": "31a3117a6fb5c6f9b32774cb0eb6981ce9aa6211d741e4a10a49fe48f48ca112"
+    "prime-coverage.json": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071",
+    "verification.json": "0b340cb3e81c91e4c0236a0fa010c38fbeb0753b2d0c5abcff8ba4bcd46054d5",
+    "general-train-v2.jsonl.gz": "e325a6336fb51b937228754e82cb2aa484caddef4e7e72441966ffceeaa69e95",
+    "riemann-train-v2.jsonl.gz": "1c55980ec05cf535e1f0dfbee5ccfb3e17c8482c61ee2316f84a4494d4a884e6",
+    "training-views.json": "d8336e4747705a65eb394789bd44097c7f062c9123914f80333f4c758774f4bc",
+    "train-probe.json": "ef6c8d559006ba49582d44e858b16db8bbbaa4b66b421191056d4256aa9f1034"
   }
 }

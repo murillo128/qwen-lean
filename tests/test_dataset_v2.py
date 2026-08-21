@@ -13,6 +13,7 @@ from qwen_lean.dataset_v2 import (
     read_membership_view,
     validate_prime_coverage,
     validate_role_isolation,
+    validate_synthetic_source_resolvability,
     write_records,
     write_membership_view,
 )
@@ -222,6 +223,40 @@ def test_training_views_cover_prime_specialist_and_support_rows() -> None:
     }
 
 
+def test_riemann_view_requires_and_includes_synthetic_prime_source_support() -> None:
+    support = _record("synthetic_support")
+    synthetic = _record(
+        "synthetic_prime",
+        provenance="synthetic",
+        family="direct-family",
+        structural="direct",
+        proposition="False → False",
+    )
+    synthetic = replace(
+        synthetic,
+        topic_tags=("domain:prime-number-theory", "prime-family:pnt-plus"),
+        source_lemma_ids=(support.statement_id,),
+        source_relation_edges=(),
+    )
+    views, validation = build_training_view_memberships([support, synthetic])
+
+    assert views[RIEMANN_TRAIN_VIEW] == {
+        support.statement_id,
+        synthetic.statement_id,
+    }
+    assert validation["support_neighborhood"] == {
+        "dependency_name_references": 1,
+        "resolved_dependency_statements": 0,
+        "synthetic_source_lemma_statements": 1,
+        "synthetic_prime_source_lemma_statements": 1,
+        "missing_source_lemma_statements": 0,
+    }
+
+    unresolved = replace(synthetic, source_lemma_ids=("missing-statement-id",))
+    with pytest.raises(ValueError, match="source lemma support is absent"):
+        build_training_view_memberships([support, unresolved])
+
+
 def test_synthetic_roles_keep_statement_family_and_proof_out_of_other_roles() -> None:
     records = [
         _record(
@@ -241,6 +276,33 @@ def test_synthetic_roles_keep_statement_family_and_proof_out_of_other_roles() ->
         "cross_role_derivation_families": 0,
         "cross_role_proofs": 0,
     }
+
+
+def test_synthetic_source_lemmas_must_resolve_to_canonical_training() -> None:
+    source = _record("source")
+    synthetic = _record(
+        "synthetic",
+        provenance="synthetic",
+        family="direct-family",
+        structural="direct",
+        proposition="False → False",
+    )
+    synthetic = replace(
+        synthetic,
+        source_lemma_ids=(source.statement_id, source.statement_id),
+        source_relation_edges=(
+            (source.statement_id, source.statement_id, "fixture-relevance"),
+        ),
+    )
+    assert validate_synthetic_source_resolvability([source, synthetic]) == {
+        "synthetic_records": 1,
+        "source_lemma_references": 2,
+        "missing_source_lemma_references": 0,
+        "missing_source_statement_ids": 0,
+    }
+
+    with pytest.raises(ValueError, match="do not resolve"):
+        validate_synthetic_source_resolvability([synthetic])
 
 
 def test_validation_proof_variant_cannot_reappear_in_training() -> None:

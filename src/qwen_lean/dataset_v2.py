@@ -192,6 +192,39 @@ def validate_role_isolation(records: Sequence[DatasetV2Record]) -> dict[str, int
     }
 
 
+def validate_synthetic_source_resolvability(
+    records: Sequence[DatasetV2Record],
+) -> dict[str, int]:
+    """Require every synthetic source lemma to be canonical optimizer knowledge."""
+
+    training_ids = {
+        record.statement_id for record in records if record.role == "training"
+    }
+    synthetic = [record for record in records if record.provenance == "synthetic"]
+    missing_references = [
+        (record.statement_id, source_id)
+        for record in synthetic
+        for source_id in record.source_lemma_ids
+        if source_id not in training_ids
+    ]
+    if missing_references:
+        affected = {statement_id for statement_id, _ in missing_references}
+        missing = {source_id for _, source_id in missing_references}
+        raise ValueError(
+            "synthetic source lemma ids do not resolve to canonical training: "
+            f"records={len(affected)}, references={len(missing_references)}, "
+            f"source_ids={len(missing)}"
+        )
+    return {
+        "synthetic_records": len(synthetic),
+        "source_lemma_references": sum(
+            len(record.source_lemma_ids) for record in synthetic
+        ),
+        "missing_source_lemma_references": 0,
+        "missing_source_statement_ids": 0,
+    }
+
+
 def plan_training_examples(
     records: Sequence[DatasetV2Record],
     *,

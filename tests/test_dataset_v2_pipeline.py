@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from qwen_lean.dataset_v2_pipeline import (
     PRIME_FAMILIES,
     build_source_dispositions,
@@ -91,6 +93,22 @@ def test_source_dispositions_account_for_acceptance_and_explicit_exclusion() -> 
         "placeholder/axiom-policy-blocked",
     }
     assert all(item["prime_families"] for item in dispositions)
+
+
+@pytest.mark.parametrize("status", ["infrastructure-error", "timeout"])
+def test_source_dispositions_reject_transient_verification_statuses(status: str) -> None:
+    with pytest.raises(RuntimeError, match="cannot become source dispositions"):
+        build_source_dispositions(
+            [_candidate(status=status)],
+            diagnostics=ExtractionDiagnostics(1, 1, 1, {"none": 1}, {}, ()),
+            config={
+                "target_environment": {
+                    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+                    "mathlib_revision": "a" * 40,
+                }
+            },
+            topic_metadata={},
+        )
 
 
 def test_historical_crosswalk_reports_mapped_and_missing_identities() -> None:

@@ -45,46 +45,48 @@
     },
     "pnt_plus_real_training_in_riemann": 22,
     "pnt_plus_real_training_statements": 22,
-    "pnt_plus_synthetic_training_in_riemann": 133,
-    "pnt_plus_synthetic_training_statements": 133,
-    "pnt_plus_training_in_riemann": 155,
-    "pnt_plus_training_statements": 155,
-    "prime_training_in_general": 5624,
-    "prime_training_in_riemann": 5624,
-    "prime_training_statements": 5624,
+    "pnt_plus_synthetic_training_in_riemann": 131,
+    "pnt_plus_synthetic_training_statements": 131,
+    "pnt_plus_training_in_riemann": 153,
+    "pnt_plus_training_statements": 153,
+    "prime_training_in_general": 5625,
+    "prime_training_in_riemann": 5625,
+    "prime_training_statements": 5625,
     "riemann_subset_general": true,
     "support_neighborhood": {
-      "dependency_name_references": 17634,
-      "resolved_dependency_statements": 12076,
-      "synthetic_source_lemma_statements": 1341
+      "dependency_name_references": 17601,
+      "missing_source_lemma_statements": 0,
+      "resolved_dependency_statements": 12049,
+      "synthetic_prime_source_lemma_statements": 1348,
+      "synthetic_source_lemma_statements": 1348
     },
-    "synthetic_prime_training_in_riemann": 820,
-    "synthetic_prime_training_statements": 820
+    "synthetic_prime_training_in_riemann": 818,
+    "synthetic_prime_training_statements": 818
   },
   "views": {
     "general-train-v2": {
-      "bytes": 14017325,
+      "bytes": 14044188,
       "file": "general-train-v2.jsonl.gz",
-      "proof_variants": 182456,
+      "proof_variants": 182811,
       "provenance": {
         "external-lean": 22,
-        "real-mathlib": 177896,
-        "synthetic": 3272
+        "real-mathlib": 178234,
+        "synthetic": 3274
       },
-      "sha256": "648372a3e40f8f4b9456566667d51fb2d3859bb4c9dd74e5484363b5d0894864",
-      "statements": 181190
+      "sha256": "e325a6336fb51b937228754e82cb2aa484caddef4e7e72441966ffceeaa69e95",
+      "statements": 181530
     },
     "riemann-train-v2": {
-      "bytes": 1257973,
+      "bytes": 1258074,
       "file": "riemann-train-v2.jsonl.gz",
-      "proof_variants": 16305,
+      "proof_variants": 16307,
       "provenance": {
         "external-lean": 22,
-        "real-mathlib": 15263,
-        "synthetic": 820
+        "real-mathlib": 15267,
+        "synthetic": 818
       },
-      "sha256": "341e621c1266c40712a9d6c1eacd4f1cdbfeee5b86f3965189d724644f81ef5b",
-      "statements": 16105
+      "sha256": "1c55980ec05cf535e1f0dfbee5ccfb3e17c8482c61ee2316f84a4494d4a884e6",
+      "statements": 16107
     }
   }
 }

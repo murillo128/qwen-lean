@@ -375,6 +375,29 @@ def test_verification_group_cache_survives_across_invocations(
     assert len(list(cache_dir.glob("*.pkl"))) == 1
 
 
+def test_verification_treats_infrastructure_failure_as_build_blocking(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = "theorem identity (P : Prop) : P → P := fun h => h\n"
+    candidate = _candidate(source)
+    source_path = tmp_path / candidate.file_path
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text(source, encoding="utf-8")
+    monkeypatch.setattr(
+        dataset_v2_extraction,
+        "_run_reconstructed_file",
+        lambda *args, **kwargs: (
+            "infrastructure-error",
+            None,
+            0.01,
+            "No space left on device",
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="transient transformed-proof"):
+        _verify_candidate(candidate, source_root=tmp_path)
+
+
 def test_split_whole_declaration_recovers_outer_calc_proof() -> None:
     declaration, proof = split_whole_declaration(
         "theorem renamed (n : Nat) : n = n := calc\n  n = n := by rfl"

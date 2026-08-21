@@ -226,6 +226,14 @@ def build_source_dispositions(
             raise ValueError(f"duplicate source disposition identity: {key}")
         seen.add(key)
         accepted = candidate.verification_status == "accepted"
+        if "infrastructure-error" in candidate.verification_status or (
+            "timeout" in candidate.verification_status
+        ):
+            raise RuntimeError(
+                "transient verification failures cannot become source dispositions: "
+                f"{candidate.file_path}:{candidate.declaration_name}:"
+                f"{candidate.verification_status}"
+            )
         entries.append(
             {
                 "source_disposition_id": _source_disposition_id(*key),
@@ -601,11 +609,15 @@ def build_training_view_memberships(
     by_id = {record.statement_id: record for record in training}
     for identity in sorted(seed_ids):
         record = by_id[identity]
-        source_lemma_ids.update(
-            source_id for source_id in record.source_lemma_ids if source_id in training_ids
-        )
+        source_lemma_ids.update(record.source_lemma_ids)
         for variant in record.proof_variants:
             dependency_name_references.update(variant.resolved_dependencies)
+    missing_source_lemma_ids = source_lemma_ids - training_ids
+    if missing_source_lemma_ids:
+        raise ValueError(
+            "riemann-train-v2 source lemma support is absent from canonical training: "
+            f"{len(missing_source_lemma_ids)} statement ids"
+        )
     for name in dependency_name_references:
         dependency_statement_ids.update(by_source_name.get(name, ()))
 
@@ -647,11 +659,17 @@ def build_training_view_memberships(
         if by_id[identity].provenance in {"external-lean", "mixed-real"}
     }
     pnt_plus_synthetic_ids = pnt_plus_ids - pnt_plus_real_ids
+    synthetic_prime_source_ids = {
+        source_id
+        for identity in synthetic_prime_ids
+        for source_id in by_id[identity].source_lemma_ids
+    }
     if not riemann_ids <= training_ids:
         raise ValueError("riemann-train-v2 is not a subset of general-train-v2")
     required_sets = {
         "prime_training": prime_ids,
         "synthetic_prime_training": synthetic_prime_ids,
+        "synthetic_prime_source_support": synthetic_prime_source_ids,
         "pnt_plus_training": pnt_plus_ids,
         "historical_riemann_memberships": historical_ids,
     }
@@ -687,6 +705,10 @@ def build_training_view_memberships(
             "dependency_name_references": len(dependency_name_references),
             "resolved_dependency_statements": len(dependency_statement_ids),
             "synthetic_source_lemma_statements": len(source_lemma_ids),
+            "synthetic_prime_source_lemma_statements": len(
+                synthetic_prime_source_ids
+            ),
+            "missing_source_lemma_statements": 0,
         },
     }
     return views, validation

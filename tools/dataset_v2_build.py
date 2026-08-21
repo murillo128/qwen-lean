@@ -20,10 +20,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
-FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v4"
-FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v5"
+FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v5"
+FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v7"
 LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
-    "dataset-v2-full-verification-cache-v4"
+    "dataset-v2-full-verification-cache-v4",
+    "dataset-v2-full-verification-cache-v5",
+    "dataset-v2-full-verification-cache-v6",
 }
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
 FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS = {
@@ -45,6 +47,7 @@ from qwen_lean.dataset_v2 import (  # noqa: E402
     read_membership_view,
     sha256_file,
     validate_role_isolation,
+    validate_synthetic_source_resolvability,
     write_records,
     write_membership_view,
 )
@@ -215,6 +218,13 @@ def _transfer_cached_verification(
     missing_indexes: list[int] = []
     for candidate in candidates:
         previous = cached_by_span.get(_candidate_source_span_key(candidate))
+        if previous is not None and (
+            "infrastructure-error" in previous.verification_status
+            or "timeout" in previous.verification_status
+        ):
+            missing_indexes.append(len(transferred))
+            transferred.append(candidate)
+            continue
         if previous is None and candidate.transformation_kind != "none":
             missing_indexes.append(len(transferred))
             transferred.append(candidate)
@@ -255,14 +265,13 @@ def _rebuild_file_verification(
             if len(rejected) == len(group)
             else "partial"
         )
+        # Candidate results are authoritative after a resumed verification pass.
+        # Reusing the old file-level aggregate can retain diagnostics from a
+        # transient failure even after every affected candidate was reverified.
         diagnostics = [
-            item
-            for item in (
-                getattr(prior, "diagnostic", ""),
-                getattr(extra, "diagnostic", ""),
-                *(item.verification_diagnostic for item in rejected),
-            )
-            if item
+            item.verification_diagnostic
+            for item in rejected
+            if item.verification_diagnostic
         ]
         rebuilt.append(
             type(prior or extra)(
@@ -1176,7 +1185,7 @@ def main() -> int:
     real_candidates, _ = collapse_duplicate_candidates(real_candidates)
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
-    synthetic_cache = output_dir / ".synthetic-v4-cache.pkl"
+    synthetic_cache = output_dir / ".synthetic-v5-cache.pkl"
     if args.resume_full and synthetic_cache.is_file():
         with synthetic_cache.open("rb") as handle:
             cache_version, synthetic, synthetic_evidence = pickle.load(handle)
@@ -1184,7 +1193,7 @@ def main() -> int:
             raise RuntimeError("full synthetic cache version mismatch")
     else:
         synthetic, synthetic_evidence = _synthetic_records(
-            candidates=mathlib_candidates + pnt_candidates,
+            candidates=real_candidates,
             requested_counts=requested_counts,
             seed=(seed if args.mode == "preflight" else str(config.value["synthetic"]["split_seed"])),
             output_dir=output_dir,
@@ -1205,6 +1214,7 @@ def main() -> int:
     real_records = [candidate_to_record(item, config=config) for item in real_candidates]
     records = merge_statement_records([*real_records, *synthetic])
     role_validation = validate_role_isolation(records)
+    synthetic_source_resolution = validate_synthetic_source_resolvability(records)
     records_path = output_dir / "records.jsonl.gz"
     records_sha = write_records(records_path, records)
     loaded = read_records(records_path)
@@ -1346,6 +1356,7 @@ def main() -> int:
             ),
         },
         "synthetic": synthetic_evidence,
+        "synthetic_source_resolution": synthetic_source_resolution,
         "role_isolation": role_validation,
         "loader": {
             "loaded_records": len(loaded),
@@ -1460,6 +1471,7 @@ def main() -> int:
             "loader_evaluation_records_exposed": 0,
             "prime_coverage_eligible_omissions": coverage["summary"]["verified_legal_target_compatible_omissions"],
             "synthetic_shortcut_rejections": synthetic_evidence["shortcut_rejected"],
+            "synthetic_source_resolution": synthetic_source_resolution,
         },
     )
     _write_json(output_dir / "manifest.json", manifest)

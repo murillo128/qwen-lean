@@ -9098,17 +9098,19 @@
       "declaration_names": [
         "AlgebraicGeometry.IsAffineOpen.primeIdealOf_eq_map_closedPoint"
       ],
-      "disposition": "source-integrity-blocked",
+      "disposition": "included-training",
       "legally_usable": true,
       "prime_families": [
         "prime-arithmetic-divisibility"
       ],
-      "reason": "canonical-proof-verification-failed",
+      "reason": "accepted-canonical-proof",
       "source": "https://github.com/leanprover-community/mathlib4",
       "source_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
-      "statement_ids": [],
-      "target_compatible": false,
-      "verified_lean": false
+      "statement_ids": [
+        "5c3701670a7e8cab0ccdc13174ad3b07aae92c3f54b7683c7823aeedaf584f40"
+      ],
+      "target_compatible": true,
+      "verified_lean": true
     },
     {
       "coverage_id": "source:b824e2cafee16b4663e6b99a7d9114e1ca51ab0ec0537589a638e7c295e664f5",
@@ -9134,17 +9136,19 @@
       "declaration_names": [
         "AlgebraicGeometry.Scheme.map_PrimeSpectrum_basicOpen_of_affine"
       ],
-      "disposition": "source-integrity-blocked",
+      "disposition": "included-training",
       "legally_usable": true,
       "prime_families": [
         "prime-arithmetic-divisibility"
       ],
-      "reason": "canonical-proof-verification-failed",
+      "reason": "accepted-canonical-proof",
       "source": "https://github.com/leanprover-community/mathlib4",
       "source_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
-      "statement_ids": [],
-      "target_compatible": false,
-      "verified_lean": false
+      "statement_ids": [
+        "3dee38f00b9f2d20147429092eeef251ed2061555b69423228de57c714ade506"
+      ],
+      "target_compatible": true,
+      "verified_lean": true
     },
     {
       "coverage_id": "source:265d4e47a3e2c76df733a3dcbe7cf69956bb20e3e4b303b0bddbd399fffc4097",
@@ -9170,17 +9174,19 @@
       "declaration_names": [
         "AlgebraicGeometry.specTargetImageFactorization_comp"
       ],
-      "disposition": "source-integrity-blocked",
+      "disposition": "included-training",
       "legally_usable": true,
       "prime_families": [
         "prime-arithmetic-divisibility"
       ],
-      "reason": "canonical-proof-verification-failed",
+      "reason": "accepted-canonical-proof",
       "source": "https://github.com/leanprover-community/mathlib4",
       "source_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
-      "statement_ids": [],
-      "target_compatible": false,
-      "verified_lean": false
+      "statement_ids": [
+        "507b87a735295185ef88d79dcb47bcf406a879961cbd4173498b88945343db79"
+      ],
+      "target_compatible": true,
+      "verified_lean": true
     },
     {
       "coverage_id": "source:cc30eabea2184bc40ab8fc3bbec85342ab32a00338d58b4cf45e7201eeec51d7",
@@ -100470,10 +100476,10 @@
   "schema_version": "dataset-v2-prime-coverage-v1",
   "summary": {
     "dispositions": {
-      "included-training": 4964,
+      "included-training": 4967,
       "not-verified-lean": 3,
       "placeholder/axiom-policy-blocked": 4,
-      "source-integrity-blocked": 238,
+      "source-integrity-blocked": 235,
       "target-compatibility-blocked": 4,
       "unproved/knowledge-only": 27
     },

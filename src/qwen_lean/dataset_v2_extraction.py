@@ -45,7 +45,7 @@ from .phase2_corpus import (
 
 DATASET_V2_CONFIG_SCHEMA_VERSION = "dataset-v2-config-v1"
 DATASET_V2_GROUP_VERIFICATION_CACHE_VERSION = (
-    "dataset-v2-group-verification-cache-v2"
+    "dataset-v2-group-verification-cache-v3"
 )
 
 
@@ -898,6 +898,11 @@ def verify_transformed_candidates(
         status, exit_code, latency, diagnostic = _run_reconstructed_file(
             transformed, target_root=target_root, timeout_seconds=timeout_seconds
         )
+        if status in {"timeout", "infrastructure-error"}:
+            raise RuntimeError(
+                f"transient transformed-proof verification failure for {file_path}: "
+                f"{status}: {diagnostic}"
+            )
         if status == "accepted":
             accepted = [
                 replace(
@@ -934,6 +939,11 @@ def verify_transformed_candidates(
                 source, target_root=target_root, timeout_seconds=timeout_seconds
             )
         )
+        if baseline_status in {"timeout", "infrastructure-error"}:
+            raise RuntimeError(
+                f"transient baseline verification failure for {file_path}: "
+                f"{baseline_status}: {baseline_diagnostic}"
+            )
         if baseline_status != "accepted":
             baseline_rejected = [
                 replace(
@@ -978,6 +988,11 @@ def verify_transformed_candidates(
                 target_root=target_root,
                 timeout_seconds=timeout_seconds,
             )
+            if subgroup_status in {"timeout", "infrastructure-error"}:
+                raise RuntimeError(
+                    f"transient bisect verification failure for {file_path}: "
+                    f"{subgroup_status}: {subgroup_diagnostic}"
+                )
             attempts.append(f"{len(subgroup)}:{subgroup_status}")
             if subgroup_status == "accepted":
                 return [
