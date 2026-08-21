@@ -17,6 +17,7 @@ from qwen_lean.generalist_v2_training import (
     build_weighted_sft_trainer,
     checkpointed_target_only_causal_loss,
     choose_precision_lane,
+    configure_gradient_checkpointing,
     enable_sequence_chunked_mlp,
     inspect_gated_delta_rule_backend,
     inspect_lora_targets,
@@ -26,6 +27,7 @@ from qwen_lean.generalist_v2_training import (
     scale_single_example_causal_loss,
     select_overfit64_variants,
     select_smoke4096_variants,
+    should_checkpoint_activations,
     should_offload_activations,
     statement_weighted_causal_loss,
     summarize_finite_optimizer_logs,
@@ -627,10 +629,30 @@ def test_sequence_chunked_mlp_preserves_output_and_gradients() -> None:
 
 
 def test_activation_cpu_offload_is_reserved_for_long_sequences() -> None:
-    assert should_offload_activations(8191) is False
-    assert should_offload_activations(8192) is True
+    assert should_offload_activations(4095) is False
+    assert should_offload_activations(4096) is True
     with pytest.raises(ValueError, match="sequence length"):
         should_offload_activations(0)
+
+
+def test_gradient_checkpointing_is_reserved_for_nontrivial_sequences() -> None:
+    assert should_checkpoint_activations(1023) is False
+    assert should_checkpoint_activations(1024) is True
+    with pytest.raises(ValueError, match="sequence length"):
+        should_checkpoint_activations(0)
+
+    class Model:
+        is_gradient_checkpointing = True
+
+        def gradient_checkpointing_enable(self, **kwargs) -> None:
+            self.is_gradient_checkpointing = True
+
+        def gradient_checkpointing_disable(self) -> None:
+            self.is_gradient_checkpointing = False
+
+    model = Model()
+    assert configure_gradient_checkpointing(model, 100) is False
+    assert configure_gradient_checkpointing(model, 2000) is True
 
 
 def test_locked_fla_delta_rule_matches_torch_reference() -> None:
@@ -659,7 +681,7 @@ def test_locked_fla_delta_rule_matches_torch_reference() -> None:
             *arguments,
             g=run_decay,
             beta=run_beta,
-            chunk_size=64,
+            chunk_size=32,
             initial_state=None,
             output_final_state=False,
             use_qk_l2norm_in_kernel=True,

@@ -53,9 +53,11 @@ BOUNDED_TRAINING_SCHEMA_VERSION = "generalist-v2-bounded-training-v1"
 MINIMUM_PRODUCTION_HEADROOM_BYTES = 512 * 1024**2
 OVERFIT64_OPTIMIZER_STEPS = 600
 GRADIENT_CHECKPOINTING_USE_REENTRANT = False
-LINEAR_ATTENTION_TRAINING_CHUNK_SIZE = 64
+GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS = 1024
+LINEAR_ATTENTION_TRAINING_CHUNK_SIZE = 32
+FULL_ATTENTION_SDPA_BACKEND = "FLASH_ATTENTION"
 ACTIVATION_CPU_OFFLOAD = True
-ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS = 8192
+ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS = 4096
 LM_HEAD_LOSS_CHUNK_TOKENS = 64
 MLP_SEQUENCE_CHUNK_TOKENS = 1024
 FLA_VERSION = "0.5.2"
@@ -895,6 +897,29 @@ def should_offload_activations(sequence_tokens: int) -> bool:
     )
 
 
+def should_checkpoint_activations(sequence_tokens: int) -> bool:
+    if sequence_tokens < 1:
+        raise ValueError("generalist-v2 sequence length must be positive")
+    return sequence_tokens >= GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS
+
+
+def configure_gradient_checkpointing(model: Any, sequence_tokens: int) -> bool:
+    required = should_checkpoint_activations(sequence_tokens)
+    enabled = bool(getattr(model, "is_gradient_checkpointing", False))
+    if required and not enabled:
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={
+                "use_reentrant": GRADIENT_CHECKPOINTING_USE_REENTRANT
+            }
+        )
+    elif not required and enabled:
+        model.gradient_checkpointing_disable()
+    observed = bool(getattr(model, "is_gradient_checkpointing", False))
+    if observed != required:
+        raise RuntimeError("generalist-v2 could not set sequence-aware checkpointing")
+    return observed
+
+
 def build_weighted_sft_trainer(
     runtime: GeneralistTrainingRuntime,
     examples: Sequence[WeightedTokenizedExample],
@@ -925,6 +950,7 @@ def build_weighted_sft_trainer(
     try:
         import torch
         from datasets import Dataset
+        from torch.nn.attention import SDPBackend, sdpa_kernel
         from transformers import TrainerCallback
         from trl import SFTConfig, SFTTrainer
     except ImportError as error:
@@ -971,12 +997,17 @@ def build_weighted_sft_trainer(
                 model.get_base_model() if hasattr(model, "get_base_model") else model
             )
             sequence_tokens = int(inputs["input_ids"].shape[1])
+            configure_gradient_checkpointing(causal_model, sequence_tokens)
             activation_context = (
                 torch.autograd.graph.save_on_cpu(pin_memory=True)
                 if should_offload_activations(sequence_tokens)
                 else nullcontext()
             )
-            with activation_context:
+            with (
+                activation_context,
+                sdpa_kernel(SDPBackend.FLASH_ATTENTION),
+                torch.autocast("cuda", dtype=torch.bfloat16),
+            ):
                 outputs = causal_model.model(
                     **inputs,
                     chunk_size=LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
@@ -1740,6 +1771,9 @@ def run_bounded_training_gate(
     activation_cpu_offload_example_count = sum(
         should_offload_activations(len(item.input_ids)) for item in examples
     )
+    gradient_checkpointing_example_count = sum(
+        should_checkpoint_activations(len(item.input_ids)) for item in examples
+    )
     del records, selected
     gc.collect()
     one_pass_steps = math.ceil(
@@ -1862,7 +1896,15 @@ def run_bounded_training_gate(
             "gradient_checkpointing_use_reentrant": (
                 GRADIENT_CHECKPOINTING_USE_REENTRANT
             ),
+            "gradient_checkpointing_min_sequence_tokens": (
+                GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS
+            ),
+            "gradient_checkpointing_example_count": (
+                gradient_checkpointing_example_count
+            ),
             "linear_attention_chunk_size": LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
+            "full_attention_sdpa_backend": FULL_ATTENTION_SDPA_BACKEND,
+            "explicit_compute_loss_bf16_autocast": True,
             "activation_cpu_offload": ACTIVATION_CPU_OFFLOAD,
             "activation_cpu_offload_min_sequence_tokens": (
                 ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS
@@ -2117,7 +2159,15 @@ def run_production_preflight(
             "gradient_checkpointing_use_reentrant": (
                 GRADIENT_CHECKPOINTING_USE_REENTRANT
             ),
+            "gradient_checkpointing_min_sequence_tokens": (
+                GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS
+            ),
+            "gradient_checkpointing_applied": should_checkpoint_activations(
+                len(example.input_ids)
+            ),
             "linear_attention_chunk_size": LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
+            "full_attention_sdpa_backend": FULL_ATTENTION_SDPA_BACKEND,
+            "explicit_compute_loss_bf16_autocast": True,
             "activation_cpu_offload": ACTIVATION_CPU_OFFLOAD,
             "activation_cpu_offload_min_sequence_tokens": (
                 ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS

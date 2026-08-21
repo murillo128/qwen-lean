@@ -28,12 +28,15 @@ from .generalist_v2_dataset import (
 from .generalist_v2_training import (
     ACTIVATION_CPU_OFFLOAD,
     ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS,
+    FULL_ATTENTION_SDPA_BACKEND,
+    GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS,
     GRADIENT_CHECKPOINTING_USE_REENTRANT,
     LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
     LM_HEAD_LOSS_CHUNK_TOKENS,
     MLP_SEQUENCE_CHUNK_TOKENS,
     build_weighted_sft_trainer,
     load_training_runtime,
+    should_checkpoint_activations,
     should_offload_activations,
     summarize_finite_optimizer_logs,
     tokenize_weighted_training_selection,
@@ -200,6 +203,9 @@ def run_full_generalist_training(
     activation_cpu_offload_example_count = sum(
         should_offload_activations(len(item.input_ids)) for item in examples
     )
+    gradient_checkpointing_example_count = sum(
+        should_checkpoint_activations(len(item.input_ids)) for item in examples
+    )
     if not math.isclose(
         observed_weight_mean, weight_normalizer, rel_tol=1e-12, abs_tol=1e-12
     ):
@@ -307,7 +313,15 @@ def run_full_generalist_training(
             "gradient_checkpointing_use_reentrant": (
                 GRADIENT_CHECKPOINTING_USE_REENTRANT
             ),
+            "gradient_checkpointing_min_sequence_tokens": (
+                GRADIENT_CHECKPOINTING_MIN_SEQUENCE_TOKENS
+            ),
+            "gradient_checkpointing_example_count": (
+                gradient_checkpointing_example_count
+            ),
             "linear_attention_chunk_size": LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
+            "full_attention_sdpa_backend": FULL_ATTENTION_SDPA_BACKEND,
+            "explicit_compute_loss_bf16_autocast": True,
             "activation_cpu_offload": ACTIVATION_CPU_OFFLOAD,
             "activation_cpu_offload_min_sequence_tokens": (
                 ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS

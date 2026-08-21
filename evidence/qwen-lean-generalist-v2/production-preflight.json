@@ -393,7 +393,7 @@
   "runtime": {
     "activation_cpu_offload": true,
     "activation_cpu_offload_applied": true,
-    "activation_cpu_offload_min_sequence_tokens": 8192,
+    "activation_cpu_offload_min_sequence_tokens": 4096,
     "cuda_allocator_config": "expandable_segments:True",
     "cuda_device": "NVIDIA RTX 4000 Ada Generation",
     "cuda_device_capability": [
@@ -403,6 +403,7 @@
     "cuda_device_index": 0,
     "cuda_device_total_memory_bytes": 20989804544,
     "execution": "project-controlled-local-cuda",
+    "full_attention_sdpa_backend": "FLASH_ATTENTION",
     "gated_delta_rule_backend": {
       "distribution": "flash-linear-attention",
       "distribution_version": "0.5.2",
@@ -413,9 +414,11 @@
       "upstream_revision": "9c8e42e762fce087c27b673af4922795d9edb85e",
       "upstream_tag": "v0.5.2"
     },
+    "gradient_checkpointing_applied": true,
+    "gradient_checkpointing_min_sequence_tokens": 1024,
     "gradient_checkpointing_use_reentrant": false,
     "headroom_passed": true,
-    "linear_attention_chunk_size": 64,
+    "linear_attention_chunk_size": 32,
     "lm_head_loss_chunk_tokens": 64,
     "minimum_required_headroom_bytes": 536870912,
     "mlp_sequence_chunk_tokens": 1024,
@@ -431,14 +434,14 @@
       "transformers": "5.15.1",
       "trl": "1.10.0"
     },
-    "peak_cuda_allocated_bytes": 12278879744,
-    "peak_cuda_reserved_bytes": 13017022464,
+    "peak_cuda_allocated_bytes": 12071390720,
+    "peak_cuda_reserved_bytes": 12744392704,
     "python": "3.12.14",
-    "reserved_memory_headroom_bytes": 7972782080,
+    "reserved_memory_headroom_bytes": 8245411840,
     "sequence_chunked_mlp_module_count": 32,
     "target_only_checkpointed_causal_loss": true,
     "torch_cuda_version": "13.0",
-    "wall_time_seconds": 121.30050554603804
+    "wall_time_seconds": 39.17695788794663
   },
   "schema_version": "generalist-v2-production-preflight-v1",
   "selected_lane": "nf4-qlora",
