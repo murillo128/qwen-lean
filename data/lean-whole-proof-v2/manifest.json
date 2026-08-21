@@ -1,0 +1,97 @@
+{
+  "dataset_id": "lean-whole-proof-v2",
+  "files": {
+    "general-train-v2.jsonl.gz": {
+      "bytes": 14017325,
+      "sha256": "648372a3e40f8f4b9456566667d51fb2d3859bb4c9dd74e5484363b5d0894864"
+    },
+    "historical-crosswalk.json": {
+      "bytes": 2549,
+      "sha256": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb"
+    },
+    "minif2f-test-clean-v2.jsonl": {
+      "bytes": 84220,
+      "sha256": "33bfe19509081f5b4d73a6ad7984cea63fae8c70a046b42af46f5709ddfe24dc"
+    },
+    "minif2f-valid-clean-v2.jsonl": {
+      "bytes": 95471,
+      "sha256": "c356b72bdfb8c9e95223f7c6daaddff64127093d5f5b200216eeff12474dbb90"
+    },
+    "prime-coverage.json": {
+      "bytes": 3649504,
+      "sha256": "af1ebd0228a95366bff6ef5e375cf0c21c430651357f3ec4cb6134db97868041"
+    },
+    "records.jsonl.gz": {
+      "bytes": 87873259,
+      "sha256": "e35ad16a1aff7c08910c1febacb1f1605ebe845fa80c293091cefe03c36d8c75"
+    },
+    "riemann-train-v2.jsonl.gz": {
+      "bytes": 1257973,
+      "sha256": "341e621c1266c40712a9d6c1eacd4f1cdbfeee5b86f3965189d724644f81ef5b"
+    },
+    "source-dispositions.jsonl.gz": {
+      "bytes": 19244220,
+      "sha256": "07c1a66fa0536ff6c0e67d5bb4f7d474399c15e1e4e9b2b57ee706f360c6f9b9"
+    },
+    "training-views.json": {
+      "bytes": 2967,
+      "sha256": "7904c9dd96937a15646969f0cb5b277402dc2a423cd6d2ce6ae6be2213ae2a3f"
+    },
+    "verification.json": {
+      "bytes": 12659992,
+      "sha256": "47af01c03793aaa076527805c4e5227f9a5a64952d6d1fe3b68e47ae84318ed9"
+    }
+  },
+  "identity_contract": {
+    "alpha_and_declaration_name_normalization": true,
+    "proof_variant_policy": "retain variants; one deterministic variant per optimizer encounter",
+    "sampling_unit": "normalized-statement"
+  },
+  "retention_contract": {
+    "long_context_status_recorded": true,
+    "silent_omission": false,
+    "silent_truncation": false
+  },
+  "schema_version": "lean-whole-proof-v2-manifest-v1",
+  "summary": {
+    "proof_variants": 183280,
+    "provenance": {
+      "external-lean": 22,
+      "real-mathlib": 177896,
+      "synthetic": 4096
+    },
+    "records": 182014,
+    "roles": {
+      "test": 417,
+      "training": 181190,
+      "validation": 407
+    },
+    "statements": 182014,
+    "transformations": {
+      "equations-to-fun-exact": 1489,
+      "none": 92784,
+      "term-to-exact": 86727,
+      "where-to-structure-exact": 2280
+    }
+  },
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "license": "Apache-2.0",
+    "mathlib_input_revision": "v4.32.2",
+    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "validation": {
+    "loader_evaluation_records_exposed": 0,
+    "prime_coverage_eligible_omissions": 0,
+    "role_isolation": {
+      "cross_role_derivation_families": 0,
+      "cross_role_proofs": 0,
+      "cross_role_statements": 0
+    },
+    "synthetic_shortcut_rejections": 1613
+  }
+}

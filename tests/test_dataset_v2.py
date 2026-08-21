@@ -10,9 +10,11 @@ from qwen_lean.dataset_v2 import (
     iter_optimizer_examples,
     merge_statement_records,
     plan_training_examples,
+    read_membership_view,
     validate_prime_coverage,
     validate_role_isolation,
     write_records,
+    write_membership_view,
 )
 from qwen_lean.dataset_v2_contract import (
     derivation_family_fingerprint,
@@ -20,6 +22,11 @@ from qwen_lean.dataset_v2_contract import (
     proof_variant_id,
     statement_fingerprint_v2,
     statement_id,
+)
+from qwen_lean.dataset_v2_pipeline import (
+    GENERAL_TRAIN_VIEW,
+    RIEMANN_TRAIN_VIEW,
+    build_training_view_memberships,
 )
 from qwen_lean.dataset_v2_schema import (
     DATASET_V2_SCHEMA_VERSION,
@@ -162,6 +169,57 @@ def test_gzip_corpus_packaging_is_byte_deterministic(tmp_path: Path) -> None:
 
     assert write_records(first, [record]) == write_records(second, [record])
     assert first.read_bytes() == second.read_bytes()
+
+
+def test_membership_view_is_id_only_deterministic_and_resolvable(tmp_path: Path) -> None:
+    records = [
+        _record("first"),
+        _record("second", proposition="False → False"),
+        _record("evaluation", role="test", proposition="1 = 1"),
+    ]
+    selected = {records[0].statement_id, records[1].statement_id}
+    first = tmp_path / "first.jsonl.gz"
+    second = tmp_path / "second.jsonl.gz"
+
+    assert write_membership_view(first, records, selected) == write_membership_view(
+        second, records, reversed(sorted(selected))
+    )
+    assert first.read_bytes() == second.read_bytes()
+    assert {
+        record.statement_id for record in read_membership_view(first, records)
+    } == selected
+
+    with pytest.raises(ValueError, match="non-training"):
+        write_membership_view(first, records, [records[2].statement_id])
+
+
+def test_training_views_cover_prime_specialist_and_support_rows() -> None:
+    support = _record("support")
+    prime = _record("prime", proposition="False → False")
+    prime = replace(
+        prime,
+        topic_tags=("domain:prime-number-theory", "prime-family:prime-counting-pnt"),
+        memberships=("number-theory-wide-v1",),
+        proof_variants=(
+            replace(
+                prime.proof_variants[0],
+                resolved_dependencies=("support",),
+            ),
+        ),
+    )
+    evaluation = _record("evaluation", role="validation", proposition="1 = 1")
+    views, validation = build_training_view_memberships(
+        [support, prime, evaluation]
+    )
+
+    assert views[GENERAL_TRAIN_VIEW] == {support.statement_id, prime.statement_id}
+    assert views[RIEMANN_TRAIN_VIEW] == {support.statement_id, prime.statement_id}
+    assert validation["riemann_subset_general"] is True
+    assert validation["prime_training_in_riemann"] == 1
+    assert validation["historical_membership_coverage"]["number-theory-wide-v1"] == {
+        "training_statements": 1,
+        "riemann_view_statements": 1,
+    }
 
 
 def test_synthetic_roles_keep_statement_family_and_proof_out_of_other_roles() -> None:

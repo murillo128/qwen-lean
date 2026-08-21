@@ -42,9 +42,11 @@ from qwen_lean.dataset_v2 import (  # noqa: E402
     iter_optimizer_examples,
     merge_statement_records,
     read_records,
+    read_membership_view,
     sha256_file,
     validate_role_isolation,
     write_records,
+    write_membership_view,
 )
 from qwen_lean.dataset_v2_composition import (  # noqa: E402
     build_composition_plans,
@@ -74,9 +76,13 @@ from qwen_lean.dataset_v2_extraction import (  # noqa: E402
 )
 from qwen_lean.dataset_v2_pipeline import (  # noqa: E402
     PRIME_FAMILIES,
+    GENERAL_TRAIN_VIEW,
+    RIEMANN_TRAIN_VIEW,
+    TRAINING_VIEWS_SCHEMA_VERSION,
     annotate_candidate,
     build_prime_coverage_manifest,
     build_source_dispositions,
+    build_training_view_memberships,
     composition_pools,
     dataset_manifest,
     distribute_prime_counts,
@@ -1251,12 +1257,20 @@ def main() -> int:
                 ROOT / f"data/mathlib-whole-proof-v1/{split}.jsonl.gz"
             )
         ]
-        membership_inventories = {
-            path.parent.name: read_jsonl(path)
-            for path in sorted(
-                (ROOT / "data/riemann/corpora").glob("*/membership.jsonl")
-            )
+        historical_by_id = {
+            str(value["id"]): value for value in historical_records
         }
+        membership_inventories: dict[str, list[dict[str, Any]]] = {}
+        for path in sorted(
+            (ROOT / "data/riemann/corpora").glob("*/membership.jsonl")
+        ):
+            enriched: list[dict[str, Any]] = []
+            for value in read_jsonl(path):
+                historical = historical_by_id.get(str(value.get("record_id", "")))
+                if historical is not None and "source_span" in historical:
+                    value = {**value, "source_span": historical["source_span"]}
+                enriched.append(value)
+            membership_inventories[path.parent.name] = enriched
         crosswalk = historical_source_crosswalk(
             source_dispositions,
             historical_records=historical_records,
@@ -1358,6 +1372,55 @@ def main() -> int:
             "sha256": sha256_file(probe_path),
             "counts": {key: len(value) for key, value in probe.items()},
         }
+        view_memberships, view_validation = build_training_view_memberships(records)
+        view_metadata: dict[str, Any] = {}
+        for view_id in (GENERAL_TRAIN_VIEW, RIEMANN_TRAIN_VIEW):
+            view_path = output_dir / f"{view_id}.jsonl.gz"
+            view_sha = write_membership_view(
+                view_path, records, view_memberships[view_id]
+            )
+            resolved_view = read_membership_view(view_path, records)
+            if {record.statement_id for record in resolved_view} != view_memberships[view_id]:
+                raise RuntimeError(f"{view_id} did not round-trip against canonical records")
+            view_metadata[view_id] = {
+                "file": view_path.name,
+                "sha256": view_sha,
+                "bytes": view_path.stat().st_size,
+                "statements": len(resolved_view),
+                "proof_variants": sum(
+                    len(record.proof_variants) for record in resolved_view
+                ),
+                "provenance": dict(
+                    sorted(Counter(record.provenance for record in resolved_view).items())
+                ),
+            }
+        training_views_path = output_dir / "training-views.json"
+        _write_json(
+            training_views_path,
+            {
+                "schema_version": TRAINING_VIEWS_SCHEMA_VERSION,
+                "dataset_id": config.value["dataset"]["id"],
+                "canonical_records_file": records_path.name,
+                "semantics": {
+                    "canonical_corpus_copies": 1,
+                    "membership_only": True,
+                    "oversampling_ratios_encoded": False,
+                    "general": "all optimizer-eligible Dataset-v2 training statements",
+                    "riemann": (
+                        "prime/Riemann seeds, historical specialist memberships, "
+                        "prime synthetic compositions, and their resolved support neighborhood"
+                    ),
+                },
+                "views": view_metadata,
+                "validation": view_validation,
+            },
+        )
+        verification["training_views"] = {
+            "manifest": training_views_path.name,
+            "sha256": sha256_file(training_views_path),
+            "views": view_metadata,
+            "validation": view_validation,
+        }
     _write_json(verification_path, verification)
     files = {
         records_path.name: {"sha256": records_sha, "bytes": records_path.stat().st_size},
@@ -1373,6 +1436,18 @@ def main() -> int:
             "sha256": sha256_file(crosswalk_path),
             "bytes": crosswalk_path.stat().st_size,
         }
+    if args.mode == "full":
+        training_views_path = output_dir / "training-views.json"
+        files[training_views_path.name] = {
+            "sha256": sha256_file(training_views_path),
+            "bytes": training_views_path.stat().st_size,
+        }
+        for view_id in (GENERAL_TRAIN_VIEW, RIEMANN_TRAIN_VIEW):
+            view_path = output_dir / f"{view_id}.jsonl.gz"
+            files[view_path.name] = {
+                "sha256": sha256_file(view_path),
+                "bytes": view_path.stat().st_size,
+            }
     for split in ("valid", "test"):
         path = output_dir / f"minif2f-{split}-clean-v2.jsonl"
         files[path.name] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}

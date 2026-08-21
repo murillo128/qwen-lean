@@ -1,0 +1,117 @@
+{
+  "schema_version": "dataset-v2-checkpoint-b-v1",
+  "issue": 56,
+  "status": "OBSERVED",
+  "command": "tools/phase2-extractor/.venv/bin/python tools/dataset_v2_build.py --mode full --resume-full --workers 8 --composition-workers 4 --composition-batch-size 128 --trace-root /workspace/qwen-lean/.lake/packages/mathlib --mini-root /workspace/qwen-lean-issue28-local/miniF2F",
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "source_materialization": {
+    "mathlib_candidates": 184335,
+    "pnt_plus_candidates": 22,
+    "repaired_declaration_names": 55755,
+    "source_dispositions": 185988,
+    "included_training_dispositions": 180345,
+    "explicitly_blocked_dispositions": 5643,
+    "term_reconstruction_attempts": 95352,
+    "term_reconstruction_accepted": 91340,
+    "term_reconstruction_rejected": 4012,
+    "retained_transformations": {
+      "equations-to-fun-exact": 1493,
+      "term-to-exact": 87558,
+      "where-to-structure-exact": 2289
+    },
+    "mathlib_v1_records_mapped_to_training": 88958,
+    "mathlib_v1_missing_source_identities": 0,
+    "riemann_inventory_missing_source_identities": 0,
+    "pnt_plus_dependency_audits": 22,
+    "pnt_plus_empty_dependency_audits": 0
+  },
+  "canonical_corpus": {
+    "records": 182014,
+    "proof_variants": 183280,
+    "roles": {
+      "training": 181190,
+      "validation": 407,
+      "test": 417
+    },
+    "provenance": {
+      "real-mathlib": 177896,
+      "external-lean": 22,
+      "synthetic": 4096
+    },
+    "cross_role_statements": 0,
+    "cross_role_derivation_families": 0,
+    "cross_role_proofs": 0,
+    "optimizer_visible_evaluation_statements": 0
+  },
+  "synthetic_corpus": {
+    "generated_with_reserve": 8192,
+    "resolved_after_constant_presence_audit": 8116,
+    "accepted_unique_statements": 4096,
+    "accepted_prime_statements": 1024,
+    "unique_source_lemma_sets": 4096,
+    "unique_derivation_families": 4096,
+    "actual_dependency_failures": 0,
+    "shortcut_rejections": 1613,
+    "shortcut_retrieval_candidates": 16268,
+    "structural_classes": {
+      "direct": 1405,
+      "branching": 1373,
+      "deep": 1318
+    },
+    "prime_families": {
+      "prime-arithmetic-divisibility": 171,
+      "arithmetic-functions": 171,
+      "prime-counting-pnt": 171,
+      "zeta-analytic-number-theory": 171,
+      "riemann-core-bubble": 170,
+      "pnt-plus": 170
+    }
+  },
+  "prime_and_benchmark_gates": {
+    "prime_coverage_entries": 5240,
+    "verified_legal_target_compatible_prime_omissions": 0,
+    "minif2f_valid_source": 244,
+    "minif2f_valid_retained": 244,
+    "minif2f_valid_training_overlaps": 0,
+    "minif2f_test_source": 244,
+    "minif2f_test_retained": 244,
+    "minif2f_test_training_overlaps": 0,
+    "train_probe_records_per_stratum": 64
+  },
+  "training_views": {
+    "canonical_corpus_copies": 1,
+    "general_train_v2_statements": 181190,
+    "riemann_train_v2_statements": 16105,
+    "riemann_subset_general": true,
+    "prime_training_in_general": 5624,
+    "prime_training_in_riemann": 5624,
+    "synthetic_prime_training_in_riemann": 820,
+    "pnt_plus_real_training_in_riemann": 22,
+    "historical_membership_omissions": 0,
+    "canonical_statement_references_missing": 0,
+    "canonical_proof_variant_references_missing": 0,
+    "resolved_dependency_support_statements": 12076
+  },
+  "validation": {
+    "full_build_repeated_with_identical_hashes": true,
+    "pytest": "237 passed in 27.49s",
+    "diff_check": "passed"
+  },
+  "artifact_sha256": {
+    "manifest.json": "71580462c4752711ff7ae55ed10e434f17df2b22833094fabaecdb138b2cc404",
+    "records.jsonl.gz": "e35ad16a1aff7c08910c1febacb1f1605ebe845fa80c293091cefe03c36d8c75",
+    "source-dispositions.jsonl.gz": "07c1a66fa0536ff6c0e67d5bb4f7d474399c15e1e4e9b2b57ee706f360c6f9b9",
+    "historical-crosswalk.json": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb",
+    "prime-coverage.json": "af1ebd0228a95366bff6ef5e375cf0c21c430651357f3ec4cb6134db97868041",
+    "verification.json": "47af01c03793aaa076527805c4e5227f9a5a64952d6d1fe3b68e47ae84318ed9",
+    "general-train-v2.jsonl.gz": "648372a3e40f8f4b9456566667d51fb2d3859bb4c9dd74e5484363b5d0894864",
+    "riemann-train-v2.jsonl.gz": "341e621c1266c40712a9d6c1eacd4f1cdbfeee5b86f3965189d724644f81ef5b",
+    "training-views.json": "7904c9dd96937a15646969f0cb5b277402dc2a423cd6d2ce6ae6be2213ae2a3f",
+    "train-probe.json": "31a3117a6fb5c6f9b32774cb0eb6981ce9aa6211d741e4a10a49fe48f48ca112"
+  }
+}

@@ -358,6 +358,91 @@ def read_records(path: Path) -> list[DatasetV2Record]:
     return records
 
 
+def write_membership_view(
+    path: Path,
+    records: Sequence[DatasetV2Record],
+    statement_ids: Iterable[str],
+) -> str:
+    """Write a deterministic ID-only view over canonical training records."""
+
+    by_id = {record.statement_id: record for record in records}
+    selected_ids = sorted(set(statement_ids))
+    missing = [identity for identity in selected_ids if identity not in by_id]
+    if missing:
+        raise ValueError(f"membership view has {len(missing)} unresolved statement ids")
+    non_training = [
+        identity for identity in selected_ids if by_id[identity].role != "training"
+    ]
+    if non_training:
+        raise ValueError(
+            f"membership view has {len(non_training)} non-training statement ids"
+        )
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as raw_handle:
+        with gzip.GzipFile(
+            filename="", mode="wb", fileobj=raw_handle, mtime=0
+        ) as binary_handle:
+            with io.TextIOWrapper(
+                binary_handle, encoding="utf-8", newline="\n"
+            ) as handle:
+                for identity in selected_ids:
+                    record = by_id[identity]
+                    handle.write(
+                        json.dumps(
+                            {
+                                "proof_variant_ids": [
+                                    variant.proof_variant_id
+                                    for variant in record.proof_variants
+                                ],
+                                "statement_id": identity,
+                            },
+                            ensure_ascii=False,
+                            sort_keys=True,
+                        )
+                    )
+                    handle.write("\n")
+    return sha256_file(path)
+
+
+def read_membership_view(
+    path: Path, records: Sequence[DatasetV2Record]
+) -> list[DatasetV2Record]:
+    """Resolve and validate an ID-only membership view against its canonical corpus."""
+
+    by_id = {record.statement_id: record for record in records}
+    opener = gzip.open if path.suffix == ".gz" else open
+    resolved: list[DatasetV2Record] = []
+    seen: set[str] = set()
+    with opener(path, "rt", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                value = json.loads(line)
+                identity = str(value["statement_id"])
+                if identity in seen:
+                    raise ValueError(f"duplicate statement id: {identity}")
+                record = by_id[identity]
+                if record.role != "training":
+                    raise ValueError(f"non-training statement id: {identity}")
+                expected_variants = [
+                    variant.proof_variant_id for variant in record.proof_variants
+                ]
+                observed_variants = [
+                    str(item) for item in value["proof_variant_ids"]
+                ]
+                if observed_variants != expected_variants:
+                    raise ValueError(f"proof variant ids do not resolve: {identity}")
+            except (KeyError, TypeError, ValueError) as error:
+                raise ValueError(
+                    f"invalid Dataset-v2 membership at {path}:{line_number}: {error}"
+                ) from error
+            seen.add(identity)
+            resolved.append(record)
+    return resolved
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:

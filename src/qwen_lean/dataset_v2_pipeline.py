@@ -30,6 +30,10 @@ PRIME_FAMILIES = (
     "pnt-plus",
 )
 
+TRAINING_VIEWS_SCHEMA_VERSION = "dataset-v2-training-views-v1"
+GENERAL_TRAIN_VIEW = "general-train-v2"
+RIEMANN_TRAIN_VIEW = "riemann-train-v2"
+
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     opener = gzip.open if path.suffix == ".gz" else open
@@ -229,6 +233,7 @@ def build_source_dispositions(
                 "source_revision": candidate.source_revision,
                 "file_path": candidate.file_path,
                 "declaration_name": candidate.declaration_name,
+                "source_span": asdict(candidate.source_span),
                 "provenance": candidate.provenance,
                 "memberships": list(candidate.memberships),
                 "topic_tags": list(candidate.topic_tags),
@@ -283,6 +288,7 @@ def build_source_dispositions(
                 "source_revision": revision,
                 "file_path": file_path,
                 "declaration_name": declaration_name,
+                "source_span": exclusion.get("source_span"),
                 "provenance": "real-mathlib",
                 "memberships": list(memberships),
                 "topic_tags": list(topic_tags),
@@ -327,12 +333,26 @@ def historical_source_crosswalk(
         if item.get("declaration_name")
     }
     by_name: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    by_span_start: dict[tuple[str, int, int], list[Mapping[str, Any]]] = defaultdict(list)
     for item in source_dispositions:
         if item.get("declaration_name"):
             by_name[str(item["declaration_name"])].append(item)
+        source_span = item.get("source_span")
+        if isinstance(source_span, Mapping) and isinstance(
+            source_span.get("start"), Mapping
+        ):
+            start = source_span["start"]
+            by_span_start[
+                (
+                    str(item["file_path"]),
+                    int(start["line"]),
+                    int(start["column"]),
+                )
+            ].append(item)
 
     def summarize(values: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         counts: Counter[str] = Counter()
+        resolutions: Counter[str] = Counter()
         missing: list[dict[str, str]] = []
         missing_count = 0
         for value in values:
@@ -340,12 +360,29 @@ def historical_source_crosswalk(
             file_path = str(value.get("file_path", ""))
             key = (file_path, declaration_name)
             disposition = by_source.get(key) if file_path else None
+            resolution = "exact-file-and-declaration-name" if disposition else ""
+            source_span = value.get("source_span")
+            if (
+                disposition is None
+                and file_path
+                and isinstance(source_span, Mapping)
+                and isinstance(source_span.get("start"), Mapping)
+            ):
+                start = source_span["start"]
+                span_matches = by_span_start.get(
+                    (file_path, int(start["line"]), int(start["column"])), []
+                )
+                if len(span_matches) == 1:
+                    disposition = span_matches[0]
+                    resolution = "immutable-source-span-start"
             if disposition is None and not file_path:
                 matches = by_name.get(declaration_name, [])
                 if len(matches) == 1:
                     disposition = matches[0]
+                    resolution = "unique-declaration-name"
             if disposition is None:
                 counts["source-integrity-blocked"] += 1
+                resolutions["unresolved"] += 1
                 missing_count += 1
                 if len(missing) < 100:
                     missing.append(
@@ -357,9 +394,11 @@ def historical_source_crosswalk(
                     )
             else:
                 counts[str(disposition["disposition"])] += 1
+                resolutions[resolution] += 1
         return {
             "records": len(values),
             "dispositions": dict(sorted(counts.items())),
+            "resolutions": dict(sorted(resolutions.items())),
             "missing_source_identities": missing_count,
             "missing_examples": missing,
         }
@@ -527,6 +566,130 @@ def select_train_probe(
         )
         selected[key] = [item.statement_id for item in ordered[:per_stratum]]
     return selected
+
+
+def build_training_view_memberships(
+    records: Sequence[DatasetV2Record],
+) -> tuple[dict[str, set[str]], dict[str, Any]]:
+    """Build canonical general and Riemann training views without copying records."""
+
+    training = [record for record in records if record.role == "training"]
+    training_ids = {record.statement_id for record in training}
+    by_source_name: dict[str, set[str]] = defaultdict(set)
+    for record in training:
+        for variant in record.proof_variants:
+            by_source_name[variant.source_declaration_name].add(record.statement_id)
+
+    prime_ids = {
+        record.statement_id
+        for record in training
+        if any(tag.startswith("prime-family:") for tag in record.topic_tags)
+    }
+    historical_ids = {
+        record.statement_id for record in training if record.memberships
+    }
+    riemann_tag_ids = {
+        record.statement_id
+        for record in training
+        if any(tag.startswith("riemann-") for tag in record.topic_tags)
+    }
+    seed_ids = prime_ids | historical_ids | riemann_tag_ids
+
+    dependency_name_references: set[str] = set()
+    dependency_statement_ids: set[str] = set()
+    source_lemma_ids: set[str] = set()
+    by_id = {record.statement_id: record for record in training}
+    for identity in sorted(seed_ids):
+        record = by_id[identity]
+        source_lemma_ids.update(
+            source_id for source_id in record.source_lemma_ids if source_id in training_ids
+        )
+        for variant in record.proof_variants:
+            dependency_name_references.update(variant.resolved_dependencies)
+    for name in dependency_name_references:
+        dependency_statement_ids.update(by_source_name.get(name, ()))
+
+    riemann_ids = (
+        seed_ids | source_lemma_ids | dependency_statement_ids
+    ) & training_ids
+    views = {
+        GENERAL_TRAIN_VIEW: training_ids,
+        RIEMANN_TRAIN_VIEW: riemann_ids,
+    }
+
+    membership_coverage: dict[str, dict[str, int]] = {}
+    for membership in sorted(
+        {membership for record in training for membership in record.memberships}
+    ):
+        identities = {
+            record.statement_id
+            for record in training
+            if membership in record.memberships
+        }
+        membership_coverage[membership] = {
+            "training_statements": len(identities),
+            "riemann_view_statements": len(identities & riemann_ids),
+        }
+
+    synthetic_prime_ids = {
+        identity
+        for identity in prime_ids
+        if by_id[identity].provenance == "synthetic"
+    }
+    pnt_plus_ids = {
+        identity
+        for identity in prime_ids
+        if "prime-family:pnt-plus" in by_id[identity].topic_tags
+    }
+    pnt_plus_real_ids = {
+        identity
+        for identity in pnt_plus_ids
+        if by_id[identity].provenance in {"external-lean", "mixed-real"}
+    }
+    pnt_plus_synthetic_ids = pnt_plus_ids - pnt_plus_real_ids
+    if not riemann_ids <= training_ids:
+        raise ValueError("riemann-train-v2 is not a subset of general-train-v2")
+    required_sets = {
+        "prime_training": prime_ids,
+        "synthetic_prime_training": synthetic_prime_ids,
+        "pnt_plus_training": pnt_plus_ids,
+        "historical_riemann_memberships": historical_ids,
+    }
+    for label, identities in required_sets.items():
+        if not identities <= riemann_ids:
+            raise ValueError(f"riemann-train-v2 omits required {label} statements")
+
+    validation = {
+        "general_equals_optimizer_training": training_ids
+        == views[GENERAL_TRAIN_VIEW],
+        "riemann_subset_general": riemann_ids <= training_ids,
+        "canonical_statement_references_missing": 0,
+        "canonical_proof_variant_references_missing": 0,
+        "prime_training_statements": len(prime_ids),
+        "prime_training_in_general": len(prime_ids & training_ids),
+        "prime_training_in_riemann": len(prime_ids & riemann_ids),
+        "synthetic_prime_training_statements": len(synthetic_prime_ids),
+        "synthetic_prime_training_in_riemann": len(
+            synthetic_prime_ids & riemann_ids
+        ),
+        "pnt_plus_training_statements": len(pnt_plus_ids),
+        "pnt_plus_training_in_riemann": len(pnt_plus_ids & riemann_ids),
+        "pnt_plus_real_training_statements": len(pnt_plus_real_ids),
+        "pnt_plus_real_training_in_riemann": len(
+            pnt_plus_real_ids & riemann_ids
+        ),
+        "pnt_plus_synthetic_training_statements": len(pnt_plus_synthetic_ids),
+        "pnt_plus_synthetic_training_in_riemann": len(
+            pnt_plus_synthetic_ids & riemann_ids
+        ),
+        "historical_membership_coverage": membership_coverage,
+        "support_neighborhood": {
+            "dependency_name_references": len(dependency_name_references),
+            "resolved_dependency_statements": len(dependency_statement_ids),
+            "synthetic_source_lemma_statements": len(source_lemma_ids),
+        },
+    }
+    return views, validation
 
 
 def summarize_records(records: Sequence[DatasetV2Record]) -> dict[str, Any]:

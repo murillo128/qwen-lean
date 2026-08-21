@@ -152,3 +152,36 @@ def test_historical_crosswalk_maps_unique_name_only_inventory_rows() -> None:
     assert crosswalk["riemann_inventories"]["name-only"]["dispositions"] == {
         "included-training": 1
     }
+
+
+def test_historical_crosswalk_recovers_corrupt_name_by_source_span() -> None:
+    dispositions = build_source_dispositions(
+        [_candidate()],
+        diagnostics=ExtractionDiagnostics(1, 1, 1, {"none": 1}, {}, ()),
+        config={
+            "target_environment": {
+                "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+                "mathlib_revision": "a" * 40,
+            }
+        },
+        topic_metadata={},
+    )
+    historical = {
+        "file_path": "Mathlib/NumberTheory/PrimeCounting.lean",
+        "declaration_name": "Wrong.Scope.PrimeCounting.fixture",
+        "source_span": {
+            "start": {"line": 1, "column": 1},
+            "end": {"line": 1, "column": 41},
+        },
+    }
+
+    crosswalk = historical_source_crosswalk(
+        dispositions,
+        historical_records=[historical],
+        membership_inventories={},
+    )
+
+    assert crosswalk["mathlib_v1"]["missing_source_identities"] == 0
+    assert crosswalk["mathlib_v1"]["resolutions"] == {
+        "immutable-source-span-start": 1
+    }
