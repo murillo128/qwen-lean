@@ -36,8 +36,8 @@
     "records": 182352,
     "proof_variants": 183633,
     "roles": {
-      "training": 181530,
-      "validation": 407,
+      "training": 181531,
+      "validation": 406,
       "test": 415
     },
     "provenance": {
@@ -59,14 +59,18 @@
     "unique_derivation_families": 4096,
     "actual_dependency_failures": 0,
     "shortcut_rejections": 1601,
+    "inaccessible_private_statement_types": 23,
+    "oversized_persisted_statement_types": 557,
+    "max_persisted_statement_chars": 50000,
+    "stored_declaration_roundtrip_rejections": 6,
     "shortcut_retrieval_candidates": 16270,
-    "source_lemma_references": 12224,
+    "source_lemma_references": 12137,
     "missing_source_lemma_references": 0,
     "missing_source_statement_ids": 0,
     "structural_classes": {
-      "direct": 1393,
-      "branching": 1374,
-      "deep": 1329
+      "direct": 1443,
+      "branching": 1361,
+      "deep": 1292
     },
     "prime_families": {
       "prime-arithmetic-divisibility": 171,
@@ -81,11 +85,15 @@
       "pnt_plus_records": 170,
       "empty_import_contexts": 0,
       "cross_package_context_mismatches": 0,
-      "unique_verified_contexts": 45,
+      "unique_verified_contexts": 48,
       "lean_verified_records": 4096,
       "lean_verified_proof_variants": 4096,
       "lean_verification_failures": 0,
-      "method": "lean-exact-persisted-import-context"
+      "method": "lean-exact-persisted-import-context",
+      "stored_declaration_source": "record.canonical_declaration",
+      "stored_proof_source": "variant.canonical_proof",
+      "import_source": "record.environment.imports",
+      "generation_plan_statement_dependency": false
     }
   },
   "prime_and_benchmark_gates": {
@@ -101,33 +109,33 @@
   },
   "training_views": {
     "canonical_corpus_copies": 1,
-    "general_train_v2_statements": 181530,
-    "riemann_train_v2_statements": 16107,
+    "general_train_v2_statements": 181531,
+    "riemann_train_v2_statements": 16109,
     "riemann_subset_general": true,
-    "prime_training_in_general": 5625,
-    "prime_training_in_riemann": 5625,
-    "synthetic_prime_training_in_riemann": 818,
+    "prime_training_in_general": 5627,
+    "prime_training_in_riemann": 5627,
+    "synthetic_prime_training_in_riemann": 820,
     "pnt_plus_real_training_in_riemann": 22,
     "historical_membership_omissions": 0,
     "canonical_statement_references_missing": 0,
     "canonical_proof_variant_references_missing": 0,
-    "resolved_dependency_support_statements": 12049
+    "resolved_dependency_support_statements": 12043
   },
   "validation": {
     "full_build_repeated_with_identical_hashes": true,
-    "pytest": "246 passed in 36.12s",
+    "pytest": "248 passed in 55.53s",
     "diff_check": "passed"
   },
   "artifact_sha256": {
-    "manifest.json": "dd5647995c414596686c88835fc2063a2da354762c12faeaa4dbbdae3a79e985",
-    "records.jsonl.gz": "3185b98615e33b8263426fa9503f305504c33900482076aa3347ba81554c1d5c",
+    "manifest.json": "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e",
+    "records.jsonl.gz": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c",
     "source-dispositions.jsonl.gz": "a75be1f7f5fea61066e50297a473e9824b4976ba043d9280e1fcc6cf5e52baad",
     "historical-crosswalk.json": "cf75a39a2f480b5b6e97f8e513237a336887a48938830f71046d76096cf11ceb",
     "prime-coverage.json": "8ac15e212b39c1b8d0a41f8f5ce6ccde15bc320a161367f0661f681cb0a73071",
-    "verification.json": "73e94d973e14f579e9ca785e059de2252ce41fb72aeed64a4daa9bcdb5607a51",
-    "general-train-v2.jsonl.gz": "e325a6336fb51b937228754e82cb2aa484caddef4e7e72441966ffceeaa69e95",
-    "riemann-train-v2.jsonl.gz": "1c55980ec05cf535e1f0dfbee5ccfb3e17c8482c61ee2316f84a4494d4a884e6",
-    "training-views.json": "d8336e4747705a65eb394789bd44097c7f062c9123914f80333f4c758774f4bc",
-    "train-probe.json": "ef6c8d559006ba49582d44e858b16db8bbbaa4b66b421191056d4256aa9f1034"
+    "verification.json": "53344aedc80e1be9c2d7b105eba53ba315c9a84d94dd5941cdf3d6b283cedec8",
+    "general-train-v2.jsonl.gz": "c0dbbf5f6e7e95e4acdc39219140e2f3c418c2ed131044b526a40e096b081367",
+    "riemann-train-v2.jsonl.gz": "4e9437221611418c6067d192a5cb1f46a9e87e580fa0ff3abb3f0e6b2be0317f",
+    "training-views.json": "6177d96c1b30478442247ffafbccb39cb6e96dc1e824c48fc872b90b367c9c6a",
+    "train-probe.json": "2c268b091d1d586837a8c773d8d6b1df01f02c82ae68fef69bcbfc10033624ff"
   }
 }

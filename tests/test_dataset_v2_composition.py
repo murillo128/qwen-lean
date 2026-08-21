@@ -13,12 +13,14 @@ from qwen_lean.dataset_v2_composition import (
     LeanCompositionRun,
     build_composition_plans,
     composition_imports,
+    find_non_roundtripping_compositions,
     lean_name_key,
     parse_audits,
     records_from_compositions,
     render_constant_audit_source,
     render_constant_presence_source,
     render_composition_source,
+    render_composition_roundtrip_source,
     render_persisted_synthetic_context_source,
     render_shortcut_gate_source,
     run_shortcut_gate_source,
@@ -99,12 +101,14 @@ def test_synthetic_record_persists_its_verified_import_context() -> None:
 
     assert record.environment.imports == verified
     assert "PrimeNumberTheoremAnd" not in record.environment.imports
-    rendered = render_persisted_synthetic_context_source(
-        [record], {generic.synthetic_name: generic}
-    )
+    rendered = render_persisted_synthetic_context_source([record])
     assert rendered.startswith("import Mathlib.Extra\nimport Mathlib.Test\n")
     assert f"theorem {generic.synthetic_name} :" in rendered
-    assert "source_type% Source.generic_" in rendered
+    assert record.canonical_declaration in rendered
+    assert "source_type%" not in rendered
+    assert rendered.index(record.canonical_declaration) < rendered.index(
+        "def datasetV2StoredAudit"
+    )
     assert record.proof_variants[0].canonical_proof in rendered
 
     with pytest.raises(ValueError, match="omit source modules"):
@@ -185,7 +189,6 @@ def test_persisted_context_gate_covers_every_record(tmp_path, monkeypatch) -> No
 
     evidence = verify_persisted_synthetic_contexts(
         records,
-        plans={plan.synthetic_name: plan for plan in plans},
         output_dir=tmp_path,
         target_root=tmp_path,
         workers=2,
@@ -195,6 +198,101 @@ def test_persisted_context_gate_covers_every_record(tmp_path, monkeypatch) -> No
     assert evidence["accepted_records"] == 2
     assert evidence["context_groups"] == 2
     assert evidence["context_failures"] == 0
+
+
+def test_persisted_context_gate_rejects_invalid_stored_declaration(
+    tmp_path, monkeypatch
+) -> None:
+    plan = build_composition_plans(
+        {"generic": _pool("generic")}, {"generic": 1}, seed="invalid-context"
+    )[0]
+    audit = CompositionAudit(
+        plan.synthetic_name,
+        "True ∧ True",
+        tuple(item.declaration_name for item in plan.source_lemmas),
+        (),
+    )
+    record = records_from_compositions(
+        [plan],
+        {plan.synthetic_name: audit},
+        environment={
+            "environment_id": "fixture-env",
+            "lean_toolchain": "leanprover/lean4:v4.32.2",
+            "mathlib_revision": "a" * 40,
+        },
+        verification_evidence_id="fixture-evidence",
+        shortcut_status={},
+    )[0]
+    invalid = replace(
+        record,
+        canonical_declaration=(
+            f"theorem {plan.synthetic_name} : DatasetV2DefinitelyMissing"
+        ),
+    )
+
+    def rejected(source_path, **kwargs):
+        source = source_path.read_text(encoding="utf-8")
+        assert invalid.canonical_declaration in source
+        assert "source_type%" not in source
+        return LeanCompositionRun("rejected", 1, 0.01, "unknown identifier", ())
+
+    monkeypatch.setattr(
+        "qwen_lean.dataset_v2_composition.run_composition_source", rejected
+    )
+
+    with pytest.raises(RuntimeError, match="persisted synthetic context verification failed"):
+        verify_persisted_synthetic_contexts(
+            [invalid], output_dir=tmp_path, target_root=tmp_path
+        )
+
+
+def test_composition_roundtrip_gate_bisects_invalid_audited_statement(
+    tmp_path, monkeypatch
+) -> None:
+    plans = build_composition_plans(
+        {"generic": _pool("generic")}, {"generic": 3}, seed="roundtrip"
+    )
+    bad_name = plans[1].synthetic_name
+    audits = {
+        plan.synthetic_name: CompositionAudit(
+            plan.synthetic_name,
+            "DatasetV2DefinitelyMissing" if plan.synthetic_name == bad_name else "True",
+            tuple(item.declaration_name for item in plan.source_lemmas),
+            (),
+        )
+        for plan in plans
+    }
+    rendered = render_composition_roundtrip_source(plans, audits)
+    assert "source_type%" not in rendered
+    assert f"theorem {bad_name} : DatasetV2DefinitelyMissing" in rendered
+
+    def compile_if_valid(source_path, **kwargs):
+        source = source_path.read_text(encoding="utf-8")
+        if "DatasetV2DefinitelyMissing" in source:
+            return LeanCompositionRun("rejected", 1, 0.01, "unknown identifier", ())
+        names = re.findall(
+            r"`(DatasetV2CompositionRoundtrip\.[^,\]]+)", source
+        )
+        return LeanCompositionRun(
+            "accepted",
+            0,
+            0.01,
+            "",
+            tuple(CompositionAudit(name, "", (), ()) for name in names),
+        )
+
+    monkeypatch.setattr(
+        "qwen_lean.dataset_v2_composition.run_composition_source",
+        compile_if_valid,
+    )
+    rejected = find_non_roundtripping_compositions(
+        plans,
+        audits,
+        source_path=tmp_path / "Roundtrip.lean",
+        target_root=tmp_path,
+    )
+
+    assert rejected == (bad_name,)
 
 
 def test_constant_audit_imports_target_and_indexes_names() -> None:
@@ -227,6 +325,8 @@ def test_rendered_composition_uses_audited_explicit_universes() -> None:
     source = render_composition_source([replace(plan, source_lemmas=sources)])
 
     assert ".{0, 0}" in source
+    assert "`pp.all true" in source
+    assert "`pp.privateNames false" in source
     assert 'map fun _ => "0"' in render_constant_presence_source(_pool("generic")[:1])
 
 

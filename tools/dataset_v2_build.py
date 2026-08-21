@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FULL_CACHE_VERSION = "dataset-v2-full-cache-v3"
-FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v9"
+FULL_SYNTHETIC_CACHE_VERSION = "dataset-v2-full-synthetic-cache-v10"
 FULL_VERIFICATION_CACHE_VERSION = "dataset-v2-full-verification-cache-v7"
 LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
     "dataset-v2-full-verification-cache-v4",
@@ -28,6 +28,7 @@ LEGACY_FULL_VERIFICATION_CACHE_VERSIONS = {
     "dataset-v2-full-verification-cache-v6",
 }
 COMPOSITION_BATCH_CACHE_VERSION = "dataset-v2-composition-batch-cache-v1"
+MAX_PERSISTABLE_SYNTHETIC_STATEMENT_CHARS = 50_000
 FULL_SYNTHETIC_ACCEPTANCE_YIELD_FLOORS = {
     "generic": (1, 2),
     "prime-arithmetic-divisibility": (1, 2),
@@ -55,6 +56,7 @@ from qwen_lean.dataset_v2 import (  # noqa: E402
 from qwen_lean.dataset_v2_composition import (  # noqa: E402
     build_composition_plans,
     composition_imports,
+    find_non_roundtripping_compositions,
     find_missing_constants,
     lean_name_key,
     records_from_compositions,
@@ -529,7 +531,9 @@ def _synthetic_records(
             group[start : start + batch_size]
             for start in range(0, len(group), batch_size)
         )
-    def verify_batch(indexed_batch: tuple[int, list[Any]]) -> tuple[int, Any, Any, dict[str, Any]]:
+    def verify_batch(
+        indexed_batch: tuple[int, list[Any]],
+    ) -> tuple[int, Any, Any, dict[str, Any], tuple[str, ...]]:
         batch_index, batch = indexed_batch
         composition_path = lean_dir / f"Composition-{batch_index:04d}.lean"
         composition_source = render_composition_source(batch)
@@ -540,16 +544,49 @@ def _synthetic_records(
         cache_dir = output_dir / ".composition-batch-cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
         cache_path = cache_dir / f"{batch_index:04d}-{batch_digest}.pkl"
+        roundtrip_path = lean_dir / f"CompositionRoundtrip-{batch_index:04d}.lean"
+
+        def roundtrip_rejections(run: Any) -> tuple[str, ...]:
+            audits = {audit.name: audit for audit in run.audits}
+            candidates = [
+                plan
+                for plan in batch
+                if (
+                    "✝" not in audits[plan.synthetic_name].statement_type
+                    and len(audits[plan.synthetic_name].statement_type)
+                    <= MAX_PERSISTABLE_SYNTHETIC_STATEMENT_CHARS
+                )
+            ]
+            return find_non_roundtripping_compositions(
+                candidates,
+                audits,
+                source_path=roundtrip_path,
+                target_root=target_root,
+            )
+
         if cache_path.is_file():
             with cache_path.open("rb") as handle:
-                run, shortcut_run, audit_summary = pickle.load(handle)
+                cached = pickle.load(handle)
+            if len(cached) == 3:
+                run, shortcut_run, audit_summary = cached
+                roundtrip_rejected = roundtrip_rejections(run)
+                temporary_cache = cache_path.with_suffix(".tmp")
+                with temporary_cache.open("wb") as handle:
+                    pickle.dump(
+                        (run, shortcut_run, audit_summary, roundtrip_rejected),
+                        handle,
+                        protocol=pickle.HIGHEST_PROTOCOL,
+                    )
+                temporary_cache.replace(cache_path)
+            else:
+                run, shortcut_run, audit_summary, roundtrip_rejected = cached
             shortcut_source, _ = render_shortcut_gate_source(
                 batch, {audit.name: audit for audit in run.audits}
             )
             (lean_dir / f"ShortcutGate-{batch_index:04d}.lean").write_text(
                 shortcut_source, encoding="utf-8"
             )
-            return batch_index, run, shortcut_run, audit_summary
+            return batch_index, run, shortcut_run, audit_summary, roundtrip_rejected
         run = run_composition_source(composition_path, target_root=target_root)
         if run.status != "accepted":
             raise RuntimeError(f"composition batch {batch_index} failed: {run.diagnostic}")
@@ -566,20 +603,22 @@ def _synthetic_records(
             raise RuntimeError(
                 f"shortcut batch {batch_index} infrastructure failure: {shortcut_run.diagnostic}"
             )
+        roundtrip_rejected = roundtrip_rejections(run)
         temporary_cache = cache_path.with_suffix(".tmp")
         with temporary_cache.open("wb") as handle:
             pickle.dump(
-                (run, shortcut_run, audit_summary),
+                (run, shortcut_run, audit_summary, roundtrip_rejected),
                 handle,
                 protocol=pickle.HIGHEST_PROTOCOL,
             )
         temporary_cache.replace(cache_path)
-        return batch_index, run, shortcut_run, audit_summary
+        return batch_index, run, shortcut_run, audit_summary, roundtrip_rejected
 
     with ThreadPoolExecutor(max_workers=min(workers, len(batches))) as executor:
         batch_results = list(executor.map(verify_batch, enumerate(batches)))
     verified_imports: dict[str, tuple[str, ...]] = {}
-    for batch_index, run, shortcut_run, audit_summary in batch_results:
+    roundtrip_rejected_names: set[str] = set()
+    for batch_index, run, shortcut_run, audit_summary, roundtrip_rejected in batch_results:
         batch_imports = composition_imports(batches[batch_index])
         verified_imports.update(
             (plan.synthetic_name, batch_imports) for plan in batches[batch_index]
@@ -589,6 +628,7 @@ def _synthetic_records(
             {"batch": batch_index, "status": run.status, **audit_summary}
         )
         rejected_names.update(shortcut_run.rejected_names)
+        roundtrip_rejected_names.update(roundtrip_rejected)
         shortcut_runs.append(
             {
                 "batch": batch_index,
@@ -601,11 +641,27 @@ def _synthetic_records(
     selected_source_sets: set[tuple[str, ...]] = set()
     selected_derivation_families: set[str] = set()
     shortfalls: dict[str, tuple[int, int, int, int]] = {}
+    inaccessible_private_types = {
+        name
+        for name, audit in all_audits.items()
+        if "✝" in audit.statement_type
+    }
+    oversized_persisted_types = {
+        name
+        for name, audit in all_audits.items()
+        if len(audit.statement_type) > MAX_PERSISTABLE_SYNTHETIC_STATEMENT_CHARS
+    }
     for family, requested in requested_counts.items():
         eligible = [
             plan
             for plan in plans
-            if plan.domain_family == family and plan.synthetic_name not in rejected_names
+            if (
+                plan.domain_family == family
+                and plan.synthetic_name not in rejected_names
+                and plan.synthetic_name not in inaccessible_private_types
+                and plan.synthetic_name not in oversized_persisted_types
+                and plan.synthetic_name not in roundtrip_rejected_names
+            )
         ]
         family_selected: list[Any] = []
         for plan in eligible:
@@ -682,7 +738,6 @@ def _synthetic_records(
         raise RuntimeError("synthetic uniqueness gate failed after record construction")
     persisted_context = verify_persisted_synthetic_contexts(
         assigned,
-        plans={plan.synthetic_name: plan for plan in selected},
         output_dir=output_dir,
         target_root=target_root,
         workers=workers,
@@ -694,6 +749,10 @@ def _synthetic_records(
         "supplemental_reserve_counts": supplemental_reserve_counts,
         "resolved_after_presence_audit": len(plans),
         "shortcut_rejected": len(rejected_names),
+        "inaccessible_private_statement_types": len(inaccessible_private_types),
+        "oversized_persisted_statement_types": len(oversized_persisted_types),
+        "max_persisted_statement_chars": MAX_PERSISTABLE_SYNTHETIC_STATEMENT_CHARS,
+        "stored_declaration_roundtrip_rejected": len(roundtrip_rejected_names),
         "unresolved_source_constants": len(missing_constants),
         "composition_runs": composition_runs,
         "shortcut_runs": shortcut_runs,
@@ -1202,7 +1261,7 @@ def main() -> int:
     real_candidates, _ = collapse_duplicate_candidates(real_candidates)
     environment = dict(config.environment)
     environment["split_seed"] = config.value["synthetic"]["split_seed"]
-    synthetic_cache = output_dir / ".synthetic-v9-cache.pkl"
+    synthetic_cache = output_dir / ".synthetic-v10-cache.pkl"
     if args.resume_full and synthetic_cache.is_file():
         with synthetic_cache.open("rb") as handle:
             cache_version, synthetic, synthetic_evidence = pickle.load(handle)

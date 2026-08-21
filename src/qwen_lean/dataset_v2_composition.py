@@ -36,7 +36,7 @@ MISSING_PREFIX = "DATASET_V2_MISSING\t"
 UNIVERSE_GROUNDING_PREFIX = "DATASET_V2_UNIVERSE_GROUNDING\t"
 STRUCTURAL_ARITY = {"direct": 2, "branching": 3, "deep": 4}
 CONSTANT_PRESENCE_BATCH_SIZE = 256
-PERSISTED_CONTEXT_CACHE_VERSION = "dataset-v2-persisted-context-v2"
+PERSISTED_CONTEXT_CACHE_VERSION = "dataset-v2-persisted-context-v7"
 _QUOTED_NAME_COMPONENT_RE = re.compile(r"«([^»]+)»")
 
 
@@ -464,7 +464,7 @@ def composition_imports(
     return _composition_imports(plans, include_retrieval=include_retrieval)
 
 
-_LEAN_AUDIT_PRELUDE = r'''
+_LEAN_SOURCE_TYPE_PRELUDE = r'''
 open Lean Elab Term Command Meta
 
 syntax "source_type% " ident : term
@@ -477,6 +477,11 @@ elab_rules : term
       unless ← isProp type do
         throwError "Dataset-v2 composition source is not proposition-valued"
       pure type
+'''.strip()
+
+
+_LEAN_AUDIT_PRELUDE = r'''
+open Lean Elab Term Command Meta
 
 partial def datasetV2Consts : Expr → List Name
   | .bvar _ | .fvar _ | .mvar _ | .sort _ | .lit _ => []
@@ -495,7 +500,11 @@ def datasetV2Audit (names : Array Name) : CommandElabM Unit :=
       let info ← getConstInfo name
       match info with
       | .thmInfo data =>
-        let rendered := (← ppExpr data.type).pretty
+        let rendered := (← withOptions (fun options =>
+          options
+            |>.setBool `pp.all true
+            |>.setBool `pp.privateNames false
+            |>.set `pp.maxSteps (1000000 : Nat)) (ppExpr data.type)).pretty
         let dependencies := (datasetV2Consts data.value).eraseDups
         let json := Json.mkObj [
           ("name", Json.str name.toString),
@@ -508,10 +517,36 @@ def datasetV2Audit (names : Array Name) : CommandElabM Unit :=
 '''.strip()
 
 
+_LEAN_COMPOSITION_PRELUDE = _LEAN_SOURCE_TYPE_PRELUDE + "\n\n" + _LEAN_AUDIT_PRELUDE
+
+
+_LEAN_STORED_AUDIT_PRELUDE = r'''
+open Lean Elab Command
+
+def datasetV2StoredAudit (names : Array Name) : CommandElabM Unit := do
+  for name in names do
+    match ← getConstInfo name with
+    | .thmInfo _ =>
+      let json := Json.mkObj [
+        ("name", Json.str name.toString),
+        ("type", Json.str ""),
+        ("dependencies", Json.arr #[]),
+        ("level_parameters", Json.arr #[])
+      ]
+      logInfo ("DATASET_V2_AUDIT\t" ++ json.compress)
+    | _ => throwError "{name} is not a theorem"
+'''.strip()
+
+
 def render_composition_source(plans: Sequence[CompositionPlan]) -> str:
     if not plans:
         raise ValueError("composition source requires at least one plan")
-    lines = [*(f"import {module}" for module in _composition_imports(plans)), "", _LEAN_AUDIT_PRELUDE, ""]
+    lines = [
+        *(f"import {module}" for module in _composition_imports(plans)),
+        "",
+        _LEAN_COMPOSITION_PRELUDE,
+        "",
+    ]
     for plan in plans:
         plan.validate()
         lines.extend(
@@ -701,10 +736,6 @@ def validate_composition_audits(
     }
 
 
-def _compact_type(value: str) -> str:
-    return re.sub(r"\s+", " ", value).strip()
-
-
 def render_shortcut_gate_source(
     plans: Sequence[CompositionPlan],
     audits: Mapping[str, CompositionAudit],
@@ -717,7 +748,7 @@ def render_shortcut_gate_source(
             for module in _composition_imports(plans, include_retrieval=True)
         ),
         "",
-        _LEAN_AUDIT_PRELUDE,
+        _LEAN_SOURCE_TYPE_PRELUDE,
         "",
     ]
     line_to_name: dict[int, str] = {}
@@ -905,9 +936,8 @@ def records_from_compositions(
 
 def render_persisted_synthetic_context_source(
     records: Sequence[DatasetV2Record],
-    plans: Mapping[str, CompositionPlan],
 ) -> str:
-    """Reconstruct final generated theorems from their plans and persisted imports."""
+    """Reconstruct final generated theorems from only their persisted records."""
 
     if not records:
         raise ValueError("persisted synthetic context source requires records")
@@ -921,7 +951,7 @@ def render_persisted_synthetic_context_source(
     lines = [
         *(f"import {module}" for module in imports),
         "",
-        _LEAN_AUDIT_PRELUDE,
+        "set_option maxHeartbeats 1000000",
         "",
     ]
     audit_names: list[str] = []
@@ -932,14 +962,6 @@ def render_persisted_synthetic_context_source(
         name = record.canonical_declaration[len(declaration_prefix) :].split(
             ":", 1
         )[0].strip()
-        plan = plans.get(name)
-        if plan is None:
-            raise ValueError(f"missing persisted-context plan for {name}")
-        if (
-            tuple(item.statement_id for item in plan.source_lemmas)
-            != record.source_lemma_ids
-        ):
-            raise ValueError(f"persisted-context plan sources differ for {name}")
         namespace = f"R{record.statement_id}"
         lines.extend(
             [
@@ -955,27 +977,113 @@ def render_persisted_synthetic_context_source(
             lines.extend(
                 [
                     f"namespace V{variant_index}",
-                    f"theorem {name} : {_type_expression(plan)} := {variant.canonical_proof}",
+                    f"{record.canonical_declaration} := {variant.canonical_proof}",
                     f"end V{variant_index}",
                     "",
                 ]
             )
         lines.extend([f"end {namespace}", "end DatasetV2PersistedContext", ""])
+    lines.extend([_LEAN_STORED_AUDIT_PRELUDE, ""])
     rendered_names = ", ".join(f"`{name}" for name in audit_names)
-    lines.append(f"run_cmd datasetV2Audit #[{rendered_names}]")
+    lines.append(f"run_cmd datasetV2StoredAudit #[{rendered_names}]")
     return "\n".join(lines) + "\n"
+
+
+def render_composition_roundtrip_source(
+    plans: Sequence[CompositionPlan],
+    audits: Mapping[str, CompositionAudit],
+) -> str:
+    """Render generated statements from audited text, without source-type macros."""
+
+    if not plans:
+        raise ValueError("composition roundtrip source requires plans")
+    lines = [
+        *(f"import {module}" for module in _composition_imports(plans)),
+        "",
+        "set_option maxHeartbeats 1000000",
+        "",
+    ]
+    audit_names: list[str] = []
+    for plan in plans:
+        audit = audits.get(plan.synthetic_name)
+        if audit is None:
+            raise ValueError(f"missing roundtrip audit for {plan.synthetic_name}")
+        namespace = f"N{plan.synthetic_name}"
+        qualified_name = (
+            "DatasetV2CompositionRoundtrip."
+            f"{namespace}.{plan.synthetic_name}"
+        )
+        audit_names.append(qualified_name)
+        lines.extend(
+            [
+                "namespace DatasetV2CompositionRoundtrip",
+                f"namespace {namespace}",
+                f"theorem {plan.synthetic_name} : {audit.statement_type} := by",
+                f"  exact {_oracle_expression(plan)}",
+                f"end {namespace}",
+                "end DatasetV2CompositionRoundtrip",
+                "",
+            ]
+        )
+    lines.extend([_LEAN_STORED_AUDIT_PRELUDE, ""])
+    rendered_names = ", ".join(f"`{name}" for name in audit_names)
+    lines.append(f"run_cmd datasetV2StoredAudit #[{rendered_names}]")
+    return "\n".join(lines) + "\n"
+
+
+def find_non_roundtripping_compositions(
+    plans: Sequence[CompositionPlan],
+    audits: Mapping[str, CompositionAudit],
+    *,
+    source_path: Path,
+    target_root: Path,
+    timeout_seconds: float = 1800.0,
+) -> tuple[str, ...]:
+    """Bisect a batch and return every audited statement that Lean cannot recompile."""
+
+    if not plans:
+        return ()
+    rejected: set[str] = set()
+
+    def check(candidates: Sequence[CompositionPlan], suffix: str) -> None:
+        candidate_path = source_path.with_name(
+            f"{source_path.stem}-{suffix}{source_path.suffix}"
+        )
+        candidate_path.write_text(
+            render_composition_roundtrip_source(candidates, audits),
+            encoding="utf-8",
+        )
+        run = run_composition_source(
+            candidate_path,
+            target_root=target_root,
+            timeout_seconds=timeout_seconds,
+        )
+        if run.status == "accepted":
+            if len(run.audits) != len(candidates):
+                raise RuntimeError(
+                    "composition roundtrip gate accepted without auditing every theorem"
+                )
+            return
+        if len(candidates) == 1:
+            rejected.add(candidates[0].synthetic_name)
+            return
+        midpoint = len(candidates) // 2
+        check(candidates[:midpoint], suffix + "0")
+        check(candidates[midpoint:], suffix + "1")
+
+    check(plans, "root")
+    return tuple(sorted(rejected))
 
 
 def verify_persisted_synthetic_contexts(
     records: Sequence[DatasetV2Record],
     *,
-    plans: Mapping[str, CompositionPlan],
     output_dir: Path,
     target_root: Path,
     workers: int = 4,
     timeout_seconds: float = 1800.0,
 ) -> dict[str, int | str]:
-    """Lean-verify every final synthetic from only its persisted imports."""
+    """Lean-verify every final synthetic from its stored declaration, proof, and imports."""
 
     synthetic = [record for record in records if record.provenance == "synthetic"]
     if not synthetic:
@@ -998,7 +1106,7 @@ def verify_persisted_synthetic_contexts(
         indexed: tuple[int, tuple[tuple[str, ...], list[DatasetV2Record]]],
     ) -> tuple[int, int]:
         index, (_, group) = indexed
-        source = render_persisted_synthetic_context_source(group, plans)
+        source = render_persisted_synthetic_context_source(group)
         record_contract = "\0".join(
             item.canonical_declaration
             for item in sorted(group, key=lambda item: item.statement_id)
@@ -1038,20 +1146,14 @@ def verify_persisted_synthetic_contexts(
             name = record.canonical_declaration.removeprefix("theorem ").split(
                 ":", 1
             )[0].strip()
-            stored_type = record.canonical_declaration.split(":", 1)[1]
             for variant_index in range(len(record.proof_variants)):
                 qualified_name = (
                     "DatasetV2PersistedContext."
                     f"R{record.statement_id}.V{variant_index}.{name}"
                 )
-                audit = audited.get(qualified_name)
-                if (
-                    audit is None
-                    or _compact_type(audit.statement_type)
-                    != _compact_type(stored_type)
-                ):
+                if qualified_name not in audited:
                     raise RuntimeError(
-                        "persisted context reconstruction changed the stored statement "
+                        "persisted context reconstruction omitted the stored theorem "
                         f"for {record.statement_id} variant {variant_index}"
                     )
         temporary_cache = cache_path.with_suffix(".tmp")
