@@ -55,9 +55,11 @@ row to 19,385 tokens and completed one real NF4 QLoRA forward, backward, and
 optimizer update on the project-controlled RTX 4000 Ada GPU. All 496 intended
 LoRA parameter tensors had present finite gradients, 248 tensors changed on the
 first update, and the checked frozen base parameter remained unchanged. The
-run used non-reentrant decoder checkpointing, activation CPU offload, 64-token
-DeltaNet and target-only LM-head loss chunks, and checkpointed 1,024-token
-sequence chunks in all 32 decoder MLPs. Peak CUDA allocation was 18,143,714,816
+run used non-reentrant decoder checkpointing, activation CPU offload for
+sequences of at least 8,192 tokens, 64-token DeltaNet and target-only LM-head
+loss chunks, and checkpointed 1,024-token sequence chunks in all 32 decoder
+MLPs. Shorter training examples remain on the faster GPU-only activation path.
+Peak CUDA allocation was 18,143,714,816
 bytes and peak reservation was 18,440,257,536 bytes, leaving 2,549,547,008
 bytes of reserved-memory headroom against the 536,870,912-byte gate.
 `production-preflight.json` retains the exact example, parameter inventory,

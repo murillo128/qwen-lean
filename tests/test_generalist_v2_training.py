@@ -25,6 +25,7 @@ from qwen_lean.generalist_v2_training import (
     scale_single_example_causal_loss,
     select_overfit64_variants,
     select_smoke4096_variants,
+    should_offload_activations,
     statement_weighted_causal_loss,
     summarize_finite_optimizer_logs,
     summarize_overfit_curve,
@@ -622,3 +623,10 @@ def test_sequence_chunked_mlp_preserves_output_and_gradients() -> None:
     assert torch.allclose(observed.detach(), expected)
     assert inputs.grad is not None
     assert bool(torch.isfinite(inputs.grad).all().item())
+
+
+def test_activation_cpu_offload_is_reserved_for_long_sequences() -> None:
+    assert should_offload_activations(8191) is False
+    assert should_offload_activations(8192) is True
+    with pytest.raises(ValueError, match="sequence length"):
+        should_offload_activations(0)

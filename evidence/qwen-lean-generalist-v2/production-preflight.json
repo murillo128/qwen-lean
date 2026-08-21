@@ -392,6 +392,8 @@
   },
   "runtime": {
     "activation_cpu_offload": true,
+    "activation_cpu_offload_applied": true,
+    "activation_cpu_offload_min_sequence_tokens": 8192,
     "cuda_allocator_config": "expandable_segments:True",
     "cuda_device": "NVIDIA RTX 4000 Ada Generation",
     "cuda_device_capability": [
@@ -425,7 +427,7 @@
     "sequence_chunked_mlp_module_count": 32,
     "target_only_checkpointed_causal_loss": true,
     "torch_cuda_version": "13.0",
-    "wall_time_seconds": 177.93124216899741
+    "wall_time_seconds": 174.9455247449223
   },
   "schema_version": "generalist-v2-production-preflight-v1",
   "selected_lane": "nf4-qlora",

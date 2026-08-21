@@ -12,6 +12,7 @@ import subprocess
 import time
 from collections import Counter
 from collections.abc import Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import fmean
@@ -53,6 +54,7 @@ OVERFIT64_OPTIMIZER_STEPS = 600
 GRADIENT_CHECKPOINTING_USE_REENTRANT = False
 LINEAR_ATTENTION_TRAINING_CHUNK_SIZE = 64
 ACTIVATION_CPU_OFFLOAD = True
+ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS = 8192
 LM_HEAD_LOSS_CHUNK_TOKENS = 64
 MLP_SEQUENCE_CHUNK_TOKENS = 1024
 Q0_EVIDENCE_SCHEMA_VERSION = "generalist-v2-q0-evidence-v1"
@@ -838,6 +840,15 @@ def checkpointed_target_only_causal_loss(
     return loss_sum / target_count
 
 
+def should_offload_activations(sequence_tokens: int) -> bool:
+    if sequence_tokens < 1:
+        raise ValueError("generalist-v2 sequence length must be positive")
+    return (
+        ACTIVATION_CPU_OFFLOAD
+        and sequence_tokens >= ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS
+    )
+
+
 def build_weighted_sft_trainer(
     runtime: GeneralistTrainingRuntime,
     examples: Sequence[WeightedTokenizedExample],
@@ -913,7 +924,13 @@ def build_weighted_sft_trainer(
             causal_model = (
                 model.get_base_model() if hasattr(model, "get_base_model") else model
             )
-            with torch.autograd.graph.save_on_cpu(pin_memory=True):
+            sequence_tokens = int(inputs["input_ids"].shape[1])
+            activation_context = (
+                torch.autograd.graph.save_on_cpu(pin_memory=True)
+                if should_offload_activations(sequence_tokens)
+                else nullcontext()
+            )
+            with activation_context:
                 outputs = causal_model.model(
                     **inputs,
                     chunk_size=LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
@@ -1674,6 +1691,9 @@ def run_bounded_training_gate(
         maximum_sequence_tokens=context_tokens,
     )
     reload_probes = tuple(selected)
+    activation_cpu_offload_example_count = sum(
+        should_offload_activations(len(item.input_ids)) for item in examples
+    )
     del records, selected
     gc.collect()
     one_pass_steps = math.ceil(
@@ -1797,6 +1817,12 @@ def run_bounded_training_gate(
             ),
             "linear_attention_chunk_size": LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
             "activation_cpu_offload": ACTIVATION_CPU_OFFLOAD,
+            "activation_cpu_offload_min_sequence_tokens": (
+                ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS
+            ),
+            "activation_cpu_offload_example_count": (
+                activation_cpu_offload_example_count
+            ),
             "lm_head_loss_chunk_tokens": LM_HEAD_LOSS_CHUNK_TOKENS,
             "target_only_checkpointed_causal_loss": True,
             "mlp_sequence_chunk_tokens": MLP_SEQUENCE_CHUNK_TOKENS,
@@ -2044,6 +2070,12 @@ def run_production_preflight(
             ),
             "linear_attention_chunk_size": LINEAR_ATTENTION_TRAINING_CHUNK_SIZE,
             "activation_cpu_offload": ACTIVATION_CPU_OFFLOAD,
+            "activation_cpu_offload_min_sequence_tokens": (
+                ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS
+            ),
+            "activation_cpu_offload_applied": should_offload_activations(
+                len(example.input_ids)
+            ),
             "lm_head_loss_chunk_tokens": LM_HEAD_LOSS_CHUNK_TOKENS,
             "target_only_checkpointed_causal_loss": True,
             "mlp_sequence_chunk_tokens": MLP_SEQUENCE_CHUNK_TOKENS,
