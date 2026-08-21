@@ -18,6 +18,7 @@ from qwen_lean.generalist_v2_training import (
     checkpointed_target_only_causal_loss,
     choose_precision_lane,
     enable_sequence_chunked_mlp,
+    inspect_gated_delta_rule_backend,
     inspect_lora_targets,
     lora_target_summary,
     pad_weighted_target_only_batch,
@@ -630,3 +631,53 @@ def test_activation_cpu_offload_is_reserved_for_long_sequences() -> None:
     assert should_offload_activations(8192) is True
     with pytest.raises(ValueError, match="sequence length"):
         should_offload_activations(0)
+
+
+def test_locked_fla_delta_rule_matches_torch_reference() -> None:
+    torch = pytest.importorskip("torch")
+    pytest.importorskip("fla")
+    if not torch.cuda.is_available():
+        pytest.skip("FLA DeltaNet equivalence requires CUDA")
+    from transformers.models.qwen3_5.modeling_qwen3_5 import (
+        torch_chunk_gated_delta_rule,
+    )
+
+    backend = inspect_gated_delta_rule_backend()
+    torch.manual_seed(7)
+    shape = (1, 64, 2, 8)
+    inputs = [torch.randn(shape, device="cuda", dtype=torch.bfloat16) for _ in range(3)]
+    decay = torch.nn.functional.logsigmoid(
+        torch.randn((1, 64, 2), device="cuda", dtype=torch.float32)
+    )
+    beta = torch.sigmoid(torch.randn((1, 64, 2), device="cuda", dtype=torch.float32))
+
+    def run(operation):
+        arguments = [item.detach().clone().requires_grad_() for item in inputs]
+        run_decay = decay.detach().clone().requires_grad_()
+        run_beta = beta.detach().clone().requires_grad_()
+        output, _ = operation(
+            *arguments,
+            g=run_decay,
+            beta=run_beta,
+            chunk_size=64,
+            initial_state=None,
+            output_final_state=False,
+            use_qk_l2norm_in_kernel=True,
+        )
+        output.float().square().mean().backward()
+        gradients = [
+            item.grad.detach().float() for item in [*arguments, run_decay, run_beta]
+        ]
+        return output.detach().float(), gradients
+
+    observed, observed_gradients = run(torch_chunk_gated_delta_rule)
+    expected, expected_gradients = run(torch_chunk_gated_delta_rule.__wrapped__)
+
+    assert backend["distribution_version"] == "0.5.2"
+    assert torch.allclose(observed, expected, atol=0.005, rtol=0.005)
+    assert all(
+        torch.allclose(actual, reference, atol=2e-5, rtol=0.01)
+        for actual, reference in zip(
+            observed_gradients, expected_gradients, strict=True
+        )
+    )

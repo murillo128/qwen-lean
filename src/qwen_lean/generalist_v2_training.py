@@ -3,6 +3,7 @@ from __future__ import annotations
 import gc
 import hashlib
 import importlib.metadata
+import inspect
 import json
 import math
 import os
@@ -57,6 +58,9 @@ ACTIVATION_CPU_OFFLOAD = True
 ACTIVATION_CPU_OFFLOAD_MIN_SEQUENCE_TOKENS = 8192
 LM_HEAD_LOSS_CHUNK_TOKENS = 64
 MLP_SEQUENCE_CHUNK_TOKENS = 1024
+FLA_VERSION = "0.5.2"
+FLA_UPSTREAM_TAG = "v0.5.2"
+FLA_UPSTREAM_REVISION = "9c8e42e762fce087c27b673af4922795d9edb85e"
 Q0_EVIDENCE_SCHEMA_VERSION = "generalist-v2-q0-evidence-v1"
 Q0_EXPECTED_WORKLOADS = {
     "fresh-composition-valid-v2": 406,
@@ -99,6 +103,7 @@ class GeneralistTrainingRuntime:
     total_parameter_count: int
     quantized_linear_module_count: int
     sequence_chunked_mlp_module_count: int = 0
+    gated_delta_rule_backend: Mapping[str, Any] | None = None
 
 
 def _target_family(path: str) -> str:
@@ -469,6 +474,43 @@ def enable_sequence_chunked_mlp(model: Any, *, chunk_tokens: int) -> int:
     return matched
 
 
+def inspect_gated_delta_rule_backend() -> dict[str, Any]:
+    """Require the pinned local training kernel instead of the slow torch loop."""
+    try:
+        from transformers.models.qwen3_5.modeling_qwen3_5 import (
+            torch_chunk_gated_delta_rule,
+        )
+    except ImportError as error:
+        raise RuntimeError(
+            "generalist-v2 cannot inspect the DeltaNet backend"
+        ) from error
+    implementation = inspect.getclosurevars(torch_chunk_gated_delta_rule).nonlocals.get(
+        "implementation"
+    )
+    module = getattr(implementation, "__module__", "")
+    name = getattr(implementation, "__name__", "")
+    version = importlib.metadata.version("flash-linear-attention")
+    if (
+        module != "fla.ops.gated_delta_rule.chunk"
+        or name != "chunk_gated_delta_rule"
+        or version != FLA_VERSION
+    ):
+        raise RuntimeError(
+            "generalist-v2 requires the pinned FLA DeltaNet training kernel: "
+            f"module={module}, name={name}, version={version}"
+        )
+    return {
+        "implementation_module": module,
+        "implementation_name": name,
+        "distribution": "flash-linear-attention",
+        "distribution_version": version,
+        "upstream_tag": FLA_UPSTREAM_TAG,
+        "upstream_revision": FLA_UPSTREAM_REVISION,
+        "license": "MIT",
+        "execution": "project-controlled-local-cuda",
+    }
+
+
 def load_training_runtime(
     config: GeneralistV2Config,
     *,
@@ -568,6 +610,7 @@ def load_training_runtime(
     sequence_chunked_mlp_module_count = enable_sequence_chunked_mlp(
         model, chunk_tokens=MLP_SEQUENCE_CHUNK_TOKENS
     )
+    gated_delta_rule_backend = inspect_gated_delta_rule_backend()
     trainable, trainable_count, total_count = _validate_trainables(model, matches)
     return GeneralistTrainingRuntime(
         model=model,
@@ -579,6 +622,7 @@ def load_training_runtime(
         total_parameter_count=total_count,
         quantized_linear_module_count=int(quantized_linear_count),
         sequence_chunked_mlp_module_count=sequence_chunked_mlp_module_count,
+        gated_delta_rule_backend=gated_delta_rule_backend,
     )
 
 
@@ -652,6 +696,7 @@ def run_runtime_preparation_smoke(
             "sequence_chunked_mlp_module_count": (
                 runtime.sequence_chunked_mlp_module_count
             ),
+            "gated_delta_rule_backend": runtime.gated_delta_rule_backend,
             "packages": _package_versions(
                 (
                     "torch",
@@ -663,6 +708,7 @@ def run_runtime_preparation_smoke(
                     "datasets",
                     "huggingface-hub",
                     "safetensors",
+                    "flash-linear-attention",
                 )
             ),
         },
@@ -1752,6 +1798,7 @@ def run_bounded_training_gate(
     trainable_parameter_count = runtime.trainable_parameter_count
     selected_lane = runtime.lane
     sequence_chunked_mlp_module_count = runtime.sequence_chunked_mlp_module_count
+    gated_delta_rule_backend = runtime.gated_delta_rule_backend
     del trainer, runtime, examples
     gc.collect()
     torch.cuda.empty_cache()
@@ -1827,6 +1874,7 @@ def run_bounded_training_gate(
             "target_only_checkpointed_causal_loss": True,
             "mlp_sequence_chunk_tokens": MLP_SEQUENCE_CHUNK_TOKENS,
             "sequence_chunked_mlp_module_count": (sequence_chunked_mlp_module_count),
+            "gated_delta_rule_backend": gated_delta_rule_backend,
             "packages": _package_versions(
                 (
                     "torch",
@@ -1838,6 +1886,7 @@ def run_bounded_training_gate(
                     "datasets",
                     "huggingface-hub",
                     "safetensors",
+                    "flash-linear-attention",
                 )
             ),
         },
@@ -2082,6 +2131,7 @@ def run_production_preflight(
             "sequence_chunked_mlp_module_count": (
                 runtime.sequence_chunked_mlp_module_count
             ),
+            "gated_delta_rule_backend": runtime.gated_delta_rule_backend,
             "packages": _package_versions(
                 (
                     "torch",
@@ -2093,6 +2143,7 @@ def run_production_preflight(
                     "datasets",
                     "huggingface-hub",
                     "safetensors",
+                    "flash-linear-attention",
                 )
             ),
         },

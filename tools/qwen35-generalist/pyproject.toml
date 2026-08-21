@@ -7,6 +7,7 @@ dependencies = [
   "accelerate==1.14.0",
   "bitsandbytes==0.50.1",
   "datasets==5.0.1",
+  "flash-linear-attention==0.5.2",
   "peft==0.20.0",
   "qwen-lean",
   "torch==2.13.0",

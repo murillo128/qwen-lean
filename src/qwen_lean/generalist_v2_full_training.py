@@ -247,6 +247,7 @@ def run_full_generalist_training(
     selected_lane = runtime.lane
     trainable_parameter_count = runtime.trainable_parameter_count
     sequence_chunked_mlp_module_count = runtime.sequence_chunked_mlp_module_count
+    gated_delta_rule_backend = runtime.gated_delta_rule_backend
     del trainer, runtime, examples
     gc.collect()
     torch.cuda.empty_cache()
@@ -318,6 +319,7 @@ def run_full_generalist_training(
             "target_only_checkpointed_causal_loss": True,
             "mlp_sequence_chunk_tokens": MLP_SEQUENCE_CHUNK_TOKENS,
             "sequence_chunked_mlp_module_count": (sequence_chunked_mlp_module_count),
+            "gated_delta_rule_backend": gated_delta_rule_backend,
             "packages": _package_versions(
                 (
                     "torch",
@@ -329,6 +331,7 @@ def run_full_generalist_training(
                     "datasets",
                     "huggingface-hub",
                     "safetensors",
+                    "flash-linear-attention",
                 )
             ),
         },

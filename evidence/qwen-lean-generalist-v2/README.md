@@ -59,9 +59,12 @@ run used non-reentrant decoder checkpointing, activation CPU offload for
 sequences of at least 8,192 tokens, 64-token DeltaNet and target-only LM-head
 loss chunks, and checkpointed 1,024-token sequence chunks in all 32 decoder
 MLPs. Shorter training examples remain on the faster GPU-only activation path.
-Peak CUDA allocation was 18,143,714,816
-bytes and peak reservation was 18,440,257,536 bytes, leaving 2,549,547,008
-bytes of reserved-memory headroom against the 536,870,912-byte gate.
+The 24 DeltaNet layers used the locally executed FLA 0.5.2 training kernel,
+pinned to upstream tag commit `9c8e42e762fce087c27b673af4922795d9edb85e`
+under its MIT license. Its output and gradients were checked against the
+Transformers torch reference before use. Peak CUDA allocation was
+12,278,879,744 bytes and peak reservation was 13,017,022,464 bytes, leaving
+7,972,782,080 bytes of reserved-memory headroom against the 536,870,912-byte gate.
 `production-preflight.json` retains the exact example, parameter inventory,
 runtime lock, and measurements.
 
