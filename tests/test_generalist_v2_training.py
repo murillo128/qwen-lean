@@ -628,9 +628,10 @@ def test_sequence_chunked_mlp_preserves_output_and_gradients() -> None:
     assert bool(torch.isfinite(inputs.grad).all().item())
 
 
-def test_activation_cpu_offload_is_reserved_for_long_sequences() -> None:
+def test_activation_cpu_offload_is_disabled_for_training() -> None:
     assert should_offload_activations(4095) is False
-    assert should_offload_activations(4096) is True
+    assert should_offload_activations(4096) is False
+    assert should_offload_activations(32768) is False
     with pytest.raises(ValueError, match="sequence length"):
         should_offload_activations(0)
 

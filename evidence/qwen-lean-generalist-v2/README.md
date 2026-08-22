@@ -55,12 +55,12 @@ row to 19,385 tokens and completed one real NF4 QLoRA forward, backward, and
 optimizer update on the project-controlled RTX 4000 Ada GPU. All 496 intended
 LoRA parameter tensors had present finite gradients, 248 tensors changed on the
 first update, and the checked frozen base parameter remained unchanged. The
-run used non-reentrant decoder checkpointing from 1,024 tokens, activation CPU
-offload from 4,096 tokens, 32-token DeltaNet chunks, 64-token target-only
-LM-head loss chunks, and checkpointed 1,024-token sequence chunks in all 32
-decoder MLPs. Shorter training examples remain on the faster non-checkpointed,
-GPU-only activation path. An explicit BF16 autocast and PyTorch FlashAttention
-backend constraint prevent a silent dense FP32 SDPA fallback.
+run used non-reentrant decoder checkpointing from 1,024 tokens, 32-token
+DeltaNet chunks, 64-token target-only LM-head loss chunks, and checkpointed
+1,024-token sequence chunks in all 32 decoder MLPs. Shorter training examples
+remain on the faster non-checkpointed path. An explicit BF16 autocast and
+PyTorch FlashAttention backend constraint prevent a silent dense FP32 SDPA
+fallback.
 The 24 DeltaNet layers used the locally executed FLA 0.5.2 training kernel,
 pinned to upstream tag commit `9c8e42e762fce087c27b673af4922795d9edb85e`
 under its MIT license. Its output and gradients were checked against the
@@ -69,6 +69,24 @@ Transformers torch reference before use. Peak CUDA allocation was
 8,245,411,840 bytes of reserved-memory headroom against the 536,870,912-byte gate.
 `production-preflight.json` retains the exact example, parameter inventory,
 runtime lock, and measurements.
+
+`OBSERVED`: overfit64 strongly fit the deterministic 64-statement probe over
+its frozen 600-step sanity trajectory. Mean loss fell from 39.918397 on the
+first complete pass to 0.000578 on the last (ratio 0.00001448). A fresh frozen
+adapter reload reproduced all four generation probes exactly; all four were
+Lean-verified with zero evaluator infrastructure errors.
+
+`OBSERVED`: the first realistic-smoke attempt exposed a host-memory failure,
+not a CUDA failure. The kernel killed the process at optimizer step 186 while
+CPU-offloaded activations occupied about 14 GiB of shared memory on a host whose
+RAM-backed `/tmp` already contained 11.7 GiB of unrelated project state. A
+fresh exact 19,385-token maximum-row forward/backward/update with CPU activation
+offload disabled passed with finite gradients and an adapter-only update. It
+reserved 18,427,674,624 of 20,989,804,544 CUDA bytes, leaving 2,562,129,920
+bytes of headroom. Bounded and full training therefore disable CPU activation
+offload; `no-offload-production-preflight.json` records the superseding memory
+path check without rewriting the truthful gate hash used by the completed
+overfit run.
 
 Commands:
 
