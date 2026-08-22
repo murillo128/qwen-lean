@@ -1892,17 +1892,17 @@ def _parser() -> argparse.ArgumentParser:
 
     generalist_checkpoint_generate = subparsers.add_parser(
         "generalist-v2-checkpoint-generate",
-        help="generate one Q1-Q4 Dataset-v2 validation workload on local CUDA",
+        help="generate one Q0-Q4 Dataset-v2 workload on local CUDA",
     )
     generalist_checkpoint_generate.add_argument("--config", type=Path, required=True)
     generalist_checkpoint_generate.add_argument(
         "--base-evaluation-config", type=Path, required=True
     )
     generalist_checkpoint_generate.add_argument(
-        "--checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+        "--checkpoint", choices=("Q0", "Q1", "Q2", "Q3", "Q4"), required=True
     )
     generalist_checkpoint_generate.add_argument(
-        "--adapter-dir", type=Path, required=True
+        "--adapter-dir", type=Path
     )
     generalist_checkpoint_generate.add_argument("--workload", required=True)
     generalist_checkpoint_generate.add_argument(
@@ -1914,6 +1914,9 @@ def _parser() -> argparse.ArgumentParser:
     generalist_checkpoint_generate.add_argument(
         "--output-dir", type=Path, required=True
     )
+    generalist_checkpoint_generate.add_argument(
+        "--candidates-per-task", type=int, choices=(8, 64)
+    )
 
     generalist_checkpoint_verify = subparsers.add_parser(
         "generalist-v2-checkpoint-verify",
@@ -1921,7 +1924,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     generalist_checkpoint_verify.add_argument("--config", type=Path, required=True)
     generalist_checkpoint_verify.add_argument(
-        "--checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+        "--checkpoint", choices=("Q0", "Q1", "Q2", "Q3", "Q4"), required=True
     )
     generalist_checkpoint_verify.add_argument("--workload", required=True)
     generalist_checkpoint_verify.add_argument(
@@ -1935,6 +1938,9 @@ def _parser() -> argparse.ArgumentParser:
         "--lean-project-root", type=Path, required=True
     )
     generalist_checkpoint_verify.add_argument("--workers", type=int, default=8)
+    generalist_checkpoint_verify.add_argument(
+        "--candidates-per-task", type=int, choices=(8, 64)
+    )
 
     generalist_checkpoint_select = subparsers.add_parser(
         "generalist-v2-checkpoint-select",
@@ -1951,6 +1957,25 @@ def _parser() -> argparse.ArgumentParser:
         "--evaluation-root", type=Path, required=True
     )
     generalist_checkpoint_select.add_argument("--output", type=Path, required=True)
+
+    generalist_extended_select = subparsers.add_parser(
+        "generalist-v2-extended-select",
+        help="freeze the final checkpoint from complete n=64 finalist validation",
+    )
+    generalist_extended_select.add_argument("--config", type=Path, required=True)
+    generalist_extended_select.add_argument(
+        "--screening-selection", type=Path, required=True
+    )
+    generalist_extended_select.add_argument(
+        "--evaluation-root", type=Path, required=True
+    )
+    generalist_extended_select.add_argument(
+        "--final-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_extended_select.add_argument(
+        "--decision-rationale", required=True
+    )
+    generalist_extended_select.add_argument("--output", type=Path, required=True)
 
     generalist_production_preflight = subparsers.add_parser(
         "generalist-v2-production-preflight",
@@ -2097,6 +2122,7 @@ def main(argv: list[str] | None = None) -> int:
             args.output_dir,
             checkpoint_id=args.checkpoint,
             adapter_dir=args.adapter_dir,
+            candidates_per_task=args.candidates_per_task,
         )
         print(json.dumps(evidence, indent=2))
         return 0
@@ -2113,6 +2139,7 @@ def main(argv: list[str] | None = None) -> int:
             args.lean_project_root,
             checkpoint_id=args.checkpoint,
             workers=args.workers,
+            candidates_per_task=args.candidates_per_task,
         )
         print(json.dumps(evidence, indent=2))
         return 0
@@ -2126,6 +2153,22 @@ def main(argv: list[str] | None = None) -> int:
             args.training_run,
             args.evaluation_root,
             args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-extended-select":
+        from .generalist_v2_evaluation import (
+            compact_extended_validation_evidence,
+        )
+
+        evidence = compact_extended_validation_evidence(
+            GeneralistV2Config.load(args.config),
+            args.screening_selection,
+            args.evaluation_root,
+            args.output,
+            final_checkpoint=args.final_checkpoint,
+            decision_rationale=args.decision_rationale,
         )
         print(json.dumps(evidence, indent=2))
         return 0

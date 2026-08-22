@@ -296,6 +296,17 @@ def test_evaluation_plans_keep_test_and_riemann_out_of_selection() -> None:
     assert final["historical_riemann"]["candidates_per_task"] == 4
     assert final["generic_candidates_per_task"] == 8
     assert final["fresh_riemann_candidates_per_task"] == 8
+    assert final["extended_search_budget"]["validation_candidates_per_task"] == 64
+    assert final["extended_search_budget"]["reported_metrics"] == [
+        "pass@1",
+        "pass@2",
+        "pass@4",
+        "pass@8",
+        "pass@16",
+        "pass@32",
+        "pass@64",
+    ]
+    assert final["extended_search_budget"]["historical_riemann_budget_unchanged"]
     with pytest.raises(ValueError, match="frozen Q1-Q4"):
         final_evaluation_plan(config, selected_checkpoint="Q0")
 
@@ -312,6 +323,8 @@ def test_checkpoint_selection_uses_frozen_rule_and_paired_math() -> None:
     selection = select_generalist_checkpoint(evaluations, resamples=200, seed=0)
 
     assert selection["selected_checkpoint"] == "Q3"
+    assert selection["strongest_runner_up"] == "Q2"
+    assert selection["screening_ranking"] == ["Q3", "Q2", "Q1", "Q4"]
     assert "Q4" not in selection["eligible_checkpoints"]
     assert selection["test_or_riemann_outcomes_consulted"] is False
     paired = compare_paired_verified_counts(

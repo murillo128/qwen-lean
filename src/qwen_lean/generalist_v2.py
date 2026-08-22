@@ -915,6 +915,39 @@ def final_evaluation_plan(
         "fresh_riemann_candidates_per_task": config.value["riemann"][
             "fresh_candidates_per_task"
         ],
+        "extended_search_budget": {
+            "screening_candidates_per_task": config.evaluation["candidates_per_task"],
+            "validation_candidates_per_task": 64,
+            "validation_workloads": [
+                config.dataset["validation_memberships"]["minif2f"],
+                config.dataset["validation_memberships"]["fresh_composition"],
+            ],
+            "models": [
+                "Q0",
+                "n8-screening-winner",
+                "n8-strongest-runner-up",
+            ],
+            "reported_metrics": [
+                "pass@1",
+                "pass@2",
+                "pass@4",
+                "pass@8",
+                "pass@16",
+                "pass@32",
+                "pass@64",
+            ],
+            "marginal_gains": [
+                "delta_8_to_16",
+                "delta_16_to_32",
+                "delta_32_to_64",
+            ],
+            "test_candidates_per_task_after_final_freeze": 64,
+            "test_workloads": [
+                config.dataset["test_memberships"]["minif2f"],
+                config.dataset["test_memberships"]["fresh_composition"],
+            ],
+            "historical_riemann_budget_unchanged": True,
+        },
         "test_workloads_consulted_after_checkpoint_freeze": True,
     }
 
@@ -1038,15 +1071,24 @@ def select_generalist_checkpoint(
         raise ValueError(
             "all Q1-Q4 checkpoints have confidently negative miniF2F pass@8"
         )
-    selected = max(
-        eligible,
-        key=lambda checkpoint_id: (
+
+    def ranking_key(checkpoint_id: str) -> tuple[bool, float, float, float, int]:
+        return (
+            not results[checkpoint_id]["minif2f_clean"][
+                "confidently_negative_pass8_delta"
+            ],
             results[checkpoint_id]["fresh_composition"]["pass@8"],
             results[checkpoint_id]["minif2f_clean"]["pass@8"],
             results[checkpoint_id]["fresh_composition"]["pass@1"],
             -int(checkpoint_id[1:]),
-        ),
+        )
+
+    ranked = sorted(
+        TRAINED_CHECKPOINT_IDS,
+        key=ranking_key,
+        reverse=True,
     )
+    selected = ranked[0]
     return {
         "rule": [
             "reject only confidently negative miniF2F-clean pass@8 delta vs Q0",
@@ -1061,7 +1103,9 @@ def select_generalist_checkpoint(
         ],
         "test_or_riemann_outcomes_consulted": False,
         "eligible_checkpoints": eligible,
+        "screening_ranking": ranked,
         "selected_checkpoint": selected,
+        "strongest_runner_up": ranked[1],
         "checkpoints": results,
     }
 

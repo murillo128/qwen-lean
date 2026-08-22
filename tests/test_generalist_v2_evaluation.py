@@ -11,8 +11,10 @@ from qwen_lean.generalist_v2_dataset import generalist_variants
 from qwen_lean.generalist_v2_evaluation import (
     _checkpoint_adapter_spec,
     _compact_checkpoint_workload,
+    _compact_extended_workload,
     _source_position_verification_task,
     _synthetic_task,
+    compact_extended_validation_evidence,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,4 +154,138 @@ def test_compact_checkpoint_workload_binds_adapter_and_task_order(
     with pytest.raises(ValueError, match="selection workload is incomplete"):
         _compact_checkpoint_workload(
             tmp_path, "Q2", "fixture", 1, "different-task-hash", "adapter-hash"
+        )
+
+
+def test_compact_extended_workload_reports_curve_and_marginal_gains(
+    tmp_path: Path,
+) -> None:
+    adapter = {"adapter_model_sha256": "adapter-hash"}
+    (tmp_path / "generation-metadata.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "generalist-v2-extended-generation-v1",
+                "evaluation_profile": "extended-search-budget-v1",
+                "checkpoint_id": "Q2",
+                "workload_id": "fixture",
+                "ordered_task_ids_sha256": "task-hash",
+                "candidate_count": 64,
+                "generation_error_count": 0,
+                "adapter": adapter,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "run.json").write_text(
+        json.dumps({"selected_adapter_binding": adapter, "candidates_per_task": 64}),
+        encoding="utf-8",
+    )
+    pass_at_k = {
+        "pass@1": 0.1,
+        "pass@2": 0.2,
+        "pass@4": 0.3,
+        "pass@8": 0.4,
+        "pass@16": 0.55,
+        "pass@32": 0.7,
+        "pass@64": 1.0,
+    }
+    solved = {
+        "solved@1": 0,
+        "solved@2": 0,
+        "solved@4": 0,
+        "solved@8": 0,
+        "solved@16": 1,
+        "solved@32": 1,
+        "solved@64": 1,
+    }
+    (tmp_path / "summary.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "generalist-v2-extended-verification-v1",
+                "evaluation_profile": "extended-search-budget-v1",
+                "checkpoint_id": "Q2",
+                "workload_id": "fixture",
+                "task_count": 1,
+                "candidate_count": 64,
+                "complete": True,
+                "infrastructure_error_count": 0,
+                "pass_at_k": pass_at_k,
+                "tasks_solved_within_k": solved,
+                "category_counts": {"verified": 2, "lean_rejected": 62},
+                "finish_reason_counts": {"eos": 64},
+                "per_task": [{"verified_candidate_count": 2}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "results.jsonl").write_text("result\n", encoding="utf-8")
+    (tmp_path / "generations.jsonl").write_text("generation\n", encoding="utf-8")
+
+    compact = _compact_extended_workload(
+        tmp_path, "Q2", "fixture", 1, "task-hash", "adapter-hash"
+    )
+
+    assert compact["marginal_pass_at_k"] == pytest.approx(
+        {"delta_8_to_16": 0.15, "delta_16_to_32": 0.15, "delta_32_to_64": 0.3}
+    )
+    assert compact["marginal_tasks_solved"] == {
+        "delta_8_to_16": 1,
+        "delta_16_to_32": 0,
+        "delta_32_to_64": 0,
+    }
+
+
+def test_extended_validation_freeze_uses_only_screened_finalists(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    screening = {
+        "schema_version": "generalist-v2-checkpoint-selection-v1",
+        "status": "frozen",
+        "selection": {
+            "selected_checkpoint": "Q3",
+            "strongest_runner_up": "Q2",
+        },
+        "checkpoints": {
+            checkpoint: {
+                "adapter_model_sha256": f"{checkpoint}-hash",
+                "workloads": {
+                    workload: {"ordered_task_ids_sha256": f"{workload}-hash"}
+                    for workload in (
+                        "fresh-composition-valid-v2",
+                        "minif2f-valid-clean-v2",
+                    )
+                },
+            }
+            for checkpoint in ("Q1", "Q2", "Q3", "Q4")
+        },
+    }
+    screening_path = tmp_path / "screening.json"
+    screening_path.write_text(json.dumps(screening), encoding="utf-8")
+
+    monkeypatch.setattr(
+        "qwen_lean.generalist_v2_evaluation._compact_extended_workload",
+        lambda *args, **kwargs: {"pass_at_k": {"pass@64": 0.5}},
+    )
+    output = tmp_path / "extended.json"
+    evidence = compact_extended_validation_evidence(
+        GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json"),
+        screening_path,
+        tmp_path / "runs",
+        output,
+        final_checkpoint="Q2",
+        decision_rationale="Q2 has materially higher clean pass@64 coverage.",
+    )
+
+    assert list(evidence["controls_and_finalists"]) == ["Q0", "Q3", "Q2"]
+    assert evidence["final_checkpoint"] == "Q2"
+    assert evidence["extended_validation_refined_selection"] is True
+    assert evidence["test_workloads_consulted_before_final_freeze"] is False
+    with pytest.raises(ValueError, match="two screened finalists"):
+        compact_extended_validation_evidence(
+            GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json"),
+            screening_path,
+            tmp_path / "runs",
+            output,
+            final_checkpoint="Q1",
+            decision_rationale="not a finalist",
         )
