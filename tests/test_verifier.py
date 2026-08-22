@@ -7,7 +7,6 @@ import pytest
 from qwen_lean.schema import TaskRecord
 from qwen_lean.verifier import LeanVerifier
 
-
 ROOT = Path(__file__).resolve().parents[1]
 CORE_TASK = TaskRecord(
     id="identity",
@@ -150,6 +149,31 @@ def test_preamble_can_be_primed_outside_candidate_timeout(tmp_path: Path) -> Non
 
     assert outcome.category == "verified"
     assert probe_log.read_text(encoding="utf-8").splitlines() == ["probe"]
+
+
+def test_full_task_can_prime_a_source_prefix_with_a_dangling_modifier(
+    tmp_path: Path,
+) -> None:
+    probe_log = tmp_path / "probes.log"
+    fake_lake = tmp_path / "fake-lake"
+    fake_lake.write_text(
+        "#!/bin/sh\n"
+        f"if grep -q '#check True' \"$5\"; then echo probe >> {probe_log}; fi\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    fake_lake.chmod(0o755)
+    verifier = LeanVerifier(ROOT, lake_command=str(fake_lake))
+    task = TaskRecord(
+        id="protected-identity",
+        preamble="import Init\n\nprotected",
+        declaration="theorem identity (P : Prop) (h : P) : P",
+        declaration_name="identity",
+    )
+
+    assert verifier.prime_task(task, "exact h", timeout_seconds=1.0) is None
+    assert verifier.verify(task, "exact h").category == "verified"
+    assert not probe_log.exists()
 
 
 def test_mathlib_candidate_uses_pinned_dependency() -> None:

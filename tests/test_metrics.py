@@ -54,6 +54,11 @@ def test_summary_uses_distinct_per_task_candidate_indices() -> None:
     assert summary["pass_at_k"] == pytest.approx(
         {"pass@1": 1 / 8, "pass@4": 1 / 2, "pass@8": 1.0}
     )
+    assert summary["tasks_solved_within_k"] == {
+        "solved@1": 1,
+        "solved@4": 1,
+        "solved@8": 1,
+    }
     assert summary["finish_reason_counts"] == {"eos": 8, "token_limit": 0}
 
 
@@ -66,6 +71,7 @@ def test_summary_omits_pass_at_k_larger_than_the_candidate_budget() -> None:
 
     assert summary["complete"] is True
     assert summary["pass_at_k"] == {"pass@1": 0.0}
+    assert summary["tasks_solved_within_k"] == {"solved@1": 0}
 
 
 def test_infrastructure_error_makes_summary_incomplete_without_headline_metrics() -> (
@@ -82,4 +88,42 @@ def test_infrastructure_error_makes_summary_incomplete_without_headline_metrics(
 
     assert summary["complete"] is False
     assert summary["pass_at_k"] is None
+    assert summary["tasks_solved_within_k"] is None
     assert summary["infrastructure_error_count"] == 1
+
+
+def test_summary_reports_complete_extended_search_curve() -> None:
+    results = [
+        _result(
+            "task-a",
+            index,
+            "verified" if index in {9, 47} else "lean_rejected",
+        )
+        for index in range(64)
+    ]
+
+    summary = summarize_results(
+        results,
+        expected_task_ids=["task-a"],
+        candidates_per_task=64,
+        ks=(1, 2, 4, 8, 16, 32, 64),
+    )
+
+    assert list(summary["pass_at_k"]) == [
+        "pass@1",
+        "pass@2",
+        "pass@4",
+        "pass@8",
+        "pass@16",
+        "pass@32",
+        "pass@64",
+    ]
+    assert summary["tasks_solved_within_k"] == {
+        "solved@1": 0,
+        "solved@2": 0,
+        "solved@4": 0,
+        "solved@8": 0,
+        "solved@16": 1,
+        "solved@32": 1,
+        "solved@64": 1,
+    }

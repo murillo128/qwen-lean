@@ -34,6 +34,14 @@ from .gpt53_assessment import (
 from .gpt53_assessment import (
     write_compact_evidence as write_gpt53_evidence,
 )
+from .generalist_v2 import GeneralistV2Config
+from .generalist_v2_full_training import run_full_generalist_training
+from .generalist_v2_training import (
+    run_architecture_load_preflight,
+    run_bounded_training_gate,
+    run_production_preflight,
+    run_runtime_preparation_smoke,
+)
 from .minif2f import Phase1Config
 from .ministral3_assessment import (
     Ministral3AssessmentConfig,
@@ -1806,11 +1814,407 @@ def _parser() -> argparse.ArgumentParser:
     sft2_evidence.add_argument(
         "--config", type=Path, default=root / "config/sft2-ablation.json"
     )
+
+    generalist_architecture = subparsers.add_parser(
+        "generalist-v2-architecture-preflight",
+        help="validate the pinned text-only Qwen3.5 architecture and LoRA targets",
+    )
+    generalist_architecture.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_architecture.add_argument("--model-snapshot", type=Path)
+    generalist_architecture.add_argument("--output", type=Path, required=True)
+
+    generalist_runtime = subparsers.add_parser(
+        "generalist-v2-runtime-preparation-smoke",
+        help="attach the text-only LoRA under the automatically selected precision lane",
+    )
+    generalist_runtime.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_runtime.add_argument("--model-snapshot", type=Path)
+    generalist_runtime.add_argument("--output", type=Path, required=True)
+
+    generalist_dataset = subparsers.add_parser(
+        "generalist-v2-bind-dataset",
+        help="bind the accepted Dataset-v2 package and freeze generalist context",
+    )
+    generalist_dataset.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-4b-generalist-v2.json",
+    )
+    generalist_dataset.add_argument(
+        "--package-root",
+        type=Path,
+        default=root / "data/lean-whole-proof-v2",
+    )
+    generalist_dataset.add_argument("--model-snapshot", type=Path)
+    generalist_dataset.add_argument("--view-dir", type=Path, required=True)
+    generalist_dataset.add_argument("--output", type=Path, required=True)
+
+    generalist_q0_generate = subparsers.add_parser(
+        "generalist-v2-q0-generate",
+        help="generate one Q0 Dataset-v2 workload on local CUDA",
+    )
+    generalist_q0_generate.add_argument("--config", type=Path, required=True)
+    generalist_q0_generate.add_argument(
+        "--base-evaluation-config", type=Path, required=True
+    )
+    generalist_q0_generate.add_argument("--workload", required=True)
+    generalist_q0_generate.add_argument("--package-root", type=Path, required=True)
+    generalist_q0_generate.add_argument("--view-dir", type=Path, required=True)
+    generalist_q0_generate.add_argument("--output-dir", type=Path, required=True)
+
+    generalist_q0_verify = subparsers.add_parser(
+        "generalist-v2-q0-verify", help="verify one stored Q0 workload"
+    )
+    generalist_q0_verify.add_argument("--config", type=Path, required=True)
+    generalist_q0_verify.add_argument("--workload", required=True)
+    generalist_q0_verify.add_argument("--package-root", type=Path, required=True)
+    generalist_q0_verify.add_argument("--view-dir", type=Path, required=True)
+    generalist_q0_verify.add_argument("--output-dir", type=Path, required=True)
+    generalist_q0_verify.add_argument("--lean-project-root", type=Path, required=True)
+    generalist_q0_verify.add_argument("--workers", type=int, default=8)
+
+    generalist_q0_evidence = subparsers.add_parser(
+        "generalist-v2-q0-evidence", help="write compact complete Q0 evidence"
+    )
+    generalist_q0_evidence.add_argument("--config", type=Path, required=True)
+    generalist_q0_evidence.add_argument(
+        "--evaluation-root", type=Path, required=True
+    )
+    generalist_q0_evidence.add_argument("--output", type=Path, required=True)
+
+    generalist_checkpoint_generate = subparsers.add_parser(
+        "generalist-v2-checkpoint-generate",
+        help="generate one Q0-Q4 Dataset-v2 workload on local CUDA",
+    )
+    generalist_checkpoint_generate.add_argument("--config", type=Path, required=True)
+    generalist_checkpoint_generate.add_argument(
+        "--base-evaluation-config", type=Path, required=True
+    )
+    generalist_checkpoint_generate.add_argument(
+        "--checkpoint", choices=("Q0", "Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_checkpoint_generate.add_argument(
+        "--adapter-dir", type=Path
+    )
+    generalist_checkpoint_generate.add_argument("--workload", required=True)
+    generalist_checkpoint_generate.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_checkpoint_generate.add_argument(
+        "--view-dir", type=Path, required=True
+    )
+    generalist_checkpoint_generate.add_argument(
+        "--output-dir", type=Path, required=True
+    )
+    generalist_checkpoint_generate.add_argument(
+        "--candidates-per-task", type=int, choices=(8, 64)
+    )
+
+    generalist_checkpoint_verify = subparsers.add_parser(
+        "generalist-v2-checkpoint-verify",
+        help="verify one stored Q1-Q4 validation workload",
+    )
+    generalist_checkpoint_verify.add_argument("--config", type=Path, required=True)
+    generalist_checkpoint_verify.add_argument(
+        "--checkpoint", choices=("Q0", "Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_checkpoint_verify.add_argument("--workload", required=True)
+    generalist_checkpoint_verify.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_checkpoint_verify.add_argument("--view-dir", type=Path, required=True)
+    generalist_checkpoint_verify.add_argument(
+        "--output-dir", type=Path, required=True
+    )
+    generalist_checkpoint_verify.add_argument(
+        "--lean-project-root", type=Path, required=True
+    )
+    generalist_checkpoint_verify.add_argument("--workers", type=int, default=8)
+    generalist_checkpoint_verify.add_argument(
+        "--candidates-per-task", type=int, choices=(8, 64)
+    )
+
+    generalist_checkpoint_select = subparsers.add_parser(
+        "generalist-v2-checkpoint-select",
+        help="freeze Q1-Q4 selection from complete validation evidence",
+    )
+    generalist_checkpoint_select.add_argument("--config", type=Path, required=True)
+    generalist_checkpoint_select.add_argument(
+        "--q0-evidence", type=Path, required=True
+    )
+    generalist_checkpoint_select.add_argument(
+        "--training-run", type=Path, required=True
+    )
+    generalist_checkpoint_select.add_argument(
+        "--evaluation-root", type=Path, required=True
+    )
+    generalist_checkpoint_select.add_argument("--output", type=Path, required=True)
+
+    generalist_extended_select = subparsers.add_parser(
+        "generalist-v2-extended-select",
+        help="freeze the final checkpoint from complete n=64 finalist validation",
+    )
+    generalist_extended_select.add_argument("--config", type=Path, required=True)
+    generalist_extended_select.add_argument(
+        "--screening-selection", type=Path, required=True
+    )
+    generalist_extended_select.add_argument(
+        "--evaluation-root", type=Path, required=True
+    )
+    generalist_extended_select.add_argument(
+        "--final-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_extended_select.add_argument(
+        "--decision-rationale", required=True
+    )
+    generalist_extended_select.add_argument("--output", type=Path, required=True)
+
+    generalist_production_preflight = subparsers.add_parser(
+        "generalist-v2-production-preflight",
+        help="run the real near-maximum weighted QLoRA optimizer update",
+    )
+    generalist_production_preflight.add_argument("--config", type=Path, required=True)
+    generalist_production_preflight.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_production_preflight.add_argument(
+        "--binding", type=Path, required=True
+    )
+    generalist_production_preflight.add_argument(
+        "--q0-evidence", type=Path, required=True
+    )
+    generalist_production_preflight.add_argument("--model-snapshot", type=Path)
+    generalist_production_preflight.add_argument("--output", type=Path, required=True)
+
+    generalist_bounded_train = subparsers.add_parser(
+        "generalist-v2-bounded-train",
+        help="run the fixed overfit64 or realistic-smoke training gate",
+    )
+    generalist_bounded_train.add_argument("--config", type=Path, required=True)
+    generalist_bounded_train.add_argument("--package-root", type=Path, required=True)
+    generalist_bounded_train.add_argument("--binding", type=Path, required=True)
+    generalist_bounded_train.add_argument("--q0-evidence", type=Path, required=True)
+    generalist_bounded_train.add_argument(
+        "--production-preflight", type=Path, required=True
+    )
+    generalist_bounded_train.add_argument(
+        "--workload",
+        choices=(
+            "generalist-v2-overfit64-v1",
+            "generalist-v2-smoke4096-v1",
+        ),
+        required=True,
+    )
+    generalist_bounded_train.add_argument("--model-snapshot", type=Path)
+    generalist_bounded_train.add_argument(
+        "--lean-project-root", type=Path, required=True
+    )
+    generalist_bounded_train.add_argument("--output-dir", type=Path, required=True)
+
+    generalist_train = subparsers.add_parser(
+        "generalist-v2-train",
+        help="run the gated one-pass Dataset-v2 SFT and save Q1-Q4 adapters",
+    )
+    generalist_train.add_argument("--config", type=Path, required=True)
+    generalist_train.add_argument("--package-root", type=Path, required=True)
+    generalist_train.add_argument("--binding", type=Path, required=True)
+    generalist_train.add_argument("--q0-evidence", type=Path, required=True)
+    generalist_train.add_argument(
+        "--production-preflight", type=Path, required=True
+    )
+    generalist_train.add_argument("--overfit-run", type=Path, required=True)
+    generalist_train.add_argument("--smoke-run", type=Path, required=True)
+    generalist_train.add_argument("--model-snapshot", type=Path)
+    generalist_train.add_argument("--output-dir", type=Path, required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "generalist-v2-architecture-preflight":
+        evidence = run_architecture_load_preflight(
+            GeneralistV2Config.load(args.config),
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-runtime-preparation-smoke":
+        evidence = run_runtime_preparation_smoke(
+            GeneralistV2Config.load(args.config),
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-bind-dataset":
+        from .generalist_v2_dataset import write_dataset_binding_evidence
+
+        evidence = write_dataset_binding_evidence(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.view_dir,
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-generate":
+        from .generalist_v2_evaluation import run_q0_generation
+
+        evidence = run_q0_generation(
+            GeneralistV2Config.load(args.config),
+            args.base_evaluation_config,
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-verify":
+        from .generalist_v2_evaluation import run_q0_verification
+
+        evidence = run_q0_verification(
+            GeneralistV2Config.load(args.config),
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            args.lean_project_root,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q0-evidence":
+        from .generalist_v2_evaluation import compact_q0_evidence
+
+        evidence = compact_q0_evidence(
+            GeneralistV2Config.load(args.config),
+            args.evaluation_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-checkpoint-generate":
+        from .generalist_v2_evaluation import run_checkpoint_generation
+
+        evidence = run_checkpoint_generation(
+            GeneralistV2Config.load(args.config),
+            args.base_evaluation_config,
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            checkpoint_id=args.checkpoint,
+            adapter_dir=args.adapter_dir,
+            candidates_per_task=args.candidates_per_task,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-checkpoint-verify":
+        from .generalist_v2_evaluation import run_checkpoint_verification
+
+        evidence = run_checkpoint_verification(
+            GeneralistV2Config.load(args.config),
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            args.lean_project_root,
+            checkpoint_id=args.checkpoint,
+            workers=args.workers,
+            candidates_per_task=args.candidates_per_task,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-checkpoint-select":
+        from .generalist_v2_evaluation import compact_checkpoint_selection_evidence
+
+        evidence = compact_checkpoint_selection_evidence(
+            GeneralistV2Config.load(args.config),
+            args.q0_evidence,
+            args.training_run,
+            args.evaluation_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-extended-select":
+        from .generalist_v2_evaluation import (
+            compact_extended_validation_evidence,
+        )
+
+        evidence = compact_extended_validation_evidence(
+            GeneralistV2Config.load(args.config),
+            args.screening_selection,
+            args.evaluation_root,
+            args.output,
+            final_checkpoint=args.final_checkpoint,
+            decision_rationale=args.decision_rationale,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-production-preflight":
+        evidence = run_production_preflight(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.binding,
+            args.q0_evidence,
+            args.output,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-bounded-train":
+        evidence = run_bounded_training_gate(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.binding,
+            args.q0_evidence,
+            args.production_preflight,
+            args.workload,
+            args.output_dir,
+            args.lean_project_root,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-train":
+        evidence = run_full_generalist_training(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.binding,
+            args.q0_evidence,
+            args.production_preflight,
+            args.overfit_run,
+            args.smoke_run,
+            args.output_dir,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
     if args.command == "fixture":
         _, results, mismatches = run_fixture_evaluation(
             args.fixtures,

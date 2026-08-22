@@ -87,6 +87,21 @@ class LeanVerifier:
                 )
             return self._preamble_probes[preamble]
 
+    def prime_task(
+        self, task: TaskRecord, candidate: str, *, timeout_seconds: float
+    ) -> VerificationOutcome | None:
+        """Validate a full task and cache its source prefix as usable context."""
+
+        outcome = self._run_source(
+            reconstruct_source(task, candidate),
+            timeout_seconds=timeout_seconds,
+        )
+        if outcome.category != "verified":
+            return outcome
+        with self._preamble_probe_lock:
+            self._preamble_probes[task.preamble] = None
+        return None
+
     def _run_source(
         self,
         source: str,
