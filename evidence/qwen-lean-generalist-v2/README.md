@@ -88,6 +88,21 @@ offload; `no-offload-production-preflight.json` records the superseding memory
 path check without rewriting the truthful gate hash used by the completed
 overfit run.
 
+`OBSERVED`: the fresh realistic smoke retry completed one deterministic pass
+over 4,096 statements and all 4,128 selected proof variants (516 optimizer
+steps). All logged losses and gradient norms were finite; mean loss was
+11.126338 and the first/last losses were 19.439495/6.114424. Training reserved
+17,593,008,128 of 20,989,804,544 CUDA bytes, leaving 3,396,796,416 bytes of
+headroom, and completed in 1,839.964 seconds without CPU activation offload. A
+fresh frozen adapter reload generated and submitted the required probe to Lean
+with zero evaluator infrastructure errors. The generated proof was rejected,
+which is recorded as model behavior rather than an operational gate failure.
+The repository-native bounded-training validator accepted `smoke4096.json`;
+the run evidence SHA-256 is
+`4c3ab699c3ea656835b2b3e5f875b9cec3fe35b0afc31ac5bd69e27c84940a73`
+and the retained adapter SHA-256 is
+`eec2cc20dacb7ca211d6f59f4ad4c1b2c88f3d8a6b0dc720f397749f58c8e87f`.
+
 Commands:
 
 ```text

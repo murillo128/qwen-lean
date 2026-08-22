@@ -1,0 +1,231 @@
+{
+  "adapter": {
+    "format": "peft-lora",
+    "merged_base_model_shards_saved": false,
+    "path": "adapter",
+    "required_files": [
+      "adapter_config.json",
+      "adapter_model.safetensors"
+    ],
+    "trainable_parameter_count": 32464896
+  },
+  "dataset": {
+    "binding_manifest_sha256": "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e",
+    "package_id": "lean-whole-proof-v2"
+  },
+  "model": {
+    "add_special_tokens": false,
+    "architecture_class": "Qwen3_5ForCausalLM",
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "text_only": true,
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "production_preflight_gate": {
+    "binding_manifest_sha256": "c4e5586470f41fe403fc04557548bcea4498dca88e9ca00e544a64d52414ea5e",
+    "evidence_sha256": "4a91feb33f8d5b1caa18303fe8116ccfb28b5c41f513ae2af2b17b966abe099e",
+    "passed_before_training": true,
+    "schema_version": "generalist-v2-production-preflight-v1",
+    "selected_lane": "nf4-qlora"
+  },
+  "q0_gate": {
+    "checkpoint_id": "Q0",
+    "complete_before_optimizer_update": true,
+    "evidence_sha256": "76f0d7da0f3e4b8d00c0afd035604991f08afc32173eed3a79cd06dca15f06f5",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "schema_version": "generalist-v2-q0-evidence-v1",
+    "workload_count": 4
+  },
+  "reload_generation_evaluator_gate": {
+    "adapter_base_model_name_or_path": "Qwen/Qwen3.5-4B-Base",
+    "adapter_base_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "adapter_merged": false,
+    "adapter_rank": 16,
+    "adapter_trainable_after_reload": false,
+    "evaluator_infrastructure_errors": 0,
+    "exact_target_count": 0,
+    "fresh_base_and_adapter_reload": true,
+    "generation_backend": "transformers-greedy",
+    "generation_probe_count": 1,
+    "lean_project": {
+      "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+      "root_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    },
+    "lean_verified_count": 0,
+    "peak_cuda_allocated_bytes": 6261757952,
+    "peak_cuda_reserved_bytes": 6381633536,
+    "results": [
+      {
+        "candidate_sha256": "04cbd80766f7774846675e9639920cc2980ebb8037649732e5898b7c58b76f9e",
+        "exact_target": false,
+        "generated_tokens": 23,
+        "generation_wall_time_seconds": 2.0636165169999003,
+        "lean_category": "lean_rejected",
+        "prompt_tokens": 2470,
+        "proof_variant_id": "387bf5646715db13acaf0d88c34b217e5419c8a908d1dbad51905e320e81aff7",
+        "statement_id": "a0ae68d60534a2f29690fc772121c357cc17096469522a24c24df29b6b3a650c"
+      }
+    ]
+  },
+  "runtime": {
+    "activation_cpu_offload": false,
+    "activation_cpu_offload_example_count": 0,
+    "activation_cpu_offload_min_sequence_tokens": 4096,
+    "cuda_allocator_config": "expandable_segments:True",
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "execution": "project-controlled-local-cuda",
+    "explicit_compute_loss_bf16_autocast": true,
+    "full_attention_sdpa_backend": "FLASH_ATTENTION",
+    "gated_delta_rule_backend": {
+      "distribution": "flash-linear-attention",
+      "distribution_version": "0.5.2",
+      "execution": "project-controlled-local-cuda",
+      "implementation_module": "fla.ops.gated_delta_rule.chunk",
+      "implementation_name": "chunk_gated_delta_rule",
+      "license": "MIT",
+      "upstream_revision": "9c8e42e762fce087c27b673af4922795d9edb85e",
+      "upstream_tag": "v0.5.2"
+    },
+    "gradient_checkpointing_example_count": 91,
+    "gradient_checkpointing_min_sequence_tokens": 1024,
+    "gradient_checkpointing_use_reentrant": false,
+    "linear_attention_chunk_size": 32,
+    "lm_head_loss_chunk_tokens": 64,
+    "mlp_sequence_chunk_tokens": 1024,
+    "packages": {
+      "accelerate": "1.14.0",
+      "bitsandbytes": "0.50.1",
+      "datasets": "5.0.1",
+      "flash-linear-attention": "0.5.2",
+      "huggingface-hub": "1.28.0",
+      "peft": "0.20.0",
+      "safetensors": "0.8.0",
+      "torch": "2.13.0",
+      "transformers": "5.15.1",
+      "trl": "1.10.0"
+    },
+    "peak_cuda_allocated_bytes": 16752035840,
+    "peak_cuda_reserved_bytes": 17593008128,
+    "python": "3.12.14",
+    "reserved_memory_headroom_bytes": 3396796416,
+    "sequence_chunked_mlp_module_count": 32,
+    "target_only_checkpointed_causal_loss": true,
+    "torch_cuda_version": "13.0",
+    "training_wall_time_seconds": 1839.9640511180041
+  },
+  "schema_version": "generalist-v2-bounded-training-v1",
+  "selected_lane": "nf4-qlora",
+  "status": "passed",
+  "tokenization": {
+    "full_membership_weight_normalizer": 1.0467365380828393,
+    "selected_example_weight": {
+      "maximum": 4.0,
+      "mean": 1.050387596899225,
+      "minimum": 0.3333333333333333
+    },
+    "selected_proof_variant_count": 4128,
+    "selected_proof_variants_unique": 4128,
+    "serialization": {
+      "choices": [
+        4096,
+        8192,
+        16384,
+        32768
+      ],
+      "completion_tokens_excluding_eos": {
+        "count": 4128,
+        "maximum": 1720,
+        "minimum": 1,
+        "p50": 22.0,
+        "p90": 109.0,
+        "p95": 182.6500000000001,
+        "p99": 451.46000000000004
+      },
+      "full_sequence_tokens": {
+        "count": 4128,
+        "maximum": 17770,
+        "minimum": 66,
+        "p50": 149.0,
+        "p90": 288.3000000000002,
+        "p95": 415.0,
+        "p99": 3080.4100000000003
+      },
+      "rule": "smallest supported context that consumes every optimizer-visible variant",
+      "selected_context_tokens": 32768,
+      "truncated_or_dropped_variants": 0
+    },
+    "truncated_or_dropped_variants": 0
+  },
+  "training": {
+    "checkpoint_fractions": {
+      "Q1": 0.25,
+      "Q2": 0.5,
+      "Q3": 0.75,
+      "Q4": 1.0
+    },
+    "complete_dataset_passes": 1.0,
+    "complete_passes": 1,
+    "completed_optimizer_steps": 516,
+    "configured_maximum_optimizer_steps": null,
+    "context_choices": [
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "data_seed": 0,
+    "full_membership_weight_normalizer": 1.0467365380828393,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": true,
+    "learning_rate": 0.0001,
+    "logs": {
+      "all_gradient_norms_finite": true,
+      "all_losses_finite": true,
+      "covers_every_optimizer_step_exactly_once": true,
+      "gradient_norm_before_clipping": {
+        "maximum": 83.0,
+        "mean": 22.26344476744186,
+        "minimum": 11.6875
+      },
+      "logged_optimizer_steps": 516,
+      "loss": {
+        "first": 19.439495086669922,
+        "last": 6.114423751831055,
+        "maximum": 23.634305953979492,
+        "mean": 11.126337750013484,
+        "minimum": 5.3637261390686035
+      }
+    },
+    "lr_schedule": "cosine",
+    "maximum_gradient_norm": 1.0,
+    "one_pass_optimizer_steps": 516,
+    "optimizer": "paged_adamw_8bit",
+    "overfit_curve": null,
+    "packing": false,
+    "per_device_micro_batch_size": 1,
+    "resolved_context_tokens": 32768,
+    "seed": 0,
+    "train_sampling_strategy": "sequential",
+    "trainer": "trl-sft-weighted",
+    "truncation": false,
+    "warmup_fraction": 0.03125,
+    "weight_decay": 0.0
+  },
+  "workload": {
+    "all_selected_statement_variants_included": true,
+    "ordered_proof_variant_ids_sha256": "0b7f147f468fe662486c3b7dadb295a751b8e072d11d637a7ef8be13c9e7d4b7",
+    "ordered_statement_ids_sha256": "796825c9910a176543b840ef0b015d7719b2d63d8a68169307393acd5b29bd48",
+    "proof_variant_count": 4128,
+    "selection_rule": "first 4,096 statement IDs under the fixed smoke hash order; include every selected statement proof variant",
+    "statement_count": 4096,
+    "statement_source_counts": {
+      "real": 4016,
+      "synthetic": 80
+    },
+    "workload_id": "generalist-v2-smoke4096-v1"
+  }
+}
