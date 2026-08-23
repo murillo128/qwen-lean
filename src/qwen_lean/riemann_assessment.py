@@ -16,7 +16,12 @@ from statistics import fmean, median
 from typing import Any, Iterable, Mapping, Sequence
 
 from .artifacts import read_artifacts, write_artifacts
-from .baseline import GeneratedCandidate, _generate_candidates, _local_cuda_runtime
+from .baseline import (
+    GeneratedCandidate,
+    LoRAAdapterSpec,
+    _generate_candidates,
+    _local_cuda_runtime,
+)
 from .metrics import pass_at_k, summarize_results
 from .minif2f import Phase1Config
 from .phase2_schema import MathlibProofRecord
@@ -543,6 +548,7 @@ def run_assessment(
     *,
     verification_workers: int,
     report_progress: bool = True,
+    adapter: LoRAAdapterSpec | None = None,
 ) -> tuple[RunMetadata, list[CandidateResult], dict[str, Any]]:
     profile = assessment_profile(config)
     if verification_workers < 1:
@@ -603,6 +609,7 @@ def run_assessment(
             tasks,
             prompts=prompts,
             sampling=config.sampling,
+            adapter=adapter,
         )
     generation_wall = time.perf_counter() - generation_started
     if not memory.samples_mib:
@@ -728,7 +735,11 @@ def run_assessment(
         candidates_per_task=4,
         inference_engine=str(config.engine["name"]),
         inference_engine_version=engine_version,
-        adapter_enabled=False,
+        adapter_enabled=adapter is not None,
+        adapter_id=None if adapter is None else adapter.adapter_id,
+        adapter_path=None if adapter is None else str(adapter.path.resolve()),
+        adapter_rank=None if adapter is None else adapter.rank,
+        selected_adapter_binding=None if adapter is None else adapter.metadata(),
         generation_settings={
             **config.sampling,
             "dtype": config.engine["dtype"],

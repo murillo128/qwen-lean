@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import subprocess
 import time
 from collections import defaultdict
@@ -24,6 +25,7 @@ from .generalist_v2 import (
     MODEL_REVISION,
     CheckpointValidation,
     GeneralistV2Config,
+    compare_paired_verified_counts,
     select_generalist_checkpoint,
 )
 from .generalist_v2_dataset import (
@@ -46,7 +48,11 @@ CHECKPOINT_GENERATION_SCHEMA_VERSION = "generalist-v2-checkpoint-generation-v1"
 CHECKPOINT_VERIFICATION_SCHEMA_VERSION = "generalist-v2-checkpoint-verification-v1"
 EXTENDED_GENERATION_SCHEMA_VERSION = "generalist-v2-extended-generation-v1"
 EXTENDED_VERIFICATION_SCHEMA_VERSION = "generalist-v2-extended-verification-v1"
+FINAL_GENERATION_SCHEMA_VERSION = "generalist-v2-final-generation-v1"
+FINAL_VERIFICATION_SCHEMA_VERSION = "generalist-v2-final-verification-v1"
 EXTENDED_SEARCH_KS = (1, 2, 4, 8, 16, 32, 64)
+DEEPSEEK_MODEL_ID = "deepseek-ai/DeepSeek-Prover-V2-7B"
+DEEPSEEK_MODEL_REVISION = "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b"
 Q0_WORKLOADS = {
     "fresh-composition-valid-v2": 406,
     "minif2f-valid-clean-v2": 244,
@@ -60,6 +66,7 @@ EXTENDED_SEARCH_WORKLOADS = {
 FINAL_TEST_WORKLOADS = {
     "fresh-composition-test-v2": 415,
     "minif2f-test-clean-v2": 244,
+    "riemann-fresh-test-v2": 104,
 }
 
 
@@ -290,6 +297,33 @@ def _evaluation_phase1_config(
     return Phase1Config(path=base.path, value={**base.value, "engine": engine})
 
 
+def _final_phase1_config(
+    path: Path, generalist: GeneralistV2Config, *, model_label: str
+) -> Phase1Config:
+    base = Phase1Config.load(path)
+    expected = (
+        (DEEPSEEK_MODEL_ID, DEEPSEEK_MODEL_REVISION)
+        if model_label == "deepseek"
+        else (MODEL_ID, MODEL_REVISION)
+    )
+    if (
+        base.model.get("model_id"),
+        base.model.get("model_revision"),
+        base.model.get("tokenizer_id"),
+        base.model.get("tokenizer_revision"),
+    ) != (expected[0], expected[1], expected[0], expected[1]):
+        raise ValueError(f"final {model_label} evaluation model binding differs")
+    engine = {
+        **base.engine,
+        "max_model_len": int(generalist.training["resolved_context_tokens"]),
+        "max_num_seqs": min(
+            8 if model_label == "deepseek" else 16,
+            int(base.engine["max_num_seqs"]),
+        ),
+    }
+    return Phase1Config(path=base.path, value={**base.value, "engine": engine})
+
+
 def _sampling(
     config: GeneralistV2Config, *, candidates_per_task: int | None = None
 ) -> dict[str, Any]:
@@ -428,6 +462,110 @@ def run_checkpoint_generation(
     if metadata["generation_error_count"]:
         raise RuntimeError(
             f"generalist-v2 {checkpoint_id} generation contains infrastructure errors"
+        )
+    return metadata
+
+
+def run_final_generation(
+    config: GeneralistV2Config,
+    evaluation_config: Path,
+    workload_id: str,
+    package_root: Path,
+    view_dir: Path,
+    output_dir: Path,
+    *,
+    model_label: str,
+    selected_checkpoint: str,
+    adapter_dir: Path | None,
+) -> dict[str, Any]:
+    """Generate one frozen n=8 final lane without overwriting prior evidence."""
+
+    config.validate()
+    if model_label not in {"base", "selected", "deepseek"}:
+        raise ValueError("final model label must be base, selected, or deepseek")
+    if selected_checkpoint not in {"Q1", "Q2", "Q3", "Q4"}:
+        raise ValueError("final evaluation requires a frozen Q1-Q4 checkpoint")
+    if (model_label == "selected") != (adapter_dir is not None):
+        raise ValueError("only the selected final lane may provide an adapter")
+    if (output_dir / "generation-metadata.json").exists():
+        existing = _read_json(output_dir / "generation-metadata.json")
+        if existing.get("generation_error_count") == 0:
+            raise FileExistsError(
+                f"refusing to overwrite frozen final generation: {output_dir}"
+            )
+    adapter = (
+        None
+        if adapter_dir is None
+        else _checkpoint_adapter_spec(config, selected_checkpoint, adapter_dir)
+    )
+    tasks, _, _, task_metadata = materialize_q0_workload(
+        workload_id, package_root, view_dir
+    )
+    phase1 = _final_phase1_config(evaluation_config, config, model_label=model_label)
+    sampling = _sampling(config, candidates_per_task=8)
+    started = time.perf_counter()
+    generated, engine_version = _generate_candidates(
+        phase1, tasks, sampling=sampling, adapter=adapter
+    )
+    elapsed = time.perf_counter() - started
+    output_dir.mkdir(parents=True, exist_ok=True)
+    generation_path = output_dir / "generations.jsonl"
+    with generation_path.open("w", encoding="utf-8", newline="\n") as handle:
+        for item in generated:
+            value = asdict(item)
+            value["task"] = item.task.to_dict()
+            handle.write(json.dumps(value, ensure_ascii=False, sort_keys=True))
+            handle.write("\n")
+    metadata = {
+        "schema_version": FINAL_GENERATION_SCHEMA_VERSION,
+        "evaluation_profile": "postselection-final-n8",
+        "model_label": model_label,
+        "selected_checkpoint": selected_checkpoint,
+        "workload_id": workload_id,
+        "model_id": str(phase1.model["model_id"]),
+        "model_revision": str(phase1.model["model_revision"]),
+        "tokenizer_id": str(phase1.model["tokenizer_id"]),
+        "tokenizer_revision": str(phase1.model["tokenizer_revision"]),
+        "prompt_format_id": "lean-sft-v2-raw-whole-proof",
+        "task_count": len(tasks),
+        "ordered_task_ids_sha256": _ordered_ids_digest([item.id for item in tasks]),
+        "candidate_count": len(generated),
+        "sampling": sampling,
+        "engine": phase1.engine,
+        "engine_version": engine_version,
+        "inference_execution": "project-controlled-local-cuda",
+        "generation_wall_time_seconds": elapsed,
+        "generation_sha256": sha256_file(generation_path),
+        "generation_error_count": sum(
+            item.generation_error is not None for item in generated
+        ),
+        "final_only_workload": workload_id in FINAL_TEST_WORKLOADS,
+        "first_complete_result_overwrite_protected": True,
+        "adapter": (
+            None
+            if adapter is None
+            else {
+                "adapter_id": adapter.adapter_id,
+                "adapter_rank": adapter.rank,
+                "base_model_id": adapter.base_model_id,
+                "base_model_revision": adapter.base_model_revision,
+                "adapter_config_sha256": sha256_file(
+                    adapter.path / "adapter_config.json"
+                ),
+                "adapter_model_sha256": sha256_file(
+                    adapter.path / "adapter_model.safetensors"
+                ),
+            }
+        ),
+        "task_metadata": task_metadata,
+    }
+    (output_dir / "generation-metadata.json").write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    if metadata["generation_error_count"]:
+        raise RuntimeError(
+            f"generalist-v2 final {model_label} generation contains "
+            "infrastructure errors"
         )
     return metadata
 
@@ -745,10 +883,22 @@ def run_checkpoint_verification(
     checkpoint_id: str,
     workers: int,
     candidates_per_task: int | None = None,
+    final_model_label: str | None = None,
 ) -> dict[str, Any]:
     config.validate()
-    if checkpoint_id not in {"Q0", "Q1", "Q2", "Q3", "Q4"}:
+    if final_model_label is None and checkpoint_id not in {
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+    }:
         raise ValueError("generalist-v2 verification checkpoint must be Q0-Q4")
+    if final_model_label is not None and (
+        final_model_label not in {"base", "selected", "deepseek"}
+        or checkpoint_id not in {"Q1", "Q2", "Q3", "Q4"}
+    ):
+        raise ValueError("final verification needs a model lane and frozen checkpoint")
     tasks, verification_tasks, targets, task_metadata = materialize_q0_workload(
         workload_id,
         package_root,
@@ -765,20 +915,45 @@ def run_checkpoint_verification(
     )
     if resolved_candidates not in {8, 64}:
         raise ValueError("generalist-v2 verification budget must be 8 or 64")
+    if final_model_label is not None and resolved_candidates != 8:
+        raise ValueError("final assessment retains the frozen n=8 budget")
     expected_generation_schema = (
-        EXTENDED_GENERATION_SCHEMA_VERSION
-        if resolved_candidates == 64
+        FINAL_GENERATION_SCHEMA_VERSION
+        if final_model_label is not None
         else (
-            Q0_GENERATION_SCHEMA_VERSION
-            if checkpoint_id == "Q0"
-            else CHECKPOINT_GENERATION_SCHEMA_VERSION
+            EXTENDED_GENERATION_SCHEMA_VERSION
+            if resolved_candidates == 64
+            else (
+                Q0_GENERATION_SCHEMA_VERSION
+                if checkpoint_id == "Q0"
+                else CHECKPOINT_GENERATION_SCHEMA_VERSION
+            )
         )
     )
     adapter_metadata = generation_metadata.get("adapter")
+    expected_model = (
+        (DEEPSEEK_MODEL_ID, DEEPSEEK_MODEL_REVISION)
+        if final_model_label == "deepseek"
+        else (MODEL_ID, MODEL_REVISION)
+    )
+    final_identity_differs = final_model_label is not None and (
+        generation_metadata.get("model_label") != final_model_label
+        or generation_metadata.get("selected_checkpoint") != checkpoint_id
+        or ((final_model_label == "selected") != (adapter_metadata is not None))
+        or generation_metadata.get("model_id") != expected_model[0]
+        or generation_metadata.get("model_revision") != expected_model[1]
+        or generation_metadata.get("candidate_count") != len(tasks) * 8
+        or generation_metadata.get("first_complete_result_overwrite_protected")
+        is not True
+    )
+    checkpoint_identity_differs = final_model_label is None and (
+        generation_metadata.get("checkpoint_id") != checkpoint_id
+        or ((checkpoint_id == "Q0") != (adapter_metadata is None))
+    )
     if (
         generation_metadata.get("schema_version") != expected_generation_schema
-        or generation_metadata.get("checkpoint_id") != checkpoint_id
-        or ((checkpoint_id == "Q0") != (adapter_metadata is None))
+        or final_identity_differs
+        or checkpoint_identity_differs
     ):
         raise ValueError("generalist-v2 generation checkpoint identity differs")
     if generation_metadata["generation_sha256"] != sha256_file(generation_path):
@@ -859,10 +1034,12 @@ def run_checkpoint_verification(
         .strip(),
         mathlib_revision=mathlib_revision,
         verifier_timeout_seconds=float(config.evaluation["verifier_timeout_seconds"]),
-        model_id=MODEL_ID,
-        tokenizer_id=MODEL_ID,
-        model_revision=MODEL_REVISION,
-        tokenizer_revision=MODEL_REVISION,
+        model_id=str(generation_metadata.get("model_id", MODEL_ID)),
+        tokenizer_id=str(generation_metadata.get("tokenizer_id", MODEL_ID)),
+        model_revision=str(generation_metadata.get("model_revision", MODEL_REVISION)),
+        tokenizer_revision=str(
+            generation_metadata.get("tokenizer_revision", MODEL_REVISION)
+        ),
         workload_id=workload_id,
         candidates_per_task=resolved_candidates,
         inference_engine=str(generation_metadata["engine"]["name"]),
@@ -895,20 +1072,29 @@ def run_checkpoint_verification(
     summary.update(
         {
             "schema_version": (
-                EXTENDED_VERIFICATION_SCHEMA_VERSION
-                if resolved_candidates == 64
+                FINAL_VERIFICATION_SCHEMA_VERSION
+                if final_model_label is not None
                 else (
-                    Q0_VERIFICATION_SCHEMA_VERSION
-                    if checkpoint_id == "Q0"
-                    else CHECKPOINT_VERIFICATION_SCHEMA_VERSION
+                    EXTENDED_VERIFICATION_SCHEMA_VERSION
+                    if resolved_candidates == 64
+                    else (
+                        Q0_VERIFICATION_SCHEMA_VERSION
+                        if checkpoint_id == "Q0"
+                        else CHECKPOINT_VERIFICATION_SCHEMA_VERSION
+                    )
                 )
             ),
             "evaluation_profile": (
-                "extended-search-budget-v1"
-                if resolved_candidates == 64
-                else "checkpoint-screening-n8"
+                "postselection-final-n8"
+                if final_model_label is not None
+                else (
+                    "extended-search-budget-v1"
+                    if resolved_candidates == 64
+                    else "checkpoint-screening-n8"
+                )
             ),
             "checkpoint_id": checkpoint_id,
+            "model_label": final_model_label,
             "workload_id": workload_id,
             "exact_target_candidate_count": exact_candidates,
             "exact_target_task_count": len(exact_tasks),
@@ -957,6 +1143,41 @@ def run_q0_verification(
     )
 
 
+def run_final_verification(
+    config: GeneralistV2Config,
+    workload_id: str,
+    package_root: Path,
+    view_dir: Path,
+    output_dir: Path,
+    lean_project_root: Path,
+    *,
+    model_label: str,
+    selected_checkpoint: str,
+    workers: int,
+) -> dict[str, Any]:
+    if (output_dir / "summary.json").exists():
+        existing = _read_json(output_dir / "summary.json")
+        if (
+            existing.get("complete") is True
+            and existing.get("infrastructure_error_count") == 0
+        ):
+            raise FileExistsError(
+                f"refusing to overwrite complete final verification: {output_dir}"
+            )
+    return run_checkpoint_verification(
+        config,
+        workload_id,
+        package_root,
+        view_dir,
+        output_dir,
+        lean_project_root,
+        checkpoint_id=selected_checkpoint,
+        workers=workers,
+        candidates_per_task=8,
+        final_model_label=model_label,
+    )
+
+
 def compact_q0_evidence(
     config: GeneralistV2Config,
     evaluation_root: Path,
@@ -981,6 +1202,13 @@ def compact_q0_evidence(
         ordered_counts = [
             int(item["verified_candidate_count"]) for item in summary["per_task"]
         ]
+        per_task = [
+            {
+                "task_id": str(item["task_id"]),
+                "verified_candidate_count": int(item["verified_candidate_count"]),
+            }
+            for item in summary["per_task"]
+        ]
         workloads[workload_id] = {
             "task_count": summary["task_count"],
             "candidate_count": summary["candidate_count"],
@@ -991,6 +1219,7 @@ def compact_q0_evidence(
             "exact_target_candidate_count": summary["exact_target_candidate_count"],
             "exact_target_task_count": summary["exact_target_task_count"],
             "verified_counts": ordered_counts,
+            "per_task": per_task,
             "ordered_task_ids_sha256": generation_metadata["ordered_task_ids_sha256"],
             "results_sha256": sha256_file(root / "results.jsonl"),
             "generation_sha256": sha256_file(root / "generations.jsonl"),
@@ -1032,6 +1261,8 @@ def _compact_checkpoint_workload(
         or generation.get("ordered_task_ids_sha256") != expected_task_ids_sha256
         or generation.get("candidate_count") != expected_task_count * 8
         or generation.get("generation_error_count") != 0
+        or generation.get("generation_sha256")
+        != sha256_file(root / "generations.jsonl")
         or adapter.get("adapter_model_sha256") != expected_adapter_model_sha256
         or run.get("selected_adapter_binding") != adapter
         or summary.get("schema_version") != CHECKPOINT_VERIFICATION_SCHEMA_VERSION
@@ -1049,6 +1280,13 @@ def _compact_checkpoint_workload(
     verified_counts = [
         int(item["verified_candidate_count"]) for item in summary["per_task"]
     ]
+    per_task = [
+        {
+            "task_id": str(item["task_id"]),
+            "verified_candidate_count": int(item["verified_candidate_count"]),
+        }
+        for item in summary["per_task"]
+    ]
     if len(verified_counts) != expected_task_count:
         raise ValueError("generalist-v2 checkpoint per-task outcomes are incomplete")
     return {
@@ -1061,6 +1299,7 @@ def _compact_checkpoint_workload(
         "exact_target_candidate_count": summary["exact_target_candidate_count"],
         "exact_target_task_count": summary["exact_target_task_count"],
         "verified_counts": verified_counts,
+        "per_task": per_task,
         "ordered_task_ids_sha256": expected_task_ids_sha256,
         "results_sha256": sha256_file(root / "results.jsonl"),
         "generation_sha256": sha256_file(root / "generations.jsonl"),
@@ -1344,6 +1583,565 @@ def compact_extended_validation_evidence(
         "test_workloads_evaluated_at_n64": False,
         "test_workloads_consulted_before_checkpoint_freeze": False,
         "riemann_used_for_selection": False,
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return evidence
+
+
+FINAL_ASSESSMENT_WORKLOADS = {
+    "minif2f-valid-clean-v2": 244,
+    "minif2f-test-clean-v2": 244,
+    "fresh-composition-valid-v2": 406,
+    "fresh-composition-test-v2": 415,
+    "riemann-fresh-valid-v2": 100,
+    "riemann-fresh-test-v2": 104,
+}
+
+
+def _compact_final_run(
+    root: Path,
+    *,
+    model_label: str,
+    selected_checkpoint: str,
+    workload_id: str,
+    expected_task_count: int,
+) -> dict[str, Any]:
+    generation = _read_json(root / "generation-metadata.json")
+    run = _read_json(root / "run.json")
+    summary = _read_json(root / "summary.json")
+    expected_model = (
+        (DEEPSEEK_MODEL_ID, DEEPSEEK_MODEL_REVISION)
+        if model_label == "deepseek"
+        else (MODEL_ID, MODEL_REVISION)
+    )
+    adapter = generation.get("adapter")
+    if (
+        generation.get("schema_version") != FINAL_GENERATION_SCHEMA_VERSION
+        or generation.get("evaluation_profile") != "postselection-final-n8"
+        or generation.get("model_label") != model_label
+        or generation.get("selected_checkpoint") != selected_checkpoint
+        or generation.get("workload_id") != workload_id
+        or generation.get("model_id") != expected_model[0]
+        or generation.get("model_revision") != expected_model[1]
+        or generation.get("task_count") != expected_task_count
+        or generation.get("candidate_count") != expected_task_count * 8
+        or generation.get("generation_error_count") != 0
+        or generation.get("generation_sha256")
+        != sha256_file(root / "generations.jsonl")
+        or generation.get("first_complete_result_overwrite_protected") is not True
+        or generation.get("final_only_workload")
+        != (workload_id in FINAL_TEST_WORKLOADS)
+        or ((model_label == "selected") != isinstance(adapter, dict))
+        or run.get("model_id") != expected_model[0]
+        or run.get("model_revision") != expected_model[1]
+        or run.get("selected_adapter_binding") != adapter
+        or run.get("candidates_per_task") != 8
+        or summary.get("schema_version") != FINAL_VERIFICATION_SCHEMA_VERSION
+        or summary.get("evaluation_profile") != "postselection-final-n8"
+        or summary.get("model_label") != model_label
+        or summary.get("checkpoint_id") != selected_checkpoint
+        or summary.get("workload_id") != workload_id
+        or summary.get("task_count") != expected_task_count
+        or summary.get("candidate_count") != expected_task_count * 8
+        or summary.get("complete") is not True
+        or summary.get("infrastructure_error_count") != 0
+    ):
+        raise ValueError(
+            f"final assessment lane is incomplete: {model_label}/{workload_id}"
+        )
+    per_task = [
+        {
+            "task_id": str(item["task_id"]),
+            "verified_candidate_count": int(item["verified_candidate_count"]),
+        }
+        for item in summary["per_task"]
+    ]
+    if len(per_task) != expected_task_count or [
+        item["task_id"] for item in per_task
+    ] != list(dict.fromkeys(item["task_id"] for item in per_task)):
+        raise ValueError("final assessment per-task outcomes are incomplete")
+    return {
+        "source": "postselection-final-n8",
+        "model_id": expected_model[0],
+        "model_revision": expected_model[1],
+        "adapter": adapter,
+        "task_count": expected_task_count,
+        "candidate_count": expected_task_count * 8,
+        "tasks_with_verified_candidate": summary["tasks_with_verified_candidate"],
+        "pass_at_k": summary["pass_at_k"],
+        "category_counts": summary["category_counts"],
+        "finish_reason_counts": summary["finish_reason_counts"],
+        "per_task": per_task,
+        "ordered_task_ids_sha256": generation["ordered_task_ids_sha256"],
+        "generation_sha256": sha256_file(root / "generations.jsonl"),
+        "results_sha256": sha256_file(root / "results.jsonl"),
+        "timing_seconds": run["runtime"],
+        "first_complete_result_overwrite_protected": True,
+    }
+
+
+def _compact_reused_screening(
+    value: dict[str, Any], *, model_label: str, selected_checkpoint: str
+) -> dict[str, Any]:
+    per_task = value.get("per_task")
+    if not isinstance(per_task, list) or len(per_task) != int(value["task_count"]):
+        raise ValueError("screening evidence lacks per-task final outcomes")
+    return {
+        "source": "preselection-screening-n8-reused-after-freeze",
+        "model_id": MODEL_ID,
+        "model_revision": MODEL_REVISION,
+        "adapter": (
+            None
+            if model_label == "base"
+            else {
+                "checkpoint_id": selected_checkpoint,
+                "adapter_model_sha256": value["adapter_model_sha256"],
+            }
+        ),
+        "task_count": value["task_count"],
+        "candidate_count": value["candidate_count"],
+        "tasks_with_verified_candidate": value["tasks_with_verified_candidate"],
+        "pass_at_k": value["pass_at_k"],
+        "category_counts": value["category_counts"],
+        "finish_reason_counts": value["finish_reason_counts"],
+        "per_task": per_task,
+        "ordered_task_ids_sha256": value["ordered_task_ids_sha256"],
+        "generation_sha256": value["generation_sha256"],
+        "results_sha256": value["results_sha256"],
+        "first_complete_result_overwrite_protected": None,
+    }
+
+
+def _task_breakdowns(
+    per_task: list[dict[str, Any]], task_metadata: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    counts = {
+        str(item["task_id"]): int(item["verified_candidate_count"]) for item in per_task
+    }
+    dimensions: dict[str, dict[str, list[int]]] = {
+        "structural_class": defaultdict(list),
+        "generator_family": defaultdict(list),
+        "topic_tag": defaultdict(list),
+    }
+    for task_id, count in counts.items():
+        metadata = task_metadata.get(task_id)
+        if not metadata:
+            continue
+        for dimension in ("structural_class", "generator_family"):
+            value = metadata.get(dimension)
+            if value is not None:
+                dimensions[dimension][str(value)].append(count)
+        for value in metadata.get("topic_tags", []):
+            dimensions["topic_tag"][str(value)].append(count)
+    output: dict[str, Any] = {}
+    for dimension, groups in dimensions.items():
+        if not groups:
+            continue
+        output[dimension] = {
+            key: {
+                "task_count": len(values),
+                "solved_within_8": sum(value > 0 for value in values),
+                "pass_at_k": {
+                    f"pass@{k}": fmean(
+                        estimate_pass_at_k(8, value, k) for value in values
+                    )
+                    for k in (1, 4, 8)
+                },
+            }
+            for key, values in sorted(groups.items())
+        }
+    return output
+
+
+def compact_final_assessment_evidence(
+    config: GeneralistV2Config,
+    q0_evidence_path: Path,
+    selection_path: Path,
+    final_root: Path,
+    package_root: Path,
+    view_dir: Path,
+    output: Path,
+) -> dict[str, Any]:
+    """Compact frozen n=8 Base/generalist/DeepSeek comparisons."""
+
+    config.validate()
+    q0 = _read_json(q0_evidence_path)
+    selection = _read_json(selection_path)
+    selected_checkpoint = str(
+        selection.get("selection", {}).get("selected_checkpoint", "")
+    )
+    if (
+        q0.get("schema_version") != "generalist-v2-q0-evidence-v1"
+        or selection.get("schema_version") != "generalist-v2-checkpoint-selection-v1"
+        or selection.get("status") != "frozen"
+        or selected_checkpoint not in {"Q1", "Q2", "Q3", "Q4"}
+    ):
+        raise ValueError("final assessment requires frozen Q0 and checkpoint evidence")
+
+    validation_workloads = {
+        "minif2f-valid-clean-v2",
+        "fresh-composition-valid-v2",
+        "riemann-fresh-valid-v2",
+    }
+    workloads: dict[str, Any] = {}
+    for workload_id, task_count in FINAL_ASSESSMENT_WORKLOADS.items():
+        lanes: dict[str, dict[str, Any]] = {}
+        if workload_id in validation_workloads:
+            lanes["base"] = _compact_reused_screening(
+                q0["workloads"][workload_id],
+                model_label="base",
+                selected_checkpoint=selected_checkpoint,
+            )
+            lanes["selected"] = _compact_reused_screening(
+                selection["checkpoints"][selected_checkpoint]["workloads"][workload_id],
+                model_label="selected",
+                selected_checkpoint=selected_checkpoint,
+            )
+        else:
+            for model_label in ("base", "selected"):
+                lanes[model_label] = _compact_final_run(
+                    final_root / model_label / workload_id,
+                    model_label=model_label,
+                    selected_checkpoint=selected_checkpoint,
+                    workload_id=workload_id,
+                    expected_task_count=task_count,
+                )
+        lanes["deepseek"] = _compact_final_run(
+            final_root / "deepseek" / workload_id,
+            model_label="deepseek",
+            selected_checkpoint=selected_checkpoint,
+            workload_id=workload_id,
+            expected_task_count=task_count,
+        )
+        identities = {str(lane["ordered_task_ids_sha256"]) for lane in lanes.values()}
+        if len(identities) != 1:
+            raise ValueError(f"final task identity differs across {workload_id}")
+        task_ids = [str(item["task_id"]) for item in lanes["base"]["per_task"]]
+        for lane in lanes.values():
+            if [str(item["task_id"]) for item in lane["per_task"]] != task_ids:
+                raise ValueError(f"final task order differs across {workload_id}")
+        counts = {
+            label: [int(item["verified_candidate_count"]) for item in lane["per_task"]]
+            for label, lane in lanes.items()
+        }
+        _, _, _, task_metadata = materialize_q0_workload(
+            workload_id, package_root, view_dir
+        )
+        for lane in lanes.values():
+            lane["breakdowns"] = _task_breakdowns(lane["per_task"], task_metadata)
+        paired = {
+            "selected_vs_base": compare_paired_verified_counts(
+                counts["base"],
+                counts["selected"],
+                resamples=int(config.evaluation["bootstrap_resamples"]),
+                seed=int(config.evaluation["bootstrap_seed"]),
+            ),
+            "deepseek_vs_base": compare_paired_verified_counts(
+                counts["base"],
+                counts["deepseek"],
+                resamples=int(config.evaluation["bootstrap_resamples"]),
+                seed=int(config.evaluation["bootstrap_seed"]),
+            ),
+            "selected_vs_deepseek": compare_paired_verified_counts(
+                counts["deepseek"],
+                counts["selected"],
+                resamples=int(config.evaluation["bootstrap_resamples"]),
+                seed=int(config.evaluation["bootstrap_seed"]),
+            ),
+        }
+        gap_closure: dict[str, float | None] = {}
+        for key in ("pass@1", "pass@4", "pass@8"):
+            base = float(lanes["base"]["pass_at_k"][key])
+            selected = float(lanes["selected"]["pass_at_k"][key])
+            deepseek = float(lanes["deepseek"]["pass_at_k"][key])
+            denominator = deepseek - base
+            gap_closure[key] = (
+                None if denominator == 0.0 else (selected - base) / denominator
+            )
+        workloads[workload_id] = {
+            "task_count": task_count,
+            "candidates_per_task": 8,
+            "models": lanes,
+            "paired_comparisons": paired,
+            "deepseek_gap_closed_fraction": gap_closure,
+            "per_task_solved_outcomes": [
+                {
+                    "task_id": task_id,
+                    **{
+                        label: count_values[index] > 0
+                        for label, count_values in counts.items()
+                    },
+                }
+                for index, task_id in enumerate(task_ids)
+            ],
+        }
+
+    evidence = {
+        "schema_version": "generalist-v2-final-assessment-v1",
+        "status": "complete",
+        "selected_checkpoint": selected_checkpoint,
+        "selected_adapter_model_sha256": selection["selected_checkpoint"][
+            "adapter_model_sha256"
+        ],
+        "q0_evidence_sha256": sha256_file(q0_evidence_path),
+        "selection_evidence_sha256": sha256_file(selection_path),
+        "prompt_format_id": "lean-sft-v2-raw-whole-proof",
+        "candidates_per_task": 8,
+        "models": {
+            "base": {"model_id": MODEL_ID, "model_revision": MODEL_REVISION},
+            "selected": {
+                "model_id": MODEL_ID,
+                "model_revision": MODEL_REVISION,
+                "checkpoint_id": selected_checkpoint,
+                "adapter_model_sha256": selection["selected_checkpoint"][
+                    "adapter_model_sha256"
+                ],
+            },
+            "deepseek": {
+                "model_id": DEEPSEEK_MODEL_ID,
+                "model_revision": DEEPSEEK_MODEL_REVISION,
+            },
+        },
+        "workloads": workloads,
+        "checkpoint_selection_frozen_before_test": True,
+        "test_workloads_first_used_after_checkpoint_freeze": True,
+        "test_workloads_regenerated": False,
+        "riemann_validation_used_for_selection": False,
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return evidence
+
+
+def run_historical_riemann_assessment(
+    config: GeneralistV2Config,
+    selection_path: Path,
+    riemann_config_path: Path,
+    repository_root: Path,
+    domain_config_path: Path,
+    mathlib_root: Path,
+    preflight_path: Path,
+    adapter_dir: Path,
+    output_dir: Path,
+    *,
+    workers: int,
+) -> dict[str, Any]:
+    """Run the frozen 556x4 historical lane with the selected adapter."""
+
+    from .riemann_assessment import run_assessment, validate_assessment_config
+
+    config.validate()
+    selection = _read_json(selection_path)
+    selected = str(selection.get("selection", {}).get("selected_checkpoint", ""))
+    if selection.get("status") != "frozen" or selected not in {"Q1", "Q2", "Q3", "Q4"}:
+        raise ValueError("historical Riemann assessment needs a frozen checkpoint")
+    adapter = _checkpoint_adapter_spec(config, selected, adapter_dir)
+    if (
+        sha256_file(adapter_dir / "adapter_model.safetensors")
+        != selection["selected_checkpoint"]["adapter_model_sha256"]
+    ):
+        raise ValueError("historical Riemann selected adapter hash differs")
+    if (output_dir / "run.json").exists():
+        raise FileExistsError(
+            f"refusing to overwrite completed historical Riemann run: {output_dir}"
+        )
+    riemann_config = Phase1Config.load(riemann_config_path)
+    validate_assessment_config(riemann_config)
+    _, _, summary = run_assessment(
+        riemann_config,
+        repository_root,
+        domain_config_path,
+        mathlib_root,
+        preflight_path,
+        output_dir,
+        verification_workers=workers,
+        adapter=adapter,
+    )
+    if not summary["complete"] or summary["infrastructure_error_count"]:
+        raise RuntimeError("historical Riemann selected-adapter run is incomplete")
+    return summary
+
+
+def _paired_solved(reference: list[bool], candidate: list[bool]) -> dict[str, Any]:
+    if len(reference) != len(candidate) or not reference:
+        raise ValueError("historical paired outcomes are incomplete")
+    both = sum(left and right for left, right in zip(reference, candidate, strict=True))
+    candidate_only = sum(
+        not left and right for left, right in zip(reference, candidate, strict=True)
+    )
+    reference_only = sum(
+        left and not right for left, right in zip(reference, candidate, strict=True)
+    )
+    neither = len(reference) - both - candidate_only - reference_only
+    discordant = candidate_only + reference_only
+    if discordant:
+        tail = sum(
+            math.comb(discordant, value)
+            for value in range(min(candidate_only, reference_only) + 1)
+        )
+        p_value = min(1.0, 2.0 * tail / (2**discordant))
+    else:
+        p_value = 1.0
+    return {
+        "both_solved": both,
+        "candidate_only": candidate_only,
+        "reference_only": reference_only,
+        "neither_solved": neither,
+        "paired_wins_candidate_minus_reference": candidate_only - reference_only,
+        "exact_two_sided_mcnemar_p": p_value,
+    }
+
+
+def _historical_breakdowns(
+    counts: dict[str, int], metadata_rows: list[dict[str, Any]]
+) -> dict[str, Any]:
+    dimensions = (
+        "primary_domain",
+        "relevance_distance",
+        "inclusion_scope",
+        "component_inclusion_basis",
+    )
+    output: dict[str, Any] = {}
+    for dimension in dimensions:
+        groups: dict[str, list[int]] = defaultdict(list)
+        for row in metadata_rows:
+            groups[str(row[dimension])].append(counts[str(row["task_id"])])
+        output[dimension] = {
+            key: {
+                "task_count": len(values),
+                "solved_within_4": sum(value > 0 for value in values),
+                "pass_at_k": {
+                    f"pass@{k}": fmean(
+                        estimate_pass_at_k(4, value, k) for value in values
+                    )
+                    for k in (1, 4)
+                },
+            }
+            for key, values in sorted(groups.items())
+        }
+    return output
+
+
+def compact_historical_riemann_evidence(
+    selection_path: Path,
+    artifact_dir: Path,
+    base_evidence_dir: Path,
+    deepseek_evidence_dir: Path,
+    output: Path,
+) -> dict[str, Any]:
+    selection = _read_json(selection_path)
+    selected = str(selection.get("selection", {}).get("selected_checkpoint", ""))
+    run = _read_json(artifact_dir / "run.json")
+    summary = _read_json(artifact_dir / "summary.json")
+    adapter = run.get("selected_adapter_binding")
+    if (
+        selection.get("status") != "frozen"
+        or selected not in {"Q1", "Q2", "Q3", "Q4"}
+        or run.get("model_id") != MODEL_ID
+        or run.get("model_revision") != MODEL_REVISION
+        or run.get("adapter_enabled") is not True
+        or not isinstance(adapter, dict)
+        or adapter.get("adapter_id") != f"qwen-lean-generalist-v2-{selected.lower()}"
+        or sha256_file(Path(str(adapter["adapter_path"])) / "adapter_model.safetensors")
+        != selection["selected_checkpoint"]["adapter_model_sha256"]
+        or run.get("workload_id") != "riemann-specialist-validation-v1"
+        or run.get("candidates_per_task") != 4
+        or summary.get("task_count") != 556
+        or summary.get("candidate_count") != 2224
+        or summary.get("complete") is not True
+        or summary.get("infrastructure_error_count") != 0
+    ):
+        raise ValueError("historical Riemann selected-adapter evidence is incomplete")
+    selected_rows = [
+        {
+            "task_id": str(item["task_id"]),
+            "verified_candidate_count": int(item["verified_candidate_count"]),
+            "solved": int(item["verified_candidate_count"]) > 0,
+        }
+        for item in summary["per_task"]
+    ]
+    if len(selected_rows) != 556:
+        raise ValueError("historical selected per-task outcomes are incomplete")
+
+    anchors: dict[str, Any] = {}
+    anchor_rows: dict[str, list[dict[str, Any]]] = {}
+    for label, root, expected_model, expected_revision in (
+        ("base", base_evidence_dir, MODEL_ID, MODEL_REVISION),
+        ("deepseek", deepseek_evidence_dir, DEEPSEEK_MODEL_ID, DEEPSEEK_MODEL_REVISION),
+    ):
+        full = _read_json(root / "full.json")
+        rows = list(_iter_jsonl(root / "task-outcomes.jsonl"))
+        identity = full.get("execution_identity", {})
+        if (
+            full.get("status") != "passed"
+            or identity.get("model_id") != expected_model
+            or identity.get("model_revision") != expected_revision
+            or full.get("workload", {}).get("task_count") != 556
+            or full.get("workload", {}).get("candidates_per_task") != 4
+            or full.get("workload", {}).get("protected_holdouts_used") is not False
+            or len(rows) != 556
+        ):
+            raise ValueError(f"accepted historical {label} anchor differs")
+        anchors[label] = {
+            "model_id": expected_model,
+            "model_revision": expected_revision,
+            "overall": full["overall"],
+            "full_evidence_sha256": sha256_file(root / "full.json"),
+            "task_outcomes_sha256": sha256_file(root / "task-outcomes.jsonl"),
+        }
+        anchor_rows[label] = rows
+
+    task_ids = [str(item["task_id"]) for item in selected_rows]
+    if any(
+        [str(item["task_id"]) for item in rows] != task_ids
+        for rows in anchor_rows.values()
+    ):
+        raise ValueError("historical paired task identities differ")
+    selected_counts = {
+        str(item["task_id"]): int(item["verified_candidate_count"])
+        for item in selected_rows
+    }
+    evidence = {
+        "schema_version": "generalist-v2-historical-riemann-v1",
+        "status": "complete",
+        "interpretation": "historical-comparability-and-learned-knowledge-only",
+        "clean_unseen_generalization": False,
+        "dataset_v2_training_source_knowledge_may_overlap": True,
+        "workload": {
+            "id": "riemann-specialist-validation-v1",
+            "task_count": 556,
+            "candidates_per_task": 4,
+        },
+        "selected_checkpoint": selected,
+        "selected_adapter_model_sha256": selection["selected_checkpoint"][
+            "adapter_model_sha256"
+        ],
+        "selected": {
+            "model_id": MODEL_ID,
+            "model_revision": MODEL_REVISION,
+            "pass_at_k": summary["pass_at_k"],
+            "tasks_with_verified_candidate": summary["tasks_with_verified_candidate"],
+            "category_counts": summary["category_counts"],
+            "finish_reason_counts": summary["finish_reason_counts"],
+            "per_task": selected_rows,
+            "breakdowns": _historical_breakdowns(selected_counts, anchor_rows["base"]),
+            "generation_sha256": sha256_file(artifact_dir / "generation.jsonl"),
+            "results_sha256": sha256_file(artifact_dir / "results.jsonl"),
+        },
+        "accepted_anchors_regenerated": False,
+        "accepted_anchors": anchors,
+        "paired_solved_within_4": {
+            f"selected_vs_{label}": _paired_solved(
+                [bool(item["solved"]) for item in rows],
+                [bool(item["solved"]) for item in selected_rows],
+            )
+            for label, rows in anchor_rows.items()
+        },
     }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(

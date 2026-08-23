@@ -1942,6 +1942,46 @@ def _parser() -> argparse.ArgumentParser:
         "--candidates-per-task", type=int, choices=(8, 64)
     )
 
+    generalist_final_generate = subparsers.add_parser(
+        "generalist-v2-final-generate",
+        help="generate one overwrite-protected final n=8 model/workload lane",
+    )
+    generalist_final_generate.add_argument("--config", type=Path, required=True)
+    generalist_final_generate.add_argument(
+        "--evaluation-config", type=Path, required=True
+    )
+    generalist_final_generate.add_argument(
+        "--model-label", choices=("base", "selected", "deepseek"), required=True
+    )
+    generalist_final_generate.add_argument(
+        "--selected-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_final_generate.add_argument("--adapter-dir", type=Path)
+    generalist_final_generate.add_argument("--workload", required=True)
+    generalist_final_generate.add_argument("--package-root", type=Path, required=True)
+    generalist_final_generate.add_argument("--view-dir", type=Path, required=True)
+    generalist_final_generate.add_argument("--output-dir", type=Path, required=True)
+
+    generalist_final_verify = subparsers.add_parser(
+        "generalist-v2-final-verify",
+        help="verify one stored final n=8 model/workload lane",
+    )
+    generalist_final_verify.add_argument("--config", type=Path, required=True)
+    generalist_final_verify.add_argument(
+        "--model-label", choices=("base", "selected", "deepseek"), required=True
+    )
+    generalist_final_verify.add_argument(
+        "--selected-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
+    )
+    generalist_final_verify.add_argument("--workload", required=True)
+    generalist_final_verify.add_argument("--package-root", type=Path, required=True)
+    generalist_final_verify.add_argument("--view-dir", type=Path, required=True)
+    generalist_final_verify.add_argument("--output-dir", type=Path, required=True)
+    generalist_final_verify.add_argument(
+        "--lean-project-root", type=Path, required=True
+    )
+    generalist_final_verify.add_argument("--workers", type=int, default=8)
+
     generalist_checkpoint_select = subparsers.add_parser(
         "generalist-v2-checkpoint-select",
         help="freeze Q1-Q4 selection from complete validation evidence",
@@ -1970,6 +2010,59 @@ def _parser() -> argparse.ArgumentParser:
         "--evaluation-root", type=Path, required=True
     )
     generalist_extended_select.add_argument("--output", type=Path, required=True)
+
+    generalist_final_evidence = subparsers.add_parser(
+        "generalist-v2-final-evidence",
+        help="compact frozen n=8 Base/generalist/DeepSeek final comparisons",
+    )
+    generalist_final_evidence.add_argument("--config", type=Path, required=True)
+    generalist_final_evidence.add_argument("--q0-evidence", type=Path, required=True)
+    generalist_final_evidence.add_argument("--selection", type=Path, required=True)
+    generalist_final_evidence.add_argument("--final-root", type=Path, required=True)
+    generalist_final_evidence.add_argument("--package-root", type=Path, required=True)
+    generalist_final_evidence.add_argument("--view-dir", type=Path, required=True)
+    generalist_final_evidence.add_argument("--output", type=Path, required=True)
+
+    generalist_historical_riemann = subparsers.add_parser(
+        "generalist-v2-historical-riemann",
+        help="run the selected adapter on the frozen historical 556x4 workload",
+    )
+    generalist_historical_riemann.add_argument("--config", type=Path, required=True)
+    generalist_historical_riemann.add_argument("--selection", type=Path, required=True)
+    generalist_historical_riemann.add_argument(
+        "--riemann-config", type=Path, required=True
+    )
+    generalist_historical_riemann.add_argument(
+        "--repository-root", type=Path, required=True
+    )
+    generalist_historical_riemann.add_argument(
+        "--domain-config", type=Path, required=True
+    )
+    generalist_historical_riemann.add_argument(
+        "--mathlib-root", type=Path, required=True
+    )
+    generalist_historical_riemann.add_argument("--preflight", type=Path, required=True)
+    generalist_historical_riemann.add_argument(
+        "--adapter-dir", type=Path, required=True
+    )
+    generalist_historical_riemann.add_argument("--output-dir", type=Path, required=True)
+    generalist_historical_riemann.add_argument("--workers", type=int, default=8)
+
+    generalist_historical_evidence = subparsers.add_parser(
+        "generalist-v2-historical-riemann-evidence",
+        help="compact selected and accepted-anchor historical Riemann evidence",
+    )
+    generalist_historical_evidence.add_argument("--selection", type=Path, required=True)
+    generalist_historical_evidence.add_argument(
+        "--artifact-dir", type=Path, required=True
+    )
+    generalist_historical_evidence.add_argument(
+        "--base-evidence-dir", type=Path, required=True
+    )
+    generalist_historical_evidence.add_argument(
+        "--deepseek-evidence-dir", type=Path, required=True
+    )
+    generalist_historical_evidence.add_argument("--output", type=Path, required=True)
 
     generalist_production_preflight = subparsers.add_parser(
         "generalist-v2-production-preflight",
@@ -2138,6 +2231,40 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(evidence, indent=2))
         return 0
 
+    if args.command == "generalist-v2-final-generate":
+        from .generalist_v2_evaluation import run_final_generation
+
+        evidence = run_final_generation(
+            GeneralistV2Config.load(args.config),
+            args.evaluation_config,
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            model_label=args.model_label,
+            selected_checkpoint=args.selected_checkpoint,
+            adapter_dir=args.adapter_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-final-verify":
+        from .generalist_v2_evaluation import run_final_verification
+
+        evidence = run_final_verification(
+            GeneralistV2Config.load(args.config),
+            args.workload,
+            args.package_root,
+            args.view_dir,
+            args.output_dir,
+            args.lean_project_root,
+            model_label=args.model_label,
+            selected_checkpoint=args.selected_checkpoint,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
     if args.command == "generalist-v2-checkpoint-select":
         from .generalist_v2_evaluation import compact_checkpoint_selection_evidence
 
@@ -2160,6 +2287,54 @@ def main(argv: list[str] | None = None) -> int:
             GeneralistV2Config.load(args.config),
             args.screening_selection,
             args.evaluation_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-final-evidence":
+        from .generalist_v2_evaluation import compact_final_assessment_evidence
+
+        evidence = compact_final_assessment_evidence(
+            GeneralistV2Config.load(args.config),
+            args.q0_evidence,
+            args.selection,
+            args.final_root,
+            args.package_root,
+            args.view_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-historical-riemann":
+        from .generalist_v2_evaluation import run_historical_riemann_assessment
+
+        evidence = run_historical_riemann_assessment(
+            GeneralistV2Config.load(args.config),
+            args.selection,
+            args.riemann_config,
+            args.repository_root,
+            args.domain_config,
+            args.mathlib_root,
+            args.preflight,
+            args.adapter_dir,
+            args.output_dir,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-historical-riemann-evidence":
+        from .generalist_v2_evaluation import (
+            compact_historical_riemann_evidence,
+        )
+
+        evidence = compact_historical_riemann_evidence(
+            args.selection,
+            args.artifact_dir,
+            args.base_evidence_dir,
+            args.deepseek_evidence_dir,
             args.output,
         )
         print(json.dumps(evidence, indent=2))

@@ -12,7 +12,10 @@ from qwen_lean.generalist_v2_evaluation import (
     _checkpoint_adapter_spec,
     _compact_checkpoint_workload,
     _compact_extended_workload,
+    _compact_final_run,
+    _final_phase1_config,
     _normalized_verified_proof_sha256,
+    _paired_solved,
     _source_position_verification_task,
     _summarize_extended_raw_candidate_evidence,
     _synthetic_task,
@@ -103,6 +106,38 @@ def test_checkpoint_adapter_spec_requires_pinned_unmerged_identity(
         _checkpoint_adapter_spec(config, "Q0", tmp_path)
 
 
+def test_final_deepseek_config_uses_same_frozen_context_and_pinned_identity() -> None:
+    generalist = GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json")
+    phase1 = _final_phase1_config(
+        ROOT / "config/deepseek-prover-v2-7b-assessment.json",
+        generalist,
+        model_label="deepseek",
+    )
+
+    assert phase1.model["model_id"] == "deepseek-ai/DeepSeek-Prover-V2-7B"
+    assert phase1.model["model_revision"] == (
+        "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b"
+    )
+    assert phase1.engine["max_model_len"] == 32768
+    assert phase1.engine["max_num_seqs"] == 8
+
+
+def test_paired_historical_outcomes_use_exact_two_sided_mcnemar() -> None:
+    paired = _paired_solved(
+        [True, False, True, False],
+        [True, True, False, True],
+    )
+
+    assert paired == {
+        "both_solved": 1,
+        "candidate_only": 2,
+        "reference_only": 1,
+        "neither_solved": 0,
+        "paired_wins_candidate_minus_reference": 1,
+        "exact_two_sided_mcnemar_p": 1.0,
+    }
+
+
 def test_compact_checkpoint_workload_binds_adapter_and_task_order(
     tmp_path: Path,
 ) -> None:
@@ -147,24 +182,108 @@ def test_compact_checkpoint_workload_binds_adapter_and_task_order(
                 "finish_reason_counts": {"eos": 8},
                 "exact_target_candidate_count": 1,
                 "exact_target_task_count": 1,
-                "per_task": [{"verified_candidate_count": 4}],
+                "per_task": [{"task_id": "task-a", "verified_candidate_count": 4}],
             }
         ),
         encoding="utf-8",
     )
     (tmp_path / "results.jsonl").write_text("result\n", encoding="utf-8")
     (tmp_path / "generations.jsonl").write_text("generation\n", encoding="utf-8")
+    generation_metadata = json.loads(
+        (tmp_path / "generation-metadata.json").read_text(encoding="utf-8")
+    )
+    generation_metadata["generation_sha256"] = sha256_file(
+        tmp_path / "generations.jsonl"
+    )
+    (tmp_path / "generation-metadata.json").write_text(
+        json.dumps(generation_metadata), encoding="utf-8"
+    )
 
     compact = _compact_checkpoint_workload(
         tmp_path, "Q2", "fixture", 1, "task-hash", "adapter-hash"
     )
 
     assert compact["verified_counts"] == [4]
+    assert compact["per_task"] == [{"task_id": "task-a", "verified_candidate_count": 4}]
     assert compact["adapter_model_sha256"] == "adapter-hash"
     with pytest.raises(ValueError, match="selection workload is incomplete"):
         _compact_checkpoint_workload(
             tmp_path, "Q2", "fixture", 1, "different-task-hash", "adapter-hash"
         )
+
+
+def test_compact_final_run_requires_frozen_identity_and_per_task_outcomes(
+    tmp_path: Path,
+) -> None:
+    generation = {
+        "schema_version": "generalist-v2-final-generation-v1",
+        "evaluation_profile": "postselection-final-n8",
+        "model_label": "base",
+        "selected_checkpoint": "Q2",
+        "workload_id": "fixture",
+        "model_id": "Qwen/Qwen3.5-4B-Base",
+        "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+        "task_count": 1,
+        "candidate_count": 8,
+        "generation_error_count": 0,
+        "first_complete_result_overwrite_protected": True,
+        "final_only_workload": False,
+        "ordered_task_ids_sha256": "task-hash",
+        "adapter": None,
+    }
+    (tmp_path / "generation-metadata.json").write_text(
+        json.dumps(generation), encoding="utf-8"
+    )
+    (tmp_path / "run.json").write_text(
+        json.dumps(
+            {
+                "model_id": generation["model_id"],
+                "model_revision": generation["model_revision"],
+                "selected_adapter_binding": None,
+                "candidates_per_task": 8,
+                "runtime": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "summary.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "generalist-v2-final-verification-v1",
+                "evaluation_profile": "postselection-final-n8",
+                "model_label": "base",
+                "checkpoint_id": "Q2",
+                "workload_id": "fixture",
+                "task_count": 1,
+                "candidate_count": 8,
+                "complete": True,
+                "infrastructure_error_count": 0,
+                "tasks_with_verified_candidate": {"count": 1, "rate": 1.0},
+                "pass_at_k": {"pass@1": 0.25, "pass@4": 1.0, "pass@8": 1.0},
+                "category_counts": {"verified": 2, "lean_rejected": 6},
+                "finish_reason_counts": {"eos": 8},
+                "per_task": [{"task_id": "task-a", "verified_candidate_count": 2}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "generations.jsonl").write_text("generation\n", encoding="utf-8")
+    (tmp_path / "results.jsonl").write_text("result\n", encoding="utf-8")
+    generation["generation_sha256"] = sha256_file(tmp_path / "generations.jsonl")
+    (tmp_path / "generation-metadata.json").write_text(
+        json.dumps(generation), encoding="utf-8"
+    )
+
+    compact = _compact_final_run(
+        tmp_path,
+        model_label="base",
+        selected_checkpoint="Q2",
+        workload_id="fixture",
+        expected_task_count=1,
+    )
+
+    assert compact["per_task"] == [{"task_id": "task-a", "verified_candidate_count": 2}]
+    assert compact["first_complete_result_overwrite_protected"] is True
 
 
 def test_compact_extended_workload_reports_curve_and_marginal_gains(
