@@ -1973,6 +1973,9 @@ def _parser() -> argparse.ArgumentParser:
         "--evaluation-config", type=Path, required=True
     )
     generalist_final_deepseek_preflight.add_argument(
+        "--selection", type=Path, required=True
+    )
+    generalist_final_deepseek_preflight.add_argument(
         "--package-root", type=Path, required=True
     )
     generalist_final_deepseek_preflight.add_argument(
@@ -2274,6 +2277,7 @@ def main(argv: list[str] | None = None) -> int:
         evidence = run_final_deepseek_preflight(
             GeneralistV2Config.load(args.config),
             args.evaluation_config,
+            args.selection,
             args.package_root,
             args.view_dir,
             args.output,

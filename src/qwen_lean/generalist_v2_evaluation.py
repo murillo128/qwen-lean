@@ -590,6 +590,7 @@ def run_final_generation(
 def run_final_deepseek_preflight(
     config: GeneralistV2Config,
     evaluation_config: Path,
+    selection_path: Path,
     package_root: Path,
     view_dir: Path,
     output: Path,
@@ -602,6 +603,15 @@ def run_final_deepseek_preflight(
     from .qwen35_4b_base_assessment import _GpuMemorySampler
 
     config.validate()
+    selection = _read_json(selection_path)
+    selected_checkpoint = str(
+        selection.get("selection", {}).get("selected_checkpoint", "")
+    )
+    if (
+        selection.get("status") != "frozen"
+        or selected_checkpoint not in {"Q1", "Q2", "Q3", "Q4"}
+    ):
+        raise ValueError("DeepSeek final preflight requires a frozen checkpoint")
     phase1 = _final_phase1_config(
         evaluation_config, config, model_label="deepseek"
     )
@@ -653,6 +663,8 @@ def run_final_deepseek_preflight(
         "model_id": DEEPSEEK_MODEL_ID,
         "model_revision": DEEPSEEK_MODEL_REVISION,
         "tokenizer_revision": DEEPSEEK_MODEL_REVISION,
+        "checkpoint_selection_sha256": sha256_file(selection_path),
+        "selected_checkpoint_frozen": selected_checkpoint,
         "validation_only_before_final_test": True,
         "workload_id": workload_id,
         "task_id": task_id,
