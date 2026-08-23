@@ -313,14 +313,30 @@ def _final_phase1_config(
         base.model.get("tokenizer_revision"),
     ) != (expected[0], expected[1], expected[0], expected[1]):
         raise ValueError(f"final {model_label} evaluation model binding differs")
-    engine = {
-        **base.engine,
-        "max_model_len": int(generalist.training["resolved_context_tokens"]),
-        "max_num_seqs": min(
-            8 if model_label == "deepseek" else 16,
-            int(base.engine["max_num_seqs"]),
-        ),
-    }
+    if model_label == "deepseek":
+        census = base.value.get("assessment", {}).get("context_census", {})
+        expected_sampling = {
+            "candidates_per_task": 8,
+            **generalist.evaluation["sampling"],
+        }
+        if (
+            base.value.get("assessment", {}).get("id")
+            != "deepseek-prover-v2-7b-generalist-v2-final-v1"
+            or base.sampling != expected_sampling
+            or census.get("max_prompt_plus_generation_tokens") != 21041
+            or int(base.engine.get("max_model_len", 0)) < 21041
+            or float(base.engine.get("cpu_offload_gb", 0.0)) != 8.0
+            or base.engine.get("dtype") != "bfloat16"
+            or base.engine.get("quantization") is not None
+        ):
+            raise ValueError("final DeepSeek context or BF16 offload contract differs")
+        engine = dict(base.engine)
+    else:
+        engine = {
+            **base.engine,
+            "max_model_len": int(generalist.training["resolved_context_tokens"]),
+            "max_num_seqs": min(16, int(base.engine["max_num_seqs"])),
+        }
     return Phase1Config(path=base.path, value={**base.value, "engine": engine})
 
 

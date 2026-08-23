@@ -109,7 +109,7 @@ def test_checkpoint_adapter_spec_requires_pinned_unmerged_identity(
 def test_final_deepseek_config_uses_same_frozen_context_and_pinned_identity() -> None:
     generalist = GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json")
     phase1 = _final_phase1_config(
-        ROOT / "config/deepseek-prover-v2-7b-assessment.json",
+        ROOT / "config/deepseek-prover-v2-7b-generalist-v2.json",
         generalist,
         model_label="deepseek",
     )
@@ -118,8 +118,15 @@ def test_final_deepseek_config_uses_same_frozen_context_and_pinned_identity() ->
     assert phase1.model["model_revision"] == (
         "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b"
     )
-    assert phase1.engine["max_model_len"] == 32768
-    assert phase1.engine["max_num_seqs"] == 8
+    assert phase1.engine["max_model_len"] == 24576
+    assert phase1.engine["max_num_seqs"] == 4
+    assert phase1.engine["cpu_offload_gb"] == 8.0
+    with pytest.raises(ValueError, match="context or BF16 offload"):
+        _final_phase1_config(
+            ROOT / "config/deepseek-prover-v2-7b-assessment.json",
+            generalist,
+            model_label="deepseek",
+        )
 
 
 def test_paired_historical_outcomes_use_exact_two_sided_mcnemar() -> None:

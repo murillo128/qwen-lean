@@ -1,0 +1,52 @@
+{
+  "schema_version": "phase1-config-v1",
+  "assessment": {
+    "id": "deepseek-prover-v2-7b-generalist-v2-final-v1",
+    "prompt_format_id": "lean-sft-v2-raw-whole-proof",
+    "chat_template": null,
+    "precision_lane": "bf16-with-cpu-weight-offload",
+    "inference_execution": "project-controlled-local-cuda",
+    "context_census": {
+      "tokenizer_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+      "includes_max_new_tokens": 1024,
+      "max_prompt_plus_generation_tokens": 21041,
+      "workloads": {
+        "minif2f-valid-clean-v2": 1510,
+        "minif2f-test-clean-v2": 1364,
+        "fresh-composition-valid-v2": 21041,
+        "fresh-composition-test-v2": 17347,
+        "riemann-fresh-valid-v2": 9405,
+        "riemann-fresh-test-v2": 11975
+      }
+    }
+  },
+  "model": {
+    "model_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "model_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+    "tokenizer_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+    "tokenizer_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b"
+  },
+  "sampling": {
+    "candidates_per_task": 8,
+    "do_sample": true,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "top_k": -1,
+    "max_new_tokens": 1024,
+    "stop": "tokenizer_eos_or_token_limit",
+    "seed": 0
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.10.2",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 24576,
+    "max_num_seqs": 4,
+    "enforce_eager": true,
+    "quantization": null,
+    "cpu_offload_gb": 8.0,
+    "expected_cuda_device_name_fragment": "Ada"
+  }
+}
