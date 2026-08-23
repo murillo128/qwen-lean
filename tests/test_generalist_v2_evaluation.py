@@ -121,6 +121,12 @@ def test_final_deepseek_config_uses_same_frozen_context_and_pinned_identity() ->
     assert phase1.engine["max_model_len"] == 24576
     assert phase1.engine["max_num_seqs"] == 4
     assert phase1.engine["cpu_offload_gb"] == 8.0
+    assert phase1.value["assessment"]["context_census"]["scope"] == (
+        "validation-only-before-checkpoint-freeze"
+    )
+    assert len(
+        phase1.value["assessment"]["context_census"]["maximum_task"]["task_id"]
+    ) == 64
     with pytest.raises(ValueError, match="context or BF16 offload"):
         _final_phase1_config(
             ROOT / "config/deepseek-prover-v2-7b-assessment.json",

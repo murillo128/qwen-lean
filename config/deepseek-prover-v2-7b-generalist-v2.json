@@ -7,16 +7,18 @@
     "precision_lane": "bf16-with-cpu-weight-offload",
     "inference_execution": "project-controlled-local-cuda",
     "context_census": {
+      "scope": "validation-only-before-checkpoint-freeze",
       "tokenizer_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
       "includes_max_new_tokens": 1024,
       "max_prompt_plus_generation_tokens": 21041,
+      "maximum_task": {
+        "workload_id": "fresh-composition-valid-v2",
+        "task_id": "5e6a4197989c31a3c3cbed083e5c4d05bc896a06b4c6c31f5e7c5df0fd268adf"
+      },
       "workloads": {
         "minif2f-valid-clean-v2": 1510,
-        "minif2f-test-clean-v2": 1364,
         "fresh-composition-valid-v2": 21041,
-        "fresh-composition-test-v2": 17347,
-        "riemann-fresh-valid-v2": 9405,
-        "riemann-fresh-test-v2": 11975
+        "riemann-fresh-valid-v2": 9405
       }
     }
   },

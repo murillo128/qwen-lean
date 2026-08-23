@@ -1962,6 +1962,26 @@ def _parser() -> argparse.ArgumentParser:
     generalist_final_generate.add_argument("--view-dir", type=Path, required=True)
     generalist_final_generate.add_argument("--output-dir", type=Path, required=True)
 
+    generalist_final_deepseek_preflight = subparsers.add_parser(
+        "generalist-v2-final-deepseek-preflight",
+        help="load and generate from the longest final-control validation prompt",
+    )
+    generalist_final_deepseek_preflight.add_argument(
+        "--config", type=Path, required=True
+    )
+    generalist_final_deepseek_preflight.add_argument(
+        "--evaluation-config", type=Path, required=True
+    )
+    generalist_final_deepseek_preflight.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_final_deepseek_preflight.add_argument(
+        "--view-dir", type=Path, required=True
+    )
+    generalist_final_deepseek_preflight.add_argument(
+        "--output", type=Path, required=True
+    )
+
     generalist_final_verify = subparsers.add_parser(
         "generalist-v2-final-verify",
         help="verify one stored final n=8 model/workload lane",
@@ -2244,6 +2264,19 @@ def main(argv: list[str] | None = None) -> int:
             model_label=args.model_label,
             selected_checkpoint=args.selected_checkpoint,
             adapter_dir=args.adapter_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-final-deepseek-preflight":
+        from .generalist_v2_evaluation import run_final_deepseek_preflight
+
+        evidence = run_final_deepseek_preflight(
+            GeneralistV2Config.load(args.config),
+            args.evaluation_config,
+            args.package_root,
+            args.view_dir,
+            args.output,
         )
         print(json.dumps(evidence, indent=2))
         return 0

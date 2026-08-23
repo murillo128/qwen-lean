@@ -18,6 +18,7 @@ from .baseline import (
     LoRAAdapterSpec,
     _generate_candidates,
     _verify_candidate,
+    render_prompt,
 )
 from .dataset_v2_schema import DatasetV2Record
 from .generalist_v2 import (
@@ -584,6 +585,97 @@ def run_final_generation(
             "infrastructure errors"
         )
     return metadata
+
+
+def run_final_deepseek_preflight(
+    config: GeneralistV2Config,
+    evaluation_config: Path,
+    package_root: Path,
+    view_dir: Path,
+    output: Path,
+) -> dict[str, Any]:
+    """Load and generate from the longest validation prompt in the BF16 lane."""
+
+    from huggingface_hub import snapshot_download
+    from transformers import AutoTokenizer
+
+    from .qwen35_4b_base_assessment import _GpuMemorySampler
+
+    config.validate()
+    phase1 = _final_phase1_config(
+        evaluation_config, config, model_label="deepseek"
+    )
+    census = phase1.value["assessment"]["context_census"]
+    maximum = census["maximum_task"]
+    workload_id = str(maximum["workload_id"])
+    task_id = str(maximum["task_id"])
+    tasks, _, _, _ = materialize_q0_workload(
+        workload_id, package_root, view_dir
+    )
+    selected = [task for task in tasks if task.id == task_id]
+    if len(selected) != 1:
+        raise ValueError("DeepSeek preflight maximum validation task differs")
+    snapshot = Path(
+        snapshot_download(
+            repo_id=DEEPSEEK_MODEL_ID,
+            revision=DEEPSEEK_MODEL_REVISION,
+            local_files_only=True,
+        )
+    )
+    tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True)
+    prompt_tokens = len(
+        tokenizer.encode(render_prompt(selected[0]), add_special_tokens=False)
+    )
+    max_new_tokens = int(config.evaluation["sampling"]["max_new_tokens"])
+    if prompt_tokens + max_new_tokens != int(
+        census["max_prompt_plus_generation_tokens"]
+    ):
+        raise ValueError("DeepSeek preflight tokenizer context census differs")
+    sampling = {
+        **_sampling(config, candidates_per_task=8),
+        "candidates_per_task": 1,
+    }
+    started = time.perf_counter()
+    with _GpuMemorySampler() as memory:
+        generated, engine_version = _generate_candidates(
+            phase1, selected, sampling=sampling
+        )
+    elapsed = time.perf_counter() - started
+    if (
+        len(generated) != 1
+        or generated[0].generation_error is not None
+        or not memory.samples_mib
+    ):
+        raise RuntimeError("DeepSeek final local-GPU context preflight failed")
+    evidence = {
+        "schema_version": "generalist-v2-deepseek-final-preflight-v1",
+        "status": "passed",
+        "model_id": DEEPSEEK_MODEL_ID,
+        "model_revision": DEEPSEEK_MODEL_REVISION,
+        "tokenizer_revision": DEEPSEEK_MODEL_REVISION,
+        "validation_only_before_final_test": True,
+        "workload_id": workload_id,
+        "task_id": task_id,
+        "prompt_tokens": prompt_tokens,
+        "max_new_tokens": max_new_tokens,
+        "max_prompt_plus_generation_tokens": prompt_tokens + max_new_tokens,
+        "engine": phase1.engine,
+        "engine_version": engine_version,
+        "inference_execution": "project-controlled-local-cuda",
+        "generation_wall_time_seconds": elapsed,
+        "generated_token_count": generated[0].token_count,
+        "finish_reason": generated[0].finish_reason,
+        "candidate_text_sha256": _text_sha256(generated[0].text),
+        "peak_device_memory_used_mib": max(memory.samples_mib),
+        "gpu_memory_sample_count": len(memory.samples_mib),
+        "candidate_budget_role": "single-candidate-infrastructure-preflight-only",
+        "semantic_outcome_used_for_selection_or_tuning": False,
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return evidence
 
 
 def run_q0_generation(
