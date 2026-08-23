@@ -1890,6 +1890,84 @@ def _parser() -> argparse.ArgumentParser:
     )
     generalist_q0_evidence.add_argument("--output", type=Path, required=True)
 
+    generalist_parity_probes = subparsers.add_parser(
+        "generalist-v2-lora-parity-probes",
+        help="freeze the overfit64 and Q2 evaluator-parity probes",
+    )
+    generalist_parity_probes.add_argument("--config", type=Path, required=True)
+    generalist_parity_probes.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_parity_probes.add_argument("--view-dir", type=Path, required=True)
+    generalist_parity_probes.add_argument(
+        "--overfit-run", type=Path, required=True
+    )
+    generalist_parity_probes.add_argument(
+        "--general-lean-project-root", type=Path, required=True
+    )
+    generalist_parity_probes.add_argument("--output", type=Path, required=True)
+
+    generalist_parity_hf = subparsers.add_parser(
+        "generalist-v2-lora-parity-hf",
+        help="run deterministic Transformers Base/PEFT parity arms",
+    )
+    generalist_parity_hf.add_argument("--config", type=Path, required=True)
+    generalist_parity_hf.add_argument("--probes", type=Path, required=True)
+    generalist_parity_hf.add_argument(
+        "--overfit-adapter-dir", type=Path, required=True
+    )
+    generalist_parity_hf.add_argument(
+        "--q2-adapter-dir", type=Path, required=True
+    )
+    generalist_parity_hf.add_argument(
+        "--model-snapshot", type=Path, required=True
+    )
+    generalist_parity_hf.add_argument("--output", type=Path, required=True)
+
+    generalist_parity_vllm = subparsers.add_parser(
+        "generalist-v2-lora-parity-vllm",
+        help="audit and exercise Qwen3.5 adapters in the screening vLLM runtime",
+    )
+    generalist_parity_vllm.add_argument("--config", type=Path, required=True)
+    generalist_parity_vllm.add_argument(
+        "--base-evaluation-config", type=Path, required=True
+    )
+    generalist_parity_vllm.add_argument("--probes", type=Path, required=True)
+    generalist_parity_vllm.add_argument(
+        "--overfit-adapter-dir", type=Path, required=True
+    )
+    generalist_parity_vllm.add_argument(
+        "--q2-adapter-dir", type=Path, required=True
+    )
+    generalist_parity_vllm.add_argument("--output", type=Path, required=True)
+
+    generalist_parity_evidence = subparsers.add_parser(
+        "generalist-v2-lora-parity-evidence",
+        help="Lean-check and classify the blocking Qwen3.5 LoRA parity gate",
+    )
+    generalist_parity_evidence.add_argument("--config", type=Path, required=True)
+    generalist_parity_evidence.add_argument("--probes", type=Path, required=True)
+    generalist_parity_evidence.add_argument(
+        "--hf-runtime", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument(
+        "--vllm-runtime", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument(
+        "--prior-vllm-diagnostic", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument(
+        "--general-lean-project-root", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument(
+        "--minif2f-project-root", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument(
+        "--raw-verification-output", type=Path, required=True
+    )
+    generalist_parity_evidence.add_argument("--output", type=Path, required=True)
+    generalist_parity_evidence.add_argument("--workers", type=int, default=8)
+
     generalist_checkpoint_generate = subparsers.add_parser(
         "generalist-v2-checkpoint-generate",
         help="generate one Q0-Q4 Dataset-v2 workload on local CUDA",
@@ -1904,6 +1982,7 @@ def _parser() -> argparse.ArgumentParser:
     generalist_checkpoint_generate.add_argument(
         "--adapter-dir", type=Path
     )
+    generalist_checkpoint_generate.add_argument("--parity-gate", type=Path)
     generalist_checkpoint_generate.add_argument("--workload", required=True)
     generalist_checkpoint_generate.add_argument(
         "--package-root", type=Path, required=True
@@ -1957,6 +2036,7 @@ def _parser() -> argparse.ArgumentParser:
         "--selected-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
     )
     generalist_final_generate.add_argument("--adapter-dir", type=Path)
+    generalist_final_generate.add_argument("--parity-gate", type=Path)
     generalist_final_generate.add_argument("--workload", required=True)
     generalist_final_generate.add_argument("--package-root", type=Path, required=True)
     generalist_final_generate.add_argument("--view-dir", type=Path, required=True)
@@ -2017,6 +2097,9 @@ def _parser() -> argparse.ArgumentParser:
         "--training-run", type=Path, required=True
     )
     generalist_checkpoint_select.add_argument(
+        "--parity-gate", type=Path, required=True
+    )
+    generalist_checkpoint_select.add_argument(
         "--evaluation-root", type=Path, required=True
     )
     generalist_checkpoint_select.add_argument("--output", type=Path, required=True)
@@ -2068,6 +2151,9 @@ def _parser() -> argparse.ArgumentParser:
     generalist_historical_riemann.add_argument(
         "--adapter-dir", type=Path, required=True
     )
+    generalist_historical_riemann.add_argument(
+        "--parity-gate", type=Path, required=True
+    )
     generalist_historical_riemann.add_argument("--output-dir", type=Path, required=True)
     generalist_historical_riemann.add_argument("--workers", type=int, default=8)
 
@@ -2100,6 +2186,9 @@ def _parser() -> argparse.ArgumentParser:
     generalist_release_evidence.add_argument("--historical", type=Path, required=True)
     generalist_release_evidence.add_argument(
         "--deepseek-preflight", type=Path, required=True
+    )
+    generalist_release_evidence.add_argument(
+        "--lora-parity", type=Path, required=True
     )
     generalist_release_evidence.add_argument("--output", type=Path, required=True)
 
@@ -2236,6 +2325,66 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(evidence, indent=2))
         return 0
 
+    if args.command == "generalist-v2-lora-parity-probes":
+        from .generalist_v2_parity import build_lora_parity_probes
+
+        evidence = build_lora_parity_probes(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.view_dir,
+            args.overfit_run,
+            args.general_lean_project_root,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-lora-parity-hf":
+        from .generalist_v2_parity import run_hf_lora_parity
+
+        evidence = run_hf_lora_parity(
+            GeneralistV2Config.load(args.config),
+            args.probes,
+            args.overfit_adapter_dir,
+            args.q2_adapter_dir,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-lora-parity-vllm":
+        from .generalist_v2_parity import run_vllm_lora_parity
+
+        evidence = run_vllm_lora_parity(
+            GeneralistV2Config.load(args.config),
+            args.base_evaluation_config,
+            args.probes,
+            args.overfit_adapter_dir,
+            args.q2_adapter_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-lora-parity-evidence":
+        from .generalist_v2_parity import compact_lora_parity_evidence
+
+        evidence = compact_lora_parity_evidence(
+            GeneralistV2Config.load(args.config),
+            args.probes,
+            args.hf_runtime,
+            args.vllm_runtime,
+            args.prior_vllm_diagnostic,
+            args.general_lean_project_root,
+            args.minif2f_project_root,
+            args.raw_verification_output,
+            args.output,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
     if args.command == "generalist-v2-checkpoint-generate":
         from .generalist_v2_evaluation import run_checkpoint_generation
 
@@ -2248,6 +2397,7 @@ def main(argv: list[str] | None = None) -> int:
             args.output_dir,
             checkpoint_id=args.checkpoint,
             adapter_dir=args.adapter_dir,
+            parity_gate_path=args.parity_gate,
             candidates_per_task=args.candidates_per_task,
         )
         print(json.dumps(evidence, indent=2))
@@ -2283,6 +2433,7 @@ def main(argv: list[str] | None = None) -> int:
             model_label=args.model_label,
             selected_checkpoint=args.selected_checkpoint,
             adapter_dir=args.adapter_dir,
+            parity_gate_path=args.parity_gate,
         )
         print(json.dumps(evidence, indent=2))
         return 0
@@ -2325,6 +2476,7 @@ def main(argv: list[str] | None = None) -> int:
             GeneralistV2Config.load(args.config),
             args.q0_evidence,
             args.training_run,
+            args.parity_gate,
             args.evaluation_root,
             args.output,
         )
@@ -2366,6 +2518,7 @@ def main(argv: list[str] | None = None) -> int:
         evidence = run_historical_riemann_assessment(
             GeneralistV2Config.load(args.config),
             args.selection,
+            args.parity_gate,
             args.riemann_config,
             args.repository_root,
             args.domain_config,
@@ -2405,6 +2558,7 @@ def main(argv: list[str] | None = None) -> int:
             args.final,
             args.historical,
             args.deepseek_preflight,
+            args.lora_parity,
             args.output,
         )
         print(json.dumps(evidence, indent=2))

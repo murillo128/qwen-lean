@@ -9,7 +9,7 @@ import subprocess
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -379,6 +379,13 @@ def _checkpoint_adapter_spec(
     )
 
 
+def _with_vllm_runtime_adapter(adapter: LoRAAdapterSpec) -> LoRAAdapterSpec:
+    from .qwen35_vllm_lora import prepare_qwen35_vllm_adapter
+
+    binding = prepare_qwen35_vllm_adapter(adapter.path)
+    return replace(adapter, runtime_path=Path(str(binding["runtime_adapter_dir"])))
+
+
 def run_checkpoint_generation(
     config: GeneralistV2Config,
     base_evaluation_config: Path,
@@ -389,6 +396,7 @@ def run_checkpoint_generation(
     *,
     checkpoint_id: str,
     adapter_dir: Path | None,
+    parity_gate_path: Path | None = None,
     candidates_per_task: int | None = None,
 ) -> dict[str, Any]:
     config.validate()
@@ -399,6 +407,14 @@ def run_checkpoint_generation(
         if adapter_dir is None
         else _checkpoint_adapter_spec(config, checkpoint_id, adapter_dir)
     )
+    parity_gate = None
+    if adapter is not None:
+        if parity_gate_path is None:
+            raise ValueError("Q1-Q4 generation requires the passed LoRA parity gate")
+        from .generalist_v2_parity import validate_lora_parity_gate
+
+        parity_gate = validate_lora_parity_gate(config, parity_gate_path)
+        adapter = _with_vllm_runtime_adapter(adapter)
     tasks, _, _, task_metadata = materialize_q0_workload(
         workload_id, package_root, view_dir
     )
@@ -456,6 +472,7 @@ def run_checkpoint_generation(
         "generation_error_count": sum(
             item.generation_error is not None for item in generated
         ),
+        "lora_inference_parity_gate": parity_gate,
         "generate_all_candidates_without_early_stop": resolved_candidates == 64,
         "adapter": (
             None
@@ -496,6 +513,7 @@ def run_final_generation(
     model_label: str,
     selected_checkpoint: str,
     adapter_dir: Path | None,
+    parity_gate_path: Path | None = None,
 ) -> dict[str, Any]:
     """Generate one frozen n=8 final lane without overwriting prior evidence."""
 
@@ -517,6 +535,14 @@ def run_final_generation(
         if adapter_dir is None
         else _checkpoint_adapter_spec(config, selected_checkpoint, adapter_dir)
     )
+    parity_gate = None
+    if adapter is not None:
+        if parity_gate_path is None:
+            raise ValueError("selected final generation requires the LoRA parity gate")
+        from .generalist_v2_parity import validate_lora_parity_gate
+
+        parity_gate = validate_lora_parity_gate(config, parity_gate_path)
+        adapter = _with_vllm_runtime_adapter(adapter)
     tasks, _, _, task_metadata = materialize_q0_workload(
         workload_id, package_root, view_dir
     )
@@ -558,6 +584,7 @@ def run_final_generation(
         "generation_error_count": sum(
             item.generation_error is not None for item in generated
         ),
+        "lora_inference_parity_gate": parity_gate,
         "final_only_workload": workload_id in FINAL_TEST_WORKLOADS,
         "first_complete_result_overwrite_protected": True,
         "adapter": (
@@ -1443,10 +1470,14 @@ def compact_checkpoint_selection_evidence(
     config: GeneralistV2Config,
     q0_evidence_path: Path,
     training_run_path: Path,
+    parity_gate_path: Path,
     evaluation_root: Path,
     output: Path,
 ) -> dict[str, Any]:
     config.validate()
+    from .generalist_v2_parity import validate_lora_parity_gate
+
+    parity_gate = validate_lora_parity_gate(config, parity_gate_path)
     q0 = _read_json(q0_evidence_path)
     training = _read_json(training_run_path)
     if (
@@ -1520,6 +1551,7 @@ def compact_checkpoint_selection_evidence(
         "model_revision": MODEL_REVISION,
         "training_run_sha256": sha256_file(training_run_path),
         "q0_evidence_sha256": sha256_file(q0_evidence_path),
+        "lora_inference_parity_gate": parity_gate,
         "checkpoints": checkpoints,
         "selection": selection,
         "selected_checkpoint": {
@@ -2053,6 +2085,7 @@ def compact_final_assessment_evidence(
 def run_historical_riemann_assessment(
     config: GeneralistV2Config,
     selection_path: Path,
+    parity_gate_path: Path,
     riemann_config_path: Path,
     repository_root: Path,
     domain_config_path: Path,
@@ -2068,11 +2101,15 @@ def run_historical_riemann_assessment(
     from .riemann_assessment import run_assessment, validate_assessment_config
 
     config.validate()
+    from .generalist_v2_parity import validate_lora_parity_gate
+
+    validate_lora_parity_gate(config, parity_gate_path)
     selection = _read_json(selection_path)
     selected = str(selection.get("selection", {}).get("selected_checkpoint", ""))
     if selection.get("status") != "frozen" or selected not in {"Q1", "Q2", "Q3", "Q4"}:
         raise ValueError("historical Riemann assessment needs a frozen checkpoint")
     adapter = _checkpoint_adapter_spec(config, selected, adapter_dir)
+    adapter = _with_vllm_runtime_adapter(adapter)
     if (
         sha256_file(adapter_dir / "adapter_model.safetensors")
         != selection["selected_checkpoint"]["adapter_model_sha256"]

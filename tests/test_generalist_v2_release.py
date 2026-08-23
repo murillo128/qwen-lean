@@ -168,6 +168,37 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
                 "selected_checkpoint_frozen": "Q2",
             },
         ),
+        "lora_parity": _write(
+            tmp_path / "lora-parity.json",
+            {
+                "schema_version": "generalist-v2-lora-parity-evidence-v1",
+                "gate_id": "qwen35-vllm-lora-parity-v1",
+                "status": "passed",
+                "model": {
+                    "model_id": "Qwen/Qwen3.5-4B-Base",
+                    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+                },
+                "vllm": {
+                    "version": "0.27.2rc1.dev203+g41f179b57",
+                    "source_revision": "41f179b57aa8ab6f634f508128ce1f1efadd0eb1",
+                },
+                "target_regex": config.lora["target_regex"],
+                "requirements": {
+                    "prior_evaluator_invalidated": True,
+                    "static_overfit64_complete": True,
+                    "static_q2_complete": True,
+                    "hf_known_positive_reproduced": True,
+                    "vllm_overfit_adapter_effect": True,
+                    "q2_hf_forward_effect": True,
+                    "q2_vllm_inference_effect": True,
+                    "all_expected_outputs_present": True,
+                    "zero_verifier_infrastructure_errors": True,
+                },
+                "adapters": {
+                    "Q2": {"adapter_model_sha256": adapter_sha256}
+                },
+            },
+        ),
     }
     return config, paths
 
@@ -185,6 +216,7 @@ def test_release_evidence_binds_selected_adapter_and_inputs(tmp_path: Path) -> N
         paths["final"],
         paths["historical"],
         paths["deepseek_preflight"],
+        paths["lora_parity"],
         output,
     )
 
@@ -193,6 +225,7 @@ def test_release_evidence_binds_selected_adapter_and_inputs(tmp_path: Path) -> N
     assert evidence["adapter"]["adapter_model_sha256"] == "adapter-model-sha256"
     assert evidence["screening"]["test_or_riemann_used_for_selection"] is False
     assert evidence["historical_riemann"]["clean_unseen_generalization"] is False
+    assert evidence["lora_inference_parity_gate"]["status"] == "passed"
     assert evidence["evidence_sha256"]["full_training"] == sha256_file(
         paths["training"]
     )
@@ -215,5 +248,6 @@ def test_release_evidence_rejects_mismatched_adapter(tmp_path: Path) -> None:
             paths["final"],
             paths["historical"],
             paths["deepseek_preflight"],
+            paths["lora_parity"],
             tmp_path / "release.json",
         )

@@ -44,6 +44,7 @@ def compact_generalist_v2_release_evidence(
     final_path: Path,
     historical_path: Path,
     deepseek_preflight_path: Path,
+    lora_parity_path: Path,
     output: Path,
 ) -> dict[str, Any]:
     """Bind the selected adapter identity to all complete experiment evidence."""
@@ -56,6 +57,9 @@ def compact_generalist_v2_release_evidence(
     final = _read(final_path)
     historical = _read(historical_path)
     deepseek_preflight = _read(deepseek_preflight_path)
+    from .generalist_v2_parity import validate_lora_parity_gate
+
+    lora_parity_gate = validate_lora_parity_gate(config, lora_parity_path)
     selected = str(selection.get("selection", {}).get("selected_checkpoint", ""))
     adapter_hash = str(
         selection.get("selected_checkpoint", {}).get("adapter_model_sha256", "")
@@ -190,6 +194,7 @@ def compact_generalist_v2_release_evidence(
             "paired_solved_within_4": historical["paired_solved_within_4"],
         },
         "deepseek_final_preflight": deepseek_preflight,
+        "lora_inference_parity_gate": lora_parity_gate,
         "evidence_sha256": {
             "dataset_binding": sha256_file(binding_path),
             "full_training": sha256_file(training_path),
@@ -198,6 +203,7 @@ def compact_generalist_v2_release_evidence(
             "final_assessment": sha256_file(final_path),
             "historical_riemann": sha256_file(historical_path),
             "deepseek_final_preflight": sha256_file(deepseek_preflight_path),
+            "lora_inference_parity": sha256_file(lora_parity_path),
         },
     }
     output.parent.mkdir(parents=True, exist_ok=True)
