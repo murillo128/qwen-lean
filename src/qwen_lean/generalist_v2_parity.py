@@ -23,6 +23,8 @@ from .generalist_v2_dataset import _read_json, dataset_record_preamble
 from .generalist_v2_evaluation import (
     _evaluation_phase1_config,
     _load_canonical_subset,
+    _prime_verifiers,
+    _validate_oracles,
     materialize_q0_workload,
 )
 from .prompt import normalize_transport
@@ -1185,25 +1187,58 @@ def compact_lora_parity_evidence(
         for arm_id in arm_ids
     }
     probes = {str(item["probe_id"]): item for item in manifest["probes"]}
-    general_verifier = LeanVerifier(
-        general_lean_project_root,
-        timeout_seconds=float(config.evaluation["verifier_timeout_seconds"]),
-    )
-    minif2f_verifier = LeanVerifier(
-        minif2f_project_root,
-        timeout_seconds=float(config.evaluation["verifier_timeout_seconds"]),
-    )
+    candidate_timeout = float(config.evaluation["verifier_timeout_seconds"])
+    task_groups: dict[str, dict[str, TaskRecord]] = {
+        "general": {},
+        "minif2f": {},
+    }
+    target_groups: dict[str, dict[str, tuple[str, ...]]] = {
+        "general": {},
+        "minif2f": {},
+    }
+    for probe in probes.values():
+        group = (
+            "minif2f"
+            if probe["workload_id"] == "minif2f-valid-clean-v2"
+            else "general"
+        )
+        task = TaskRecord.from_dict(probe["verification_task"])
+        task_groups[group][task.id] = task
+        completions = tuple(str(item) for item in probe["target_completions"])
+        if completions:
+            target_groups[group][task.id] = completions
+    verifiers: dict[str, dict[str, LeanVerifier]] = {}
+    for group, project_root in (
+        ("general", general_lean_project_root),
+        ("minif2f", minif2f_project_root),
+    ):
+        group_verifiers, already_validated = _prime_verifiers(
+            task_groups[group],
+            project_root,
+            candidate_timeout_seconds=candidate_timeout,
+            workers=workers,
+            targets=target_groups[group],
+        )
+        _validate_oracles(
+            group_verifiers,
+            task_groups[group],
+            target_groups[group],
+            workers=workers,
+            already_validated=already_validated,
+        )
+        verifiers[group] = group_verifiers
     jobs = []
     for arm_id in arm_ids:
         for probe_id, result in _results_by_probe(
             runtime_for_arm[arm_id], arm_id
         ).items():
             probe = probes[probe_id]
-            verifier = (
-                minif2f_verifier
+            group = (
+                "minif2f"
                 if probe["workload_id"] == "minif2f-valid-clean-v2"
-                else general_verifier
+                else "general"
             )
+            verifier = verifiers[group][str(probe["verification_task"]["preamble"])]
             jobs.append((verifier, probe, arm_id, result))
     with ThreadPoolExecutor(max_workers=workers) as executor:
         verification_rows = list(

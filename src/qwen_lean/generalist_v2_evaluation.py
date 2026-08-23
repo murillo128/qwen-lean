@@ -983,7 +983,7 @@ def _prime_verifiers(
             outcome = verifier.prime_task(
                 task,
                 targets[task.id][0],
-                timeout_seconds=candidate_timeout_seconds,
+                timeout_seconds=max(120.0, candidate_timeout_seconds),
             )
             validated_task_id: str | None = task.id
         else:
