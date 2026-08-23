@@ -1960,7 +1960,7 @@ def _parser() -> argparse.ArgumentParser:
 
     generalist_extended_select = subparsers.add_parser(
         "generalist-v2-extended-select",
-        help="freeze the final checkpoint from complete n=64 finalist validation",
+        help="compact n=64 evidence for the checkpoint frozen by n=8 screening",
     )
     generalist_extended_select.add_argument("--config", type=Path, required=True)
     generalist_extended_select.add_argument(
@@ -1968,12 +1968,6 @@ def _parser() -> argparse.ArgumentParser:
     )
     generalist_extended_select.add_argument(
         "--evaluation-root", type=Path, required=True
-    )
-    generalist_extended_select.add_argument(
-        "--final-checkpoint", choices=("Q1", "Q2", "Q3", "Q4"), required=True
-    )
-    generalist_extended_select.add_argument(
-        "--decision-rationale", required=True
     )
     generalist_extended_select.add_argument("--output", type=Path, required=True)
 
@@ -2167,8 +2161,6 @@ def main(argv: list[str] | None = None) -> int:
             args.screening_selection,
             args.evaluation_root,
             args.output,
-            final_checkpoint=args.final_checkpoint,
-            decision_rationale=args.decision_rationale,
         )
         print(json.dumps(evidence, indent=2))
         return 0

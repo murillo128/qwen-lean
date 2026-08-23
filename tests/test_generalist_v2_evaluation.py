@@ -7,17 +7,27 @@ import pytest
 from test_generalist_v2_dataset import _record
 
 from qwen_lean.generalist_v2 import GeneralistV2Config
-from qwen_lean.generalist_v2_dataset import generalist_variants
+from qwen_lean.generalist_v2_dataset import generalist_variants, sha256_file
 from qwen_lean.generalist_v2_evaluation import (
     _checkpoint_adapter_spec,
     _compact_checkpoint_workload,
     _compact_extended_workload,
+    _normalized_verified_proof_sha256,
     _source_position_verification_task,
+    _summarize_extended_raw_candidate_evidence,
     _synthetic_task,
+    _text_sha256,
     compact_extended_validation_evidence,
 )
+from qwen_lean.metrics import pass_at_k
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_verified_proof_hash_ignores_comments_and_whitespace() -> None:
+    assert _normalized_verified_proof_sha256(
+        "by\n  /- irrelevant -/ exact True.intro"
+    ) == _normalized_verified_proof_sha256("by exact   True.intro -- irrelevant\n")
 
 
 def test_synthetic_evaluation_uses_persisted_import_context() -> None:
@@ -171,7 +181,9 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
                 "ordered_task_ids_sha256": "task-hash",
                 "candidate_count": 64,
                 "generation_error_count": 0,
+                "generate_all_candidates_without_early_stop": True,
                 "adapter": adapter,
+                "sampling": {"seed": 0},
             }
         ),
         encoding="utf-8",
@@ -180,15 +192,7 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
         json.dumps({"selected_adapter_binding": adapter, "candidates_per_task": 64}),
         encoding="utf-8",
     )
-    pass_at_k = {
-        "pass@1": 0.1,
-        "pass@2": 0.2,
-        "pass@4": 0.3,
-        "pass@8": 0.4,
-        "pass@16": 0.55,
-        "pass@32": 0.7,
-        "pass@64": 1.0,
-    }
+    pass_metrics = {f"pass@{k}": pass_at_k(64, 2, k) for k in (1, 2, 4, 8, 16, 32, 64)}
     solved = {
         "solved@1": 0,
         "solved@2": 0,
@@ -209,15 +213,70 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
                 "candidate_count": 64,
                 "complete": True,
                 "infrastructure_error_count": 0,
-                "pass_at_k": pass_at_k,
+                "pass_at_k": pass_metrics,
                 "tasks_solved_within_k": solved,
+                "all_candidates_verified_without_early_stop": True,
                 "category_counts": {"verified": 2, "lean_rejected": 62},
                 "finish_reason_counts": {"eos": 64},
-                "per_task": [{"verified_candidate_count": 2}],
+                "per_task": [{"task_id": "task-a", "verified_candidate_count": 2}],
             }
         ),
         encoding="utf-8",
     )
+    raw_path = tmp_path / "raw-candidates.jsonl"
+    raw_rows = []
+    for index in range(64):
+        verified = index in {9, 47}
+        candidate_text = "by\n  exact True.intro" if verified else "by\n  contradiction"
+        raw_rows.append(
+            {
+                "schema_version": "generalist-v2-extended-candidate-v1",
+                "checkpoint_id": "Q2",
+                "workload_id": "fixture",
+                "model_id": "Qwen/Qwen3.5-4B-Base",
+                "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+                "adapter_model_sha256": "adapter-hash",
+                "task_id": "task-a",
+                "candidate_id": f"model-{index}",
+                "candidate_index": index,
+                "sampling_seed": 0,
+                "candidate_text": candidate_text,
+                "candidate_text_sha256": _text_sha256(candidate_text),
+                "generated_token_count": 4,
+                "finish_reason": "eos",
+                "generation_latency_seconds": 0.1,
+                "category": "verified" if verified else "lean_rejected",
+                "lean_exit_code": 0 if verified else 1,
+                "diagnostics": {"stdout": "", "stderr": ""},
+                "verification_latency_seconds": 0.1,
+                "total_latency_seconds": 0.2,
+                "normalized_proof_sha256": (
+                    _normalized_verified_proof_sha256(candidate_text)
+                    if verified
+                    else None
+                ),
+            }
+        )
+    raw_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows),
+        encoding="utf-8",
+    )
+    density = _summarize_extended_raw_candidate_evidence(
+        raw_path,
+        checkpoint_id="Q2",
+        workload_id="fixture",
+        expected_task_ids=["task-a"],
+        expected_adapter_model_sha256="adapter-hash",
+        sampling_seed=0,
+    )
+    summary_path = tmp_path / "summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["extended_candidate_evidence"] = {
+        "artifact": "raw-candidates.jsonl",
+        "sha256": sha256_file(raw_path),
+        **density,
+    }
+    summary_path.write_text(json.dumps(summary), encoding="utf-8")
     (tmp_path / "results.jsonl").write_text("result\n", encoding="utf-8")
     (tmp_path / "generations.jsonl").write_text("generation\n", encoding="utf-8")
 
@@ -226,16 +285,32 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
     )
 
     assert compact["marginal_pass_at_k"] == pytest.approx(
-        {"delta_8_to_16": 0.15, "delta_16_to_32": 0.15, "delta_32_to_64": 0.3}
+        {
+            "delta_8_to_16": pass_metrics["pass@16"] - pass_metrics["pass@8"],
+            "delta_16_to_32": pass_metrics["pass@32"] - pass_metrics["pass@16"],
+            "delta_32_to_64": pass_metrics["pass@64"] - pass_metrics["pass@32"],
+        }
     )
     assert compact["marginal_tasks_solved"] == {
         "delta_8_to_16": 1,
         "delta_16_to_32": 0,
         "delta_32_to_64": 0,
     }
+    assert compact["raw_candidate_evidence"]["verified_candidate_count"] == 2
+    assert compact["raw_candidate_evidence"]["unique_verified_proof_count"] == 1
+    assert compact["raw_candidate_evidence"]["verified_duplication_fraction"] == 0.5
+    raw_rows[0]["candidate_text_sha256"] = "tampered"
+    raw_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="raw candidate identity"):
+        _compact_extended_workload(
+            tmp_path, "Q2", "fixture", 1, "task-hash", "adapter-hash"
+        )
 
 
-def test_extended_validation_freeze_uses_only_screened_finalists(
+def test_extended_validation_uses_only_the_n8_frozen_checkpoint(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     screening = {
@@ -272,20 +347,18 @@ def test_extended_validation_freeze_uses_only_screened_finalists(
         screening_path,
         tmp_path / "runs",
         output,
-        final_checkpoint="Q2",
-        decision_rationale="Q2 has materially higher clean pass@64 coverage.",
     )
 
-    assert list(evidence["controls_and_finalists"]) == ["Q0", "Q3", "Q2"]
-    assert evidence["final_checkpoint"] == "Q2"
-    assert evidence["extended_validation_refined_selection"] is True
-    assert evidence["test_workloads_consulted_before_final_freeze"] is False
-    with pytest.raises(ValueError, match="two screened finalists"):
+    assert evidence["evaluated_checkpoint"]["checkpoint_id"] == "Q3"
+    assert evidence["base_control_evaluated_at_n64"] is False
+    assert evidence["runner_up_evaluated_at_n64"] is False
+    assert evidence["test_workloads_evaluated_at_n64"] is False
+    screening["selection"]["selected_checkpoint"] = "Q0"
+    screening_path.write_text(json.dumps(screening), encoding="utf-8")
+    with pytest.raises(ValueError, match="complete n=8 screening"):
         compact_extended_validation_evidence(
             GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json"),
             screening_path,
             tmp_path / "runs",
             output,
-            final_checkpoint="Q1",
-            decision_rationale="not a finalist",
         )

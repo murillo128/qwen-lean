@@ -922,11 +922,9 @@ def final_evaluation_plan(
                 config.dataset["validation_memberships"]["minif2f"],
                 config.dataset["validation_memberships"]["fresh_composition"],
             ],
-            "models": [
-                "Q0",
-                "n8-screening-winner",
-                "n8-strongest-runner-up",
-            ],
+            "models": [selected_checkpoint],
+            "generate_and_verify_all_candidates_without_early_stop": True,
+            "raw_per_candidate_evidence": True,
             "reported_metrics": [
                 "pass@1",
                 "pass@2",
@@ -941,11 +939,22 @@ def final_evaluation_plan(
                 "delta_16_to_32",
                 "delta_32_to_64",
             ],
-            "test_candidates_per_task_after_final_freeze": 64,
-            "test_workloads": [
-                config.dataset["test_memberships"]["minif2f"],
-                config.dataset["test_memberships"]["fresh_composition"],
+            "density_and_diversity_metrics": [
+                "verified_candidate_count",
+                "verified_rate",
+                "unique_verified_proof_count",
+                "unique_verified_rate",
+                "verified_duplication_fraction",
+                "verified_candidates_per_task_buckets",
+                "mean_verified_candidates_per_solved_task",
+                "mean_unique_verified_proofs_per_solved_task",
             ],
+            "base_control_evaluated": False,
+            "runner_up_evaluated": False,
+            "test_candidates_per_task_after_final_freeze": config.evaluation[
+                "candidates_per_task"
+            ],
+            "test_evaluated_at_extended_budget": False,
             "historical_riemann_budget_unchanged": True,
         },
         "test_workloads_consulted_after_checkpoint_freeze": True,

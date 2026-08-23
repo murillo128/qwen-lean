@@ -297,6 +297,18 @@ def test_evaluation_plans_keep_test_and_riemann_out_of_selection() -> None:
     assert final["generic_candidates_per_task"] == 8
     assert final["fresh_riemann_candidates_per_task"] == 8
     assert final["extended_search_budget"]["validation_candidates_per_task"] == 64
+    assert final["extended_search_budget"]["models"] == ["Q3"]
+    assert final["extended_search_budget"][
+        "generate_and_verify_all_candidates_without_early_stop"
+    ]
+    assert final["extended_search_budget"]["raw_per_candidate_evidence"]
+    assert final["extended_search_budget"]["base_control_evaluated"] is False
+    assert final["extended_search_budget"]["runner_up_evaluated"] is False
+    assert (
+        final["extended_search_budget"]["test_candidates_per_task_after_final_freeze"]
+        == 8
+    )
+    assert final["extended_search_budget"]["test_evaluated_at_extended_budget"] is False
     assert final["extended_search_budget"]["reported_metrics"] == [
         "pass@1",
         "pass@2",

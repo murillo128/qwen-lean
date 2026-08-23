@@ -4,9 +4,11 @@ import hashlib
 import json
 import subprocess
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from pathlib import Path
+from statistics import fmean
 from typing import Any
 
 from .artifacts import write_artifacts
@@ -30,11 +32,12 @@ from .generalist_v2_dataset import (
     dataset_record_preamble,
     sha256_file,
 )
+from .metrics import pass_at_k as estimate_pass_at_k
 from .metrics import summarize_results
 from .minif2f import Phase1Config
-from .phase2_corpus import position_offset
+from .phase2_corpus import _lex_lean, position_offset
 from .prompt import normalize_transport
-from .schema import CandidateResult, RunMetadata, TaskRecord
+from .schema import RESULT_CATEGORIES, CandidateResult, RunMetadata, TaskRecord
 from .verifier import LeanVerifier
 
 Q0_GENERATION_SCHEMA_VERSION = "generalist-v2-q0-generation-v1"
@@ -52,14 +55,28 @@ Q0_WORKLOADS = {
 }
 EXTENDED_SEARCH_WORKLOADS = {
     "fresh-composition-valid-v2": 406,
-    "fresh-composition-test-v2": 415,
     "minif2f-valid-clean-v2": 244,
+}
+FINAL_TEST_WORKLOADS = {
+    "fresh-composition-test-v2": 415,
     "minif2f-test-clean-v2": 244,
 }
 
 
 def _ordered_ids_digest(ids: list[str]) -> str:
     return hashlib.sha256(json.dumps(ids, separators=(",", ":")).encode()).hexdigest()
+
+
+def _text_sha256(value: str) -> str:
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
+def _normalized_verified_proof_sha256(candidate_text: str) -> str:
+    """Hash the verified Lean token stream after transport/comment normalization."""
+
+    tokens = _lex_lean(normalize_transport(candidate_text))
+    canonical = json.dumps(tokens, ensure_ascii=False, separators=(",", ":"))
+    return _text_sha256(canonical)
 
 
 def _git_revision(path: Path) -> str:
@@ -189,7 +206,11 @@ def materialize_q0_workload(
     dict[str, tuple[str, ...]],
     dict[str, dict[str, Any]],
 ]:
-    known_workloads = {**Q0_WORKLOADS, **EXTENDED_SEARCH_WORKLOADS}
+    known_workloads = {
+        **Q0_WORKLOADS,
+        **EXTENDED_SEARCH_WORKLOADS,
+        **FINAL_TEST_WORKLOADS,
+    }
     if workload_id not in known_workloads:
         raise ValueError(f"unknown generalist-v2 evaluation workload: {workload_id}")
     expected = known_workloads[workload_id]
@@ -382,6 +403,7 @@ def run_checkpoint_generation(
         "generation_error_count": sum(
             item.generation_error is not None for item in generated
         ),
+        "generate_all_candidates_without_early_stop": resolved_candidates == 64,
         "adapter": (
             None
             if adapter is None
@@ -453,6 +475,193 @@ def _read_generations(
             )
         )
     return generated
+
+
+def _summarize_extended_raw_candidate_evidence(
+    path: Path,
+    *,
+    checkpoint_id: str,
+    workload_id: str,
+    expected_task_ids: list[str],
+    expected_adapter_model_sha256: str,
+    sampling_seed: int,
+) -> dict[str, Any]:
+    """Validate the primary n=64 candidate artifact and derive density metrics."""
+
+    expected_task_id_set = set(expected_task_ids)
+    indices_by_task: dict[str, list[int]] = defaultdict(list)
+    verified_by_task: dict[str, int] = defaultdict(int)
+    verified_indices_by_task: dict[str, list[int]] = defaultdict(list)
+    unique_verified_by_task: dict[str, set[str]] = defaultdict(set)
+    candidate_count = 0
+    for row in _iter_jsonl(path):
+        task_id = str(row.get("task_id", ""))
+        candidate_text = str(row.get("candidate_text", ""))
+        category = str(row.get("category", ""))
+        normalized_hash = row.get("normalized_proof_sha256")
+        if (
+            row.get("schema_version") != "generalist-v2-extended-candidate-v1"
+            or row.get("checkpoint_id") != checkpoint_id
+            or row.get("workload_id") != workload_id
+            or row.get("model_id") != MODEL_ID
+            or row.get("model_revision") != MODEL_REVISION
+            or row.get("adapter_model_sha256") != expected_adapter_model_sha256
+            or int(row.get("sampling_seed", -1)) != sampling_seed
+            or task_id not in expected_task_id_set
+            or category not in RESULT_CATEGORIES
+            or row.get("candidate_text_sha256") != _text_sha256(candidate_text)
+            or not isinstance(row.get("diagnostics"), dict)
+        ):
+            raise ValueError("extended raw candidate identity or payload differs")
+        candidate_index = int(row.get("candidate_index", -1))
+        if row.get("candidate_id") != f"model-{candidate_index}":
+            raise ValueError("extended raw candidate identifier differs")
+        indices_by_task[task_id].append(candidate_index)
+        if category == "verified":
+            expected_normalized = _normalized_verified_proof_sha256(candidate_text)
+            if normalized_hash != expected_normalized:
+                raise ValueError("extended verified proof hash differs")
+            verified_by_task[task_id] += 1
+            verified_indices_by_task[task_id].append(candidate_index)
+            unique_verified_by_task[task_id].add(expected_normalized)
+        elif normalized_hash is not None:
+            raise ValueError("non-verified extended candidate has a proof identity")
+        candidate_count += 1
+
+    for task_id in expected_task_ids:
+        if sorted(indices_by_task[task_id]) != list(range(64)):
+            raise ValueError(
+                f"extended raw candidates are incomplete for task {task_id}"
+            )
+    if candidate_count != len(expected_task_ids) * 64:
+        raise ValueError("extended raw candidate count differs")
+
+    per_task = [
+        {
+            "task_id": task_id,
+            "verified_candidate_count": verified_by_task[task_id],
+            "unique_verified_proof_count": len(unique_verified_by_task[task_id]),
+            "verified_candidate_indices": sorted(verified_indices_by_task[task_id]),
+        }
+        for task_id in expected_task_ids
+    ]
+    bucket_counts = {key: 0 for key in ("0", "1", "2-4", "5-15", "16-31", "32+")}
+    for item in per_task:
+        count = int(item["verified_candidate_count"])
+        bucket = (
+            "0"
+            if count == 0
+            else (
+                "1"
+                if count == 1
+                else (
+                    "2-4"
+                    if count <= 4
+                    else "5-15"
+                    if count <= 15
+                    else "16-31"
+                    if count <= 31
+                    else "32+"
+                )
+            )
+        )
+        bucket_counts[bucket] += 1
+    verified_count = sum(verified_by_task.values())
+    unique_verified_count = sum(
+        len(values) for values in unique_verified_by_task.values()
+    )
+    solved = [item for item in per_task if item["verified_candidate_count"]]
+    return {
+        "raw_candidate_count": candidate_count,
+        "verified_candidate_count": verified_count,
+        "verified_rate": verified_count / candidate_count if candidate_count else 0.0,
+        "unique_verified_proof_count": unique_verified_count,
+        "unique_verified_rate": (
+            unique_verified_count / candidate_count if candidate_count else 0.0
+        ),
+        "unique_verified_identity": "task_id plus normalized Lean proof-token hash",
+        "verified_rate_denominator": "all generated candidates",
+        "unique_verified_rate_denominator": "all generated candidates",
+        "verified_duplication_fraction": (
+            1.0 - unique_verified_count / verified_count if verified_count else None
+        ),
+        "verified_candidates_per_task_buckets": bucket_counts,
+        "mean_verified_candidates_per_solved_task": (
+            fmean(int(item["verified_candidate_count"]) for item in solved)
+            if solved
+            else None
+        ),
+        "mean_unique_verified_proofs_per_solved_task": (
+            fmean(int(item["unique_verified_proof_count"]) for item in solved)
+            if solved
+            else None
+        ),
+        "per_task": per_task,
+    }
+
+
+def _write_extended_raw_candidate_evidence(
+    path: Path,
+    generated: list[GeneratedCandidate],
+    results: list[CandidateResult],
+    generation_metadata: dict[str, Any],
+) -> dict[str, Any]:
+    """Persist every n=64 generation and Lean outcome without early stopping."""
+
+    if len(generated) != len(results):
+        raise ValueError("extended generations and results differ in length")
+    adapter = generation_metadata.get("adapter")
+    if not isinstance(adapter, dict):
+        raise TypeError("extended validation requires the frozen adapter")
+    checkpoint_id = str(generation_metadata["checkpoint_id"])
+    workload_id = str(generation_metadata["workload_id"])
+    sampling_seed = int(generation_metadata["sampling"]["seed"])
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        for item, result in zip(generated, results, strict=True):
+            if (
+                item.task.id != result.task_id
+                or item.candidate_index != result.candidate_index
+                or item.text != result.candidate_text
+            ):
+                raise ValueError("extended generation/result candidate order differs")
+            value = {
+                "schema_version": "generalist-v2-extended-candidate-v1",
+                "checkpoint_id": checkpoint_id,
+                "workload_id": workload_id,
+                "model_id": MODEL_ID,
+                "model_revision": MODEL_REVISION,
+                "adapter_model_sha256": adapter["adapter_model_sha256"],
+                "task_id": result.task_id,
+                "candidate_id": result.candidate_id,
+                "candidate_index": result.candidate_index,
+                "sampling_seed": sampling_seed,
+                "candidate_text": result.candidate_text,
+                "candidate_text_sha256": _text_sha256(result.candidate_text),
+                "generated_token_count": result.generated_token_count,
+                "finish_reason": result.finish_reason,
+                "generation_latency_seconds": result.generation_latency_seconds,
+                "category": result.category,
+                "lean_exit_code": result.lean_exit_code,
+                "diagnostics": result.diagnostics,
+                "verification_latency_seconds": result.verification_latency_seconds,
+                "total_latency_seconds": result.total_latency_seconds,
+                "normalized_proof_sha256": (
+                    _normalized_verified_proof_sha256(result.candidate_text)
+                    if result.category == "verified"
+                    else None
+                ),
+            }
+            handle.write(json.dumps(value, ensure_ascii=False, sort_keys=True))
+            handle.write("\n")
+    expected_task_ids = list(dict.fromkeys(item.task.id for item in generated))
+    return _summarize_extended_raw_candidate_evidence(
+        path,
+        checkpoint_id=checkpoint_id,
+        workload_id=workload_id,
+        expected_task_ids=expected_task_ids,
+        expected_adapter_model_sha256=str(adapter["adapter_model_sha256"]),
+        sampling_seed=sampling_seed,
+    )
 
 
 def _prime_verifiers(
@@ -706,6 +915,17 @@ def run_checkpoint_verification(
             "task_metadata": task_metadata,
         }
     )
+    if resolved_candidates == 64:
+        raw_path = output_dir / "raw-candidates.jsonl"
+        density = _write_extended_raw_candidate_evidence(
+            raw_path, generated, results, generation_metadata
+        )
+        summary["all_candidates_verified_without_early_stop"] = True
+        summary["extended_candidate_evidence"] = {
+            "artifact": "raw-candidates.jsonl",
+            "sha256": sha256_file(raw_path),
+            **density,
+        }
     write_artifacts(output_dir, metadata, results, summary=summary)
     if not summary["complete"] or summary["infrastructure_error_count"]:
         raise RuntimeError(
@@ -952,18 +1172,15 @@ def _compact_extended_workload(
     workload_id: str,
     expected_task_count: int,
     expected_task_ids_sha256: str,
-    expected_adapter_model_sha256: str | None,
+    expected_adapter_model_sha256: str,
 ) -> dict[str, Any]:
     generation = _read_json(root / "generation-metadata.json")
     run = _read_json(root / "run.json")
     summary = _read_json(root / "summary.json")
     adapter = generation.get("adapter")
-    expected_adapter = checkpoint_id != "Q0"
     adapter_matches = (
         isinstance(adapter, dict)
         and adapter.get("adapter_model_sha256") == expected_adapter_model_sha256
-        if expected_adapter
-        else adapter is None and expected_adapter_model_sha256 is None
     )
     required_pass_metrics = {f"pass@{k}" for k in EXTENDED_SEARCH_KS}
     required_solved_metrics = {f"solved@{k}" for k in EXTENDED_SEARCH_KS}
@@ -975,6 +1192,7 @@ def _compact_extended_workload(
         or generation.get("ordered_task_ids_sha256") != expected_task_ids_sha256
         or generation.get("candidate_count") != expected_task_count * 64
         or generation.get("generation_error_count") != 0
+        or generation.get("generate_all_candidates_without_early_stop") is not True
         or not adapter_matches
         or run.get("selected_adapter_binding") != adapter
         or run.get("candidates_per_task") != 64
@@ -986,6 +1204,7 @@ def _compact_extended_workload(
         or summary.get("candidate_count") != expected_task_count * 64
         or summary.get("complete") is not True
         or summary.get("infrastructure_error_count") != 0
+        or summary.get("all_candidates_verified_without_early_stop") is not True
         or set(summary.get("pass_at_k", {})) != required_pass_metrics
         or set(summary.get("tasks_solved_within_k", {})) != required_solved_metrics
     ):
@@ -1002,6 +1221,43 @@ def _compact_extended_workload(
         count < 0 or count > 64 for count in verified_counts
     ):
         raise ValueError("generalist-v2 extended per-task outcomes are incomplete")
+    raw_path = root / "raw-candidates.jsonl"
+    density = _summarize_extended_raw_candidate_evidence(
+        raw_path,
+        checkpoint_id=checkpoint_id,
+        workload_id=workload_id,
+        expected_task_ids=[str(item["task_id"]) for item in summary["per_task"]],
+        expected_adapter_model_sha256=expected_adapter_model_sha256,
+        sampling_seed=int(generation["sampling"]["seed"]),
+    )
+    raw_evidence = {
+        "artifact": "raw-candidates.jsonl",
+        "sha256": sha256_file(raw_path),
+        **density,
+    }
+    raw_pass_at_k = {
+        f"pass@{k}": fmean(
+            estimate_pass_at_k(64, int(item["verified_candidate_count"]), k)
+            for item in density["per_task"]
+        )
+        for k in EXTENDED_SEARCH_KS
+    }
+    raw_solved_within_k = {
+        f"solved@{k}": sum(
+            any(index < k for index in item["verified_candidate_indices"])
+            for item in density["per_task"]
+        )
+        for k in EXTENDED_SEARCH_KS
+    }
+    if (
+        summary.get("extended_candidate_evidence") != raw_evidence
+        or pass_at_k != raw_pass_at_k
+        or solved_within_k != raw_solved_within_k
+        or verified_counts
+        != [int(item["verified_candidate_count"]) for item in density["per_task"]]
+        or summary["category_counts"]["verified"] != density["verified_candidate_count"]
+    ):
+        raise ValueError("extended aggregate evidence differs from raw candidates")
     return {
         "task_count": expected_task_count,
         "candidate_count": expected_task_count * 64,
@@ -1025,6 +1281,7 @@ def _compact_extended_workload(
         "ordered_task_ids_sha256": expected_task_ids_sha256,
         "results_sha256": sha256_file(root / "results.jsonl"),
         "generation_sha256": sha256_file(root / "generations.jsonl"),
+        "raw_candidate_evidence": raw_evidence,
         "adapter_model_sha256": expected_adapter_model_sha256,
     }
 
@@ -1034,85 +1291,58 @@ def compact_extended_validation_evidence(
     screening_selection_path: Path,
     evaluation_root: Path,
     output: Path,
-    *,
-    final_checkpoint: str,
-    decision_rationale: str,
 ) -> dict[str, Any]:
-    """Freeze the post-screening checkpoint after the issue's n=64 validation lane."""
+    """Compact n=64 validation evidence for the already-frozen checkpoint."""
 
     config.validate()
     screening = _read_json(screening_selection_path)
     selection = screening.get("selection", {})
     selected = str(selection.get("selected_checkpoint", ""))
-    runner_up = str(selection.get("strongest_runner_up", ""))
-    finalists = [selected, runner_up]
     if (
         screening.get("schema_version") != "generalist-v2-checkpoint-selection-v1"
         or screening.get("status") != "frozen"
         or selected not in {"Q1", "Q2", "Q3", "Q4"}
-        or runner_up not in {"Q1", "Q2", "Q3", "Q4"}
-        or selected == runner_up
     ):
         raise ValueError("extended validation needs complete n=8 screening evidence")
-    if final_checkpoint not in finalists:
-        raise ValueError("final checkpoint must be one of the two screened finalists")
-    if not decision_rationale.strip():
-        raise ValueError("extended checkpoint decision requires a rationale")
 
     workload_counts = {
         "fresh-composition-valid-v2": 406,
         "minif2f-valid-clean-v2": 244,
     }
-    controls_and_finalists: dict[str, Any] = {}
-    for checkpoint_id in ["Q0", *finalists]:
-        checkpoint_workloads: dict[str, Any] = {}
-        for workload_id, task_count in workload_counts.items():
-            screening_workload = screening["checkpoints"][selected]["workloads"][
-                workload_id
-            ]
-            adapter_sha256 = (
-                None
-                if checkpoint_id == "Q0"
-                else str(
-                    screening["checkpoints"][checkpoint_id]["adapter_model_sha256"]
-                )
-            )
-            checkpoint_workloads[workload_id] = _compact_extended_workload(
-                evaluation_root / checkpoint_id / workload_id,
-                checkpoint_id,
-                workload_id,
-                task_count,
-                str(screening_workload["ordered_task_ids_sha256"]),
-                adapter_sha256,
-            )
-        controls_and_finalists[checkpoint_id] = {
-            "role": (
-                "base-control"
-                if checkpoint_id == "Q0"
-                else (
-                    "n8-screening-winner"
-                    if checkpoint_id == selected
-                    else "n8-strongest-runner-up"
-                )
-            ),
-            "workloads": checkpoint_workloads,
-        }
+    checkpoint_workloads: dict[str, Any] = {}
+    for workload_id, task_count in workload_counts.items():
+        screening_workload = screening["checkpoints"][selected]["workloads"][
+            workload_id
+        ]
+        checkpoint_workloads[workload_id] = _compact_extended_workload(
+            evaluation_root / selected / workload_id,
+            selected,
+            workload_id,
+            task_count,
+            str(screening_workload["ordered_task_ids_sha256"]),
+            str(screening["checkpoints"][selected]["adapter_model_sha256"]),
+        )
 
     evidence = {
         "schema_version": "generalist-v2-extended-validation-v1",
-        "status": "final-checkpoint-frozen",
+        "status": "selected-checkpoint-extended-validation-complete",
         "model_id": MODEL_ID,
         "model_revision": MODEL_REVISION,
         "screening_selection_sha256": sha256_file(screening_selection_path),
         "candidates_per_task": 64,
         "reported_k": list(EXTENDED_SEARCH_KS),
         "screening_selected_checkpoint": selected,
-        "screening_strongest_runner_up": runner_up,
-        "controls_and_finalists": controls_and_finalists,
-        "final_checkpoint": final_checkpoint,
-        "extended_validation_refined_selection": final_checkpoint != selected,
-        "decision_rationale": decision_rationale.strip(),
-        "test_workloads_consulted_before_final_freeze": False,
+        "evaluated_checkpoint": {
+            "checkpoint_id": selected,
+            "adapter_model_sha256": screening["checkpoints"][selected][
+                "adapter_model_sha256"
+            ],
+            "workloads": checkpoint_workloads,
+        },
+        "base_control_evaluated_at_n64": False,
+        "runner_up_evaluated_at_n64": False,
+        "test_workloads_evaluated_at_n64": False,
+        "test_workloads_consulted_before_checkpoint_freeze": False,
         "riemann_used_for_selection": False,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
