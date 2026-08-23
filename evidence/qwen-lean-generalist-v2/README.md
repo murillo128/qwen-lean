@@ -103,6 +103,20 @@ the run evidence SHA-256 is
 and the retained adapter SHA-256 is
 `eec2cc20dacb7ca211d6f59f4ad4c1b2c88f3d8a6b0dc720f397749f58c8e87f`.
 
+`OBSERVED`: the full NF4 QLoRA run completed exactly one pass over all 182,812
+optimizer-visible proof variants in 22,852 optimizer steps. All logged losses
+and gradient norms were finite; mean loss was 7.148310 and the first/last
+losses were 16.811586/2.858912. The run finished in 81,315.080 seconds on the
+project Ada GPU without CPU activation offload, reserved at most 18,874,368,000
+of 20,989,804,544 CUDA bytes, and retained 2,115,436,544 bytes of headroom.
+Complete adapter-only checkpoints with optimizer/scheduler/RNG state were
+written at Q1/Q2/Q3/Q4 steps 5,713/11,426/17,139/22,852. `full-training.json`
+binds their adapter and trainer-state hashes; the complete outside-Git source
+run has SHA-256
+`c6175c15f8419c30807d8b4fec3cec338a3e41966ebd6beb96c205046c1f3798`.
+This is operational training evidence, not a checkpoint-quality claim; Q1-Q4
+remain unselected pending the frozen validation procedure.
+
 Commands:
 
 ```text
@@ -112,4 +126,5 @@ uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-runtim
 uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-bind-dataset --config config/qwen35-4b-generalist-v2.json --package-root data/lean-whole-proof-v2 --view-dir artifacts/qwen-lean-generalist-v2/dataset-binding/views --output evidence/qwen-lean-generalist-v2/dataset-binding.json
 PYTHONPATH=src .venv/bin/python -m qwen_lean generalist-v2-q0-evidence --config config/qwen35-4b-generalist-v2.json --evaluation-root artifacts/qwen-lean-generalist-v2/q0 --output evidence/qwen-lean-generalist-v2/q0.json
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True HF_HUB_OFFLINE=1 uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-production-preflight --config config/qwen35-4b-generalist-v2.json --package-root data/lean-whole-proof-v2 --binding evidence/qwen-lean-generalist-v2/dataset-binding.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --model-snapshot /root/.cache/huggingface/hub/models--Qwen--Qwen3.5-4B-Base/snapshots/1001bb4d826a52d1f399e183466143f4da7b741b --output evidence/qwen-lean-generalist-v2/production-preflight.json
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True HF_HUB_OFFLINE=1 uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-train --config config/qwen35-4b-generalist-v2.json --package-root data/lean-whole-proof-v2 --binding evidence/qwen-lean-generalist-v2/dataset-binding.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --production-preflight evidence/qwen-lean-generalist-v2/production-preflight.json --overfit-run artifacts/qwen-lean-generalist-v2/overfit64/run.json --smoke-run artifacts/qwen-lean-generalist-v2/smoke4096/run.json --model-snapshot /root/.cache/huggingface/hub/models--Qwen--Qwen3.5-4B-Base/snapshots/1001bb4d826a52d1f399e183466143f4da7b741b --output-dir artifacts/qwen-lean-generalist-v2/full-training
 ```
