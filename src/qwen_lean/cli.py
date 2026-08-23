@@ -2087,6 +2087,22 @@ def _parser() -> argparse.ArgumentParser:
     )
     generalist_historical_evidence.add_argument("--output", type=Path, required=True)
 
+    generalist_release_evidence = subparsers.add_parser(
+        "generalist-v2-release-evidence",
+        help="bind the selected adapter to complete generalist-v2 evidence",
+    )
+    generalist_release_evidence.add_argument("--config", type=Path, required=True)
+    generalist_release_evidence.add_argument("--binding", type=Path, required=True)
+    generalist_release_evidence.add_argument("--training", type=Path, required=True)
+    generalist_release_evidence.add_argument("--selection", type=Path, required=True)
+    generalist_release_evidence.add_argument("--extended", type=Path, required=True)
+    generalist_release_evidence.add_argument("--final", type=Path, required=True)
+    generalist_release_evidence.add_argument("--historical", type=Path, required=True)
+    generalist_release_evidence.add_argument(
+        "--deepseek-preflight", type=Path, required=True
+    )
+    generalist_release_evidence.add_argument("--output", type=Path, required=True)
+
     generalist_production_preflight = subparsers.add_parser(
         "generalist-v2-production-preflight",
         help="run the real near-maximum weighted QLoRA optimizer update",
@@ -2372,6 +2388,23 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.base_evidence_dir,
             args.deepseek_evidence_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-release-evidence":
+        from .generalist_v2_release import compact_generalist_v2_release_evidence
+
+        evidence = compact_generalist_v2_release_evidence(
+            GeneralistV2Config.load(args.config),
+            args.binding,
+            args.training,
+            args.selection,
+            args.extended,
+            args.final,
+            args.historical,
+            args.deepseek_preflight,
             args.output,
         )
         print(json.dumps(evidence, indent=2))
