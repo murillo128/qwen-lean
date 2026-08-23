@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import gzip
 import hashlib
+import io
 import json
 import math
 import subprocess
@@ -874,43 +876,53 @@ def _write_extended_raw_candidate_evidence(
     checkpoint_id = str(generation_metadata["checkpoint_id"])
     workload_id = str(generation_metadata["workload_id"])
     sampling_seed = int(generation_metadata["sampling"]["seed"])
-    with path.open("w", encoding="utf-8", newline="\n") as handle:
-        for item, result in zip(generated, results, strict=True):
-            if (
-                item.task.id != result.task_id
-                or item.candidate_index != result.candidate_index
-                or item.text != result.candidate_text
-            ):
-                raise ValueError("extended generation/result candidate order differs")
-            value = {
-                "schema_version": "generalist-v2-extended-candidate-v1",
-                "checkpoint_id": checkpoint_id,
-                "workload_id": workload_id,
-                "model_id": MODEL_ID,
-                "model_revision": MODEL_REVISION,
-                "adapter_model_sha256": adapter["adapter_model_sha256"],
-                "task_id": result.task_id,
-                "candidate_id": result.candidate_id,
-                "candidate_index": result.candidate_index,
-                "sampling_seed": sampling_seed,
-                "candidate_text": result.candidate_text,
-                "candidate_text_sha256": _text_sha256(result.candidate_text),
-                "generated_token_count": result.generated_token_count,
-                "finish_reason": result.finish_reason,
-                "generation_latency_seconds": result.generation_latency_seconds,
-                "category": result.category,
-                "lean_exit_code": result.lean_exit_code,
-                "diagnostics": result.diagnostics,
-                "verification_latency_seconds": result.verification_latency_seconds,
-                "total_latency_seconds": result.total_latency_seconds,
-                "normalized_proof_sha256": (
-                    _normalized_verified_proof_sha256(result.candidate_text)
-                    if result.category == "verified"
-                    else None
-                ),
-            }
-            handle.write(json.dumps(value, ensure_ascii=False, sort_keys=True))
-            handle.write("\n")
+    with path.open("wb") as raw_handle:
+        with gzip.GzipFile(
+            filename="", mode="wb", fileobj=raw_handle, mtime=0
+        ) as compressed_handle:
+            with io.TextIOWrapper(
+                compressed_handle, encoding="utf-8", newline="\n"
+            ) as handle:
+                for item, result in zip(generated, results, strict=True):
+                    if (
+                        item.task.id != result.task_id
+                        or item.candidate_index != result.candidate_index
+                        or item.text != result.candidate_text
+                    ):
+                        raise ValueError(
+                            "extended generation/result candidate order differs"
+                        )
+                    value = {
+                        "schema_version": "generalist-v2-extended-candidate-v1",
+                        "checkpoint_id": checkpoint_id,
+                        "workload_id": workload_id,
+                        "model_id": MODEL_ID,
+                        "model_revision": MODEL_REVISION,
+                        "adapter_model_sha256": adapter["adapter_model_sha256"],
+                        "task_id": result.task_id,
+                        "candidate_id": result.candidate_id,
+                        "candidate_index": result.candidate_index,
+                        "sampling_seed": sampling_seed,
+                        "candidate_text": result.candidate_text,
+                        "candidate_text_sha256": _text_sha256(result.candidate_text),
+                        "generated_token_count": result.generated_token_count,
+                        "finish_reason": result.finish_reason,
+                        "generation_latency_seconds": result.generation_latency_seconds,
+                        "category": result.category,
+                        "lean_exit_code": result.lean_exit_code,
+                        "diagnostics": result.diagnostics,
+                        "verification_latency_seconds": (
+                            result.verification_latency_seconds
+                        ),
+                        "total_latency_seconds": result.total_latency_seconds,
+                        "normalized_proof_sha256": (
+                            _normalized_verified_proof_sha256(result.candidate_text)
+                            if result.category == "verified"
+                            else None
+                        ),
+                    }
+                    handle.write(json.dumps(value, ensure_ascii=False, sort_keys=True))
+                    handle.write("\n")
     expected_task_ids = list(dict.fromkeys(item.task.id for item in generated))
     return _summarize_extended_raw_candidate_evidence(
         path,
@@ -1222,13 +1234,13 @@ def run_checkpoint_verification(
         }
     )
     if resolved_candidates == 64:
-        raw_path = output_dir / "raw-candidates.jsonl"
+        raw_path = output_dir / "raw-candidates.jsonl.gz"
         density = _write_extended_raw_candidate_evidence(
             raw_path, generated, results, generation_metadata
         )
         summary["all_candidates_verified_without_early_stop"] = True
         summary["extended_candidate_evidence"] = {
-            "artifact": "raw-candidates.jsonl",
+            "artifact": "raw-candidates.jsonl.gz",
             "sha256": sha256_file(raw_path),
             **density,
         }
@@ -1580,7 +1592,7 @@ def _compact_extended_workload(
         count < 0 or count > 64 for count in verified_counts
     ):
         raise ValueError("generalist-v2 extended per-task outcomes are incomplete")
-    raw_path = root / "raw-candidates.jsonl"
+    raw_path = root / "raw-candidates.jsonl.gz"
     density = _summarize_extended_raw_candidate_evidence(
         raw_path,
         checkpoint_id=checkpoint_id,
@@ -1590,7 +1602,7 @@ def _compact_extended_workload(
         sampling_seed=int(generation["sampling"]["seed"]),
     )
     raw_evidence = {
-        "artifact": "raw-candidates.jsonl",
+        "artifact": "raw-candidates.jsonl.gz",
         "sha256": sha256_file(raw_path),
         **density,
     }

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 
 import pytest
 from test_generalist_v2_dataset import _record
 
+from qwen_lean.baseline import GeneratedCandidate
 from qwen_lean.generalist_v2 import GeneralistV2Config
 from qwen_lean.generalist_v2_dataset import generalist_variants, sha256_file
 from qwen_lean.generalist_v2_evaluation import (
@@ -20,9 +22,11 @@ from qwen_lean.generalist_v2_evaluation import (
     _summarize_extended_raw_candidate_evidence,
     _synthetic_task,
     _text_sha256,
+    _write_extended_raw_candidate_evidence,
     compact_extended_validation_evidence,
 )
 from qwen_lean.metrics import pass_at_k
+from qwen_lean.schema import CandidateResult, TaskRecord
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -355,7 +359,7 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
         ),
         encoding="utf-8",
     )
-    raw_path = tmp_path / "raw-candidates.jsonl"
+    raw_path = tmp_path / "raw-candidates.jsonl.gz"
     raw_rows = []
     for index in range(64):
         verified = index in {9, 47}
@@ -389,10 +393,10 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
                 ),
             }
         )
-    raw_path.write_text(
-        "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows),
-        encoding="utf-8",
-    )
+    with gzip.open(raw_path, "wt", encoding="utf-8") as handle:
+        handle.write(
+            "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows)
+        )
     density = _summarize_extended_raw_candidate_evidence(
         raw_path,
         checkpoint_id="Q2",
@@ -404,7 +408,7 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
     summary_path = tmp_path / "summary.json"
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     summary["extended_candidate_evidence"] = {
-        "artifact": "raw-candidates.jsonl",
+        "artifact": "raw-candidates.jsonl.gz",
         "sha256": sha256_file(raw_path),
         **density,
     }
@@ -432,14 +436,71 @@ def test_compact_extended_workload_reports_curve_and_marginal_gains(
     assert compact["raw_candidate_evidence"]["unique_verified_proof_count"] == 1
     assert compact["raw_candidate_evidence"]["verified_duplication_fraction"] == 0.5
     raw_rows[0]["candidate_text_sha256"] = "tampered"
-    raw_path.write_text(
-        "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows),
-        encoding="utf-8",
-    )
+    with gzip.open(raw_path, "wt", encoding="utf-8") as handle:
+        handle.write(
+            "".join(json.dumps(row, sort_keys=True) + "\n" for row in raw_rows)
+        )
     with pytest.raises(ValueError, match="raw candidate identity"):
         _compact_extended_workload(
             tmp_path, "Q2", "fixture", 1, "task-hash", "adapter-hash"
         )
+
+
+def test_extended_raw_candidates_are_deterministically_compressed(
+    tmp_path: Path,
+) -> None:
+    task = TaskRecord(
+        id="task-a",
+        preamble="import Mathlib",
+        declaration="theorem task_a : True",
+        declaration_name="task_a",
+    )
+    generated = [
+        GeneratedCandidate(
+            task=task,
+            candidate_index=index,
+            text="by\n  contradiction",
+            token_count=2,
+            finish_reason="eos",
+            generation_latency_seconds=0.1,
+        )
+        for index in range(64)
+    ]
+    results = [
+        CandidateResult(
+            task_id=task.id,
+            candidate_id=f"model-{index}",
+            candidate_index=index,
+            candidate_text="by\n  contradiction",
+            category="lean_rejected",
+            lean_exit_code=1,
+            diagnostics={"stdout": "", "stderr": ""},
+            generation_latency_seconds=0.1,
+            verification_latency_seconds=0.1,
+            total_latency_seconds=0.2,
+            generated_token_count=2,
+            finish_reason="eos",
+        )
+        for index in range(64)
+    ]
+    metadata = {
+        "checkpoint_id": "Q2",
+        "workload_id": "fixture",
+        "sampling": {"seed": 0},
+        "adapter": {"adapter_model_sha256": "adapter-hash"},
+    }
+    first = tmp_path / "first.jsonl.gz"
+    second = tmp_path / "second.jsonl.gz"
+
+    density = _write_extended_raw_candidate_evidence(
+        first, generated, results, metadata
+    )
+    _write_extended_raw_candidate_evidence(second, generated, results, metadata)
+
+    assert density["raw_candidate_count"] == 64
+    assert density["verified_candidate_count"] == 0
+    assert sha256_file(first) == sha256_file(second)
+    assert len(list(gzip.open(first, "rt", encoding="utf-8"))) == 64
 
 
 def test_extended_validation_uses_only_the_n8_frozen_checkpoint(
