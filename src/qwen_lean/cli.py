@@ -1968,6 +1968,96 @@ def _parser() -> argparse.ArgumentParser:
     generalist_parity_evidence.add_argument("--output", type=Path, required=True)
     generalist_parity_evidence.add_argument("--workers", type=int, default=8)
 
+    generalist_q4_canary_probes = subparsers.add_parser(
+        "generalist-v2-q4-canary-probes",
+        help="freeze known-positive Q4 fresh-validation canary probes",
+    )
+    generalist_q4_canary_probes.add_argument("--config", type=Path, required=True)
+    generalist_q4_canary_probes.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_q4_canary_probes.add_argument("--view-dir", type=Path, required=True)
+    generalist_q4_canary_probes.add_argument(
+        "--extended-evidence", type=Path, required=True
+    )
+    generalist_q4_canary_probes.add_argument(
+        "--extended-results", type=Path, required=True
+    )
+    generalist_q4_canary_probes.add_argument(
+        "--extended-generation-metadata", type=Path, required=True
+    )
+    generalist_q4_canary_probes.add_argument(
+        "--q4-adapter-dir", type=Path, required=True
+    )
+    generalist_q4_canary_probes.add_argument("--output", type=Path, required=True)
+
+    generalist_q4_canary_hf = subparsers.add_parser(
+        "generalist-v2-q4-canary-hf",
+        help="run deterministic Transformers Base/PEFT-Q4 canary arms",
+    )
+    generalist_q4_canary_hf.add_argument("--config", type=Path, required=True)
+    generalist_q4_canary_hf.add_argument("--probes", type=Path, required=True)
+    generalist_q4_canary_hf.add_argument(
+        "--q4-adapter-dir", type=Path, required=True
+    )
+    generalist_q4_canary_hf.add_argument(
+        "--model-snapshot", type=Path, required=True
+    )
+    generalist_q4_canary_hf.add_argument("--output", type=Path, required=True)
+
+    generalist_q4_canary_vllm = subparsers.add_parser(
+        "generalist-v2-q4-canary-vllm",
+        help="audit and run deterministic vLLM Base/Q4 canary arms",
+    )
+    generalist_q4_canary_vllm.add_argument("--config", type=Path, required=True)
+    generalist_q4_canary_vllm.add_argument(
+        "--base-evaluation-config", type=Path, required=True
+    )
+    generalist_q4_canary_vllm.add_argument("--probes", type=Path, required=True)
+    generalist_q4_canary_vllm.add_argument(
+        "--q4-adapter-dir", type=Path, required=True
+    )
+    generalist_q4_canary_vllm.add_argument("--output", type=Path, required=True)
+
+    generalist_q4_canary_evidence = subparsers.add_parser(
+        "generalist-v2-q4-canary-evidence",
+        help="Lean-check and classify the blocking Q4 inference canary",
+    )
+    generalist_q4_canary_evidence.add_argument("--config", type=Path, required=True)
+    generalist_q4_canary_evidence.add_argument("--probes", type=Path, required=True)
+    generalist_q4_canary_evidence.add_argument(
+        "--hf-runtime", type=Path, required=True
+    )
+    generalist_q4_canary_evidence.add_argument(
+        "--vllm-runtime", type=Path, required=True
+    )
+    generalist_q4_canary_evidence.add_argument(
+        "--general-lean-project-root", type=Path, required=True
+    )
+    generalist_q4_canary_evidence.add_argument(
+        "--raw-verification-output", type=Path, required=True
+    )
+    generalist_q4_canary_evidence.add_argument("--output", type=Path, required=True)
+    generalist_q4_canary_evidence.add_argument("--workers", type=int, default=8)
+
+    generalist_q4_failure_diagnosis = subparsers.add_parser(
+        "generalist-v2-q4-fresh-test-failure-diagnosis",
+        help="classify stored Q4 fresh-test failures without regeneration",
+    )
+    generalist_q4_failure_diagnosis.add_argument(
+        "--final-evidence", type=Path, required=True
+    )
+    generalist_q4_failure_diagnosis.add_argument(
+        "--generations", type=Path, required=True
+    )
+    generalist_q4_failure_diagnosis.add_argument(
+        "--results", type=Path, required=True
+    )
+    generalist_q4_failure_diagnosis.add_argument(
+        "--generation-metadata", type=Path, required=True
+    )
+    generalist_q4_failure_diagnosis.add_argument("--output", type=Path, required=True)
+
     generalist_checkpoint_generate = subparsers.add_parser(
         "generalist-v2-checkpoint-generate",
         help="generate one Q0-Q4 Dataset-v2 workload on local CUDA",
@@ -2226,6 +2316,12 @@ def _parser() -> argparse.ArgumentParser:
     generalist_release_evidence.add_argument(
         "--lora-parity", type=Path, required=True
     )
+    generalist_release_evidence.add_argument(
+        "--q4-canary", type=Path, required=True
+    )
+    generalist_release_evidence.add_argument(
+        "--q4-failure-diagnosis", type=Path, required=True
+    )
     generalist_release_evidence.add_argument("--output", type=Path, required=True)
 
     generalist_production_preflight = subparsers.add_parser(
@@ -2417,6 +2513,77 @@ def main(argv: list[str] | None = None) -> int:
             args.raw_verification_output,
             args.output,
             workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q4-canary-probes":
+        from .generalist_v2_q4_canary import build_q4_canary_probes
+
+        evidence = build_q4_canary_probes(
+            GeneralistV2Config.load(args.config),
+            args.package_root,
+            args.view_dir,
+            args.extended_evidence,
+            args.extended_results,
+            args.extended_generation_metadata,
+            args.q4_adapter_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q4-canary-hf":
+        from .generalist_v2_q4_canary import run_hf_q4_canary
+
+        evidence = run_hf_q4_canary(
+            GeneralistV2Config.load(args.config),
+            args.probes,
+            args.q4_adapter_dir,
+            args.model_snapshot,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q4-canary-vllm":
+        from .generalist_v2_q4_canary import run_vllm_q4_canary
+
+        evidence = run_vllm_q4_canary(
+            GeneralistV2Config.load(args.config),
+            args.base_evaluation_config,
+            args.probes,
+            args.q4_adapter_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q4-canary-evidence":
+        from .generalist_v2_q4_canary import compact_q4_canary_evidence
+
+        evidence = compact_q4_canary_evidence(
+            GeneralistV2Config.load(args.config),
+            args.probes,
+            args.hf_runtime,
+            args.vllm_runtime,
+            args.general_lean_project_root,
+            args.raw_verification_output,
+            args.output,
+            workers=args.workers,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-q4-fresh-test-failure-diagnosis":
+        from .generalist_v2_q4_canary import diagnose_q4_fresh_test_failures
+
+        evidence = diagnose_q4_fresh_test_failures(
+            args.final_evidence,
+            args.generations,
+            args.results,
+            args.generation_metadata,
+            args.output,
         )
         print(json.dumps(evidence, indent=2))
         return 0
@@ -2614,6 +2781,8 @@ def main(argv: list[str] | None = None) -> int:
             args.refinement,
             args.deepseek_preflight,
             args.lora_parity,
+            args.q4_canary,
+            args.q4_failure_diagnosis,
             args.output,
         )
         print(json.dumps(evidence, indent=2))

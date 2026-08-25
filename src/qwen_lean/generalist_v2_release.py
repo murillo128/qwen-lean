@@ -68,6 +68,8 @@ def compact_generalist_v2_release_evidence(
     refinement_path: Path,
     deepseek_preflight_path: Path,
     lora_parity_path: Path,
+    q4_canary_path: Path,
+    q4_failure_diagnosis_path: Path,
     output: Path,
 ) -> dict[str, Any]:
     """Bind the selected adapter identity to all complete experiment evidence."""
@@ -80,9 +82,17 @@ def compact_generalist_v2_release_evidence(
     final = _read(final_path)
     refinement = _read(refinement_path)
     deepseek_preflight = _read(deepseek_preflight_path)
+    q4_failure_diagnosis = _read(q4_failure_diagnosis_path)
     from .generalist_v2_parity import validate_lora_parity_gate
+    from .generalist_v2_q4_canary import (
+        Q4_ADAPTER_MODEL_SHA256,
+        Q4_FAILURE_DIAGNOSIS_SCHEMA_VERSION,
+        validate_q4_canary_gate,
+    )
 
     lora_parity_gate = validate_lora_parity_gate(config, lora_parity_path)
+    q4_canary_gate = validate_q4_canary_gate(q4_canary_path)
+    q4_canary = _read(q4_canary_path)
     selected = str(selection.get("selection", {}).get("selected_checkpoint", ""))
     adapter_hash = str(
         selection.get("selected_checkpoint", {}).get("adapter_model_sha256", "")
@@ -123,6 +133,22 @@ def compact_generalist_v2_release_evidence(
         != "generalist-v2-deepseek-final-preflight-v1"
         or deepseek_preflight.get("status") != "passed"
         or deepseek_preflight.get("selected_checkpoint_frozen") != selected
+        or selected != "Q4"
+        or adapter_hash != Q4_ADAPTER_MODEL_SHA256
+        or q4_canary_gate.get("adapter_model_sha256") != adapter_hash
+        or q4_failure_diagnosis.get("schema_version")
+        != Q4_FAILURE_DIAGNOSIS_SCHEMA_VERSION
+        or q4_failure_diagnosis.get("status") != "complete"
+        or q4_failure_diagnosis.get("checkpoint_id") != selected
+        or q4_failure_diagnosis.get("adapter_model_sha256") != adapter_hash
+        or q4_failure_diagnosis.get("method", {}).get("benchmark_regenerated")
+        is not False
+        or int(q4_failure_diagnosis.get("method", {}).get("sample_count", 0))
+        != 100
+        or q4_failure_diagnosis.get("artifacts", {}).get(
+            "final_assessment_sha256"
+        )
+        != sha256_file(final_path)
     ):
         raise ValueError("generalist-v2 release evidence is incomplete or inconsistent")
     if (
@@ -139,7 +165,7 @@ def compact_generalist_v2_release_evidence(
 
     selected_screening = selection["checkpoints"][selected]["workloads"]
     evidence = {
-        "schema_version": "generalist-v2-release-evidence-v1",
+        "schema_version": "generalist-v2-release-evidence-v2",
         "status": "ready-for-review",
         "artifact_id": "qwen-lean-generalist-v2",
         "parent": training["model"],
@@ -218,15 +244,39 @@ def compact_generalist_v2_release_evidence(
         "final_assessment": _headline_final_workloads(final),
         "refinement_conclusions": _headline_refinement(refinement),
         "scope_amendment": {
-            "issue_comment_ids": [5409570320, 5415045961],
+            "issue_comment_ids": [5409570320, 5415045961, 5415834670],
             "general_final_test_only": True,
             "riemann_evidence_completion_gate": False,
             "deepseek_fresh_test_completion_gate": False,
             "deepseek_fresh_test_scored": False,
             "additional_n64_lanes_run": False,
+            "q4_final_inference_canary_required": True,
+            "final_benchmarks_regenerated_for_canary": False,
         },
         "deepseek_final_preflight": deepseek_preflight,
         "lora_inference_parity_gate": lora_parity_gate,
+        "q4_final_inference_canary": {
+            **q4_canary_gate,
+            "classification": q4_canary["classification"],
+            "probe_selection": q4_canary["probe_selection"],
+            "functional_parity": q4_canary["functional_parity"],
+            "arm_summaries": q4_canary["arm_summaries"],
+            "requirements": q4_canary["requirements"],
+        },
+        "q4_fresh_test_failure_diagnosis": {
+            "status": q4_failure_diagnosis["status"],
+            "method": q4_failure_diagnosis["method"],
+            "full_candidate_diagnostics": q4_failure_diagnosis[
+                "full_candidate_diagnostics"
+            ],
+            "sample_primary_category_counts": q4_failure_diagnosis["sample"][
+                "primary_category_counts"
+            ],
+            "sample_overlapping_signal_counts": q4_failure_diagnosis["sample"][
+                "overlapping_signal_counts"
+            ],
+            "interpretation": q4_failure_diagnosis["interpretation"],
+        },
         "evidence_sha256": {
             "dataset_binding": sha256_file(binding_path),
             "full_training": sha256_file(training_path),
@@ -236,6 +286,10 @@ def compact_generalist_v2_release_evidence(
             "refinement_conclusions": sha256_file(refinement_path),
             "deepseek_final_preflight": sha256_file(deepseek_preflight_path),
             "lora_inference_parity": sha256_file(lora_parity_path),
+            "q4_final_inference_canary": sha256_file(q4_canary_path),
+            "q4_fresh_test_failure_diagnosis": sha256_file(
+                q4_failure_diagnosis_path
+            ),
         },
     }
     output.parent.mkdir(parents=True, exist_ok=True)

@@ -10,6 +10,10 @@ from qwen_lean.generalist_v2_dataset import sha256_file
 from qwen_lean.generalist_v2_release import (
     compact_generalist_v2_release_evidence,
 )
+from qwen_lean.generalist_v2_q4_canary import (
+    Q4_ADAPTER_MODEL_SHA256,
+    Q4_CANARY_REQUIRED_GATES,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,7 +26,7 @@ def _write(path: Path, value: dict[str, object]) -> Path:
 def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]]:
     config = GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json")
     manifest_sha256 = config.dataset["binding"]["manifest_sha256"]
-    adapter_sha256 = "adapter-model-sha256"
+    adapter_sha256 = Q4_ADAPTER_MODEL_SHA256
     workload = {
         "pass_at_k": {"pass@1": 0.1, "pass@4": 0.2, "pass@8": 0.3},
         "tasks_with_verified_candidate": 3,
@@ -70,8 +74,8 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
                     "trainable_parameter_count": 1,
                 },
                 "checkpoints": {
-                    "Q2": {
-                        "optimizer_step": 11426,
+                    "Q4": {
+                        "optimizer_step": 22852,
                         "adapter_config_sha256": "adapter-config-sha256",
                         "adapter_model_sha256": adapter_sha256,
                     }
@@ -92,16 +96,16 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
                 "status": "frozen",
                 "q0_evidence_sha256": "q0-evidence-sha256",
                 "selection": {
-                    "selected_checkpoint": "Q2",
+                    "selected_checkpoint": "Q4",
                     "rule": "validation-only",
                     "screening_ranking": ["Q2", "Q1", "Q3", "Q4"],
                 },
                 "selected_checkpoint": {
                     "adapter_model_sha256": adapter_sha256,
-                    "optimizer_step": 11426,
+                    "optimizer_step": 22852,
                 },
                 "checkpoints": {
-                    "Q2": {
+                    "Q4": {
                         "workloads": {
                             "minif2f-valid-clean-v2": workload,
                             "fresh-composition-valid-v2": workload,
@@ -115,7 +119,7 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             {
                 "schema_version": "generalist-v2-extended-validation-v1",
                 "status": "selected-checkpoint-extended-validation-complete",
-                "screening_selected_checkpoint": "Q2",
+                "screening_selected_checkpoint": "Q4",
                 "evaluated_checkpoint": {
                     "adapter_model_sha256": adapter_sha256,
                     "workloads": {"minif2f-valid-clean-v2": workload},
@@ -127,7 +131,7 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             {
                 "schema_version": "generalist-v2-final-assessment-v1",
                 "status": "complete",
-                "selected_checkpoint": "Q2",
+                "selected_checkpoint": "Q4",
                 "selected_adapter_model_sha256": adapter_sha256,
                 "workloads": {
                     "minif2f-test-clean-v2": {
@@ -149,7 +153,7 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             {
                 "schema_version": "generalist-v2-deepseek-final-preflight-v1",
                 "status": "passed",
-                "selected_checkpoint_frozen": "Q2",
+                "selected_checkpoint_frozen": "Q4",
             },
         ),
         "lora_parity": _write(
@@ -189,7 +193,7 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
         {
             "schema_version": "generalist-v2-refinement-conclusions-v1",
             "status": "complete",
-            "selected_checkpoint": "Q2",
+            "selected_checkpoint": "Q4",
             "selected_adapter_model_sha256": adapter_sha256,
             "extended_validation_sha256": sha256_file(paths["extended"]),
             "final_assessment_sha256": sha256_file(paths["final"]),
@@ -218,6 +222,47 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             "conclusions": {"actionable_future_work": []},
         },
     )
+    paths["q4_canary"] = _write(
+        tmp_path / "q4-canary.json",
+        {
+            "schema_version": "generalist-v2-q4-canary-evidence-v1",
+            "gate_id": "qwen35-q4-final-inference-canary-v1",
+            "status": "passed",
+            "classification": "PASS",
+            "adapter_model_sha256": adapter_sha256,
+            "requirements": {
+                name: True for name in sorted(Q4_CANARY_REQUIRED_GATES)
+            },
+            "probe_selection": {"probe_count": 12},
+            "functional_parity": {"hf_q4_vs_vllm_q4": {}},
+            "arm_summaries": {"hf_q4": {}, "vllm_q4": {}},
+        },
+    )
+    paths["q4_failure_diagnosis"] = _write(
+        tmp_path / "q4-failure-diagnosis.json",
+        {
+            "schema_version": (
+                "generalist-v2-q4-fresh-test-failure-diagnosis-v1"
+            ),
+            "status": "complete",
+            "checkpoint_id": "Q4",
+            "adapter_model_sha256": adapter_sha256,
+            "method": {"benchmark_regenerated": False, "sample_count": 100},
+            "full_candidate_diagnostics": {"candidate_count": 3320},
+            "sample": {
+                "primary_category_counts": {"unknown_or_mismatched_lemma": 100},
+                "overlapping_signal_counts": {
+                    "unknown_or_mismatched_lemma": 100
+                },
+            },
+            "interpretation": {
+                "classification": "narrow-template failure pattern"
+            },
+            "artifacts": {
+                "final_assessment_sha256": sha256_file(paths["final"])
+            },
+        },
+    )
     return config, paths
 
 
@@ -235,18 +280,24 @@ def test_release_evidence_binds_selected_adapter_and_inputs(tmp_path: Path) -> N
         paths["refinement"],
         paths["deepseek_preflight"],
         paths["lora_parity"],
+        paths["q4_canary"],
+        paths["q4_failure_diagnosis"],
         output,
     )
 
     assert evidence["status"] == "ready-for-review"
-    assert evidence["adapter"]["selected_checkpoint"] == "Q2"
-    assert evidence["adapter"]["adapter_model_sha256"] == "adapter-model-sha256"
+    assert evidence["adapter"]["selected_checkpoint"] == "Q4"
+    assert evidence["adapter"]["adapter_model_sha256"] == Q4_ADAPTER_MODEL_SHA256
     assert evidence["screening"]["test_or_riemann_used_for_selection"] is False
     assert evidence["scope_amendment"]["riemann_evidence_completion_gate"] is False
     assert evidence["refinement_conclusions"]["analysis_scope"][
         "validation_only"
     ] is True
     assert evidence["lora_inference_parity_gate"]["status"] == "passed"
+    assert evidence["q4_final_inference_canary"]["status"] == "passed"
+    assert evidence["q4_fresh_test_failure_diagnosis"]["method"][
+        "benchmark_regenerated"
+    ] is False
     assert evidence["evidence_sha256"]["full_training"] == sha256_file(
         paths["training"]
     )
@@ -270,5 +321,7 @@ def test_release_evidence_rejects_mismatched_adapter(tmp_path: Path) -> None:
             paths["refinement"],
             paths["deepseek_preflight"],
             paths["lora_parity"],
+            paths["q4_canary"],
+            paths["q4_failure_diagnosis"],
             tmp_path / "release.json",
         )

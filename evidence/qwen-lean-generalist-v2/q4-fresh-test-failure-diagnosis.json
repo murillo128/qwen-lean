@@ -1,0 +1,2673 @@
+{
+  "adapter_model_sha256": "2398be7ac95db85d646bce66762abcea96487a93b7d92508ddcc274914ef470e",
+  "artifacts": {
+    "final_assessment_sha256": "47d0985ac4a04f5772f37055c20df08656f8744c869a300701759e5417e4a0eb",
+    "generation_metadata_sha256": "f87d520f823d4fca93dfac2878f16842869256dd01103ce9db324ab9f3fb59bb",
+    "generations_sha256": "4cf3e5e7112a2c4a35120e4c3f10f66eba02a80c81886561038e663657a575bf",
+    "results_sha256": "391d11b44235fadf6925728efa991b50802c876e776b4dd7d5a9d9510bdb5edc",
+    "sample_membership_sha256": "b7615ede46be39f13ec606ca8837fc7988d154c5605cf13945fce5d1e2104b5b"
+  },
+  "checkpoint_id": "Q4",
+  "full_candidate_diagnostics": {
+    "candidate_count": 3320,
+    "exact_constructor_fraction": 0.9966867469879518,
+    "finish_reason_counts": {
+      "eos": 3320
+    },
+    "generated_tokens": {
+      "at_most_64_count": 2837,
+      "at_most_64_fraction": 0.8545180722891567,
+      "maximum": 184,
+      "mean": 45.56897590361446,
+      "median": 42.0,
+      "minimum": 13
+    },
+    "proof_head_counts": {
+      "exact": 11,
+      "exact-constructor": 3309
+    },
+    "repeated_exact_output_candidate_count": 876,
+    "top_cross_task_templates": [
+      {
+        "candidate_count": 1158,
+        "task_count": 145,
+        "template": "exact ⟨@CONST, @CONST⟩",
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_count": 982,
+        "task_count": 136,
+        "template": "exact ⟨@CONST, ⟨@CONST, @CONST⟩⟩",
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_count": 647,
+        "task_count": 135,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => @CONST⟩⟩",
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_count": 98,
+        "task_count": 31,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => ⟨@CONST, @CONST⟩⟩⟩",
+        "template_sha256": "db64f6775e3ad0d0ac09ac38ce17f1221d2504a87667264b0a39f31767f2a460"
+      },
+      {
+        "candidate_count": 59,
+        "task_count": 26,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => ⟨fun _ => @CONST, fun _ => @CONST⟩⟩⟩",
+        "template_sha256": "2a2b7ae8a76c1335ead542878f73567e82b9e193ac22b4b068ea4dc8af2b98d3"
+      },
+      {
+        "candidate_count": 64,
+        "task_count": 21,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => @CONST⟩, @CONST⟩",
+        "template_sha256": "65825199b16aa9f7c2c099d3bca771b573314df608c89ea6e2b6244fa2bcde54"
+      },
+      {
+        "candidate_count": 57,
+        "task_count": 16,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => ⟨fun _ => @CONST, fun _ => @CONST⟩⟩",
+        "template_sha256": "cc2a55dc576f8f9e02e81a566393eb6b1744a439b5057d77a8a0f0e03dc7585a"
+      },
+      {
+        "candidate_count": 52,
+        "task_count": 15,
+        "template": "exact ⟨@CONST, ⟨⟨@CONST, @CONST⟩, @CONST⟩⟩",
+        "template_sha256": "7fc309c64ffc0d2eb7ca08a971fe88823ec0599fae210095a47b0dab525a289a"
+      },
+      {
+        "candidate_count": 34,
+        "task_count": 13,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => ⟨@CONST, @CONST⟩⟩",
+        "template_sha256": "abba0c38305a3e46f79ad7ff136c89f41c5964f86456708c750e7cdf54ad171a"
+      },
+      {
+        "candidate_count": 25,
+        "task_count": 9,
+        "template": "exact ⟨@CONST, ⟨fun _ => ⟨fun _ => @CONST, fun _ => @CONST⟩, fun _ => @CONST⟩⟩",
+        "template_sha256": "4152cd66b4f05389b8da068bb4004752b5948d32b145abe45cd2b4486f1eb864"
+      },
+      {
+        "candidate_count": 22,
+        "task_count": 8,
+        "template": "exact ⟨@CONST, ⟨fun _ => ⟨@CONST, @CONST⟩, fun _ => @CONST⟩⟩",
+        "template_sha256": "b8936d3ff0919933111dab8eeb1cdd0a0ffa2297b8a23f7593fc97f3db56eb6d"
+      },
+      {
+        "candidate_count": 18,
+        "task_count": 8,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => @CONST⟩, fun _ => @CONST⟩",
+        "template_sha256": "e129731ef79f80d9e4a66a8e7138738cf6ce04defad2e8563f87a1196fc72dcc"
+      },
+      {
+        "candidate_count": 7,
+        "task_count": 6,
+        "template": "exact ⟨@CONST, ⟨fun _ => @CONST, fun _ => @CONST, fun _ => @CONST⟩⟩",
+        "template_sha256": "31814ccbbedd9e5c4db27bbc79636cec8340f8b7e041ab30f7de8ae12bc14a8d"
+      },
+      {
+        "candidate_count": 7,
+        "task_count": 5,
+        "template": "exact ⟨@CONST, ⟨⟨fun _ => @CONST, fun _ => @CONST⟩, fun _ => @CONST⟩⟩",
+        "template_sha256": "0591d5cdc074b75ae131a164959533c548c446edf4f3c43f5e9a179a22d8acb2"
+      },
+      {
+        "candidate_count": 10,
+        "task_count": 4,
+        "template": "exact ⟨@CONST, ⟨fun h => ⟨@CONST, @CONST⟩, fun h => @CONST⟩⟩",
+        "template_sha256": "0e85d34cda6584bd4289ceff387d7bc41d7c60b2b7d02b4513eedeb008fa113f"
+      },
+      {
+        "candidate_count": 9,
+        "task_count": 4,
+        "template": "exact ⟨@CONST, ⟨fun _ => ⟨@CONST, @CONST⟩, @CONST⟩⟩",
+        "template_sha256": "4f59a704042ea4685554bc36687983676d8f1e7b8455cfbaba0bfd3f77f554ce"
+      },
+      {
+        "candidate_count": 5,
+        "task_count": 4,
+        "template": "exact ⟨@CONST, ⟨⟨fun _ => @CONST, fun _ => @CONST⟩, @CONST⟩⟩",
+        "template_sha256": "74a563a86e10c3b6b2f25f23cb6117c35ed1bf72fab4737e057db5822d6f6eaf"
+      },
+      {
+        "candidate_count": 12,
+        "task_count": 3,
+        "template": "exact ⟨@CONST, ⟨@CONST, @CONST, @CONST⟩⟩",
+        "template_sha256": "e81d1d23bb3aa624e62cc84739197546116f097d5cbb01ffb4588b7798d4c226"
+      },
+      {
+        "candidate_count": 3,
+        "task_count": 2,
+        "template": "exact ⟨@CONST, ⟨fun _ => ⟨fun _ => @CONST, fun _ => @CONST⟩, fun _ => @CONST⟩",
+        "template_sha256": "905fa4498a27797ad0667f0817a07e13bf802f0f4a520a14354dfc3c83a4378f"
+      },
+      {
+        "candidate_count": 2,
+        "task_count": 2,
+        "template": "exact ⟨@CONST, ⟨fun _ => ⟨@CONST, @CONST⟩⟩⟩",
+        "template_sha256": "308385016d0948b00e8baeed577d5c94a9a720443daf72260273f29d15599564"
+      }
+    ],
+    "top_exact_output_recurrences": [
+      {
+        "candidate_count": 8,
+        "normalized_text_sha256": "2f816b783b53e705c15298bd7106767b0a45e68c35adedeab06e1297a563e10c",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 8,
+        "normalized_text_sha256": "62ceb50e7777672a5d35264975208779e33db0f61ddbc68b8740bc787d4d6f8e",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 8,
+        "normalized_text_sha256": "a72ad513edf5a4bf3fe7660fbe7fc4b693a30cc87b93666a3be0649870c2b843",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 8,
+        "normalized_text_sha256": "c5685b87ab02ff16631636664cfaecb89fdfadaa114e5e1b35fb265da0e5034f",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 8,
+        "normalized_text_sha256": "d7a6bf09cf83d149f6c569439bcb7d1871c48b34727c55f28415413d51f53caa",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "3c2125cb7c096ccf4bdc5834c90b3d628f0a612db3dbb9a10ebd8c346e2f2cae",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "44ceb4a7d9e65811e69a5b96101489f73f20209cd0db36ffd6549dc545c1de0e",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "5146aed8eeb689d3b3cd6e6633333d2f13ae95e187b8db62339220fa7d05e247",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "64781a7c7e2d37af8be39e650df69ba9c4d0dfcebb3156c41fc733a07dddd7a9",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "6c17253b8899e49f023080aae999971e88d89af2f8b4156a38c50808c5f151f0",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "89aaeedb930d310023b9125658f2fa005ee68c1310eff85103ced19bae0a352b",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 7,
+        "normalized_text_sha256": "ec6df3e63d73bb459f05527055a3d5a788b44fc541b3c0c7e0280c7e3decd5e0",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "001f70a67d6af6a640cc0b1ccb8d66380e53d600572da5b7e8a314d856db240a",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "2b159b3f100e18b15d6aa9d18a66ce45535d3843e8350ee5dc4e87c555d20f9e",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "2d5c6f66d40c9cfbc469d1d9e51e5f6464584147ccfdd384bf2952735de5bc0e",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "3596a95dd3614bc7b8142e6f572e1a04545671bc6443d1e5f50d25136da18085",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "3a25ef7db127456a82d46cd925a866cbd04804375ee82a679a59dddd8370f71c",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "3a709bf5d806f4ffe9d7615681c62471c3468d481ba1a03aa3850873cf3acbd5",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "5a76ce6d10a8598198ed34fbddfed49aca02b65a92be0807a34300a7373cd175",
+        "task_count": 1
+      },
+      {
+        "candidate_count": 6,
+        "normalized_text_sha256": "8930634603e10f67fabf8802e8eff319848cf4933e41922535ce563a6b1992c7",
+        "task_count": 1
+      }
+    ],
+    "unique_exact_output_count": 2739,
+    "unique_template_count": 60,
+    "verified_candidate_count": 0
+  },
+  "interpretation": {
+    "all_candidates_ended_by_eos": true,
+    "classification": "narrow learned proof-template / reduced-exploration failure pattern; adapter integrity is decided separately by the Q4 parity canary",
+    "short_exact_constructor_mode_dominates": true,
+    "token_limit_or_truncation_explains_failures": false
+  },
+  "method": {
+    "benchmark_regenerated": false,
+    "classification_precedence": [
+      "premature_eos_or_incomplete_proof",
+      "syntax_or_parser",
+      "structurally_wrong_proof_or_template",
+      "unknown_or_mismatched_lemma",
+      "unsolved_goals",
+      "type_or_elaboration",
+      "other_lean_rejection"
+    ],
+    "sample_count": 100,
+    "sample_policy": "lowest SHA-256 of gate-id, task-id, candidate-index over all stored failed candidates",
+    "source": "already-generated first complete Q4 final-test candidates"
+  },
+  "sample": {
+    "overlapping_signal_counts": {
+      "other_lean_rejection": 1,
+      "premature_eos_or_incomplete_proof": 3,
+      "structurally_wrong_proof_or_template": 68,
+      "type_or_elaboration": 36,
+      "unknown_or_mismatched_lemma": 65
+    },
+    "primary_category_counts": {
+      "other_lean_rejection": 1,
+      "premature_eos_or_incomplete_proof": 3,
+      "structurally_wrong_proof_or_template": 65,
+      "type_or_elaboration": 8,
+      "unknown_or_mismatched_lemma": 23
+    },
+    "rows": [
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "0019e76c82ee2cc9f947e3144db18b0366619a5de1ea7ad7883177dcf1375b80",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 27,
+        "normalized_text_sha256": "5b3c6b0f08f260dc3a239e1500cc369e2424bee6cab9b292404040a79c2dafec",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "40cfc097a4f29b4675dfc7c75463c7afe73c841d33477bb423d4be3f337b98c1",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "4ff1ed5324567cf3add1f6b3cbd7e2ea999ecb743d21ee5dd963bbc6cd303754",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 16,
+        "normalized_text_sha256": "cd555b57fda813d24bec487e672517f565f5a048dd97c4a729570c242a34039c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Complex.smul_def`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "a58211a22dba8d4454894a394f68056bdff5c0bb2ef70ed231ad15dc8ec3c6a1",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "21e1c4bdf52d895f64e25c01611aaf94473ca25e59f46e1f901e52ea05fe4a5a",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 87,
+        "normalized_text_sha256": "ad3707e062be01986046d9153c543a685966f3b7ea9e95db78ae5a7d5513d040",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "685030bed14f0b96775f2bcc273a668dde7a0887e1b0f948b68625ab8cc194b9",
+        "template_recurrence": {
+          "candidate_count": 59,
+          "task_count": 26
+        },
+        "template_sha256": "2a2b7ae8a76c1335ead542878f73567e82b9e193ac22b4b068ea4dc8af2b98d3"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "4f322944ff669b4c1c00bbfc3ea7972d70f7c35eb0f6273d38d1362ae2f2022f",
+        "exact_output_recurrence": {
+          "candidate_count": 5,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 24,
+        "normalized_text_sha256": "89b0384628f3b4ad6cc62b96764501ef37075a57dcf417560e7ef02773416b52",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "8fbc7ed7cb0354bfc6a48d9333a6382b67e9594c97f77b605433e67c4ac554ab",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "5b4772614f6d767f3fda0807ac837de65464b2afc54bea4eb14af345477b6254",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 47,
+        "normalized_text_sha256": "d50175b3b82191ee2cb0742c84f04df7f8f5155f4d127e8b1d044e63c917bbea",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Measurable.prod_map`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "089115987199ad374f7be584967ac417415b6731059efe94f371fc1f7bc0c3f0",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "84055fdea51abfb0cbfdfa51826be68b0635346dcc146ef649d004b2b6ff7fc4",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 35,
+        "normalized_text_sha256": "7262fad6646d52592eb4a4136dbad08d3853223405985c96fdcf5aec912433bf",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "9e89a84ee15c0f812f36d1c4afdcca8689e1b70fc3bc4e01a963e80e0e25793a",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "da4a3d8def10a9ab78e3a6abd570b17f88e8f0f3b9b5853aca43c7a9123157ae",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 46,
+        "normalized_text_sha256": "a9b2f65b8bb8b0bcf072561fa9c675bd6eeaf3b22db874369eaef18476286bf1",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Real.strictConcaveOn_Icc_sin`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "a78543d4bbc2643daf8e14ac50ff69f4f033ba57ed9096bf06306313e9d7ae65",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "3437b75c9176a9a418198175e23fb7641a4c43fac9f72386276decd37b5158fa",
+        "exact_output_recurrence": {
+          "candidate_count": 6,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 30,
+        "normalized_text_sha256": "3a709bf5d806f4ffe9d7615681c62471c3468d481ba1a03aa3850873cf3acbd5",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "9fde12ae4253722ac59a8cd4251712a28d04fd0d7e6890f0705c6b3c24f24162",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "591164566a38e156135477801a80a0917f00af08b0b423815dd4882470096947",
+        "exact_output_recurrence": {
+          "candidate_count": 7,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 30,
+        "normalized_text_sha256": "3c2125cb7c096ccf4bdc5834c90b3d628f0a612db3dbb9a10ebd8c346e2f2cae",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "2405ffd678d7787373aac512c00d7f4c4bbcf74b1ba7ddd68f4c6edb784af79f",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "ae82d31b5a3edee2e64a2dcbf6c05bb3db2275e927dcca173211af699cedf1a2",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 56,
+        "normalized_text_sha256": "6219fa3194e891366ed39524ec30e0ce9065ae8d86d177ed5d0f2d4615c68569",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Nat.forall_prime_le_iff_minFac`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "998c3afc1f372237b41e91f1f3b2b193a7ed7e13db5e301cfca3ab5dca4bddd3",
+        "template_recurrence": {
+          "candidate_count": 59,
+          "task_count": 26
+        },
+        "template_sha256": "2a2b7ae8a76c1335ead542878f73567e82b9e193ac22b4b068ea4dc8af2b98d3"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "9dd4048ea0a1a736c2305c07697e8ea9b313199ab33927c89cd949c56e351d81",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 49,
+        "normalized_text_sha256": "0994ca5b26df4f2968470de0366363d2179f06cad79e0e7310679c1043f9471d",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `RelSeries.length_pos_iff_nontrivial`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "13cadcac0f6847d96ad8fae3c458dac48df2b211648ce90040a4ab2d06fd5b9f",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "923e7acf3a976ac2295b11be395ea458d8f64f337bd4e6cb3beef2b3d17da205",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 37,
+        "normalized_text_sha256": "71a36c52c800a6a9150629f19304cfe348ca868ff9610ee7842e7688ea9b71c7",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Set.InjOn.card_preimage_eq_of_le_range`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "cd60a333f4d31cdda75ea029ef063f650174329cc47c81631a97c135ab66e5c4",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "f29da653669d935af1cecc4050c0aa1dfd318b4042870921e6d76e81179f70d7",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 35,
+        "normalized_text_sha256": "3687fb7f578bf3ac94908ce9ab323a568327b57b4ca0085d669c5fcb791654ad",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `IsCoprime.abs`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "754b45e11e8f17f520503f6c2cd6e52df2903fd2eae610943e470e6bcfa67b80",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "ad33c36aa4eacbdef938835782bf5babbbf93c1aa290eb5017d87b0a31ff3dab",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 33,
+        "normalized_text_sha256": "c7d66641edce2bdc53b4e2e2c87e583ae624754cd0562523178cb6e15c870bfc",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `prespectralSpace_of_isClosedEmbedding`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "e173cc10d5f5cb8bbb535886f7f90314fbb3cd7e7841bd3445d86e745b193fd0",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "53011459f26881556a8856bbacfa32d53fca6d20eb424c47ab99e5c03508b5b2",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 54,
+        "normalized_text_sha256": "337574ca152deddc07b5ffb3c8bde687ca9478ef3f91f7f49f9cf4fbceb5cd14",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `RootPairing.EmbeddedG2.nodup_allRoots`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "d352f1a8c062d331b111d33583e6d777d2f5425b91017daa3f04b47c5ae4e822",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "d741aed2f40ff7a023bcd9b154b6c1ca5a11656b818285cbedec0bbbd3aa99bb",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 30,
+        "normalized_text_sha256": "bfde232fb6a61a5c04f3493bba97ba7ca4db0dded2dcddacf03256ccde6d4f9e",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "633f205d712eb77a17e6eb2c241a6c4a4d26f635bf6aa83741f1808f40a1e653",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "b2ae6c775db767e0e2ba1260b28cf30bcdacede112904eeb65f8aef0abfec965",
+        "exact_output_recurrence": {
+          "candidate_count": 5,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 18,
+        "normalized_text_sha256": "3ae1ad32cdca78556be601332920533c89dc459829002e25e7e829925b7e0fc0",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `ENat.pow_add`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "abb15337bc2120bb4173876d31f10f4054c011c77049f253eadfbac4e5ce69b3",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "8d5341facd65dbc3bf3a9b1dc8c8be1341045c5dd093058fb7338fee117d06da",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 42,
+        "normalized_text_sha256": "622b1711172792124cfbfe0dd6b66212fcc0f2a8a3496214b111a5b00327d70f",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Submodule.linearDisjoint_of_injective_finsuppLinearCombination`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "8c4cfad842d014d7630ad13d12b9be7297daa5abde3030490eed75c029221fe0",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "8b60a35855afc23ad8d017e6020780862049ffa5850bc65bd9601a223dc1c2c6",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "other_lean_rejection"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 30,
+        "normalized_text_sha256": "904d62d2fbbc53cf586ebb4d95818b7f6b0e86e10f1aa45b74f34061acca2cf2",
+        "primary_diagnostic": "error: too many explicit universe levels for `Equiv.cast_symm`",
+        "primary_failure_category": "other_lean_rejection",
+        "proof_head": "exact-constructor",
+        "task_id": "a7b8485aff00a7f860e2184b94b296fc451c6486760f63f0a74d3511ab176d73",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "08f0259658215c917720e21b15b3cd529f729729cfb468bc3eba735775c7b84f",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 59,
+        "normalized_text_sha256": "547b8594415db7009630945c08c4aca1ec79b8b911343962943ea11a073329ae",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "3510458452b60b5fe0ca634260efd22fac4ca5de15b2956680e41dec98b1c0d4",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "8a4cba434fd2c2cacf56a94540cdea05e7dd5c39a308f9d09f2c07ad71747e4c",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 61,
+        "normalized_text_sha256": "fbee02b7322be18d2d663f3467758db2f0c8a85c3f35d0e3060dda3c5d66f1f7",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `CompactlySupportedContinuousMap.exists_apply_eq_one_of_mapsTo_compacts_of_isCompact`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "630a483af0765d9a41f20bb0826c746a031fb887c6c514e0b8fe8e141025a2f7",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "a33d440147c3187a5e506547e61f710aaee30e26e4eda52b6ecf7e26dd257d66",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 103,
+        "normalized_text_sha256": "9ce82a265e74f9061579583886b17de11e98e208aa1d4c26555d54bf378b47c5",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "687e30cd4cd18ff224bf54f3b644fedcb9c5daf1767097176fee3113f9e2fed3",
+        "template_recurrence": {
+          "candidate_count": 7,
+          "task_count": 5
+        },
+        "template_sha256": "0591d5cdc074b75ae131a164959533c548c446edf4f3c43f5e9a179a22d8acb2"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "b8ebf7e783ad76edefbd10cb6a4780ba2fa6565f1548e8005b2f79063870af95",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 22,
+        "normalized_text_sha256": "d577cc0f51b67a7494247a7a02e99840e81e73fb3fb8f3baea45ef0c40ac6482",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Matroid.contract_ground_le`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "211317be83205c8c803df66735446d4a88a41980233a0e305b214ba4dc78e242",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "204fed5a036a602246e05e1213d073fe7850db004af9baab45c7f265c4ee8744",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 24,
+        "normalized_text_sha256": "8a0b42d573261beb603302f7ef01b49e245419d53dd3d369c35104ee2fddf3e1",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "7d93191e7c8072e81421fae05b516e27fe6edfb4481c73ca619c844f19a90c78",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "72da6c372b77dcd15386dd78ff24a8b29d6cbe99140a62164aed8a214911d713",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 31,
+        "normalized_text_sha256": "809e5e5f592cc5a6d0ff86fc7de7e5ebc922060aa09a033da29860fe11dd363c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Seminorm.exists_le_norm`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "b3c5346312f6efcd1b587080bceb87106b2e10d739321e8f7f812b764d7c9ad5",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "638640ff9da4ca4dc63d44e4bacfffb2f62d6c8fc7cf68ef241ebbaa06874aba",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 58,
+        "normalized_text_sha256": "24fc522c2d7e1abf353f3b0aabae594dc5d51d5812875204dbf780933e393de0",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Submodule.starProjection_toLinearMap_eq_projection`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "e720dba9d3dd52977c1ce2389d8815c99787985d978d1b34e5d3cfa6bd7d3603",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "fe30f5d7bc890eee34c000121b09ee2203a5d28bb5cec9eb32fabb3345bbf2cc",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 29,
+        "normalized_text_sha256": "59e3acf6030fcec8572eb8cb0a1decbe21bb7e76e1858fb25505577e67a6205c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Fin.lt_last_iff`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "2c96c9d9490ae4cb4872e0b2d9b346fece0d14895b309ee99e49c15d307c73d4",
+        "template_recurrence": {
+          "candidate_count": 2,
+          "task_count": 2
+        },
+        "template_sha256": "308385016d0948b00e8baeed577d5c94a9a720443daf72260273f29d15599564"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "96b21fe86d430e6dd36cb2ab4576d8e3f2e34d623412c155653a4882e0f50534",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 26,
+        "normalized_text_sha256": "0b93d6dcf8a580a19170ceca2a822d282e3a459cc3f7554ec26aafbb51ab082e",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `UniqueFactorizationMonoid.normalizedFactors_prod_of_normalizedFactors_subset`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "022eaa899daba3713109e10b5b6e092c0a8d399e3ae2eb2cfa80cbae3e72143f",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "6f3844c44dc611b0f5ad4366bcf862c86fdddf64751d5832d5a883c43ea7b229",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 50,
+        "normalized_text_sha256": "9d59ac24b6b89f038d9e2968e25aedd26a6de218ef3304858c12c46b6dd7f3a8",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `CategoryTheory.Under.ext_right`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "958f60b963b05b529d020f83952a0b0b7102921403f4f0ce5c33d63effd51d0c",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "b9ba95940f3f1061cc99109b92f72489100298884427f004f28b18ff01ea09f7",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 24,
+        "normalized_text_sha256": "0ce047d5cf9ab484bdd854c93c6f6c94472f43cee755e58e634c9b4f52739382",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Rat.padicValuation_intCast`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "6a85f55721cdf5d5b07a5c5bf621b0f8c9e256b6437ae06e25dcc544292fb706",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "4120ca29845fe483f6d21607d7368b7eb604c745cdf43caa519ac622da49f389",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 43,
+        "normalized_text_sha256": "7529708bc81150ffe77f12c4e711e96e30f40b3348a5fc102fe13c96e637e76e",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "9797659e4b07b2549f0b26be66f06b619293f4e3c19378609122cc88c3a575f5",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "ab9553854a2a912d6593591eebe37dfe02cc361433626d7f027e47a3e6eb14c3",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 42,
+        "normalized_text_sha256": "c1f92d37cdf3e747153ff2b70260d19d3522c5dc4394568d809b0e8172fc92a3",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `MvPolynomial.degrees_monomial_le_toMultiset`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "1a7bc8b70a215bfc1726f4caeb0f4fc0cd4353f1a3bf016f119b6b533d2eb29b",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "4fc87257a0c555041af91943f99b8cff3738f336426b3a6d924bb62c2c05f358",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 66,
+        "normalized_text_sha256": "2a2fa85d34b2055fbae341d6c1abffd272b7068d97194b504c9693917628a349",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Submodule.smul_mem_of_mem`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "17e101457b597bd11c48fcf89602b60817d3715b577097198d014cd6f8cd8674",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "ab6ea2f9f3442832a9bfa9b1c23e4c998412f08eabb0c3f7032e3480d879fcc9",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 40,
+        "normalized_text_sha256": "e84c1c22f98ab54fc04579c317117f2803dd693e5b203f1b9fabd99f911ff106",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "e6a49043ef86c9db6f02b755bac876fd34dcaa97253ca8efbe519284aa40ee09",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "d041e0a74af0cd6eaf4d40b5d0a82f477e3e76e155ee8c22a36df94b6770ede9",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 35,
+        "normalized_text_sha256": "a73223ea3ec873670888c665c5e9782739cf992849eb2757b28384eb74886864",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `isCoprime_abs_abs`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "754b45e11e8f17f520503f6c2cd6e52df2903fd2eae610943e470e6bcfa67b80",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "d383ea97d861fa49fd9bcc597130a056d4be13946cc4588ac623fb31a27e3e0c",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 45,
+        "normalized_text_sha256": "de5798cd100384742862be9b8c587060c16fa14518766cfa39310e9f3382cbf9",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Subgroup.map_subtype_injective`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "bc0dfc5308df2e24bde9a823e67866e79e4f258cf8f9c033b34922d6ac7543d9",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "66773dee0e9f79b72863b4af50389ff1c1a0ed4d5503e10a9f39331d33c43257",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 40,
+        "normalized_text_sha256": "5199aa8f13e5de8b889c5481ec6dfe3b01457eee168e3747db5a0a61b86d5141",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "b6c58bee6ad7f5ed782460aeab2d95c32556a5896c167b879c2ef407de5c623c",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "0d995218b04108d3b5d4974f62956591613528a3ded05207285e597c95470e34",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 54,
+        "normalized_text_sha256": "c42b6472e4efbbed3eb5e0ac8e23f02ab4b01efe1bd4c7d11328ba4d360878d1",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "8d1f02c2b95c2de14deb5895989f8577d74868045d363c4f0344170301ce3bb1",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "51bfed391007de3366d249a4cce6b32992d4d679f9a136952193aebcafa72829",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 57,
+        "normalized_text_sha256": "ffba21dd753fc92e86dd7b6c265c481015f74811c63386a231793905b5fcd36c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `Chebyshev.sum_Ioc_isPrimePow_eq_sum_Icc_sum_Ioc_filter_prime`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "2ecbf2d6977b73902c87bfbdf4747ae07a54a0e45a474f61c45c6ff337435aa5",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "f00b63e4dfb5341e4b5f3dd3d9fcd9aa5db8e374495f701e96ae5cc376b1ddcd",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 37,
+        "normalized_text_sha256": "ea225f05b00ffb54604c56583da4630549da3af4ee4f3b0947cd712573a1add6",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "6d74279be1f84725305a126ad8370d49f3ccd714292ee0902e3c653ef78c5d7d",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "0fc1c4f7bba9bc8f052da9040b20b75b1e494b09012becb721f4d1c680cfb327",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 35,
+        "normalized_text_sha256": "8127170afaf04120ea1896d3625bd69df2c3a8eeb10f04756d3e6eeaeb013af0",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "45bf4d043ac81bae01701d75f70a4ea53e5747efa70f5941cf4a89098e77d87b",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "3437b75c9176a9a418198175e23fb7641a4c43fac9f72386276decd37b5158fa",
+        "exact_output_recurrence": {
+          "candidate_count": 6,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 30,
+        "normalized_text_sha256": "3a709bf5d806f4ffe9d7615681c62471c3468d481ba1a03aa3850873cf3acbd5",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "9fde12ae4253722ac59a8cd4251712a28d04fd0d7e6890f0705c6b3c24f24162",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "710397135e4bf003e5ad3d2066fadc127a06c06701287081b6e5659f0a9ff591",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 88,
+        "normalized_text_sha256": "0d27c0c07ae42d9c371193be49f9da6e13ea7ff3256c885fc08a34dff981375c",
+        "primary_diagnostic": "error: too many explicit universe levels for `Function.update_zero`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "6c8b3715eceef3057f1a652e3993983aa45bb88b61b2e8fcf7077a929ea7cace",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "1928d17f9a9f766d1804b0cb87bf09afe62c5578daa2312cee9eca909113ebea",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 51,
+        "normalized_text_sha256": "78a34113dbe8f16ebd175ba95caedd291e1d850b8cc637d64d32e17e2da788f6",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "982814eac71f995d1dd2266fffdbb20211c01314d5ef52cf9a2f4f92e80f320f",
+        "template_recurrence": {
+          "candidate_count": 59,
+          "task_count": 26
+        },
+        "template_sha256": "2a2b7ae8a76c1335ead542878f73567e82b9e193ac22b4b068ea4dc8af2b98d3"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "eea91d293a0c8a1f5079ebcbfdcc6f433b2e896406bc4eb943893bd76dbea3ff",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 51,
+        "normalized_text_sha256": "7f2befdac29513235be38ba49453abef9182ead5de8e9217133c226957483491",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Finset.sup_sdiff`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "93cc104d92f273ee505d71ee1dd71bc32a3cadb3e3fbde20eaf42653fb0fb34f",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "8cd6b5f6773141b4a41757d155292141314e44046c205146c654bf0cbfd07ffa",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 34,
+        "normalized_text_sha256": "efb70b15c69c699271b8f347bb03d668a28d444e8d80c7087b1205406970d826",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "b7c74debd29bce8bed9280c172f1bdccbe46cabe2fcf1d78e932bc93f86fc1f4",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "16e1cb919127a74230fa75a881b7479abfca3ace7cd1febc9d7ef50aef0d1421",
+        "exact_output_recurrence": {
+          "candidate_count": 5,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 22,
+        "normalized_text_sha256": "3b97d86ecf288babb71017808d6588040e6087f3d1ed2536a20ebbb0fbbfef1f",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "1d00096a6fee295b646e0aefc2daa6f7db05d54cd06377c1661d337cbd1c17c6",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "cf859e2a5419330705869de11b7bb07cf3c7a41ca1956c1d3eaf5844138eb236",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 44,
+        "normalized_text_sha256": "8b514d7815eee57d91424f15574540b6d4fdd9745aaefa1842b5df6c3ebf2ecf",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `exists_pow_assoc_of_isCoprime_of_isUnit`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "c8ffd49830ee1f8e19b2c3306ebcb4894c8786cb7102262665098d8aacbf97dc",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "c793ebb2933c8786d4893d1bcf7c7882ce86eeb4dc5c8dd4473f5a26d36d4ab2",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 58,
+        "normalized_text_sha256": "9a1f3868c49312fe386156da5f892ce9c7c7c80773f92480b6cebf5a6e589abc",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "f663f6cc41a063ee0c1dd62585c11557eae6c4eaaad6e7ced72b56117cd1704a",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "203483a6785a8bdfae084646f9bdf753126633fda5235ce7ace2fc71a69657b4",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 39,
+        "normalized_text_sha256": "885e85818ac9398fdf547f4d94d59503e3efcec40447f7ee7162b5f3abf9836c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `MeasureTheory.Measure.QuasiMeasurePreserving.map_eq_zero_of_map_eq_zero`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "7d217b4b7c9eba24b2ff48ceeeb5ceee77d10dad8a65cb764ce18c9d977483f6",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "cf2362ddac2a9fc252f904198e6c8b8f9e9bad6cde792471d50b87684a144723",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 39,
+        "normalized_text_sha256": "d6f461213986a317a45cd1c2711d268430d7329c6f7efabef7bb2732ea9bda22",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `IsCoprime.exists_pow_associated_left`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "c8ffd49830ee1f8e19b2c3306ebcb4894c8786cb7102262665098d8aacbf97dc",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "6a6d9de7d871a2d2f7db448162be4dd04e9438d58c5a422178afc54ed45705a5",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 78,
+        "normalized_text_sha256": "83bd9fdcd83bcf3dc57762c195544bacfae386a16550cbb50327b391c29616c5",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `CategoryTheory.Limits.CofanTypes.equivOfIsColimit_symm_inj`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "d46d86ca13afb099814d4fa70ce2230543053a067b80043041f5f76d0563fb34",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "71ff380d5dca2eb9076308e25e4ccb51a9b2c9ab4634da9297dfcbdbde829fb9",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 62,
+        "normalized_text_sha256": "f21d63b0a01056098e4829d354b5246a4ca71e15ad6412cf45863a7ff0e1c175",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `differentiableOn_circleIntegral_inv_sq_circle_eq_deriv`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "f59249f584f5068505d8b841dca57aa0dd0b20cf3f7d9e61e8c572b6b89f3adf",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "fafa6489d2009afa1613a73831a02ff9429b2908c571896ddc92cbe0d6fbd879",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 37,
+        "normalized_text_sha256": "6eb55cd4b8bd588c084acc82a48bfa5610033d4fed353e8d22bdecf27764ef5a",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "9a070ea732a2bdb98e64c85f7ba9d1bff3819b611879d60ed794417d4261196e",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "e4b11e96d4debe94881d95d72e208f975284397e51d532f1d9d57cb293189310",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 56,
+        "normalized_text_sha256": "a29510de5c5dfd4353cf39f4f8231cb0fd89487c3c0dd908b07747a3e2dcef42",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `Chebyshev.primeCounting_le_of_lt_one`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "a91b7c380c025ba7318560c1707c5c641ad7346ed57e04da647312afb2d63e25",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "4001e2d974a160b9c37e122c7c033ab753dfbddafe893186ef92aa085eee8c6f",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 40,
+        "normalized_text_sha256": "0b6c97fce7d04c01c783763ce47a9855fb3ae4a1ab2199511a4f07c52277fc6d",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `ENNReal.HolderTriple.coe_toNNReal`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "60d09a2f6d94374975be3cbf3e53d60c26698bdea2fd56d4ad62e5ddbf6ff619",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "4fe234af008db2c93289c66a5204a577b453974612a97d598155a3ec70b6212a",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 44,
+        "normalized_text_sha256": "37fecf8eb8ff235eb45bb72464bf8fa7a44505b8d89825924460b2646431c389",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Finset.existsUnique_mem_notMem_image`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "6a57fea7643cceb4d915612d3d17459711ae2d4d72c0c9f6efff7ddabebd6d87",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "82169a3c5362968de4cb82c4216aea20f3a8fc55d7c7079b424baaf0d0ce652a",
+        "exact_output_recurrence": {
+          "candidate_count": 4,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 32,
+        "normalized_text_sha256": "65a0ae446140ccf1cf70d90b96b2ace0aa035b4c73fa4d2fb503f93811e73e44",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "73ac8386dbd4fd05f8de79b5574e25ed1b477c11680b6abea53b25abca159666",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "2ccd601e0d36d54bb71075651e59665d777fc1e6a46bd34dd2785cdf254b7c0a",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 23,
+        "normalized_text_sha256": "ee1427e204fe332d19dca38d9ebcd94c8b0174a257407dee1b5a3f08c4a8292b",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `not_strictMono_nat`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "35b455a450185a9e1ba0152a3a181ff5fb5caf886e57446cd1e1677266c3e00b",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "76de4adc00d3568f2c8a07934be6e5b842251c906eb8c6733e86287554ffb407",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 62,
+        "normalized_text_sha256": "3a7c0814bfd255fa569b95b534d65bc0cbe2fd75e67a01d3b9917f479ea373f6",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `TopologicalSpace.countable_clopens_iff`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "c390657097e02971661ade2ac8f289677303bbf29ee51a19d56571b26aefc211",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "cd70515ac336e4e6cc66bc2fa94d19a05845b422ce86cd9147c9567cc2e25f67",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 29,
+        "normalized_text_sha256": "e5ffda9b277af57a27712b3b2a0a52d32bc2078c98adc72b77c31331ee44bbf0",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Polynomial.Chebyshev.degree_U`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "2566261ca961f8bf3cc5b2606b12a0ff4ae7f78026bb8d501a01ec40fa71941b",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "927108094d0b6e3a0f65cb1d40dad83b8474ac4e5f1df2704110f661b44afb3b",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 60,
+        "normalized_text_sha256": "c90106cfd1f46462321039fe00f7a7267289a689b072cd87e775cf79b9ba139d",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "1cb2d9e39dc0574c920ba5da21a2dc7983f514836f0cb9e5d73cfe70c107e370",
+        "template_recurrence": {
+          "candidate_count": 18,
+          "task_count": 8
+        },
+        "template_sha256": "e129731ef79f80d9e4a66a8e7138738cf6ce04defad2e8563f87a1196fc72dcc"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "556d27d0ba81d6e2b8d018d989e7745f4ab23823859d5f8cb41b7f96251e0b66",
+        "exact_output_recurrence": {
+          "candidate_count": 6,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 55,
+        "normalized_text_sha256": "5a76ce6d10a8598198ed34fbddfed49aca02b65a92be0807a34300a7373cd175",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "865842159133343e9d2cd7abae7e6e4880770ade6fdf21af3b4686b68159d041",
+        "template_recurrence": {
+          "candidate_count": 64,
+          "task_count": 21
+        },
+        "template_sha256": "65825199b16aa9f7c2c099d3bca771b573314df608c89ea6e2b6244fa2bcde54"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "d5a4124110cc9f3b916a5572fb91f75cfde7bf45b596344e2b287c927f644d5b",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 53,
+        "normalized_text_sha256": "805f2336f08fe49bf7060b0af263c51436600e0c66f7569ac9523cd55ec70b11",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `MeasureTheory.lintegral_finset_restrict`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "17e76ad418da7792a169473d090dac1446487674f74e35622ba2668a48940c5c",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "abc5097dcbd41fc9e42a6a6f23323cbc576ca5e826adbf7dadd0855cda9b4846",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 39,
+        "normalized_text_sha256": "fb48c4ca6f6507e7d9c2aa24f89c7763df5385b45687e0e1dcba84d2bc3a06ee",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `WithZero.coe_le_sup`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "07851f4eace753bb0f0c4471ead297ce79f036c66339c50edc5fb69e24b3637d",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "a75237d87c400fac8df1bdcef3e408ad2493a02b31e6d81a2651354394249f25",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 37,
+        "normalized_text_sha256": "10c243669865661039c9dfc871553cebd6ba19a8e83f5d9f39682ebee1d6872e",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Nat.prime_factors_of_dvd`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "ba4457b5d089a3fb58076831c3896a102c8194617d39dadddb63f6e1849f3298",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "0c5444cc828b5725d891a0210eecff76d6622250bf52f628c5e4fdf8f1ba12aa",
+        "exact_output_recurrence": {
+          "candidate_count": 6,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 25,
+        "normalized_text_sha256": "ac20feb30bc6e1d90f3a3488ff6d158ecf0f4dbb2572757895dcde02f732b422",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "8849187da3e221807c1ee3378a6369d4905914c9b2741655128ca8d575fc34d8",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "203c58aec2eb3253799fe2858955c80e1b3f930de10f3849fdd8c2de29d48fca",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 23,
+        "normalized_text_sha256": "d951f094b8c70e705dd2928117a565ac8f42c798b8aad3c8ad45c5c50a46fc5c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Fin.prod_Ioi_succ_zero`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "5399dd0b72ccf75f5432b176c048e8fb470c4bbad20e70aa4e8af8c480878c73",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "0a80a3fbd6a0adce28a55120c12e3ea8a4d3aa954849a37f6ee8a5a6c91736ef",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 44,
+        "normalized_text_sha256": "dd37e77a89aa0816707e0a63a7e807f7d074f827f3861dc57852acccf95b6001",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Localization.oreSetAdd_mk`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "c70b4a6ce53d9caeb6ceabd170df6da79ac81a99154dfcf935e84fad01a9d7d3",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "630115892b6ac55c63ea4ceb89b32c9782e798ec247901bca4cf816ce8579003",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 31,
+        "normalized_text_sha256": "40c14dbc6ff249a89b4c20ab92f8b91c9c86bb49cbe073c725d5590e8c83ed12",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "93e49c76581b4bdf92e332d87ceef9d29436e255773531375c0516b4da291178",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "90fc274fbb2822cc3f5a276d5a785b5a54d99cb0f6aba3c0d1aece5363a7b33e",
+        "exact_output_recurrence": {
+          "candidate_count": 3,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 43,
+        "normalized_text_sha256": "6944bf000f0560a7e98d35d1beb0e829b3e6a79629557482ad4c1ba7c7d9f454",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "b104e8083d11ece49a850493388ec0ea7c06263290e24a0b25d5fee336d435b7",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "1796b98a7d29fa5887153907f5eab6398554c29b1abb693b67d3e89e66384854",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 21,
+        "normalized_text_sha256": "d5a33c531338e4816d408e25f432e6c67fb33029e9607f010e202b6171870a1d",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "fa7097e1040794436a329373f9d47979242781fa5177c00e3745adaf7d89d3fc",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "19cc0f5ce90cd898d710e8d8276c008c3a3f6990d30e5850400ec95dabcb1f04",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 46,
+        "normalized_text_sha256": "8d36a528570e4bdc9516b548f2c4da883226cced5379fcf4568af4da22cae463",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `RingQuot.mk_zero`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "a29329d6e30a1b5f787aadcd0428d07c39ff7b69a12aaef324100f0156d165d0",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "c2564cb9cd88d73a86e6901d2ac2e039fcf74de13459c1b9baa732e9033348b4",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 68,
+        "normalized_text_sha256": "2a20166158eb605f343c4cd8228a82459d265c4e2d6ad10443b908bc5dc5ea53",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `SimpleGraph.Walk.exists_exists_exists_concat`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "3eabfc27066ed01852f068f5d0117d30e43b1fb5d12aff6c48f0859a163687d7",
+        "template_recurrence": {
+          "candidate_count": 25,
+          "task_count": 9
+        },
+        "template_sha256": "4152cd66b4f05389b8da068bb4004752b5948d32b145abe45cd2b4486f1eb864"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "174ea32fd8267582672b3b7948ee206a7a36f6f472c6daec7a2eed24ca7a186b",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "premature_eos_or_incomplete_proof",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 72,
+        "normalized_text_sha256": "93f60f3a6c42ef11ea98201b149efd979b07393c54639e62aecd9c2377c5254e",
+        "primary_diagnostic": "error: unexpected end of input; expected '⟩'",
+        "primary_failure_category": "premature_eos_or_incomplete_proof",
+        "proof_head": "exact-constructor",
+        "task_id": "fdb932953afbcb6af46f36ace7e935ebb2a03e89c189654dd2cac07f434b3d6f",
+        "template_recurrence": {
+          "candidate_count": 34,
+          "task_count": 13
+        },
+        "template_sha256": "abba0c38305a3e46f79ad7ff136c89f41c5964f86456708c750e7cdf54ad171a"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "97e8a924a9efca33540432a01f9df6638a57aa41a9612614cd1e7c2c48832c46",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "premature_eos_or_incomplete_proof",
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 85,
+        "normalized_text_sha256": "7d1b6e7af906e8819616f51b91a7e5d4de132bea02732d53483dfb166923cf94",
+        "primary_diagnostic": "error: unexpected end of input; expected '⟩'",
+        "primary_failure_category": "premature_eos_or_incomplete_proof",
+        "proof_head": "exact-constructor",
+        "task_id": "d15b5b8b14299935be76d9b7d41fec503f56adde59ee30819078fe6ec2a1f8a8",
+        "template_recurrence": {
+          "candidate_count": 34,
+          "task_count": 13
+        },
+        "template_sha256": "abba0c38305a3e46f79ad7ff136c89f41c5964f86456708c750e7cdf54ad171a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "83fa004739f198a52d6b07ac9f64828e9cd97f4c75dc235353272a8ee025f7ff",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 17,
+        "normalized_text_sha256": "014722541f7c641a11368df8b14d4d068833fc718f6e4bad8f0a7f2b955212d8",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "dd478a0922450bedc686ee83d366e8b83f6d688686c9c60e5a740f5715b611f7",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "b518a81f1e3b72a82bdd7053cd601ae1b30f0ce88cb13c4fd3101a9b2343eae0",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 60,
+        "normalized_text_sha256": "edb1b0d82ff7cb328133eeb8bd8bd64cf4b13657de15ff64fbdcc88b2c4dd4bb",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "6dac20ab1fdb0569b1137b7769808ed1deb5b09fb6fdb67f9dc206c1d13774ac",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "355ba4d79ddc970fe5a26946b09a53bc2efee7da58ccd4a522e0b20672289c66",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 105,
+        "normalized_text_sha256": "c1c3125f22b05c18eafc538883c812edc427d8c983a95c9a5c87ff48506379ae",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `CategoryTheory.Limits.ReflectsLimitsOfSize.refl`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "fdc5cfe9579d268008984d7e98e3973544121b514e099b13efe691faed9c05d6",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "afa907364cbfa5f64947016f73a99eeb379869818449bd82781e07362f9b88ef",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 44,
+        "normalized_text_sha256": "69fdbde8e196f8f00518d7cacf66ed26eca8b7818c056dc39125244f065b097d",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "447bac1d388cea4cd437f9ee02bfe89c27ee5df1a67cc2ed9c76213dd6afe5fe",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "4efc9659c9d9a012695216026a110c023c5842652c41817b1704569ef1a0fce8",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 61,
+        "normalized_text_sha256": "87a6bd948175e913f4a4b2f774a8bb3baab1bce80425b548bf48c44e86dce27d",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `UniformEquicontinuous.unique_iff_default`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "991e6b67c90b4b5598f0b1df12bf99a3995b21fd53e983c45929918ab7f1df1d",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "9f3394b428011ff597813349fad6d1f6c520942289c86bf4a79b0a304db49326",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 18,
+        "normalized_text_sha256": "7d5b3842925528cd8984e4e46f4007da42b848c6c1fe8eccd0b61ad6cc9a6cf4",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `isUnit_zero`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "93abeaecdd0cc5bd797965cd756f01149da5567e9546dabd83681b8a685240fc",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "3b8f6c20a0531ae80f9865bc11593ce3c7b97726e20040b2c41bd78db4810770",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 29,
+        "normalized_text_sha256": "742f4aac5c6c222317f0c9b3b56fc9df353a76e47637cd90b5cfc6c38c085567",
+        "primary_diagnostic": "error: too many explicit universe levels for `Equiv.cast_symm`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "a7b8485aff00a7f860e2184b94b296fc451c6486760f63f0a74d3511ab176d73",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "f5859e9e7db9cd596b1f42cfd0dc888d66aaa17bb68b3c6f1038b8d887892601",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "premature_eos_or_incomplete_proof",
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 78,
+        "normalized_text_sha256": "b6e8d2c93930e83f6a2aa8611b555d50b7340655c3415daaa52a40434f45c167",
+        "primary_diagnostic": "error: unexpected end of input; expected '⟩'",
+        "primary_failure_category": "premature_eos_or_incomplete_proof",
+        "proof_head": "exact-constructor",
+        "task_id": "3fa5495c7bbc04e9512c55daa66a83b58bc1684fa0596278aa1f15614775a144",
+        "template_recurrence": {
+          "candidate_count": 34,
+          "task_count": 13
+        },
+        "template_sha256": "abba0c38305a3e46f79ad7ff136c89f41c5964f86456708c750e7cdf54ad171a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "2b92b4f1dcb31cffdc5da788b67622fce2221dd6d99aeac4dbd7e773fdb8dc1c",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 60,
+        "normalized_text_sha256": "dedc54ea44a1a3c5478757243a00eacfd98260623d4ee7ec7f424994b5d61c0e",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `ContinuousMap.norm_add_eq_max_of_mul_eq_zero`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "1234a5ef79926d4ec8fbfc5caef3caf3c9438b8888b26a45ed79115edcd1d36f",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "7f3c73f4c72bfc35f8ac23d9f2df2cac71d6e4f6d45d1af6db0357ea19cb2891",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 37,
+        "normalized_text_sha256": "bb3112ce2f80861ea4fd917a00be25f4a6046cae64a315f5b798a3f7507432a0",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Nat.mem_primeFactors_of_dvd_of_prime`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "ba4457b5d089a3fb58076831c3896a102c8194617d39dadddb63f6e1849f3298",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "dadc3a67a8a635e4292999a91cb81da10737face63e7147cfb2a5c3008daadcd",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 67,
+        "normalized_text_sha256": "69037e5dcccc26a8d7dbdaedfb496e0005e7ea7fad4df32fd4260729a5206242",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "2b87ffbd36082c200c85359213a90121e754b935cc62de64b2e9a6c9aa11e7c5",
+        "template_recurrence": {
+          "candidate_count": 98,
+          "task_count": 31
+        },
+        "template_sha256": "db64f6775e3ad0d0ac09ac38ce17f1221d2504a87667264b0a39f31767f2a460"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "65e4669051b24128f5eb87cfa7010bec1e77b11a100549debd1e19c4696012fe",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 48,
+        "normalized_text_sha256": "0f24900c69baff547ea8716787635816b7ae694c6c76137bfc7186c49edd1b40",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `SkewPolynomial.C_zero`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "42262245807c415d3cf2aa08ad1acae61033ec79f1aa07dc9705f5ee98ce2779",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "729e2d3a5642f1c94d0a9f2ac56c5802881e4b671396908520051bc456d51b4f",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "structurally_wrong_proof_or_template",
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 46,
+        "normalized_text_sha256": "5093d83d02e5bbb320ca194a8b8ffde18ad01c616910ad4f511b57f473647adc",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "7cdc9a67bc3224953013abe94a94a7b5cabc208f9d67af22c4eaaab63c597061",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 6,
+        "diagnostics_sha256": "481a450d946eda831bc9ff0924706cb908c667fb74f2101175e7737d6c7afa51",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 22,
+        "normalized_text_sha256": "d7210cb235c2bdfbbe0726cebfa36d0e26ea4e3ed45f6b0a65575048e7c0fb5f",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `UniqueFactorizationMonoid.normalizedFactors_prod`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "022eaa899daba3713109e10b5b6e092c0a8d399e3ae2eb2cfa80cbae3e72143f",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "bb2edcc89797620139d7499980a73cffffebace672c42f5e3bd86675bedc9050",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 53,
+        "normalized_text_sha256": "d7801a2cc1ac03dddfe76ea07a3ef2f3a43ee42691ccd3ea81f319e49f5acbd7",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Polynomial.expand_cyclotomic_eq_cyclotomic_mul`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "a50aaba8433c486cc21e761e40e37680e9f2cad2ee5e8addd14ca69310a670fa",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 5,
+        "diagnostics_sha256": "25f3234c9f504753a241a6af32dc6f714e20380acfaecf7c3ec7f0eb04d007e1",
+        "exact_output_recurrence": {
+          "candidate_count": 7,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 22,
+        "normalized_text_sha256": "64781a7c7e2d37af8be39e650df69ba9c4d0dfcebb3156c41fc733a07dddd7a9",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "7acd1fafe2162db64275290acbdf7945338692cc389871d8baea4fed55c7593a",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "1550c1d104968df07fe64abc32ed70f4f326e8fc39a858de3398849850d15313",
+        "exact_output_recurrence": {
+          "candidate_count": 4,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "type_or_elaboration"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 27,
+        "normalized_text_sha256": "e5ccb503eb3eed7b9799a814c9cc8b8b0db982943c11d5e40d587ba5dd9e046d",
+        "primary_diagnostic": "error: Application type mismatch: The argument",
+        "primary_failure_category": "type_or_elaboration",
+        "proof_head": "exact-constructor",
+        "task_id": "a50a9c7ccb5e76de7d710ee0104e356e682f35e625249995bbd240ca642705d8",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 2,
+        "diagnostics_sha256": "581b8b890012137b60d61754f33c753db60fb36844c347f8c7583abfa2dd1608",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 43,
+        "normalized_text_sha256": "cf03fe4ac3049f76a9ec750e7e32e78f420796d214766416270c3daa22602bfb",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Multiset.antidiagonal_map_eq_powerset`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "d8ef270215302c1c5f1765361e7422a82433252cc6bf2a87d8ba84aac5f1e2df",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 3,
+        "diagnostics_sha256": "aa89f8929bd1857ae88ea20c7ac27d65b2fe11868f761236f3706e4f09aa72b9",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 107,
+        "normalized_text_sha256": "e7a13ed38b64837cad18d607aade91adac16381043b4753ccb946eb19c111b66",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `ContMDiffAt.smul'`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "80856d9f45be6180fb93907f7aac96a89dbbc4693c6f6c0702ecbaf12d821f04",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 4,
+        "diagnostics_sha256": "65e4669051b24128f5eb87cfa7010bec1e77b11a100549debd1e19c4696012fe",
+        "exact_output_recurrence": {
+          "candidate_count": 2,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 48,
+        "normalized_text_sha256": "0f24900c69baff547ea8716787635816b7ae694c6c76137bfc7186c49edd1b40",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `SkewPolynomial.C_zero`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "42262245807c415d3cf2aa08ad1acae61033ec79f1aa07dc9705f5ee98ce2779",
+        "template_recurrence": {
+          "candidate_count": 647,
+          "task_count": 135
+        },
+        "template_sha256": "c14338144578d3743b3f9a0c03d8d97d3f681d2bb99a4e3a1966189c3cd18d36"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "f9e9efcdd470d3f50896cd093a6d2934617d09d5898dd366319939d19ef9541f",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 21,
+        "normalized_text_sha256": "398d20eb42e7502cb19180354aa01977a9724724cc4b3aa7f59ace6bc2672d78",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `not_strictMono`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "35b455a450185a9e1ba0152a3a181ff5fb5caf886e57446cd1e1677266c3e00b",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 7,
+        "diagnostics_sha256": "4b87eab901130d61e51c2914285b569e81612774ac59d83a23b6c657e36196ed",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 53,
+        "normalized_text_sha256": "49a4afffd95911a3360ae3d3d26864b4a181e04ae4a055c29d1cffd24d9bd28c",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown identifier `Chebyshev.sum_filter_IsPrimePow_Ioc_eq_sum_sum_Ioc`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "2ecbf2d6977b73902c87bfbdf4747ae07a54a0e45a474f61c45c6ff337435aa5",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      },
+      {
+        "candidate_index": 0,
+        "diagnostics_sha256": "08a498ca9e4ebe59bfe6b4298ad2efbf14bdd8f168d42b4a16ee55e8f1b94b28",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 18,
+        "normalized_text_sha256": "b55164e7c392a33b570f925b0d762746d16faf4a045d90e383b867eadb57cb42",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `IsUnit.zero`",
+        "primary_failure_category": "unknown_or_mismatched_lemma",
+        "proof_head": "exact-constructor",
+        "task_id": "93abeaecdd0cc5bd797965cd756f01149da5567e9546dabd83681b8a685240fc",
+        "template_recurrence": {
+          "candidate_count": 1158,
+          "task_count": 145
+        },
+        "template_sha256": "1f112eaf082d2b181ee7f0438d638ec83ea5f855d5dd25d73093ac53903ae42a"
+      },
+      {
+        "candidate_index": 1,
+        "diagnostics_sha256": "6b10cf6216c91a47c2d9931038a4e504a6e470409657c7c5c6fd84224ee7671b",
+        "exact_output_recurrence": {
+          "candidate_count": 1,
+          "task_count": 1
+        },
+        "failure_signals": [
+          "unknown_or_mismatched_lemma",
+          "structurally_wrong_proof_or_template"
+        ],
+        "finish_reason": "eos",
+        "generated_token_count": 83,
+        "normalized_text_sha256": "41852b826de16c723482b3572a9e00ffd19b00a23401f9a1c5b033cc8d3f8752",
+        "primary_diagnostic": "error(lean.unknownIdentifier): Unknown constant `Submonoid.LocalizationMap.ofMulEquivOfDom_toMonoidHom`",
+        "primary_failure_category": "structurally_wrong_proof_or_template",
+        "proof_head": "exact-constructor",
+        "task_id": "59bdf3feebb10a72c3233630a7327aa87ff0286cc8d8a884279fdef777a80685",
+        "template_recurrence": {
+          "candidate_count": 982,
+          "task_count": 136
+        },
+        "template_sha256": "1699202854c8b8f41f7cb021e602a29a61563ea9b6be5c7b20e2b509efd3867a"
+      }
+    ]
+  },
+  "schema_version": "generalist-v2-q4-fresh-test-failure-diagnosis-v1",
+  "status": "complete",
+  "workload_id": "fresh-composition-test-v2"
+}

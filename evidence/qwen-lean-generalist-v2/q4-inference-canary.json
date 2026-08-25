@@ -1,0 +1,1696 @@
+{
+  "adapter_model_sha256": "2398be7ac95db85d646bce66762abcea96487a93b7d92508ddcc274914ef470e",
+  "arm_summaries": {
+    "hf_base": {
+      "candidate_count": 12,
+      "exact_target_count": 0,
+      "infrastructure_error_count": 0,
+      "lean_category_counts": {
+        "lean_rejected": 12
+      },
+      "lean_verified_count": 0
+    },
+    "hf_q4": {
+      "candidate_count": 12,
+      "exact_target_count": 12,
+      "infrastructure_error_count": 0,
+      "lean_category_counts": {
+        "verified": 12
+      },
+      "lean_verified_count": 12
+    },
+    "vllm_base": {
+      "candidate_count": 12,
+      "exact_target_count": 0,
+      "infrastructure_error_count": 0,
+      "lean_category_counts": {
+        "lean_rejected": 12
+      },
+      "lean_verified_count": 0
+    },
+    "vllm_q4": {
+      "candidate_count": 12,
+      "exact_target_count": 12,
+      "infrastructure_error_count": 0,
+      "lean_category_counts": {
+        "verified": 12
+      },
+      "lean_verified_count": 12
+    }
+  },
+  "artifacts": {
+    "extended_evidence_sha256": "7686c7504b03ae7c6335815c6ff937768d6b914c9c3d65f63ccf23de4d875b86",
+    "extended_generation_metadata_sha256": "4fe475a00532c2f1080dbe2294954fcc8a61137e160a218d198ff3fdbe194154",
+    "extended_results_sha256": "6063146ffcfb03f6319bd65c99ea706480bc6c2fb7e2339639ebc1e83caf8a2f",
+    "hf_runtime_sha256": "879aee626cd91a60ed769fdee0176b23d16c41d7b2b17332973d60a28e763068",
+    "prior_candidate_count": 25984,
+    "probe_manifest_sha256": "a242fe63fc3495e1ca12f805846f73f7398ff864fc4c407891717c8ba3ea1b04",
+    "raw_verification_sha256": "2dae543af2a63b1f74404de9a320b0772de70626394ed5a691230038395bb014",
+    "vllm_runtime_sha256": "ebee2c36ca879bad85becc090bfc6a9f6a85d666c565c39546472a297c497bc8"
+  },
+  "classification": "PASS: exact Q4 is loaded, active, and consistent across HF/PEFT and vLLM",
+  "deterministic_generation": {
+    "add_special_tokens": false,
+    "do_sample": false,
+    "eos_semantics": "tokenizer_eos_or_token_limit",
+    "max_new_tokens": 1024,
+    "temperature": 0.0
+  },
+  "functional_parity": {
+    "hf_base_vs_q4": {
+      "forward_sensitivity": {
+        "changed_probe_count": 12,
+        "maximum_absolute_logit_delta": 23.71875,
+        "mean_of_maximum_absolute_logit_deltas": 22.516927083333332,
+        "probe_count": 12
+      },
+      "pair": {
+        "maximum_same_first_token_logprob_delta": 0.0,
+        "output_difference_count": 12,
+        "probe_count": 12,
+        "same_first_token_logprob_comparison_count": 0
+      }
+    },
+    "hf_q4_vs_vllm_q4": {
+      "both_lean_verified_probe_count": 12,
+      "both_lean_verified_probe_ids": [
+        "q4-fresh-valid-00",
+        "q4-fresh-valid-01",
+        "q4-fresh-valid-02",
+        "q4-fresh-valid-03",
+        "q4-fresh-valid-04",
+        "q4-fresh-valid-05",
+        "q4-fresh-valid-06",
+        "q4-fresh-valid-07",
+        "q4-fresh-valid-08",
+        "q4-fresh-valid-09",
+        "q4-fresh-valid-10",
+        "q4-fresh-valid-11"
+      ],
+      "exact_output_match_count": 12
+    },
+    "vllm_base_vs_q4": {
+      "pair": {
+        "maximum_same_first_token_logprob_delta": 0.0,
+        "output_difference_count": 12,
+        "probe_count": 12,
+        "same_first_token_logprob_comparison_count": 0
+      }
+    }
+  },
+  "gate_id": "qwen35-q4-final-inference-canary-v1",
+  "hf_adapter_load_audit": {
+    "loaded_tensor_count": 496,
+    "mismatched_adapter_tensors": [],
+    "missing_adapter_tensors": [],
+    "source_adapter_model_sha256": "2398be7ac95db85d646bce66762abcea96487a93b7d92508ddcc274914ef470e",
+    "source_tensor_count": 496,
+    "status": "passed",
+    "unexpected_adapter_tensors": []
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "outputs": [
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "71157ef462c9cedde1013f011b11ae67ef63fb0e0b31f76b39fd4498a40ea2c7",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.93601655960083,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.12351655960083,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.24851655960083,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.93601655960083,
+              "token_id": 1137
+            },
+            {
+              "logprob": -2.93601655960083,
+              "token_id": 361
+            },
+            {
+              "logprob": -3.06101655960083,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.24851655960083,
+              "token_id": 14169
+            },
+            {
+              "logprob": -3.62351655960083,
+              "token_id": 4581
+            }
+          ],
+          "normalized_text_sha256": "e7f3fe9a1302408c75a5043f2aa044082e0ae7f5198ac823b9067f8c39876d7a",
+          "raw_text": " intro R _\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebys",
+          "raw_text_sha256": "e7f3fe9a1302408c75a5043f2aa044082e0ae7f5198ac823b9067f8c39876d7a"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 28,
+          "last_token_logits_float32_sha256": "8b6d26dab896e13daf621323927e52cf75426ca3462081a385a8006852096873",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0005332001601345837,
+              "token_id": 44839
+            },
+            {
+              "logprob": -8.625533103942871,
+              "token_id": 429
+            },
+            {
+              "logprob": -9.250533103942871,
+              "token_id": 2939
+            },
+            {
+              "logprob": -9.625533103942871,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.000533103942871,
+              "token_id": 56009
+            },
+            {
+              "logprob": -10.000533103942871,
+              "token_id": 1193
+            },
+            {
+              "logprob": -10.125533103942871,
+              "token_id": 325
+            },
+            {
+              "logprob": -11.000533103942871,
+              "token_id": 71946
+            }
+          ],
+          "normalized_text_sha256": "e5c1eea858abf00a2834d7297e3bb7d6733030970a38d027f246caddffd617b8",
+          "raw_text": "exact ⟨@Polynomial.Chebyshev.S_two.{0}, @Polynomial.Chebyshev.T_mul.{0}⟩",
+          "raw_text_sha256": "e5c1eea858abf00a2834d7297e3bb7d6733030970a38d027f246caddffd617b8"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 19104,
+          "first_token_logprob": -1.9275295734405518,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "e7f3fe9a1302408c75a5043f2aa044082e0ae7f5198ac823b9067f8c39876d7a",
+          "raw_text": " intro R _\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebyshev.S, Polynomial.Chebyshev.T, Polynomial.comp]\n   simp [Polynomial.Chebys",
+          "raw_text_sha256": "e7f3fe9a1302408c75a5043f2aa044082e0ae7f5198ac823b9067f8c39876d7a"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0005237876321189106,
+          "generated_tokens": 28,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "e5c1eea858abf00a2834d7297e3bb7d6733030970a38d027f246caddffd617b8",
+          "raw_text": "exact ⟨@Polynomial.Chebyshev.S_two.{0}, @Polynomial.Chebyshev.T_mul.{0}⟩",
+          "raw_text_sha256": "e5c1eea858abf00a2834d7297e3bb7d6733030970a38d027f246caddffd617b8"
+        }
+      },
+      "prior_verified_candidate_count": 64,
+      "probe_id": "q4-fresh-valid-00",
+      "statement_id": "9d948042de289aaf0a510ea335412d4339e1ab626bda839a869d462d18d2f9b2",
+      "structural_class": "direct"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "a62c38a860fee1d537d507d6d98f0e0aaa395de8da8c3a0bdf13e2c1f435c5f8",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.193290114402771,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.1932902336120605,
+              "token_id": 12075
+            },
+            {
+              "logprob": -3.0682902336120605,
+              "token_id": 599
+            },
+            {
+              "logprob": -3.1307902336120605,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.1932902336120605,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.2557902336120605,
+              "token_id": 4581
+            },
+            {
+              "logprob": -3.3182902336120605,
+              "token_id": 4540
+            },
+            {
+              "logprob": -3.6932902336120605,
+              "token_id": 4886
+            }
+          ],
+          "normalized_text_sha256": "0547b95216aab5d19420298651b76eaca1f3c820cde2858094ec0d71881209a7",
+          "raw_text": " intro α inst s x γ inst_1 inst_2 f h\n   exact\n     @LowerSemicontinuousWithinAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       f s x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice",
+          "raw_text_sha256": "0547b95216aab5d19420298651b76eaca1f3c820cde2858094ec0d71881209a7"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 37,
+          "last_token_logits_float32_sha256": "8b61d609ea3e6165c274b6aebf6937350ff714d0e80a50f48ccfa05866dde433",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0008842610404826701,
+              "token_id": 44839
+            },
+            {
+              "logprob": -7.750884056091309,
+              "token_id": 429
+            },
+            {
+              "logprob": -8.750884056091309,
+              "token_id": 2939
+            },
+            {
+              "logprob": -8.750884056091309,
+              "token_id": 325
+            },
+            {
+              "logprob": -10.375884056091309,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.375884056091309,
+              "token_id": 1193
+            },
+            {
+              "logprob": -11.000884056091309,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.375884056091309,
+              "token_id": 8119
+            }
+          ],
+          "normalized_text_sha256": "a4ca74f24a35dc588f3ac739c2618d63e0b836f4e403d44bce3963db2eba68de",
+          "raw_text": "exact ⟨@ContinuousWithinAt.lowerSemicontinuousWithinAt.{0, 0}, @UpperSemicontinuousAt.add.{0, 0}⟩",
+          "raw_text_sha256": "a4ca74f24a35dc588f3ac739c2618d63e0b836f4e403d44bce3963db2eba68de"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 19104,
+          "first_token_logprob": -1.2043490409851074,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "0547b95216aab5d19420298651b76eaca1f3c820cde2858094ec0d71881209a7",
+          "raw_text": " intro α inst s x γ inst_1 inst_2 f h\n   exact\n     @LowerSemicontinuousWithinAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       f s x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice.toSemilatticeInf.{0} γ\n             (@DistribLattice.toLattice.{0} γ (@instDistribLatticeOfLinearOrder.{0} γ inst_2)))))\n       (fun (z : α) =>\n         @HAdd.hAdd.{0, 0, 0} γ γ γ\n           (@instHAdd.{0} γ\n             (@AddCommMagma.toAdd.{0} γ\n               (@AddCommSemigroup.toAddCommMagma.{0} γ (@AddCommMonoid.toAddCommSemigroup.{0} γ inst_1))))\n           (f z) (g z))\n       x\n   intro α inst x γ inst_1 inst_2 f g hf hg\n   exact\n     @UpperSemicontinuousAt.{0, 0} α γ inst\n       (@PartialOrder.toPreorder.{0} γ\n         (@SemilatticeInf.toPartialOrder.{0} γ\n           (@Lattice",
+          "raw_text_sha256": "0547b95216aab5d19420298651b76eaca1f3c820cde2858094ec0d71881209a7"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0009707267745397985,
+          "generated_tokens": 37,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "a4ca74f24a35dc588f3ac739c2618d63e0b836f4e403d44bce3963db2eba68de",
+          "raw_text": "exact ⟨@ContinuousWithinAt.lowerSemicontinuousWithinAt.{0, 0}, @UpperSemicontinuousAt.add.{0, 0}⟩",
+          "raw_text_sha256": "a4ca74f24a35dc588f3ac739c2618d63e0b836f4e403d44bce3963db2eba68de"
+        }
+      },
+      "prior_verified_candidate_count": 64,
+      "probe_id": "q4-fresh-valid-01",
+      "statement_id": "bb3f9a79efc86496fdd8ba6c025e2e37ee526d1b0f8efd683309810cf2a660dd",
+      "structural_class": "direct"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "d176cbcb9bbb14309215b6ee0a74323888723001510604c5e251fc5cafbbffb7",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.3648922443389893,
+              "token_id": 19104
+            },
+            {
+              "logprob": -1.9898922443389893,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.5523922443389893,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.6148922443389893,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.1773922443389893,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.3648922443389893,
+              "token_id": 11143
+            },
+            {
+              "logprob": -3.4273922443389893,
+              "token_id": 4540
+            },
+            {
+              "logprob": -3.6148922443389893,
+              "token_id": 361
+            }
+          ],
+          "normalized_text_sha256": "cbe7815797256cecb56ddabc1cda6cd807bd548816066c0db802b53de75b20d4",
+          "raw_text": " intro\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp",
+          "raw_text_sha256": "cbe7815797256cecb56ddabc1cda6cd807bd548816066c0db802b53de75b20d4"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 23,
+          "last_token_logits_float32_sha256": "31e42069f610dc95b7ca5409ea16b156d31646d684413285548976bd4f9eb610",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0013612775364890695,
+              "token_id": 44839
+            },
+            {
+              "logprob": -7.62636137008667,
+              "token_id": 2939
+            },
+            {
+              "logprob": -7.75136137008667,
+              "token_id": 429
+            },
+            {
+              "logprob": -8.626360893249512,
+              "token_id": 325
+            },
+            {
+              "logprob": -9.251360893249512,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.126360893249512,
+              "token_id": 1193
+            },
+            {
+              "logprob": -10.501360893249512,
+              "token_id": 56009
+            },
+            {
+              "logprob": -10.751360893249512,
+              "token_id": 8119
+            }
+          ],
+          "normalized_text_sha256": "f9dfea05696ce78ff5562d1d00c4589dee927fecdc7ffd17c674c3bf9f9214a3",
+          "raw_text": "exact ⟨@RelSeries.tail_cons.{0}, @HurwitzZeta.completedCosZeta₀_neg⟩",
+          "raw_text_sha256": "f9dfea05696ce78ff5562d1d00c4589dee927fecdc7ffd17c674c3bf9f9214a3"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 19104,
+          "first_token_logprob": -1.4608222246170044,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "cbe7815797256cecb56ddabc1cda6cd807bd548816066c0db802b53de75b20d4",
+          "raw_text": " intro\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp_all [HurwitzZeta.completedCosZeta₀]\n   simp",
+          "raw_text_sha256": "cbe7815797256cecb56ddabc1cda6cd807bd548816066c0db802b53de75b20d4"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0013381821336224675,
+          "generated_tokens": 23,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "f9dfea05696ce78ff5562d1d00c4589dee927fecdc7ffd17c674c3bf9f9214a3",
+          "raw_text": "exact ⟨@RelSeries.tail_cons.{0}, @HurwitzZeta.completedCosZeta₀_neg⟩",
+          "raw_text_sha256": "f9dfea05696ce78ff5562d1d00c4589dee927fecdc7ffd17c674c3bf9f9214a3"
+        }
+      },
+      "prior_verified_candidate_count": 64,
+      "probe_id": "q4-fresh-valid-02",
+      "statement_id": "d71bdbcd1356aebc57a0f151ee79beae6a690945b41eba824a26286f84ac33c9",
+      "structural_class": "direct"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "8534972d215a360edafdae849c1578675fd6df09462ecbdab61d6610f50191ba",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.8680698871612549,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.243069887161255,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.305569887161255,
+              "token_id": 3668
+            },
+            {
+              "logprob": -2.805569887161255,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.993069887161255,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.243069887161255,
+              "token_id": 4540
+            },
+            {
+              "logprob": -3.305569887161255,
+              "token_id": 361
+            },
+            {
+              "logprob": -3.430569887161255,
+              "token_id": 4886
+            }
+          ],
+          "normalized_text_sha256": "1d43a939353022d5b0b9265e0d0ed8c47bb2378202d9c6308cc4a0aff8278e86",
+          "raw_text": " simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiableAt_affineMap]\n   <;> simp_all [differentiableOn_affineMap, differentiable",
+          "raw_text_sha256": "1d43a939353022d5b0b9265e0d0ed8c47bb2378202d9c6308cc4a0aff8278e86"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 32,
+          "last_token_logits_float32_sha256": "fd6ca933ecb6588b0efb06334db40416572a4ba51bdb1d0a045784cebd7e18b7",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0006612736615352333,
+              "token_id": 44839
+            },
+            {
+              "logprob": -8.00066089630127,
+              "token_id": 429
+            },
+            {
+              "logprob": -9.62566089630127,
+              "token_id": 2939
+            },
+            {
+              "logprob": -9.62566089630127,
+              "token_id": 1193
+            },
+            {
+              "logprob": -9.75066089630127,
+              "token_id": 325
+            },
+            {
+              "logprob": -10.12566089630127,
+              "token_id": 4581
+            },
+            {
+              "logprob": -11.25066089630127,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.43816089630127,
+              "token_id": 71946
+            }
+          ],
+          "normalized_text_sha256": "2bfe9a7fca3416be523f57f0e752a14ce46324930615d9c8212d2a8a45b15f48",
+          "raw_text": "exact ⟨@AffineMap.differentiableOn.{0, 0}, @AffineMap.differentiableAt.{0, 0}⟩",
+          "raw_text_sha256": "2bfe9a7fca3416be523f57f0e752a14ce46324930615d9c8212d2a8a45b15f48"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.857950210571289,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "136d284b9e01f7db85959b29b4d8463f2caaaabd81ea03c197e76708436b1563",
+          "raw_text": " simp_all [DifferentiableOn, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, DifferentiableAt, Different",
+          "raw_text_sha256": "136d284b9e01f7db85959b29b4d8463f2caaaabd81ea03c197e76708436b1563"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0006521005416288972,
+          "generated_tokens": 32,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "2bfe9a7fca3416be523f57f0e752a14ce46324930615d9c8212d2a8a45b15f48",
+          "raw_text": "exact ⟨@AffineMap.differentiableOn.{0, 0}, @AffineMap.differentiableAt.{0, 0}⟩",
+          "raw_text_sha256": "2bfe9a7fca3416be523f57f0e752a14ce46324930615d9c8212d2a8a45b15f48"
+        }
+      },
+      "prior_verified_candidate_count": 61,
+      "probe_id": "q4-fresh-valid-03",
+      "statement_id": "20d4fc9dcd22efa1c1bdcd23f20b4ebff6f90476f86efb8ed3661a522fb19a01",
+      "structural_class": "direct"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "b7de66aa01513c93de8f3ec1e0f9c9ea24eb3e86d11449b8b161bd192c426543",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.8780406713485718,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.1280407905578613,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.4405407905578613,
+              "token_id": 1137
+            },
+            {
+              "logprob": -2.9405407905578613,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.0655407905578613,
+              "token_id": 14169
+            },
+            {
+              "logprob": -3.0655407905578613,
+              "token_id": 471
+            },
+            {
+              "logprob": -3.4405407905578613,
+              "token_id": 11143
+            },
+            {
+              "logprob": -3.5655407905578613,
+              "token_id": 539
+            }
+          ],
+          "normalized_text_sha256": "c5725812e98a35ef13452b6edf448a1397320254b3f11f8ba7dae12977933f43",
+          "raw_text": " have h1 : ∀ (ν : Real → Real) {ε : Real}\n     (εpos : @GT.gt.{0} Real Real.instLT ε (@OfNat.ofNat.{0} Real (nat_lit 0) (@Zero.toOfNat0.{0} Real Real.instZero)))\n     (s : Complex),\n     @Eq.{1} Complex\n       (@mellin.{0} Complex Complex.instNormedAddCommGroup\n         (@InnerProductSpace.toNormedSpace.{0, 0} Complex Complex Complex.instRCLike\n           (@NormedAddCommGroup.toSeminormedAddCommGroup.{0} Complex Complex.instNormedAddCommGroup)\n           (@RCLike.innerProductSpace.{0} Complex Complex.instRCLike))\n         (fun (x : Real) => Complex.ofReal (DeltaSpike ν ε x)) s)\n       (@mellin.{0} Complex Complex.instNormedAddCommGroup\n         (@InnerProductSpace.toNormedSpace.{0, 0} Complex Complex Complex.instRCLike\n           (@NormedAddCommGroup.toSeminormedAddCommGroup.{0} Complex Complex.instNormedAddCommGroup)\n           (@RCLike.innerProductSpace.{0} Complex Complex.instRCLike))\n         (fun (x : Real) => Complex.ofReal (ν x))\n         (@HMul.hMul.{0, 0, 0} Complex Complex Complex (@instHMul.{0} Complex Complex.instMul) (Complex.ofReal ε) s)) := by\n     simp [mellin, DeltaSpike]\n     ext x\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp [mellin, DeltaSpike]\n     simp",
+          "raw_text_sha256": "c5725812e98a35ef13452b6edf448a1397320254b3f11f8ba7dae12977933f43"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 44,
+          "last_token_logits_float32_sha256": "18a4c07312409828dede5dd8619bd53ee13968334540df782ae3f486e896cf83",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.00020239688456058502,
+              "token_id": 44839
+            },
+            {
+              "logprob": -9.875202178955078,
+              "token_id": 56009
+            },
+            {
+              "logprob": -10.375202178955078,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.625202178955078,
+              "token_id": 325
+            },
+            {
+              "logprob": -10.875202178955078,
+              "token_id": 1193
+            },
+            {
+              "logprob": -11.250202178955078,
+              "token_id": 2939
+            },
+            {
+              "logprob": -11.250202178955078,
+              "token_id": 7589
+            },
+            {
+              "logprob": -11.250202178955078,
+              "token_id": 429
+            }
+          ],
+          "normalized_text_sha256": "e799529b4f6e980f554af2cc89bf5a491f6de3c79076ac84789935ea4f73a00c",
+          "raw_text": "exact ⟨@MellinOfDeltaSpike, ⟨fun _ => @ZetaNoZerosOn1Line, fun _ => @rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt⟩⟩",
+          "raw_text_sha256": "e799529b4f6e980f554af2cc89bf5a491f6de3c79076ac84789935ea4f73a00c"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 599,
+          "first_token_logprob": -1.8515361547470093,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "910b66b7cc48a152951f38f1d0e8fcc54a42c4931d2536ab684a25d37abf2fca",
+          "raw_text": " have h1 : ∀ (ν : Real → Real) {ε : Real}\n     (εpos : @GT.gt.{0} Real Real.instLT ε (@OfNat.ofNat.{0} Real (nat_lit 0) (@Zero.toOfNat0.{0} Real Real.instZero)))\n     (s : Complex),\n     @Eq.{1} Complex\n       (@mellin.{0} Complex Complex.instNormedAddCommGroup\n         (@InnerProductSpace.toNormedSpace.{0, 0} Complex Complex Complex.instRCLike\n           (@NormedAddCommGroup.toSeminormedAddCommGroup.{0} Complex Complex.instNormedAddCommGroup)\n           (@RCLike.innerProductSpace.{0} Complex Complex.instRCLike))\n         (fun (x : Real) => Complex.ofReal (DeltaSpike ν ε x)) s)\n       (@mellin.{0} Complex Complex.instNormedAddCommGroup\n         (@InnerProductSpace.toNormedSpace.{0, 0} Complex Complex Complex.instRCLike\n           (@NormedAddCommGroup.toSeminormedAddCommGroup.{0} Complex Complex.instNormedAddCommGroup)\n           (@RCLike.innerProductSpace.{0} Complex Complex.instRCLike))\n         (fun (x : Real) => Complex.ofReal (ν x))\n         (@HMul.hMul.{0, 0, 0} Complex Complex Complex (@instHMul.{0} Complex Complex.instMul) (Complex.ofReal ε) s)) := by\n     simp [mellin, DeltaSpike]\n     <;> simp_all [Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal,\n       Complex.ofReal, Complex.ofReal, Complex.ofReal, Complex.ofReal",
+          "raw_text_sha256": "910b66b7cc48a152951f38f1d0e8fcc54a42c4931d2536ab684a25d37abf2fca"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00023505308490712196,
+          "generated_tokens": 44,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "e799529b4f6e980f554af2cc89bf5a491f6de3c79076ac84789935ea4f73a00c",
+          "raw_text": "exact ⟨@MellinOfDeltaSpike, ⟨fun _ => @ZetaNoZerosOn1Line, fun _ => @rectangleIntegral_logDeriv_eq_sum_meromorphicOrderAt⟩⟩",
+          "raw_text_sha256": "e799529b4f6e980f554af2cc89bf5a491f6de3c79076ac84789935ea4f73a00c"
+        }
+      },
+      "prior_verified_candidate_count": 64,
+      "probe_id": "q4-fresh-valid-04",
+      "statement_id": "ef54c6d15b666ac2f0073c6eff950c3988340c0728b4405ddd3feb7a04d38a49",
+      "structural_class": "branching"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "c696f0a835b6822bf6bc27826542fae760a8524cd81ef7313ac28accfd83436f",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.2989425659179688,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.5489425659179688,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.6739425659179688,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.1114425659179688,
+              "token_id": 471
+            },
+            {
+              "logprob": -3.2364425659179688,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.2989425659179688,
+              "token_id": 19104
+            },
+            {
+              "logprob": -3.2989425659179688,
+              "token_id": 14169
+            },
+            {
+              "logprob": -3.3614425659179688,
+              "token_id": 11143
+            }
+          ],
+          "normalized_text_sha256": "64547b019f6427b75cd51d98b609040537aa2f2fb5de21cbcd52d93824007c20",
+          "raw_text": " simp [\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0}",
+          "raw_text_sha256": "64547b019f6427b75cd51d98b609040537aa2f2fb5de21cbcd52d93824007c20"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 41,
+          "last_token_logits_float32_sha256": "4fd0a7e59e3c09b4092a86f8e0b0ea2ed20c3102b3b7c269ff62c77c524f7d35",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0002338612830499187,
+              "token_id": 44839
+            },
+            {
+              "logprob": -10.00023365020752,
+              "token_id": 429
+            },
+            {
+              "logprob": -10.25023365020752,
+              "token_id": 325
+            },
+            {
+              "logprob": -10.37523365020752,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.50023365020752,
+              "token_id": 56009
+            },
+            {
+              "logprob": -10.50023365020752,
+              "token_id": 2939
+            },
+            {
+              "logprob": -11.43773365020752,
+              "token_id": 21174
+            },
+            {
+              "logprob": -12.06273365020752,
+              "token_id": 71946
+            }
+          ],
+          "normalized_text_sha256": "f23976832939343ae9072e6b23a462d74e8cb7de609f48424343e626c3a8ce3f",
+          "raw_text": "exact ⟨@WeakPNT', ⟨fun _ => @riemannZetaLogDerivResidue, fun _ => @rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt⟩⟩",
+          "raw_text_sha256": "f23976832939343ae9072e6b23a462d74e8cb7de609f48424343e626c3a8ce3f"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.3162287473678589,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "64547b019f6427b75cd51d98b609040537aa2f2fb5de21cbcd52d93824007c20",
+          "raw_text": " simp [\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0} Real Real.pseudoMetricSpace))\n         (@OfNat.ofNat.{0} Real (nat_lit 1) (@One.toOfNat1.{0} Real Real.instOne)))\n     @Filter.Tendsto.tendsto_nhds.{0, 0} Nat Real\n       (@Filter.atTop.{0} Nat Nat.instPreorder)\n       (@nhds.{0} Real\n         (@UniformSpace.toTopologicalSpace.{0} Real (@PseudoMetricSpace.toUniformSpace.{0}",
+          "raw_text_sha256": "64547b019f6427b75cd51d98b609040537aa2f2fb5de21cbcd52d93824007c20"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00021646064124070108,
+          "generated_tokens": 41,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "f23976832939343ae9072e6b23a462d74e8cb7de609f48424343e626c3a8ce3f",
+          "raw_text": "exact ⟨@WeakPNT', ⟨fun _ => @riemannZetaLogDerivResidue, fun _ => @rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt⟩⟩",
+          "raw_text_sha256": "f23976832939343ae9072e6b23a462d74e8cb7de609f48424343e626c3a8ce3f"
+        }
+      },
+      "prior_verified_candidate_count": 61,
+      "probe_id": "q4-fresh-valid-05",
+      "statement_id": "75f2823a2c586503e79de96b3b0f31d7b1ac3b602f4f47f47ebc8c3e91f39135",
+      "structural_class": "branching"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "7441b5acc7facd96693b0c6bb7b060721358f77b618ac21d760cf35a95f7263b",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.5998380184173584,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.1623380184173584,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.3498380184173584,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.7873380184173584,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.0373380184173584,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.0373380184173584,
+              "token_id": 4540
+            },
+            {
+              "logprob": -3.4123380184173584,
+              "token_id": 4581
+            },
+            {
+              "logprob": -3.4748380184173584,
+              "token_id": 9306
+            }
+          ],
+          "normalized_text_sha256": "5f50e855d2362226d3ea32c3ec1cdd1cb10bb9ae5287c8619e1cd19af85bee6d",
+          "raw_text": " intro h\n   intro α β γ [inst : TopologicalSpace.{0} β] [inst_1 : TopologicalSpace.{0} γ] {m m₀ : MeasurableSpace.{0} α}\n     {μ : @MeasureTheory.Measure.{0} α m₀} {f : α → Prod.{0, 0} β γ}\n     (hf :\n       @MeasureTheory.AEStronglyMeasurable.{0, 0} α (Prod.{0, 0} β γ) (@instTopologicalSpaceProd.{0, 0} β γ inst inst_1)\n         m m₀ f μ)\n   simp [aesstronglymeasurable] at hf ⊢\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp [aesstronglymeasurable]\n   simp",
+          "raw_text_sha256": "5f50e855d2362226d3ea32c3ec1cdd1cb10bb9ae5287c8619e1cd19af85bee6d"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 66,
+          "last_token_logits_float32_sha256": "979027fb6e97f3dacb2a309645caa7eec947cdde3925132ab6cb419f804d0323",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.000641974329482764,
+              "token_id": 44839
+            },
+            {
+              "logprob": -8.875641822814941,
+              "token_id": 325
+            },
+            {
+              "logprob": -8.875641822814941,
+              "token_id": 429
+            },
+            {
+              "logprob": -9.000641822814941,
+              "token_id": 1193
+            },
+            {
+              "logprob": -9.500641822814941,
+              "token_id": 4581
+            },
+            {
+              "logprob": -9.750641822814941,
+              "token_id": 2939
+            },
+            {
+              "logprob": -10.500641822814941,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.000641822814941,
+              "token_id": 71946
+            }
+          ],
+          "normalized_text_sha256": "5893a63e1044e5e35569715ec6e6520e92e58be92ff4bcc760f404ae13c21785",
+          "raw_text": "exact ⟨@MeasureTheory.AEStronglyMeasurable.fst.{0, 0, 0}, ⟨fun _ => @MeasureTheory.AEFinStronglyMeasurable.sub.{0, 0}, fun _ => @MeasureTheory.AEFinStronglyMeasurable.inf.{0, 0}⟩⟩",
+          "raw_text_sha256": "5893a63e1044e5e35569715ec6e6520e92e58be92ff4bcc760f404ae13c21785"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 19104,
+          "first_token_logprob": -1.512978434562683,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "a69f883afc43c8c984a3f633ff5631c203ab9321ac2552988477b8ebe96f297a",
+          "raw_text": " intro\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]\n   simp [aesstronglymeasurable_iff]",
+          "raw_text_sha256": "a69f883afc43c8c984a3f633ff5631c203ab9321ac2552988477b8ebe96f297a"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0006523388437926769,
+          "generated_tokens": 66,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "5893a63e1044e5e35569715ec6e6520e92e58be92ff4bcc760f404ae13c21785",
+          "raw_text": "exact ⟨@MeasureTheory.AEStronglyMeasurable.fst.{0, 0, 0}, ⟨fun _ => @MeasureTheory.AEFinStronglyMeasurable.sub.{0, 0}, fun _ => @MeasureTheory.AEFinStronglyMeasurable.inf.{0, 0}⟩⟩",
+          "raw_text_sha256": "5893a63e1044e5e35569715ec6e6520e92e58be92ff4bcc760f404ae13c21785"
+        }
+      },
+      "prior_verified_candidate_count": 54,
+      "probe_id": "q4-fresh-valid-06",
+      "statement_id": "278f3f4dc30fcac28f82563639c875e0bfc8527759121b1e9f5f24f06b1da441",
+      "structural_class": "branching"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "24159cf27c6f7ec08bdafed158420f7e5579a362bbcc46c64ea882076b792200",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.735305666923523,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.1103057861328125,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.1728057861328125,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.6728057861328125,
+              "token_id": 3668
+            },
+            {
+              "logprob": -2.9853057861328125,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.1728057861328125,
+              "token_id": 9306
+            },
+            {
+              "logprob": -3.2353057861328125,
+              "token_id": 4540
+            },
+            {
+              "logprob": -3.3603057861328125,
+              "token_id": 361
+            }
+          ],
+          "normalized_text_sha256": "04a82f53700b644ba534c75bbc3aa0c1d956f804228b7b197f13b2a50e0163f3",
+          "raw_text": " intro h\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n  ",
+          "raw_text_sha256": "09b488c8077d32539410736c439bb4c467537476020dcc838f6c04450c79249d"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 46,
+          "last_token_logits_float32_sha256": "deed9772814a20f3924ff95d2b5603b260eedc2322f42c63f43861bd7ea5976b",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0001787979417713359,
+              "token_id": 44839
+            },
+            {
+              "logprob": -9.375178337097168,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.250178337097168,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.000178337097168,
+              "token_id": 71946
+            },
+            {
+              "logprob": -11.250178337097168,
+              "token_id": 325
+            },
+            {
+              "logprob": -11.375178337097168,
+              "token_id": 429
+            },
+            {
+              "logprob": -12.125178337097168,
+              "token_id": 1193
+            },
+            {
+              "logprob": -12.875178337097168,
+              "token_id": 2939
+            }
+          ],
+          "normalized_text_sha256": "b2d72dfe213dead0de3efde3b13f08c4215259953f6377edb461a061a3091671",
+          "raw_text": "exact ⟨@Polynomial.Chebyshev.T_one.{0}, ⟨fun _ => @Polynomial.Chebyshev.C_natAbs.{0}, fun _ => @Nat.two_le_of_mem_primesLE⟩⟩",
+          "raw_text_sha256": "b2d72dfe213dead0de3efde3b13f08c4215259953f6377edb461a061a3091671"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 19104,
+          "first_token_logprob": -1.7395222187042236,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "04a82f53700b644ba534c75bbc3aa0c1d956f804228b7b197f13b2a50e0163f3",
+          "raw_text": " intro h\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n   simp [h]\n  ",
+          "raw_text_sha256": "09b488c8077d32539410736c439bb4c467537476020dcc838f6c04450c79249d"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00017557987303007394,
+          "generated_tokens": 46,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "b2d72dfe213dead0de3efde3b13f08c4215259953f6377edb461a061a3091671",
+          "raw_text": "exact ⟨@Polynomial.Chebyshev.T_one.{0}, ⟨fun _ => @Polynomial.Chebyshev.C_natAbs.{0}, fun _ => @Nat.two_le_of_mem_primesLE⟩⟩",
+          "raw_text_sha256": "b2d72dfe213dead0de3efde3b13f08c4215259953f6377edb461a061a3091671"
+        }
+      },
+      "prior_verified_candidate_count": 52,
+      "probe_id": "q4-fresh-valid-07",
+      "statement_id": "807509a810c38a778f250d266d2613bf70b522b3a808ee44db15c66e5a0b44de",
+      "structural_class": "branching"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "4e31546e2b491b7a7e681137a6adfc4034be669b67d6aead2e663217427f6dac",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.7168186902999878,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.3418188095092773,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.7168188095092773,
+              "token_id": 471
+            },
+            {
+              "logprob": -2.8418188095092773,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.2168188095092773,
+              "token_id": 14169
+            },
+            {
+              "logprob": -3.2168188095092773,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.4668188095092773,
+              "token_id": 593
+            },
+            {
+              "logprob": -3.7793188095092773,
+              "token_id": 11143
+            }
+          ],
+          "normalized_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f",
+          "raw_text": " simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumber",
+          "raw_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 62,
+          "last_token_logits_float32_sha256": "ca21f0183a0cd60f0ecd23f14e8129fa698a5b9ee74e050bb883806d9e75eed4",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.00019071667338721454,
+              "token_id": 44839
+            },
+            {
+              "logprob": -10.000190734863281,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.375190734863281,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.125190734863281,
+              "token_id": 71946
+            },
+            {
+              "logprob": -11.437690734863281,
+              "token_id": 33483
+            },
+            {
+              "logprob": -11.562690734863281,
+              "token_id": 325
+            },
+            {
+              "logprob": -11.750190734863281,
+              "token_id": 873
+            },
+            {
+              "logprob": -12.000190734863281,
+              "token_id": 21174
+            }
+          ],
+          "normalized_text_sha256": "f969c56f11da2f542d1adb81040d1f0bc0220cbd28e96358046a4b11570f6a6c",
+          "raw_text": "exact ⟨⟨fun _ => @rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt, fun _ => @Backlund.zetaCounting_crude_majorant⟩, ⟨fun _ => @MediumPNT, fun _ => @riemannZetaLogDerivResidue⟩⟩",
+          "raw_text_sha256": "f969c56f11da2f542d1adb81040d1f0bc0220cbd28e96358046a4b11570f6a6c"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.7355836629867554,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f",
+          "raw_text": " simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumber",
+          "raw_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00016807096835691482,
+          "generated_tokens": 62,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "f969c56f11da2f542d1adb81040d1f0bc0220cbd28e96358046a4b11570f6a6c",
+          "raw_text": "exact ⟨⟨fun _ => @rectangle_argumentChange_eq_two_pi_sum_meromorphicOrderAt, fun _ => @Backlund.zetaCounting_crude_majorant⟩, ⟨fun _ => @MediumPNT, fun _ => @riemannZetaLogDerivResidue⟩⟩",
+          "raw_text_sha256": "f969c56f11da2f542d1adb81040d1f0bc0220cbd28e96358046a4b11570f6a6c"
+        }
+      },
+      "prior_verified_candidate_count": 54,
+      "probe_id": "q4-fresh-valid-08",
+      "statement_id": "f0a8de834ade2aaea79a03abb587b9fca61dbfeaa47dfe26e065eaa6f1abc6a9",
+      "structural_class": "deep"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "3eddaa3ac8922a89fe041f20bc7d124661e2eb923f74a94637f0d07e49363d4a",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.5387024879455566,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.5387024879455566,
+              "token_id": 471
+            },
+            {
+              "logprob": -2.6012024879455566,
+              "token_id": 599
+            },
+            {
+              "logprob": -2.9762024879455566,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.2262024879455566,
+              "token_id": 14169
+            },
+            {
+              "logprob": -3.2262024879455566,
+              "token_id": 3668
+            },
+            {
+              "logprob": -3.4137024879455566,
+              "token_id": 361
+            },
+            {
+              "logprob": -3.7262024879455566,
+              "token_id": 11143
+            }
+          ],
+          "normalized_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f",
+          "raw_text": " simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumber",
+          "raw_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 52,
+          "last_token_logits_float32_sha256": "07f240ad9d65e0e61a208467346c0c656734bdc8f1d7e1d67c967c39d2997ff2",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0001438752660760656,
+              "token_id": 44839
+            },
+            {
+              "logprob": -10.375144004821777,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.625144004821777,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.125144004821777,
+              "token_id": 325
+            },
+            {
+              "logprob": -11.687644004821777,
+              "token_id": 71946
+            },
+            {
+              "logprob": -11.812644004821777,
+              "token_id": 7589
+            },
+            {
+              "logprob": -12.187644004821777,
+              "token_id": 9974
+            },
+            {
+              "logprob": -12.250144004821777,
+              "token_id": 1193
+            }
+          ],
+          "normalized_text_sha256": "79a2199a7b35d981f99c13ea19bdd6d69ec3471d4acf75389045f95dee9bceae",
+          "raw_text": "exact ⟨⟨fun _ => @dirichlet_thm, fun _ => @BrunTitchmarsh.primesBetween_le⟩, ⟨fun _ => @ZetaDerivUpperBnd, fun _ => @ZetaZeroFree⟩⟩",
+          "raw_text_sha256": "79a2199a7b35d981f99c13ea19bdd6d69ec3471d4acf75389045f95dee9bceae"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.5426958799362183,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f",
+          "raw_text": " simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumberTheoremAnd]\n   simp [PrimeNumber",
+          "raw_text_sha256": "0f0365fed70e5f2383ade2a8450286ee55db2edb9dcffdd4f8bdbd7dfa88071f"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00014435203047469258,
+          "generated_tokens": 52,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "79a2199a7b35d981f99c13ea19bdd6d69ec3471d4acf75389045f95dee9bceae",
+          "raw_text": "exact ⟨⟨fun _ => @dirichlet_thm, fun _ => @BrunTitchmarsh.primesBetween_le⟩, ⟨fun _ => @ZetaDerivUpperBnd, fun _ => @ZetaZeroFree⟩⟩",
+          "raw_text_sha256": "79a2199a7b35d981f99c13ea19bdd6d69ec3471d4acf75389045f95dee9bceae"
+        }
+      },
+      "prior_verified_candidate_count": 41,
+      "probe_id": "q4-fresh-valid-09",
+      "statement_id": "3b5cd126d43f02d73665141d909dfccf9a9346546ff4c195b2d982adc27157ef",
+      "structural_class": "deep"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "1495567055f18f5ab67d9dfcb8415f6c95181ccb806e9d2c0f8f352c3393f480",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.6554747819900513,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.4054746627807617,
+              "token_id": 4540
+            },
+            {
+              "logprob": -2.4679746627807617,
+              "token_id": 3668
+            },
+            {
+              "logprob": -2.5929746627807617,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.6554746627807617,
+              "token_id": 599
+            },
+            {
+              "logprob": -3.2179746627807617,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.4679746627807617,
+              "token_id": 4581
+            },
+            {
+              "logprob": -3.5304746627807617,
+              "token_id": 361
+            }
+          ],
+          "normalized_text_sha256": "9df8f629d3820d0105d4ae029458b9deb79f0be59a1f64c0874f5ed1384ffdff",
+          "raw_text": " simp [OneHom.coe, OneHom.funLike, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.inst",
+          "raw_text_sha256": "9df8f629d3820d0105d4ae029458b9deb79f0be59a1f64c0874f5ed1384ffdff"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 74,
+          "last_token_logits_float32_sha256": "d68e673ea9fbc9913e52ae0842cc38d3898ec5f35292bc57cff54764914db300",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.0002656822034623474,
+              "token_id": 44839
+            },
+            {
+              "logprob": -9.250266075134277,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.375266075134277,
+              "token_id": 71946
+            },
+            {
+              "logprob": -10.375266075134277,
+              "token_id": 1193
+            },
+            {
+              "logprob": -10.500266075134277,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.250266075134277,
+              "token_id": 429
+            },
+            {
+              "logprob": -11.375266075134277,
+              "token_id": 325
+            },
+            {
+              "logprob": -11.750266075134277,
+              "token_id": 27
+            }
+          ],
+          "normalized_text_sha256": "040de7fce5781c0be3ed354d1788f028de8d23d07da4482b4dcf3251f9681147",
+          "raw_text": "exact ⟨⟨fun _ => @OneHom.inv_comp.{0, 0, 0}, fun _ => @OneHom.coe_inv.{0, 0}⟩, ⟨fun _ => @OneHom.mul_apply.{0, 0}, fun _ => @MonoidHom.inv_comp.{0, 0, 0}⟩⟩",
+          "raw_text_sha256": "040de7fce5781c0be3ed354d1788f028de8d23d07da4482b4dcf3251f9681147"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.6432958841323853,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "9df8f629d3820d0105d4ae029458b9deb79f0be59a1f64c0874f5ed1384ffdff",
+          "raw_text": " simp [OneHom.coe, OneHom.funLike, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul,\n     OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv,\n     OneHom.instMul, OneHom.instInv, OneHom.instMul, OneHom.instInv, OneHom.inst",
+          "raw_text_sha256": "9df8f629d3820d0105d4ae029458b9deb79f0be59a1f64c0874f5ed1384ffdff"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.0002829628065228462,
+          "generated_tokens": 74,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "040de7fce5781c0be3ed354d1788f028de8d23d07da4482b4dcf3251f9681147",
+          "raw_text": "exact ⟨⟨fun _ => @OneHom.inv_comp.{0, 0, 0}, fun _ => @OneHom.coe_inv.{0, 0}⟩, ⟨fun _ => @OneHom.mul_apply.{0, 0}, fun _ => @MonoidHom.inv_comp.{0, 0, 0}⟩⟩",
+          "raw_text_sha256": "040de7fce5781c0be3ed354d1788f028de8d23d07da4482b4dcf3251f9681147"
+        }
+      },
+      "prior_verified_candidate_count": 40,
+      "probe_id": "q4-fresh-valid-10",
+      "statement_id": "b55a5364a22998e67db4ebbb3caf976203dd1b852f58e0ae09cef552471b1feb",
+      "structural_class": "deep"
+    },
+    {
+      "arms": {
+        "hf_base": {
+          "finish_reason": "token_limit",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": "9f94d0b2a386d5d1d975e9ac0e357d468f52c1be49d5e74ada474929d93c32da",
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": [
+            {
+              "logprob": -1.619153380393982,
+              "token_id": 12075
+            },
+            {
+              "logprob": -2.1191534996032715,
+              "token_id": 4540
+            },
+            {
+              "logprob": -2.1191534996032715,
+              "token_id": 19104
+            },
+            {
+              "logprob": -2.3691534996032715,
+              "token_id": 3668
+            },
+            {
+              "logprob": -2.6816534996032715,
+              "token_id": 599
+            },
+            {
+              "logprob": -3.3066534996032715,
+              "token_id": 1137
+            },
+            {
+              "logprob": -3.6816534996032715,
+              "token_id": 4581
+            },
+            {
+              "logprob": -3.6816534996032715,
+              "token_id": 4886
+            }
+          ],
+          "normalized_text_sha256": "d44146199cbb61d85a80e4c576a2463e91344fbb33b4f6e2262c7341202cf00e",
+          "raw_text": " simp [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [Centroid",
+          "raw_text_sha256": "d44146199cbb61d85a80e4c576a2463e91344fbb33b4f6e2262c7341202cf00e"
+        },
+        "hf_q4": {
+          "finish_reason": "eos",
+          "first_token_id": null,
+          "first_token_logprob": null,
+          "generated_tokens": 59,
+          "last_token_logits_float32_sha256": "4e9d58423bd045a0dbe25870e4fd3997989e2915124b55dae553404d48c8f904",
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": [
+            {
+              "logprob": -0.00013517419574782252,
+              "token_id": 44839
+            },
+            {
+              "logprob": -10.25013542175293,
+              "token_id": 4581
+            },
+            {
+              "logprob": -10.75013542175293,
+              "token_id": 1193
+            },
+            {
+              "logprob": -11.12513542175293,
+              "token_id": 56009
+            },
+            {
+              "logprob": -11.25013542175293,
+              "token_id": 71946
+            },
+            {
+              "logprob": -11.75013542175293,
+              "token_id": 429
+            },
+            {
+              "logprob": -12.00013542175293,
+              "token_id": 325
+            },
+            {
+              "logprob": -12.18763542175293,
+              "token_id": 33483
+            }
+          ],
+          "normalized_text_sha256": "7a38b7c0a3557e6a42b3c945b0f88f4dda522131aa38f308f990a792e78d9996",
+          "raw_text": "exact ⟨⟨fun _ => @CentroidHom.copy_eq.{0}, fun _ => @CentroidHom.comp_apply.{0}⟩, ⟨fun _ => @CentroidHom.coe_natCast.{0}, fun _ => @CentroidHom.ext.{0}⟩⟩",
+          "raw_text_sha256": "7a38b7c0a3557e6a42b3c945b0f88f4dda522131aa38f308f990a792e78d9996"
+        },
+        "vllm_base": {
+          "finish_reason": "length",
+          "first_token_id": 12075,
+          "first_token_logprob": -1.6253786087036133,
+          "generated_tokens": 1024,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "lean_rejected",
+          "lean_exit_code": 1,
+          "next_token_top8": null,
+          "normalized_text_sha256": "d44146199cbb61d85a80e4c576a2463e91344fbb33b4f6e2262c7341202cf00e",
+          "raw_text": " simp [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [CentroidHom]\n   <;> simp_all [Centroid",
+          "raw_text_sha256": "d44146199cbb61d85a80e4c576a2463e91344fbb33b4f6e2262c7341202cf00e"
+        },
+        "vllm_q4": {
+          "finish_reason": "eos",
+          "first_token_id": 44839,
+          "first_token_logprob": -0.00014399446081370115,
+          "generated_tokens": 59,
+          "last_token_logits_float32_sha256": null,
+          "lean_category": "verified",
+          "lean_exit_code": 0,
+          "next_token_top8": null,
+          "normalized_text_sha256": "7a38b7c0a3557e6a42b3c945b0f88f4dda522131aa38f308f990a792e78d9996",
+          "raw_text": "exact ⟨⟨fun _ => @CentroidHom.copy_eq.{0}, fun _ => @CentroidHom.comp_apply.{0}⟩, ⟨fun _ => @CentroidHom.coe_natCast.{0}, fun _ => @CentroidHom.ext.{0}⟩⟩",
+          "raw_text_sha256": "7a38b7c0a3557e6a42b3c945b0f88f4dda522131aa38f308f990a792e78d9996"
+        }
+      },
+      "prior_verified_candidate_count": 27,
+      "probe_id": "q4-fresh-valid-11",
+      "statement_id": "23fb9bbec1208990ee1050065046dd59a60caee4fc934df25ac58d8d86c54a14",
+      "structural_class": "deep"
+    }
+  ],
+  "probe_selection": {
+    "known_positive_required": true,
+    "policy": "top four tasks per direct/branching/deep class by prior Q4 n=64 Lean-verified candidate count, deterministic task-id tie break",
+    "probe_count": 12,
+    "structural_class_counts": {
+      "branching": 4,
+      "deep": 4,
+      "direct": 4
+    },
+    "uses_validation_only": true
+  },
+  "requirements": {
+    "all_expected_outputs_present": true,
+    "cross_backend_q4_consistency": true,
+    "exact_q4_adapter_bound": true,
+    "hf_q4_forward_effect": true,
+    "hf_q4_tensor_load_complete": true,
+    "known_positive_probe_set_complete": true,
+    "no_base_equivalent_fallback": true,
+    "vllm_q4_inference_effect": true,
+    "vllm_runtime_transform_payload_complete": true,
+    "vllm_static_mapping_complete": true,
+    "zero_verifier_infrastructure_errors": true
+  },
+  "schema_version": "generalist-v2-q4-canary-evidence-v1",
+  "status": "passed",
+  "vllm_adapter_compatibility": {
+    "runtime_adapter_model_sha256": "2cba7578cd3ef52a9259f60838cc46cc3e64a328142e99cdb28a18319929a8f3",
+    "runtime_tensor_payload_sha256": "5edfe138138be6aea55cf3c65f87e4c9cf1717e094b24073e580f988d4741eaf",
+    "schema_version": "qwen35-vllm-text-wrapper-adapter-v1",
+    "source_adapter_model_sha256": "2398be7ac95db85d646bce66762abcea96487a93b7d92508ddcc274914ef470e",
+    "source_tensor_payload_sha256": "5edfe138138be6aea55cf3c65f87e4c9cf1717e094b24073e580f988d4741eaf",
+    "tensor_count": 496
+  },
+  "vllm_static_mapping_audit": {
+    "errors": [],
+    "full_mapping_inventory_sha256": "3e26bd44fa18017615e747d2abecf6cff43a7380e01a3e70c3620739e5a3db20",
+    "loaded_runtime_inventory_sha256": "6a4e14eee906863adc53a71b6b4562bb3f9f67d3367948abb493c8acaaa38986",
+    "missing_loaded_runtime_modules": [],
+    "model_class": "Qwen3_5ForConditionalGeneration",
+    "model_is_text_only": true,
+    "peft_module_count": 248,
+    "raw_tensor_count": 496,
+    "registered_wrapper_count": 176,
+    "runtime_module_count": 152,
+    "status": "passed",
+    "target_family_counts": {
+      "full_attention": 32,
+      "gated_deltanet": 120,
+      "mlp": 96
+    },
+    "target_suffix_counts": {
+      "down_proj": 32,
+      "gate_proj": 32,
+      "in_proj_a": 24,
+      "in_proj_b": 24,
+      "in_proj_qkv": 24,
+      "in_proj_z": 24,
+      "k_proj": 8,
+      "o_proj": 8,
+      "out_proj": 24,
+      "q_proj": 8,
+      "up_proj": 32,
+      "v_proj": 8
+    },
+    "unexpected_loaded_runtime_modules": []
+  }
+}
