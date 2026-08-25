@@ -115,7 +115,43 @@ binds their adapter and trainer-state hashes; the complete outside-Git source
 run has SHA-256
 `c6175c15f8419c30807d8b4fec3cec338a3e41966ebd6beb96c205046c1f3798`.
 This is operational training evidence, not a checkpoint-quality claim; Q1-Q4
-remain unselected pending the frozen validation procedure.
+were subsequently evaluated under the frozen validation procedure described
+below.
+
+`OBSERVED`: the original Q1/Q2 and partial-Q3 vLLM screening was invalid for
+model quality because Qwen3.5 PEFT names under `model.layers.*` did not resolve
+against vLLM's `language_model.model.layers.*` wrappers. The artifacts remain
+preserved as diagnostic-only evidence. The corrected evaluator maps all 496
+adapter tensors / 248 PEFT modules into 152 fused or unfused runtime modules
+with no omission. Its independent HF/PEFT and vLLM known-positive arms both
+reproduced overfit64 at 4/4 exact, and the fixed Q2 smoke changed all 16 output
+or forward signals. `lora-inference-parity-corrected.json` records the passed
+gate; no invalid pre-fix score was used for selection.
+
+`OBSERVED`: corrected n=8 screening completed all required Q1-Q4 lanes with
+zero infrastructure errors and selected Q4 by the frozen validation-only rule.
+Q4 solved 74/244 clean miniF2F validation tasks (pass@1/pass@4/pass@8
+0.163422/0.256089/0.303279) and 60/406 fresh-composition validation tasks
+(0.066810/0.117417/0.147783). Its train probe solved 79/256 (pass@8
+0.308594). Tests, domain diagnostics, and train-probe outcomes were not
+selection inputs; Q3 was the strongest runner-up.
+
+`OBSERVED`: the frozen Q4 winner then completed the amendment's validation-only
+n=64 measurement without early stopping. Across 41,600 retained and verified
+candidates, clean miniF2F reached 107/244 solved and pass@64 0.438525, while
+fresh composition reached 94/406 and pass@64 0.231527. Base, runner-up, and test
+n=64 lanes were not run. The compact artifact binds raw-candidate SHA-256 values
+`f10b9cc31d664b2a94aac57bbf7c954c63c0f4998b42e263ccc69ded10ac2e78`
+and `4a44b689e481ef7289cacdb03293c689ef01b749908e5d24e3099dcd21627a40`;
+the raw gzip records remain outside Git for the required post-hoc capability
+analysis.
+
+`ACCEPTED`: issue amendment `#5409570320` removes every remaining Riemann lane
+from the completion contract. Evidence produced before that amendment remains
+immutable diagnostic history, but it is not extended, regenerated, included in
+the final general comparison, or treated as a release gate. The remaining final
+assessment is restricted to the n=8 clean miniF2F and fresh-composition test
+workloads for Base, frozen Q4, and DeepSeek; no additional n=64 lane is run.
 
 Commands:
 

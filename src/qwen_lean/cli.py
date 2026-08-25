@@ -2125,9 +2125,40 @@ def _parser() -> argparse.ArgumentParser:
     generalist_final_evidence.add_argument("--q0-evidence", type=Path, required=True)
     generalist_final_evidence.add_argument("--selection", type=Path, required=True)
     generalist_final_evidence.add_argument("--final-root", type=Path, required=True)
+    generalist_final_evidence.add_argument(
+        "--deepseek-root", type=Path, required=True
+    )
     generalist_final_evidence.add_argument("--package-root", type=Path, required=True)
     generalist_final_evidence.add_argument("--view-dir", type=Path, required=True)
     generalist_final_evidence.add_argument("--output", type=Path, required=True)
+
+    generalist_refinement_evidence = subparsers.add_parser(
+        "generalist-v2-refinement-evidence",
+        help="analyze frozen Q4 n=64 general validation capability gaps",
+    )
+    generalist_refinement_evidence.add_argument(
+        "--extended", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument("--final", type=Path, required=True)
+    generalist_refinement_evidence.add_argument(
+        "--q0-evidence", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument(
+        "--selection", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument(
+        "--deepseek-root", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument(
+        "--extended-root", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument(
+        "--package-root", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument(
+        "--view-dir", type=Path, required=True
+    )
+    generalist_refinement_evidence.add_argument("--output", type=Path, required=True)
 
     generalist_historical_riemann = subparsers.add_parser(
         "generalist-v2-historical-riemann",
@@ -2183,7 +2214,9 @@ def _parser() -> argparse.ArgumentParser:
     generalist_release_evidence.add_argument("--selection", type=Path, required=True)
     generalist_release_evidence.add_argument("--extended", type=Path, required=True)
     generalist_release_evidence.add_argument("--final", type=Path, required=True)
-    generalist_release_evidence.add_argument("--historical", type=Path, required=True)
+    generalist_release_evidence.add_argument(
+        "--refinement", type=Path, required=True
+    )
     generalist_release_evidence.add_argument(
         "--deepseek-preflight", type=Path, required=True
     )
@@ -2505,6 +2538,24 @@ def main(argv: list[str] | None = None) -> int:
             args.q0_evidence,
             args.selection,
             args.final_root,
+            args.deepseek_root,
+            args.package_root,
+            args.view_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "generalist-v2-refinement-evidence":
+        from .generalist_v2_refinement import compact_refinement_evidence
+
+        evidence = compact_refinement_evidence(
+            args.extended,
+            args.final,
+            args.q0_evidence,
+            args.selection,
+            args.deepseek_root,
+            args.extended_root,
             args.package_root,
             args.view_dir,
             args.output,
@@ -2556,7 +2607,7 @@ def main(argv: list[str] | None = None) -> int:
             args.selection,
             args.extended,
             args.final,
-            args.historical,
+            args.refinement,
             args.deepseek_preflight,
             args.lora_parity,
             args.output,

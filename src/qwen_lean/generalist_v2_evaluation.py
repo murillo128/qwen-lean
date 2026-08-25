@@ -71,6 +71,23 @@ FINAL_TEST_WORKLOADS = {
     "minif2f-test-clean-v2": 244,
     "riemann-fresh-test-v2": 104,
 }
+DEEPSEEK_FINAL_LANE_RUNTIME = {
+    "minif2f-valid-clean-v2": {
+        "max_prompt_plus_generation_tokens": 1510,
+        "max_model_len": 2048,
+        "cpu_offload_gb": 0.0,
+    },
+    "minif2f-test-clean-v2": {
+        "max_prompt_plus_generation_tokens": 1364,
+        "max_model_len": 2048,
+        "cpu_offload_gb": 0.0,
+    },
+    "fresh-composition-test-v2": {
+        "max_prompt_plus_generation_tokens": 17347,
+        "max_model_len": 20480,
+        "cpu_offload_gb": 6.0,
+    },
+}
 
 
 def _ordered_ids_digest(ids: list[str]) -> str:
@@ -343,6 +360,38 @@ def _final_phase1_config(
     return Phase1Config(path=base.path, value={**base.value, "engine": engine})
 
 
+def _deepseek_final_lane_phase1_config(
+    phase1: Phase1Config, workload_id: str
+) -> Phase1Config:
+    """Right-size only memory placement for one frozen DeepSeek workload."""
+
+    lane = DEEPSEEK_FINAL_LANE_RUNTIME.get(workload_id)
+    if lane is None:
+        raise ValueError(f"unknown DeepSeek final workload: {workload_id}")
+    if int(lane["max_model_len"]) < int(
+        lane["max_prompt_plus_generation_tokens"]
+    ):
+        raise ValueError("DeepSeek lane context would truncate a frozen prompt")
+    engine = {
+        **phase1.engine,
+        "max_model_len": int(lane["max_model_len"]),
+        "cpu_offload_gb": float(lane["cpu_offload_gb"]),
+    }
+    assessment = {
+        **phase1.value["assessment"],
+        "lane_runtime": {
+            "workload_id": workload_id,
+            **lane,
+            "semantic_contract_changed": False,
+            "reason": "right-sized context and CPU weight offload after a host-memory OOM in the full-context miniF2F lane",
+        },
+    }
+    return Phase1Config(
+        path=phase1.path,
+        value={**phase1.value, "assessment": assessment, "engine": engine},
+    )
+
+
 def _sampling(
     config: GeneralistV2Config, *, candidates_per_task: int | None = None
 ) -> dict[str, Any]:
@@ -547,6 +596,8 @@ def run_final_generation(
         workload_id, package_root, view_dir
     )
     phase1 = _final_phase1_config(evaluation_config, config, model_label=model_label)
+    if model_label == "deepseek":
+        phase1 = _deepseek_final_lane_phase1_config(phase1, workload_id)
     sampling = _sampling(config, candidates_per_task=8)
     started = time.perf_counter()
     generated, engine_version = _generate_candidates(
@@ -577,6 +628,11 @@ def run_final_generation(
         "candidate_count": len(generated),
         "sampling": sampling,
         "engine": phase1.engine,
+        "deepseek_lane_runtime": (
+            phase1.value["assessment"]["lane_runtime"]
+            if model_label == "deepseek"
+            else None
+        ),
         "engine_version": engine_version,
         "inference_execution": "project-controlled-local-cuda",
         "generation_wall_time_seconds": elapsed,
@@ -1756,12 +1812,8 @@ def compact_extended_validation_evidence(
 
 
 FINAL_ASSESSMENT_WORKLOADS = {
-    "minif2f-valid-clean-v2": 244,
     "minif2f-test-clean-v2": 244,
-    "fresh-composition-valid-v2": 406,
     "fresh-composition-test-v2": 415,
-    "riemann-fresh-valid-v2": 100,
-    "riemann-fresh-test-v2": 104,
 }
 
 
@@ -1843,6 +1895,8 @@ def _compact_final_run(
         "generation_sha256": sha256_file(root / "generations.jsonl"),
         "results_sha256": sha256_file(root / "results.jsonl"),
         "timing_seconds": run["runtime"],
+        "engine": generation.get("engine"),
+        "deepseek_lane_runtime": generation.get("deepseek_lane_runtime"),
         "first_complete_result_overwrite_protected": True,
     }
 
@@ -1925,6 +1979,7 @@ def compact_final_assessment_evidence(
     q0_evidence_path: Path,
     selection_path: Path,
     final_root: Path,
+    deepseek_root: Path,
     package_root: Path,
     view_dir: Path,
     output: Path,
@@ -1945,36 +2000,19 @@ def compact_final_assessment_evidence(
     ):
         raise ValueError("final assessment requires frozen Q0 and checkpoint evidence")
 
-    validation_workloads = {
-        "minif2f-valid-clean-v2",
-        "fresh-composition-valid-v2",
-        "riemann-fresh-valid-v2",
-    }
     workloads: dict[str, Any] = {}
     for workload_id, task_count in FINAL_ASSESSMENT_WORKLOADS.items():
         lanes: dict[str, dict[str, Any]] = {}
-        if workload_id in validation_workloads:
-            lanes["base"] = _compact_reused_screening(
-                q0["workloads"][workload_id],
-                model_label="base",
+        for model_label in ("base", "selected"):
+            lanes[model_label] = _compact_final_run(
+                final_root / model_label / workload_id,
+                model_label=model_label,
                 selected_checkpoint=selected_checkpoint,
+                workload_id=workload_id,
+                expected_task_count=task_count,
             )
-            lanes["selected"] = _compact_reused_screening(
-                selection["checkpoints"][selected_checkpoint]["workloads"][workload_id],
-                model_label="selected",
-                selected_checkpoint=selected_checkpoint,
-            )
-        else:
-            for model_label in ("base", "selected"):
-                lanes[model_label] = _compact_final_run(
-                    final_root / model_label / workload_id,
-                    model_label=model_label,
-                    selected_checkpoint=selected_checkpoint,
-                    workload_id=workload_id,
-                    expected_task_count=task_count,
-                )
         lanes["deepseek"] = _compact_final_run(
-            final_root / "deepseek" / workload_id,
+            deepseek_root / "deepseek" / workload_id,
             model_label="deepseek",
             selected_checkpoint=selected_checkpoint,
             workload_id=workload_id,
@@ -2073,7 +2111,12 @@ def compact_final_assessment_evidence(
         "checkpoint_selection_frozen_before_test": True,
         "test_workloads_first_used_after_checkpoint_freeze": True,
         "test_workloads_regenerated": False,
-        "riemann_validation_used_for_selection": False,
+        "scope_amendment": {
+            "issue_comment_id": 5409570320,
+            "final_general_test_only": True,
+            "riemann_evaluation_required_for_completion": False,
+            "additional_n64_lanes_run": False,
+        },
     }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(

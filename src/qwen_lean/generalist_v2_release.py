@@ -35,6 +35,28 @@ def _headline_final_workloads(final: dict[str, Any]) -> dict[str, Any]:
     return output
 
 
+def _headline_refinement(refinement: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "analysis_scope": refinement["analysis_scope"],
+        "workloads": {
+            workload_id: {
+                "exact_c_i_distribution": workload["exact_c_i_distribution"],
+                "partition_task_counts": {
+                    label: value["task_count"]
+                    for label, value in workload["partitions"].items()
+                },
+                "paired_n8_overlap_counts": {
+                    label: value["counts"]
+                    for label, value in workload["paired_n8_overlap"].items()
+                    if isinstance(value, dict) and "counts" in value
+                },
+            }
+            for workload_id, workload in refinement["workloads"].items()
+        },
+        "conclusions": refinement["conclusions"],
+    }
+
+
 def compact_generalist_v2_release_evidence(
     config: GeneralistV2Config,
     binding_path: Path,
@@ -42,7 +64,7 @@ def compact_generalist_v2_release_evidence(
     selection_path: Path,
     extended_path: Path,
     final_path: Path,
-    historical_path: Path,
+    refinement_path: Path,
     deepseek_preflight_path: Path,
     lora_parity_path: Path,
     output: Path,
@@ -55,7 +77,7 @@ def compact_generalist_v2_release_evidence(
     selection = _read(selection_path)
     extended = _read(extended_path)
     final = _read(final_path)
-    historical = _read(historical_path)
+    refinement = _read(refinement_path)
     deepseek_preflight = _read(deepseek_preflight_path)
     from .generalist_v2_parity import validate_lora_parity_gate
 
@@ -84,10 +106,18 @@ def compact_generalist_v2_release_evidence(
         or final.get("status") != "complete"
         or final.get("selected_checkpoint") != selected
         or final.get("selected_adapter_model_sha256") != adapter_hash
-        or historical.get("schema_version") != "generalist-v2-historical-riemann-v1"
-        or historical.get("status") != "complete"
-        or historical.get("selected_checkpoint") != selected
-        or historical.get("selected_adapter_model_sha256") != adapter_hash
+        or refinement.get("schema_version")
+        != "generalist-v2-refinement-conclusions-v1"
+        or refinement.get("status") != "complete"
+        or refinement.get("selected_checkpoint") != selected
+        or refinement.get("selected_adapter_model_sha256") != adapter_hash
+        or refinement.get("extended_validation_sha256")
+        != sha256_file(extended_path)
+        or refinement.get("final_assessment_sha256") != sha256_file(final_path)
+        or refinement.get("selection_evidence_sha256")
+        != sha256_file(selection_path)
+        or refinement.get("q0_evidence_sha256")
+        != selection.get("q0_evidence_sha256")
         or deepseek_preflight.get("schema_version")
         != "generalist-v2-deepseek-final-preflight-v1"
         or deepseek_preflight.get("status") != "passed"
@@ -167,7 +197,7 @@ def compact_generalist_v2_release_evidence(
             "selection_rule": selection["selection"]["rule"],
             "selected_checkpoint": selected,
             "screening_ranking": selection["selection"]["screening_ranking"],
-            "selected_workloads": {
+            "selected_general_validation_workloads": {
                 workload_id: {
                     "pass_at_k": value["pass_at_k"],
                     "tasks_with_verified_candidate": value[
@@ -175,23 +205,22 @@ def compact_generalist_v2_release_evidence(
                     ],
                 }
                 for workload_id, value in selected_screening.items()
+                if workload_id
+                in {
+                    "minif2f-valid-clean-v2",
+                    "fresh-composition-valid-v2",
+                }
             },
             "test_or_riemann_used_for_selection": False,
         },
         "extended_validation": extended["evaluated_checkpoint"]["workloads"],
         "final_assessment": _headline_final_workloads(final),
-        "historical_riemann": {
-            "interpretation": historical["interpretation"],
-            "clean_unseen_generalization": historical["clean_unseen_generalization"],
-            "selected": {
-                "pass_at_k": historical["selected"]["pass_at_k"],
-                "tasks_with_verified_candidate": historical["selected"][
-                    "tasks_with_verified_candidate"
-                ],
-                "category_counts": historical["selected"]["category_counts"],
-            },
-            "accepted_anchors": historical["accepted_anchors"],
-            "paired_solved_within_4": historical["paired_solved_within_4"],
+        "refinement_conclusions": _headline_refinement(refinement),
+        "scope_amendment": {
+            "issue_comment_id": 5409570320,
+            "general_final_test_only": True,
+            "riemann_evidence_completion_gate": False,
+            "additional_n64_lanes_run": False,
         },
         "deepseek_final_preflight": deepseek_preflight,
         "lora_inference_parity_gate": lora_parity_gate,
@@ -201,7 +230,7 @@ def compact_generalist_v2_release_evidence(
             "checkpoint_selection": sha256_file(selection_path),
             "extended_validation": sha256_file(extended_path),
             "final_assessment": sha256_file(final_path),
-            "historical_riemann": sha256_file(historical_path),
+            "refinement_conclusions": sha256_file(refinement_path),
             "deepseek_final_preflight": sha256_file(deepseek_preflight_path),
             "lora_inference_parity": sha256_file(lora_parity_path),
         },

@@ -90,6 +90,7 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             {
                 "schema_version": "generalist-v2-checkpoint-selection-v1",
                 "status": "frozen",
+                "q0_evidence_sha256": "q0-evidence-sha256",
                 "selection": {
                     "selected_checkpoint": "Q2",
                     "rule": "validation-only",
@@ -143,23 +144,6 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
                 },
             },
         ),
-        "historical": _write(
-            tmp_path / "historical.json",
-            {
-                "schema_version": "generalist-v2-historical-riemann-v1",
-                "status": "complete",
-                "selected_checkpoint": "Q2",
-                "selected_adapter_model_sha256": adapter_sha256,
-                "interpretation": "historical non-clean context",
-                "clean_unseen_generalization": False,
-                "selected": {
-                    **workload,
-                    "category_counts": {"verified": 1},
-                },
-                "accepted_anchors": {"base": {}, "deepseek": {}},
-                "paired_solved_within_4": {"selected_vs_base": {}},
-            },
-        ),
         "deepseek_preflight": _write(
             tmp_path / "deepseek-preflight.json",
             {
@@ -200,6 +184,40 @@ def _release_inputs(tmp_path: Path) -> tuple[GeneralistV2Config, dict[str, Path]
             },
         ),
     }
+    paths["refinement"] = _write(
+        tmp_path / "refinement.json",
+        {
+            "schema_version": "generalist-v2-refinement-conclusions-v1",
+            "status": "complete",
+            "selected_checkpoint": "Q2",
+            "selected_adapter_model_sha256": adapter_sha256,
+            "extended_validation_sha256": sha256_file(paths["extended"]),
+            "final_assessment_sha256": sha256_file(paths["final"]),
+            "selection_evidence_sha256": sha256_file(paths["selection"]),
+            "q0_evidence_sha256": "q0-evidence-sha256",
+            "analysis_scope": {
+                "validation_only": True,
+                "test_workloads_inspected_for_refinement": False,
+            },
+            "workloads": {
+                "minif2f-valid-clean-v2": {
+                    "exact_c_i_distribution": {"0": 1},
+                    "partitions": {
+                        "robust": {"task_count": 0},
+                        "search-sensitive": {"task_count": 0},
+                        "lottery": {"task_count": 0},
+                        "dead-zone": {"task_count": 1},
+                    },
+                    "paired_n8_overlap": {
+                        "q0_vs_q4": {"counts": {"solved_by_neither": 1}},
+                        "q4_vs_deepseek": {"counts": {"solved_by_neither": 1}},
+                        "compute_contract": "same n=8 contract",
+                    },
+                }
+            },
+            "conclusions": {"actionable_future_work": []},
+        },
+    )
     return config, paths
 
 
@@ -214,7 +232,7 @@ def test_release_evidence_binds_selected_adapter_and_inputs(tmp_path: Path) -> N
         paths["selection"],
         paths["extended"],
         paths["final"],
-        paths["historical"],
+        paths["refinement"],
         paths["deepseek_preflight"],
         paths["lora_parity"],
         output,
@@ -224,7 +242,10 @@ def test_release_evidence_binds_selected_adapter_and_inputs(tmp_path: Path) -> N
     assert evidence["adapter"]["selected_checkpoint"] == "Q2"
     assert evidence["adapter"]["adapter_model_sha256"] == "adapter-model-sha256"
     assert evidence["screening"]["test_or_riemann_used_for_selection"] is False
-    assert evidence["historical_riemann"]["clean_unseen_generalization"] is False
+    assert evidence["scope_amendment"]["riemann_evidence_completion_gate"] is False
+    assert evidence["refinement_conclusions"]["analysis_scope"][
+        "validation_only"
+    ] is True
     assert evidence["lora_inference_parity_gate"]["status"] == "passed"
     assert evidence["evidence_sha256"]["full_training"] == sha256_file(
         paths["training"]
@@ -246,7 +267,7 @@ def test_release_evidence_rejects_mismatched_adapter(tmp_path: Path) -> None:
             paths["selection"],
             paths["extended"],
             paths["final"],
-            paths["historical"],
+            paths["refinement"],
             paths["deepseek_preflight"],
             paths["lora_parity"],
             tmp_path / "release.json",

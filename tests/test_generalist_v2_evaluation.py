@@ -15,6 +15,7 @@ from qwen_lean.generalist_v2_evaluation import (
     _compact_checkpoint_workload,
     _compact_extended_workload,
     _compact_final_run,
+    _deepseek_final_lane_phase1_config,
     _final_phase1_config,
     _normalized_verified_proof_sha256,
     _paired_solved,
@@ -137,6 +138,34 @@ def test_final_deepseek_config_uses_same_frozen_context_and_pinned_identity() ->
             generalist,
             model_label="deepseek",
         )
+
+
+def test_final_deepseek_lane_runtime_preserves_exact_context_without_full_offload() -> None:
+    generalist = GeneralistV2Config.load(ROOT / "config/qwen35-4b-generalist-v2.json")
+    phase1 = _final_phase1_config(
+        ROOT / "config/deepseek-prover-v2-7b-generalist-v2.json",
+        generalist,
+        model_label="deepseek",
+    )
+
+    lane = _deepseek_final_lane_phase1_config(
+        phase1, "minif2f-valid-clean-v2"
+    )
+
+    assert lane.engine["max_model_len"] == 2048
+    assert lane.engine["cpu_offload_gb"] == 0.0
+    assert lane.value["assessment"]["lane_runtime"][
+        "max_prompt_plus_generation_tokens"
+    ] == 1510
+    assert lane.sampling == phase1.sampling
+
+    fresh_lane = _deepseek_final_lane_phase1_config(
+        phase1, "fresh-composition-test-v2"
+    )
+    assert fresh_lane.engine["max_model_len"] == 20480
+    assert fresh_lane.engine["cpu_offload_gb"] == 6.0
+    with pytest.raises(ValueError, match="unknown DeepSeek final workload"):
+        _deepseek_final_lane_phase1_config(phase1, "riemann-fresh-test-v2")
 
 
 def test_paired_historical_outcomes_use_exact_two_sided_mcnemar() -> None:
