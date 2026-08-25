@@ -243,6 +243,9 @@ def _task_properties(
         )
         output[task.id] = {
             "source_family": _source_family(workload_id, task.id, task_metadata),
+            "structural_class": str(
+                task_metadata.get("structural_class") or "not-annotated"
+            ),
             "broad_domain": _broad_domains(
                 task.id, task.declaration, task_metadata
             ),
@@ -250,6 +253,8 @@ def _task_properties(
             "logical_shapes": _logical_shapes(task.id, task.declaration),
             "declaration_chars": len(task.declaration),
             "declaration_lines": task.declaration.count("\n") + 1,
+            "context_chars": len(task.preamble),
+            "prompt_chars": len(task.preamble) + len(task.declaration),
             "named_hypothesis_count": len(
                 re.findall(r"\bh[₀-₉0-9A-Za-z_']*\s*:", task.declaration)
             ),
@@ -370,6 +375,12 @@ def _aggregate_tasks(
             "declaration_lines": _numeric_summary(
                 [properties[item]["declaration_lines"] for item in task_ids]
             ),
+            "context_chars": _numeric_summary(
+                [properties[item]["context_chars"] for item in task_ids]
+            ),
+            "prompt_chars": _numeric_summary(
+                [properties[item]["prompt_chars"] for item in task_ids]
+            ),
             "named_hypothesis_count": _numeric_summary(
                 [properties[item]["named_hypothesis_count"] for item in task_ids]
             ),
@@ -385,6 +396,9 @@ def _aggregate_tasks(
             "unavailable_task_count": len(task_ids) - len(oracle_available),
             "completion_chars": _numeric_summary(
                 [int(value["completion_chars"]) for value in oracle_available]
+            ),
+            "completion_lines": _numeric_summary(
+                [int(value["completion_lines"]) for value in oracle_available]
             ),
             "tactic_or_lemma_family_task_counts": dict(
                 sorted(
@@ -434,6 +448,7 @@ def _representative_examples(
             "verified_candidate_count": counts[task_id],
             "unique_verified_proof_count": unique_counts[task_id],
             "source_family": properties[task_id]["source_family"],
+            "structural_class": properties[task_id]["structural_class"],
             "broad_domain": properties[task_id]["broad_domain"],
             "carriers": properties[task_id]["carriers"],
             "logical_shapes": properties[task_id]["logical_shapes"],
@@ -665,6 +680,7 @@ def compact_refinement_evidence(
             )
             for dimension in (
                 "source_family",
+                "structural_class",
                 "broad_domain",
                 "carriers",
                 "logical_shapes",
@@ -746,6 +762,7 @@ def compact_refinement_evidence(
                 )
                 for dimension in (
                     "source_family",
+                    "structural_class",
                     "broad_domain",
                     "carriers",
                     "logical_shapes",

@@ -31,6 +31,7 @@ def _headline_final_workloads(final: dict[str, Any]) -> dict[str, Any]:
                 for label, lane in workload["models"].items()
             },
             "deepseek_gap_closed_fraction": workload["deepseek_gap_closed_fraction"],
+            "incomplete_comparators": workload.get("incomplete_comparators", {}),
         }
     return output
 
@@ -217,9 +218,11 @@ def compact_generalist_v2_release_evidence(
         "final_assessment": _headline_final_workloads(final),
         "refinement_conclusions": _headline_refinement(refinement),
         "scope_amendment": {
-            "issue_comment_id": 5409570320,
+            "issue_comment_ids": [5409570320, 5415045961],
             "general_final_test_only": True,
             "riemann_evidence_completion_gate": False,
+            "deepseek_fresh_test_completion_gate": False,
+            "deepseek_fresh_test_scored": False,
             "additional_n64_lanes_run": False,
         },
         "deepseek_final_preflight": deepseek_preflight,

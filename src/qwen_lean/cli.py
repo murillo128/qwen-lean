@@ -2128,6 +2128,9 @@ def _parser() -> argparse.ArgumentParser:
     generalist_final_evidence.add_argument(
         "--deepseek-root", type=Path, required=True
     )
+    generalist_final_evidence.add_argument(
+        "--deepseek-fresh-incomplete", type=Path, required=True
+    )
     generalist_final_evidence.add_argument("--package-root", type=Path, required=True)
     generalist_final_evidence.add_argument("--view-dir", type=Path, required=True)
     generalist_final_evidence.add_argument("--output", type=Path, required=True)
@@ -2539,6 +2542,7 @@ def main(argv: list[str] | None = None) -> int:
             args.selection,
             args.final_root,
             args.deepseek_root,
+            args.deepseek_fresh_incomplete,
             args.package_root,
             args.view_dir,
             args.output,

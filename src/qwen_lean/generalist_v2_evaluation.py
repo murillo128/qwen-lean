@@ -82,11 +82,6 @@ DEEPSEEK_FINAL_LANE_RUNTIME = {
         "max_model_len": 2048,
         "cpu_offload_gb": 0.0,
     },
-    "fresh-composition-test-v2": {
-        "max_prompt_plus_generation_tokens": 17347,
-        "max_model_len": 20480,
-        "cpu_offload_gb": 6.0,
-    },
 }
 
 
@@ -1815,6 +1810,55 @@ FINAL_ASSESSMENT_WORKLOADS = {
     "minif2f-test-clean-v2": 244,
     "fresh-composition-test-v2": 415,
 }
+DEEPSEEK_FRESH_INCOMPLETE_SCHEMA_VERSION = (
+    "generalist-v2-deepseek-fresh-incomplete-v1"
+)
+
+
+def _compact_incomplete_deepseek_fresh(path: Path) -> dict[str, Any]:
+    value = _read_json(path)
+    forbidden = {
+        "pass_at_k",
+        "tasks_with_verified_candidate",
+        "verified_candidate_count",
+        "paired_comparisons",
+    }
+    if (
+        value.get("schema_version")
+        != DEEPSEEK_FRESH_INCOMPLETE_SCHEMA_VERSION
+        or value.get("status")
+        != "INCOMPLETE / DIAGNOSTIC ONLY / NOT FOR MODEL-QUALITY COMPARISON"
+        or value.get("model_id") != DEEPSEEK_MODEL_ID
+        or value.get("model_revision") != DEEPSEEK_MODEL_REVISION
+        or value.get("workload_id") != "fresh-composition-test-v2"
+        or value.get("expected_task_count") != 415
+        or value.get("expected_candidate_count") != 3320
+        or value.get("partial_candidate_records_materialized") != 0
+        or value.get("full_benchmark_metrics_computed") is not False
+        or value.get("extrapolation_performed") is not False
+        or value.get("gpu_released") is not True
+        or forbidden.intersection(value)
+    ):
+        raise ValueError("incomplete DeepSeek fresh diagnostic contract differs")
+    return {
+        "status": value["status"],
+        "stop_reason": value["stop_reason"],
+        "decision_point_completed_candidates": value[
+            "decision_point_completed_candidates"
+        ],
+        "last_observed_completed_candidates": value[
+            "last_observed_completed_candidates"
+        ],
+        "expected_candidate_count": value["expected_candidate_count"],
+        "partial_candidate_records_materialized": value[
+            "partial_candidate_records_materialized"
+        ],
+        "serialization_note": value["serialization_note"],
+        "raw_operational_log": value["raw_operational_log"],
+        "full_benchmark_metrics_computed": False,
+        "extrapolation_performed": False,
+        "source_evidence_sha256": sha256_file(path),
+    }
 
 
 def _compact_final_run(
@@ -1845,6 +1889,10 @@ def _compact_final_run(
         or generation.get("task_count") != expected_task_count
         or generation.get("candidate_count") != expected_task_count * 8
         or generation.get("generation_error_count") != 0
+        or generation.get("prompt_format_id")
+        != "lean-sft-v2-raw-whole-proof"
+        or generation.get("inference_execution")
+        != "project-controlled-local-cuda"
         or generation.get("generation_sha256")
         != sha256_file(root / "generations.jsonl")
         or generation.get("first_complete_result_overwrite_protected") is not True
@@ -1895,6 +1943,10 @@ def _compact_final_run(
         "generation_sha256": sha256_file(root / "generations.jsonl"),
         "results_sha256": sha256_file(root / "results.jsonl"),
         "timing_seconds": run["runtime"],
+        "prompt_format_id": generation["prompt_format_id"],
+        "sampling": generation["sampling"],
+        "engine_version": generation.get("engine_version"),
+        "inference_execution": generation["inference_execution"],
         "engine": generation.get("engine"),
         "deepseek_lane_runtime": generation.get("deepseek_lane_runtime"),
         "first_complete_result_overwrite_protected": True,
@@ -1980,6 +2032,7 @@ def compact_final_assessment_evidence(
     selection_path: Path,
     final_root: Path,
     deepseek_root: Path,
+    deepseek_fresh_incomplete_path: Path,
     package_root: Path,
     view_dir: Path,
     output: Path,
@@ -2011,13 +2064,41 @@ def compact_final_assessment_evidence(
                 workload_id=workload_id,
                 expected_task_count=task_count,
             )
-        lanes["deepseek"] = _compact_final_run(
-            deepseek_root / "deepseek" / workload_id,
-            model_label="deepseek",
-            selected_checkpoint=selected_checkpoint,
-            workload_id=workload_id,
-            expected_task_count=task_count,
-        )
+        incomplete_comparators: dict[str, Any] = {}
+        if workload_id == "minif2f-test-clean-v2":
+            lanes["deepseek"] = _compact_final_run(
+                deepseek_root / "deepseek" / workload_id,
+                model_label="deepseek",
+                selected_checkpoint=selected_checkpoint,
+                workload_id=workload_id,
+                expected_task_count=task_count,
+            )
+        else:
+            incomplete_comparators["deepseek"] = (
+                _compact_incomplete_deepseek_fresh(
+                    deepseek_fresh_incomplete_path
+                )
+            )
+        expected_sampling = _sampling(config, candidates_per_task=8)
+        if any(
+            lane["sampling"] != expected_sampling
+            or lane["prompt_format_id"] != "lean-sft-v2-raw-whole-proof"
+            or lane["inference_execution"] != "project-controlled-local-cuda"
+            for lane in lanes.values()
+        ):
+            raise ValueError(f"final sampling or prompt contract differs for {workload_id}")
+        if lanes["selected"]["adapter"].get("adapter_model_sha256") != selection[
+            "selected_checkpoint"
+        ]["adapter_model_sha256"]:
+            raise ValueError(f"final selected adapter differs for {workload_id}")
+        if "deepseek" in lanes:
+            deepseek_lane_runtime = lanes["deepseek"]["deepseek_lane_runtime"]
+            if (
+                not isinstance(deepseek_lane_runtime, dict)
+                or deepseek_lane_runtime.get("workload_id") != workload_id
+                or deepseek_lane_runtime.get("semantic_contract_changed") is not False
+            ):
+                raise ValueError(f"final DeepSeek runtime differs for {workload_id}")
         identities = {str(lane["ordered_task_ids_sha256"]) for lane in lanes.values()}
         if len(identities) != 1:
             raise ValueError(f"final task identity differs across {workload_id}")
@@ -2034,39 +2115,42 @@ def compact_final_assessment_evidence(
         )
         for lane in lanes.values():
             lane["breakdowns"] = _task_breakdowns(lane["per_task"], task_metadata)
-        paired = {
+        paired: dict[str, Any] = {
             "selected_vs_base": compare_paired_verified_counts(
                 counts["base"],
                 counts["selected"],
                 resamples=int(config.evaluation["bootstrap_resamples"]),
                 seed=int(config.evaluation["bootstrap_seed"]),
             ),
-            "deepseek_vs_base": compare_paired_verified_counts(
+        }
+        gap_closure: dict[str, float | None] | None = None
+        if "deepseek" in lanes:
+            paired["deepseek_vs_base"] = compare_paired_verified_counts(
                 counts["base"],
                 counts["deepseek"],
                 resamples=int(config.evaluation["bootstrap_resamples"]),
                 seed=int(config.evaluation["bootstrap_seed"]),
-            ),
-            "selected_vs_deepseek": compare_paired_verified_counts(
+            )
+            paired["selected_vs_deepseek"] = compare_paired_verified_counts(
                 counts["deepseek"],
                 counts["selected"],
                 resamples=int(config.evaluation["bootstrap_resamples"]),
                 seed=int(config.evaluation["bootstrap_seed"]),
-            ),
-        }
-        gap_closure: dict[str, float | None] = {}
-        for key in ("pass@1", "pass@4", "pass@8"):
-            base = float(lanes["base"]["pass_at_k"][key])
-            selected = float(lanes["selected"]["pass_at_k"][key])
-            deepseek = float(lanes["deepseek"]["pass_at_k"][key])
-            denominator = deepseek - base
-            gap_closure[key] = (
-                None if denominator == 0.0 else (selected - base) / denominator
             )
+            gap_closure = {}
+            for key in ("pass@1", "pass@4", "pass@8"):
+                base = float(lanes["base"]["pass_at_k"][key])
+                selected = float(lanes["selected"]["pass_at_k"][key])
+                deepseek = float(lanes["deepseek"]["pass_at_k"][key])
+                denominator = deepseek - base
+                gap_closure[key] = (
+                    None if denominator == 0.0 else (selected - base) / denominator
+                )
         workloads[workload_id] = {
             "task_count": task_count,
             "candidates_per_task": 8,
             "models": lanes,
+            "incomplete_comparators": incomplete_comparators,
             "paired_comparisons": paired,
             "deepseek_gap_closed_fraction": gap_closure,
             "per_task_solved_outcomes": [
@@ -2112,9 +2196,11 @@ def compact_final_assessment_evidence(
         "test_workloads_first_used_after_checkpoint_freeze": True,
         "test_workloads_regenerated": False,
         "scope_amendment": {
-            "issue_comment_id": 5409570320,
+            "issue_comment_ids": [5409570320, 5415045961],
             "final_general_test_only": True,
             "riemann_evaluation_required_for_completion": False,
+            "deepseek_fresh_test_required_for_completion": False,
+            "deepseek_fresh_test_scored": False,
             "additional_n64_lanes_run": False,
         },
     }

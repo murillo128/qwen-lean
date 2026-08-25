@@ -89,6 +89,8 @@ def test_refinement_group_metrics_expose_density_and_duplication() -> None:
         task_id: {
             "declaration_chars": 10,
             "declaration_lines": 1,
+            "context_chars": 5,
+            "prompt_chars": 15,
             "named_hypothesis_count": 0,
             "binder_group_count": 0,
             "coercion_marker_count": 0,

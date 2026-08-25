@@ -1,0 +1,37 @@
+{
+  "decision_point_completed_candidates": 200,
+  "expected_candidate_count": 3320,
+  "expected_task_count": 415,
+  "extrapolation_performed": false,
+  "full_benchmark_metrics_computed": false,
+  "gpu_release": {
+    "all_issue_78_gpu_processes_absent": true,
+    "previous_stale_process_terminated": true,
+    "verified_at_utc": "2026-08-25T18:49:23Z"
+  },
+  "gpu_released": true,
+  "issue_amendment_comment_id": 5415045961,
+  "last_observed_completed_candidates": 208,
+  "model_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+  "model_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+  "partial_candidate_records_materialized": 0,
+  "raw_operational_log": {
+    "byte_count": 181720,
+    "path_role": "retained-outside-git/deepseek/fresh-composition-test-v2/partial-runner.log",
+    "sha256": "b697965abe9f660059952ed7a1dc06b0f13141d469d1e31a20401b52e486c115"
+  },
+  "sampling_contract": {
+    "candidates_per_task": 8,
+    "max_new_tokens": 1024,
+    "seed": 0,
+    "temperature": 0.8,
+    "top_k": -1,
+    "top_p": 0.95
+  },
+  "schema_version": "generalist-v2-deepseek-fresh-incomplete-v1",
+  "serialization_note": "The pinned vLLM LLM.generate call buffers request outputs until the complete call returns. The process was stopped before return, so no candidate JSONL or generation metadata existed to retain; the exact operational log is the only materialized partial artifact.",
+  "status": "INCOMPLETE / DIAGNOSTIC ONLY / NOT FOR MODEL-QUALITY COMPARISON",
+  "stop_reason": "deliberate compute/value triage; not model failure or infrastructure failure",
+  "stopped_at_utc": "2026-08-25T18:46:57Z",
+  "workload_id": "fresh-composition-test-v2"
+}

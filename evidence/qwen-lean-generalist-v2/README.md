@@ -151,7 +151,41 @@ from the completion contract. Evidence produced before that amendment remains
 immutable diagnostic history, but it is not extended, regenerated, included in
 the final general comparison, or treated as a release gate. The remaining final
 assessment is restricted to the n=8 clean miniF2F and fresh-composition test
-workloads for Base, frozen Q4, and DeepSeek; no additional n=64 lane is run.
+workloads; no additional n=64 lane is run.
+
+`ACCEPTED`: the later issue amendment `#5415045961` stops the disproportionately
+expensive DeepSeek fresh-composition test and removes it as a completion gate.
+The process stopped after the log observed 208/3320 completed candidates. The
+pinned blocking vLLM call had not returned, so it had materialized no candidate
+JSONL to retain or score. `deepseek-fresh-incomplete.json` binds the exact
+outside-Git operational log SHA-256 and marks the lane `INCOMPLETE / DIAGNOSTIC
+ONLY / NOT FOR MODEL-QUALITY COMPARISON`; no pass@k or extrapolation is present.
+All #78 GPU processes, including the older stale process, were terminated and
+the Ada was released before CPU analysis and review.
+
+`OBSERVED`: on clean miniF2F test, Base/Q4/DeepSeek solved 87/76/95 of 244 tasks
+within eight samples. Their pass@1/pass@4/pass@8 values were respectively
+0.105533/0.269848/0.356557, 0.158299/0.267857/0.311475, and
+0.154713/0.319555/0.389344. Q4 improved pass@1 over Base, but its pass@8 delta
+was -0.045082 with paired-bootstrap 95% interval [-0.094262, 0.004098]. Q4 was
+below DeepSeek at pass@8 by -0.077869, interval [-0.147541, -0.008197]. On the
+fresh-composition final test, Base solved 6/415 while Q4 solved 0/415; the
+pass@8 delta was -0.014458, interval [-0.026506, -0.004819], with exact McNemar
+p=0.03125. These final-only results do not retroactively change the frozen
+validation selection and no retuning was performed.
+
+`OBSERVED`: Stage 9 partitions miniF2F validation into 48 robust, 47
+search-sensitive, 12 lottery, and 137 dead-zone tasks; fresh composition has
+39/42/13/312 respectively. Verified-proof duplication is high (0.8529 miniF2F,
+0.9440 fresh), so the evidence supports both search/diversity opportunity and a
+large executor/knowledge dead zone. The strongest sufficiently sized groups
+include miniF2F `mathd_numbertheory` and fresh direct/complex/integer tasks;
+weak groups include IMO/AIME and existential/iff shapes on miniF2F, plus deep,
+category-theory, negation/iff, and geometry groups on fresh composition. On the
+accepted same-task miniF2F validation comparator, Q4 and DeepSeek both solved
+55 tasks, Q4 alone solved 19, DeepSeek alone solved 78, and neither solved 92.
+The analysis authorizes no extra training and recommends independently sourced
+skill-matched data rather than recycling failed validation theorems.
 
 Commands:
 
@@ -163,4 +197,7 @@ uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-bind-d
 PYTHONPATH=src .venv/bin/python -m qwen_lean generalist-v2-q0-evidence --config config/qwen35-4b-generalist-v2.json --evaluation-root artifacts/qwen-lean-generalist-v2/q0 --output evidence/qwen-lean-generalist-v2/q0.json
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True HF_HUB_OFFLINE=1 uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-production-preflight --config config/qwen35-4b-generalist-v2.json --package-root data/lean-whole-proof-v2 --binding evidence/qwen-lean-generalist-v2/dataset-binding.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --model-snapshot /root/.cache/huggingface/hub/models--Qwen--Qwen3.5-4B-Base/snapshots/1001bb4d826a52d1f399e183466143f4da7b741b --output evidence/qwen-lean-generalist-v2/production-preflight.json
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True HF_HUB_OFFLINE=1 uv run --project tools/qwen35-generalist --locked qwen-lean generalist-v2-train --config config/qwen35-4b-generalist-v2.json --package-root data/lean-whole-proof-v2 --binding evidence/qwen-lean-generalist-v2/dataset-binding.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --production-preflight evidence/qwen-lean-generalist-v2/production-preflight.json --overfit-run artifacts/qwen-lean-generalist-v2/overfit64/run.json --smoke-run artifacts/qwen-lean-generalist-v2/smoke4096/run.json --model-snapshot /root/.cache/huggingface/hub/models--Qwen--Qwen3.5-4B-Base/snapshots/1001bb4d826a52d1f399e183466143f4da7b741b --output-dir artifacts/qwen-lean-generalist-v2/full-training
+PYTHONPATH=src .venv/bin/python -m qwen_lean generalist-v2-final-evidence --config config/qwen35-4b-generalist-v2.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --selection evidence/qwen-lean-generalist-v2/checkpoint-selection.json --final-root /dev/shm/qwen-lean-generalist-v2-final-assessment --deepseek-root /dev/shm/qwen-lean-generalist-v2-deepseek-recovery --deepseek-fresh-incomplete evidence/qwen-lean-generalist-v2/deepseek-fresh-incomplete.json --package-root data/lean-whole-proof-v2 --view-dir artifacts/qwen-lean-generalist-v2/dataset-binding/views --output evidence/qwen-lean-generalist-v2/final-assessment.json
+PYTHONPATH=src .venv/bin/python -m qwen_lean generalist-v2-refinement-evidence --extended evidence/qwen-lean-generalist-v2/extended-validation.json --final evidence/qwen-lean-generalist-v2/final-assessment.json --q0-evidence evidence/qwen-lean-generalist-v2/q0.json --selection evidence/qwen-lean-generalist-v2/checkpoint-selection.json --deepseek-root /dev/shm/qwen-lean-generalist-v2-deepseek-recovery --extended-root /dev/shm/qwen-lean-generalist-v2-extended-validation --package-root data/lean-whole-proof-v2 --view-dir artifacts/qwen-lean-generalist-v2/dataset-binding/views --output evidence/qwen-lean-generalist-v2/refinement-conclusions.json
+PYTHONPATH=src .venv/bin/python -m qwen_lean generalist-v2-release-evidence --config config/qwen35-4b-generalist-v2.json --binding evidence/qwen-lean-generalist-v2/dataset-binding.json --training evidence/qwen-lean-generalist-v2/full-training.json --selection evidence/qwen-lean-generalist-v2/checkpoint-selection.json --extended evidence/qwen-lean-generalist-v2/extended-validation.json --final evidence/qwen-lean-generalist-v2/final-assessment.json --refinement evidence/qwen-lean-generalist-v2/refinement-conclusions.json --deepseek-preflight evidence/qwen-lean-generalist-v2/deepseek-final-preflight.json --lora-parity evidence/qwen-lean-generalist-v2/lora-inference-parity-corrected.json --output evidence/qwen-lean-generalist-v2/release.json
 ```

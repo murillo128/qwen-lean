@@ -15,6 +15,7 @@ from qwen_lean.generalist_v2_evaluation import (
     _compact_checkpoint_workload,
     _compact_extended_workload,
     _compact_final_run,
+    _compact_incomplete_deepseek_fresh,
     _deepseek_final_lane_phase1_config,
     _final_phase1_config,
     _normalized_verified_proof_sha256,
@@ -159,11 +160,10 @@ def test_final_deepseek_lane_runtime_preserves_exact_context_without_full_offloa
     ] == 1510
     assert lane.sampling == phase1.sampling
 
-    fresh_lane = _deepseek_final_lane_phase1_config(
-        phase1, "fresh-composition-test-v2"
-    )
-    assert fresh_lane.engine["max_model_len"] == 20480
-    assert fresh_lane.engine["cpu_offload_gb"] == 6.0
+    with pytest.raises(ValueError, match="unknown DeepSeek final workload"):
+        _deepseek_final_lane_phase1_config(
+            phase1, "fresh-composition-test-v2"
+        )
     with pytest.raises(ValueError, match="unknown DeepSeek final workload"):
         _deepseek_final_lane_phase1_config(phase1, "riemann-fresh-test-v2")
 
@@ -272,6 +272,9 @@ def test_compact_final_run_requires_frozen_identity_and_per_task_outcomes(
         "task_count": 1,
         "candidate_count": 8,
         "generation_error_count": 0,
+        "prompt_format_id": "lean-sft-v2-raw-whole-proof",
+        "sampling": {"candidates_per_task": 8},
+        "inference_execution": "project-controlled-local-cuda",
         "first_complete_result_overwrite_protected": True,
         "final_only_workload": False,
         "ordered_task_ids_sha256": "task-hash",
@@ -330,6 +333,41 @@ def test_compact_final_run_requires_frozen_identity_and_per_task_outcomes(
 
     assert compact["per_task"] == [{"task_id": "task-a", "verified_candidate_count": 2}]
     assert compact["first_complete_result_overwrite_protected"] is True
+
+
+def test_incomplete_deepseek_fresh_is_diagnostic_and_never_scored(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "incomplete.json"
+    value = {
+        "schema_version": "generalist-v2-deepseek-fresh-incomplete-v1",
+        "status": "INCOMPLETE / DIAGNOSTIC ONLY / NOT FOR MODEL-QUALITY COMPARISON",
+        "model_id": "deepseek-ai/DeepSeek-Prover-V2-7B",
+        "model_revision": "a8d9e14432b2e8dd9df2a4d4e70f1ba9bc8d9b7b",
+        "workload_id": "fresh-composition-test-v2",
+        "expected_task_count": 415,
+        "expected_candidate_count": 3320,
+        "decision_point_completed_candidates": 200,
+        "last_observed_completed_candidates": 208,
+        "partial_candidate_records_materialized": 0,
+        "full_benchmark_metrics_computed": False,
+        "extrapolation_performed": False,
+        "gpu_released": True,
+        "stop_reason": "deliberate compute/value triage",
+        "serialization_note": "vLLM buffered results until full return",
+        "raw_operational_log": {"sha256": "log-sha256"},
+    }
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+    compact = _compact_incomplete_deepseek_fresh(path)
+
+    assert compact["last_observed_completed_candidates"] == 208
+    assert compact["full_benchmark_metrics_computed"] is False
+    assert "pass_at_k" not in compact
+    value["pass_at_k"] = {"pass@8": 0.0}
+    path.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(ValueError, match="diagnostic contract"):
+        _compact_incomplete_deepseek_fresh(path)
 
 
 def test_compact_extended_workload_reports_curve_and_marginal_gains(
