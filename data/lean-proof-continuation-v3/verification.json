@@ -1,0 +1,232 @@
+{
+  "deterministic_identities": {
+    "canonical_records_validated": 178544,
+    "derived_examples_validated": 317554,
+    "failures": 0
+  },
+  "fresh_composition": {
+    "accepted_roles": {
+      "test": 48,
+      "training": 192,
+      "validation": 48
+    },
+    "first_constructs": {
+      "apply": 111,
+      "constructor": 83,
+      "refine": 94
+    },
+    "logic_shapes": {
+      "and": 242,
+      "iff": 46
+    },
+    "missing_source_constants": 25,
+    "persisted_verification": [
+      {
+        "records": 76,
+        "source_sha256": "9fd5b74f10970ee74f327a45fc3fe116c2bce83e516c2b6fb00432d93a90a3fb",
+        "status": "accepted"
+      },
+      {
+        "records": 62,
+        "source_sha256": "97793a9fa275ccb6b6eb421ca0cd814d81843f9ff5a3089bc98691a879ffc4ba",
+        "status": "accepted"
+      },
+      {
+        "records": 70,
+        "source_sha256": "49731e1b364217042bc172a102de868ff4f8949d041d55344d1c14f5c0ac30be",
+        "status": "accepted"
+      },
+      {
+        "records": 80,
+        "source_sha256": "e13e5a1510c984e5a935bfd0f21890497cb19b96d545270e81ef1546058aefe6",
+        "status": "accepted"
+      }
+    ],
+    "presence_eligible_plans": 630,
+    "requested_roles": {
+      "test": 48,
+      "training": 192,
+      "validation": 48
+    },
+    "reserve_plans": 640,
+    "role_strata": {
+      "test": {
+        "branching:and": 15,
+        "branching:iff": 1,
+        "deep:and": 15,
+        "deep:iff": 1,
+        "direct:and": 15,
+        "direct:iff": 1
+      },
+      "training": {
+        "branching:and": 51,
+        "branching:iff": 13,
+        "deep:and": 51,
+        "deep:iff": 13,
+        "direct:and": 50,
+        "direct:iff": 14
+      },
+      "validation": {
+        "branching:and": 15,
+        "branching:iff": 1,
+        "deep:and": 15,
+        "deep:iff": 1,
+        "direct:and": 15,
+        "direct:iff": 1
+      }
+    },
+    "shortcut_rejections": 150,
+    "structural_classes": {
+      "branching": 96,
+      "deep": 96,
+      "direct": 96
+    },
+    "v2_collision_rejections": {
+      "derivation": 0,
+      "exact-proof": 0,
+      "statement": 0,
+      "structural-proof": 0
+    },
+    "verification_batches": [
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 0,
+        "composition_status": "accepted",
+        "shortcut_rejections": 35,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 54,
+          "deep": 52,
+          "direct": 54
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 1,
+        "composition_status": "accepted",
+        "shortcut_rejections": 38,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 53,
+          "deep": 53,
+          "direct": 54
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 2,
+        "composition_status": "accepted",
+        "shortcut_rejections": 41,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 53,
+          "deep": 54,
+          "direct": 53
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 150,
+        "batch": 3,
+        "composition_status": "accepted",
+        "shortcut_rejections": 36,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 50,
+          "deep": 50,
+          "direct": 50
+        }
+      }
+    ]
+  },
+  "incremental_reconstruction": {
+    "boundaries": 138021,
+    "hash_mismatches": 0,
+    "materialized_examples": 137827
+  },
+  "materialization_fixture": {
+    "continuation": 2,
+    "examples": 3,
+    "file": "materialization-fixture.json",
+    "whole": 1
+  },
+  "no_silent_drop_or_truncation": {
+    "dataset_v2_synthetic_excluded_by_declared_policy": 4096,
+    "dropped": 0,
+    "eligible_real_input_records": 178256,
+    "eligible_real_input_variants": 179537,
+    "emitted_real_records": 178256,
+    "emitted_real_variants": 179537,
+    "truncated": 0
+  },
+  "placeholder_gate": {
+    "optimizer_proof_variants_checked": 179729,
+    "placeholders": 0
+  },
+  "schema_version": "dataset-v3-verification-v1",
+  "source_input": {
+    "counts": {
+      "eligible_real_records": 178256,
+      "eligible_real_transformations": {
+        "equations-to-fun-exact": 1489,
+        "none": 88688,
+        "term-to-exact": 87075,
+        "where-to-structure-exact": 2285
+      },
+      "eligible_real_variants": 179537,
+      "proof_variants": 183633,
+      "provenance:external-lean": 22,
+      "provenance:real-mathlib": 178234,
+      "provenance:synthetic": 4096,
+      "records": 182352,
+      "role:test": 415,
+      "role:training": 181531,
+      "role:validation": 406
+    },
+    "path": "data/lean-whole-proof-v2/records.jsonl.gz",
+    "sha256": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c"
+  },
+  "source_lemma_resolution": {
+    "missing_source_lemma_references": 0,
+    "source_lemma_references": 864,
+    "synthetic_records": 288
+  },
+  "source_recovery": {
+    "missing": 0,
+    "source_bytes_scanned": 92687423,
+    "source_files": 7209,
+    "unique_source_expressions": 153584,
+    "verified_source_expressions": 153584
+  },
+  "split_isolation": {
+    "cross_role_derivation_families": 0,
+    "cross_role_exact_proofs": 0,
+    "cross_role_statements": 0,
+    "cross_role_structural_proofs": 0
+  },
+  "statement_normalized_mass": {
+    "maximum": "1/1",
+    "minimum": "1/1",
+    "statements": 178448,
+    "unique_exact_values": [
+      "1/1"
+    ],
+    "violations": 0
+  },
+  "target": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "whole_proofs": {
+    "accepted": 179825,
+    "canonical_records": 178544,
+    "proof_variants": 179825,
+    "source_preserved": 176051,
+    "technically_transformed": 3774
+  }
+}

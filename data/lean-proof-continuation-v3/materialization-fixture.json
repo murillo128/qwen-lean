@@ -1,0 +1,182 @@
+{
+  "examples": [
+    {
+      "boundary_id": null,
+      "example_id": "3b6304a28dcde8b645ca19dd31928b299318f5866c9942fa45db415293b7c26e",
+      "kind": "whole",
+      "mass_denominator": 2,
+      "mass_numerator": 1,
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-view-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770"
+    },
+    {
+      "boundary_id": "a48c7f40ab19e3d247db9e0718918c9e9d7298e97942dcd1e1dadd77e73bcdee",
+      "example_id": "2105203835943ccef0cb0e1ba927b4feecef4b5065870a3abb2c0058c412b58e",
+      "kind": "continuation",
+      "mass_denominator": 4,
+      "mass_numerator": 1,
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-view-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770"
+    },
+    {
+      "boundary_id": "5156795dffc241442169878fbf00aadfe7a117f2565d977280986b823fa5dfce",
+      "example_id": "c87b24c9512556b02202fc25294d421a7e03bbb508b79ba618cb606853e0f58d",
+      "kind": "continuation",
+      "mass_denominator": 4,
+      "mass_numerator": 1,
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-view-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770"
+    }
+  ],
+  "materialized": [
+    {
+      "declaration": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j",
+      "example_id": "3b6304a28dcde8b645ca19dd31928b299318f5866c9942fa45db415293b7c26e",
+      "mass_denominator": 2,
+      "mass_numerator": 1,
+      "model_input": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j := ",
+      "proof_prefix": "",
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-materialized-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770",
+      "target": "by\n  by_cases hij : c.Rel i j\n  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n  · rw [shape φ _ _ hij, G.shape _ _ hij, zero_comp, comp_zero]",
+      "task_kind": "whole",
+      "utf8_bytes": 401
+    },
+    {
+      "declaration": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j",
+      "example_id": "2105203835943ccef0cb0e1ba927b4feecef4b5065870a3abb2c0058c412b58e",
+      "mass_denominator": 4,
+      "mass_numerator": 1,
+      "model_input": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j := by\n  by_cases hij : c.Rel i j\n  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n",
+      "proof_prefix": "by\n  by_cases hij : c.Rel i j\n  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n",
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-materialized-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770",
+      "target": "  · rw [shape φ _ _ hij, G.shape _ _ hij, zero_comp, comp_zero]",
+      "task_kind": "continuation",
+      "utf8_bytes": 401
+    },
+    {
+      "declaration": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j",
+      "example_id": "c87b24c9512556b02202fc25294d421a7e03bbb508b79ba618cb606853e0f58d",
+      "mass_denominator": 4,
+      "mass_numerator": 1,
+      "model_input": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j := by\n  by_cases hij : c.Rel i j\n",
+      "proof_prefix": "by\n  by_cases hij : c.Rel i j\n",
+      "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+      "schema_version": "lean-proof-continuation-v3-materialized-v1",
+      "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770",
+      "target": "  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n  · rw [shape φ _ _ hij, G.shape _ _ hij, zero_comp, comp_zero]",
+      "task_kind": "continuation",
+      "utf8_bytes": 401
+    }
+  ],
+  "record": {
+    "canonical_declaration": "@[reassoc (attr := simp)]\nlemma inrX_d (i j : ι) :\n    inrX φ i ≫ d φ i j = G.d i j ≫ inrX φ j",
+    "derivation_family_fingerprint": null,
+    "environment": {
+      "context_kind": "source-position",
+      "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+      "file_path": "Mathlib/Algebra/Homology/HomotopyCofiber.lean",
+      "imports": [
+        "Mathlib.Algebra.Homology.HomologicalComplexBiprod",
+        "Mathlib.Algebra.Homology.Homotopy",
+        "Mathlib.CategoryTheory.MorphismProperty.IsInvertedBy"
+      ],
+      "lean_toolchain": "leanprover/lean4:v4.32.2",
+      "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+      "module": "Mathlib.Algebra.Homology.HomotopyCofiber",
+      "repository": "https://github.com/leanprover-community/mathlib4",
+      "revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+      "source_span": {
+        "end": {
+          "column": 64,
+          "line": 253
+        },
+        "start": {
+          "column": 1,
+          "line": 243
+        }
+      },
+      "target_compatibility": "verified-target-environment"
+    },
+    "generator_family": null,
+    "logic_shape": null,
+    "memberships": [],
+    "normalized_proof_dag": null,
+    "normalized_statement_fingerprint": "20c3d6d8fa27c184ac694fda19cfb9bd1093ff68bf9c27cb2ca058677cdc4600",
+    "proof_variants": [
+      {
+        "boundaries": [
+          {
+            "boundary_id": "5156795dffc241442169878fbf00aadfe7a117f2565d977280986b823fa5dfce",
+            "continuation_sha256": "50e88705f9bfb0692f5b316ba617df9cee5c5ca7b539c4835a8798f43a94c50d",
+            "extractor_version": "lean-layout-boundaries-v1",
+            "prefix_end": 30,
+            "prefix_sha256": "b2a57e18e08f81fab3bea56883ddf80344cf1c6cdbeccf50f37a224564686d6b",
+            "reconstruction_sha256": "d2be0fa89719700534c673ebb1d8cfe9bc254c28ba1d2f7fe79233442c219497",
+            "segment_index": 1,
+            "structural_kind": "branch"
+          },
+          {
+            "boundary_id": "a48c7f40ab19e3d247db9e0718918c9e9d7298e97942dcd1e1dadd77e73bcdee",
+            "continuation_sha256": "9d85af114e397226a212d256adb18e7e1edc880381667b1126e6bb441dc0c947",
+            "extractor_version": "lean-layout-boundaries-v1",
+            "prefix_end": 222,
+            "prefix_sha256": "6f1575f7e37fc4bd29c9bb242acdbc475b3d6089a46e83b515ab7e9900230b91",
+            "reconstruction_sha256": "d2be0fa89719700534c673ebb1d8cfe9bc254c28ba1d2f7fe79233442c219497",
+            "segment_index": 2,
+            "structural_kind": "branch"
+          }
+        ],
+        "exact_text_fingerprint": "d2be0fa89719700534c673ebb1d8cfe9bc254c28ba1d2f7fe79233442c219497",
+        "proof_form": "tactic",
+        "proof_text": "by\n  by_cases hij : c.Rel i j\n  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n  · rw [shape φ _ _ hij, G.shape _ _ hij, zero_comp, comp_zero]",
+        "proof_variant_id": "17babd28b4fde296ee876d06281a2e34ca7b73d4cc1a72f0ca11f6eb9793e8ea",
+        "resolved_dependencies": [
+          "CategoryTheory.Limits.comp_zero",
+          "CategoryTheory.Limits.zero_comp",
+          "HomologicalComplex.homotopyCofiber.d_fstX",
+          "HomologicalComplex.homotopyCofiber.d_sndX",
+          "HomologicalComplex.homotopyCofiber.ext_to_X",
+          "HomologicalComplex.homotopyCofiber.ext_to_X'",
+          "HomologicalComplex.homotopyCofiber.shape"
+        ],
+        "source_declaration_name": "HomologicalComplex.homotopyCofiber.inrX_d",
+        "source_expression": "by\n  by_cases hij : c.Rel i j\n  · by_cases hj : c.Rel j (c.next j)\n    · apply ext_to_X _ _ _ hj\n      · simp [d_fstX φ _ _ _ hij]\n      · simp [d_sndX φ _ _ hij]\n    · apply ext_to_X' _ _ hj\n      simp [d_sndX φ _ _ hij]\n  · rw [shape φ _ _ hij, G.shape _ _ hij, zero_comp, comp_zero]",
+        "source_expression_verified": true,
+        "source_file": "Mathlib/Algebra/Homology/HomotopyCofiber.lean",
+        "source_repository": "https://github.com/leanprover-community/mathlib4",
+        "source_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+        "structural_fingerprint": "52db49f822d08cf49b93b7a96ef714bab4a5db103ee4c1da63d95421b6692c54",
+        "transformation_kind": "none",
+        "transformation_reason": null,
+        "verification": {
+          "diagnostic": "",
+          "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+          "evidence_id": "source-build:905b95818eb32af7874a58b427f50c1711a5e96c",
+          "method": "pinned-source-expression-recovery+pinned-source-build",
+          "status": "accepted"
+        }
+      }
+    ],
+    "provenance": "real-mathlib",
+    "role": "training",
+    "schema_version": "lean-proof-continuation-v3",
+    "shortcut_checks": [],
+    "source_lemma_ids": [],
+    "source_relation_edges": [],
+    "statement_id": "00000201fb5096d20891618089c42441d0cb636cf72febc3a54068956e56b770",
+    "structural_class": null,
+    "theorem_mass_denominator": 1,
+    "theorem_mass_numerator": 1,
+    "topic_tags": [
+      "domain:generic"
+    ]
+  },
+  "schema_version": "dataset-v3-materialization-fixture-v1"
+}
