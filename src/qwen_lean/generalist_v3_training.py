@@ -914,10 +914,10 @@ def run_bounded_configuration_training(
     maximum_optimizer_steps: int = 500,
     model_snapshot: Path | None = None,
 ) -> dict[str, Any]:
-    """Run one paired C0/C1/C2 arm through the frozen 500-step boundary."""
+    """Run one paired bounded arm through the frozen 500-step boundary."""
 
-    if configuration_id not in {"C0", "C1", "C2"}:
-        raise ValueError("initial bounded training only permits C0/C1/C2")
+    if configuration_id not in {"C0", "C1", "C2", "C3"}:
+        raise ValueError("bounded training only permits C0/C1/C2/C3")
     if maximum_optimizer_steps != 500:
         raise ValueError("initial bounded training must stop exactly at 500 steps")
     if output_dir.exists():
@@ -1121,7 +1121,7 @@ def measure_checkpoint_anchor_drift(
 
     try:
         import torch
-        from peft import set_peft_model_state_dict
+        from peft import get_peft_model_state_dict, set_peft_model_state_dict
         from safetensors.torch import load_file
         from torch.nn.attention import SDPBackend, sdpa_kernel
     except ImportError as error:
@@ -1139,13 +1139,50 @@ def measure_checkpoint_anchor_drift(
     torch.cuda.manual_seed_all(0)
     runtime = load_training_runtime(config, model_snapshot=model_snapshot)  # type: ignore[arg-type]
     adapter_state = load_file(str(checkpoint_dir / "adapter_model.safetensors"))
+    model_adapter_state = get_peft_model_state_dict(
+        runtime.model, adapter_name="default"
+    )
+    missing_adapter_keys = sorted(set(model_adapter_state) - set(adapter_state))
+    unexpected_adapter_keys = sorted(set(adapter_state) - set(model_adapter_state))
+    shape_mismatches = sorted(
+        key
+        for key in set(model_adapter_state) & set(adapter_state)
+        if tuple(model_adapter_state[key].shape) != tuple(adapter_state[key].shape)
+    )
+    if missing_adapter_keys or unexpected_adapter_keys or shape_mismatches:
+        raise RuntimeError(
+            "generalist-v3 checkpoint adapter state differs from the runtime: "
+            f"missing_count={len(missing_adapter_keys)}, "
+            f"unexpected_count={len(unexpected_adapter_keys)}, "
+            f"shape_mismatch_count={len(shape_mismatches)}, "
+            f"missing_sample={missing_adapter_keys[:5]}, "
+            f"unexpected_sample={unexpected_adapter_keys[:5]}, "
+            f"shape_mismatch_sample={shape_mismatches[:5]}"
+        )
     load_result = set_peft_model_state_dict(
         runtime.model, adapter_state, adapter_name="default"
     )
-    if load_result.missing_keys or load_result.unexpected_keys:
+    if load_result.unexpected_keys:
         raise RuntimeError(
-            "generalist-v3 checkpoint adapter did not load exactly: "
-            f"missing={load_result.missing_keys}, unexpected={load_result.unexpected_keys}"
+            "generalist-v3 checkpoint adapter load had unexpected runtime keys: "
+            f"count={len(load_result.unexpected_keys)}, "
+            f"sample={sorted(load_result.unexpected_keys)[:5]}"
+        )
+    loaded_adapter_state = get_peft_model_state_dict(
+        runtime.model, adapter_name="default"
+    )
+    value_mismatches = sorted(
+        key
+        for key in adapter_state
+        if not torch.equal(
+            adapter_state[key].detach().cpu(),
+            loaded_adapter_state[key].detach().cpu(),
+        )
+    )
+    if value_mismatches:
+        raise RuntimeError(
+            "generalist-v3 checkpoint adapter values did not load exactly: "
+            f"count={len(value_mismatches)}, sample={value_mismatches[:5]}"
         )
     runtime.model.eval()
     anchor_manifest = _read_json(anchor_manifest_path)

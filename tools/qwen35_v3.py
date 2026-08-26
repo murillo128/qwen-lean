@@ -52,7 +52,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--artifact-root", type=Path, default=DEFAULT_ARTIFACTS)
     parser.add_argument("--model-snapshot", type=Path)
     parser.add_argument("--verifier-root", type=Path, default=DEFAULT_VERIFIER_ROOT)
-    parser.add_argument("--configuration", choices=("C0", "C1", "C2"))
+    parser.add_argument("--configuration", choices=("C0", "C1", "C2", "C3"))
     parser.add_argument("--optimizer-step", type=int)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("bind")
@@ -288,7 +288,7 @@ def main() -> int:
         return 0
     if args.command == "train-bounded":
         if args.configuration is None:
-            raise ValueError("train-bounded requires --configuration C0/C1/C2")
+            raise ValueError("train-bounded requires --configuration C0/C1/C2/C3")
         value = run_bounded_configuration_training(
             config,
             binding,

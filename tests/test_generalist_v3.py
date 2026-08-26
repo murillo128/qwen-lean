@@ -55,6 +55,12 @@ def test_generalist_v3_config_freezes_issue_contract() -> None:
         "base_kl_lambda": 0.1,
         "eligible": True,
     }
+    assert config.training["configurations"]["C3"] == {
+        "learning_rate": 1e-5,
+        "base_kl_lambda": 0.3,
+        "eligible": True,
+        "rescue_only": True,
+    }
     assert config.training["canonical_context_tokens"] == 262144
     assert config.training["resolved_context_tokens"] == 16384
     assert config.training["execution_view"]["expected_quarantined_examples"] == 51
