@@ -51,7 +51,9 @@ context, request seeds, sampling, prompt bytes, and candidate budget remain
 unchanged. The adjustment was made with zero durable candidates after the 0.95
 engine preflight stopped before model loading. At 0.89 the exact engine then
 initialized successfully under a pre-set `PAUSE` marker with a 47,489-token KV
-cache and zero forward passes or durable candidates.
+cache and zero `llm.generate` calls, model outputs, or durable candidates. vLLM's
+normal internal dummy/profile forward during engine initialization remained
+local and is not a scientific candidate.
 
 Raw generations and verifier diagnostics remain outside Git under `artifacts/`.
 The final compact evidence will bind every shard/result hash and process-session
