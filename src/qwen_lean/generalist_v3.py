@@ -45,7 +45,7 @@ CONFIGURATION_IDS = ("C0", "C1", "C2", "C3")
 PRIMARY_CONFIGURATION_IDS = CONFIGURATION_IDS[:3]
 RETAINED_STEPS = (100, 250, 500, 1000, 2000, 4000, 8000)
 STRUCTURAL_BUCKETS = ("direct", "multi-step", "branching", "deep")
-EXECUTION_CONTEXT_TOKENS = 65536
+EXECUTION_CONTEXT_TOKENS = 32768
 
 
 class Tokenizer(Protocol):
@@ -182,10 +182,12 @@ class GeneralistV3Config:
         execution_view = training.get("execution_view", {})
         if (
             execution_view.get("maximum_sequence_tokens") != EXECUTION_CONTEXT_TOKENS
-            or execution_view.get("expected_quarantined_examples") != 6
+            or execution_view.get("expected_quarantined_examples") != 18
             or execution_view.get("renormalize_remaining_example_mass_within_theorem")
             is not True
             or execution_view.get("exclude_theorem_when_no_example_remains") is not True
+            or execution_view.get("recompute_structure_from_eligible_proof_variants")
+            is not True
         ):
             raise ValueError("generalist-v3 execution-view contract differs")
         structural = training.get("structural_reweighting", {})
@@ -449,10 +451,20 @@ def load_training_index(
     return records, normalized
 
 
-def structural_bucket(record: DatasetV3Record) -> str:
+def structural_bucket(
+    record: DatasetV3Record,
+    eligible_references: Sequence[DerivedExampleRef] | None = None,
+) -> str:
     """Assign the frozen #83 proof-execution structural bucket."""
 
     variants = representative_variants(record)
+    if eligible_references is not None:
+        eligible_variant_ids = {item.proof_variant_id for item in eligible_references}
+        variants = tuple(
+            item for item in variants if item.proof_variant_id in eligible_variant_ids
+        )
+        if not variants:
+            raise ValueError("eligible theorem has no optimizer-visible proof variant")
     maximum_boundaries = max((len(item.boundaries) for item in variants), default=0)
     maximum_branches = max(
         (
@@ -612,9 +624,13 @@ def freeze_training_execution_view(
             mass_renormalization.append(
                 {
                     "statement_id": statement_id,
+                    "prior_structural_bucket": structural_bucket(records[statement_id]),
                     "frozen_example_count": len(by_statement[statement_id]),
                     "eligible_example_count": len(remaining),
                     "eligible_frozen_mass": _fraction_dict(eligible_mass),
+                    "removed_frozen_mass": _fraction_dict(
+                        Fraction(1, 1) - eligible_mass
+                    ),
                     "renormalization_factor": (
                         None
                         if not remaining
@@ -623,6 +639,14 @@ def freeze_training_execution_view(
                 }
             )
     retained_examples = example_count - len(quarantined)
+    excluded_theorem_details = [
+        {
+            "statement_id": statement_id,
+            "prior_structural_bucket": structural_bucket(records[statement_id]),
+            "removed_optimizer_mass": _fraction_dict(Fraction(1, 1)),
+        }
+        for statement_id in excluded_theorems
+    ]
     target_length_by_bucket_kind = []
     for key in sorted(token_counts):
         bucket, kind = key
@@ -658,6 +682,7 @@ def freeze_training_execution_view(
         "excluded_theorem_count": len(excluded_theorems),
         "excluded_theorem_ids_sha256": _sha256_json(excluded_theorems),
         "excluded_theorem_ids": excluded_theorems,
+        "excluded_theorems": excluded_theorem_details,
         "eligible_example_ids_sha256": _sha256_json(eligible_ids),
         "maximum_eligible_example": maximum_eligible,
         "target_length_by_structural_bucket_and_kind": target_length_by_bucket_kind,
@@ -744,9 +769,13 @@ def freeze_structural_sampling_manifest(
         config, binding, execution_view
     )
     pre_mapping = {key: structural_bucket(value) for key, value in all_records.items()}
-    mapping = {key: structural_bucket(value) for key, value in eligible_records.items()}
+    mapping = {
+        key: structural_bucket(value, eligible_examples[key])
+        for key, value in eligible_records.items()
+    }
     pre_counts = Counter(pre_mapping.values())
     counts = Counter(mapping.values())
+    bucket_transitions = Counter((pre_mapping[key], value) for key, value in mapping.items())
     nonempty = [bucket for bucket in STRUCTURAL_BUCKETS if counts[bucket]]
     theorem_count = len(mapping)
     bounded: dict[str, float] = {}
@@ -802,6 +831,7 @@ def freeze_structural_sampling_manifest(
             "multi-step": "otherwise max_boundaries>=1",
             "direct": "otherwise",
             "synthetic_override": "take more complex explicit structural_class",
+            "eligibility": "infer from representative proof variants with at least one eligible optimizer example",
         },
         "eligible_theorems": theorem_count,
         "nonempty_bucket_count": len(nonempty),
@@ -811,6 +841,10 @@ def freeze_structural_sampling_manifest(
         "post_quarantine_bucket_counts": dict(
             (bucket, counts[bucket]) for bucket in STRUCTURAL_BUCKETS
         ),
+        "eligible_bucket_transitions": {
+            f"{before}->{after}": count
+            for (before, after), count in sorted(bucket_transitions.items())
+        },
         "multipliers": rows,
         "normalized_theorem_multiplier_mean": total_weight / theorem_count,
         "theorem_to_bucket_mapping_sha256": _sha256_json(canonical_mapping),
@@ -889,7 +923,8 @@ def write_training_stream(
         for item in structural_manifest["multipliers"]
     }
     statement_buckets = {
-        statement_id: structural_bucket(record) for statement_id, record in records.items()
+        statement_id: structural_bucket(record, by_statement[statement_id])
+        for statement_id, record in records.items()
     }
     theorem_weights = {
         statement_id: bucket_multipliers[statement_buckets[statement_id]]
@@ -1076,7 +1111,7 @@ def freeze_anchor_manifest(
     candidates: dict[str, list[dict[str, Any]]] = {"whole": [], "continuation": []}
     for statement_id in sorted(by_statement):
         record = records[statement_id]
-        bucket = structural_bucket(record)
+        bucket = structural_bucket(record, by_statement[statement_id])
         variants = {item.proof_variant_id: item for item in record.proof_variants}
         for reference in by_statement[statement_id]:
             materialized = materialize_example(record, reference)

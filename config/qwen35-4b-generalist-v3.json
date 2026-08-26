@@ -118,13 +118,14 @@
     "context_choices": [4096, 8192, 16384, 32768, 65536, 131072, 262144],
     "canonical_context_tokens": 262144,
     "canonical_maximum_observed_sequence_tokens": 157034,
-    "resolved_context_tokens": 65536,
+    "resolved_context_tokens": 32768,
     "execution_view": {
-      "maximum_sequence_tokens": 65536,
-      "expected_quarantined_examples": 6,
+      "maximum_sequence_tokens": 32768,
+      "expected_quarantined_examples": 18,
       "quarantine_label": "long-context-quarantined / optimizer-ineligible-for-#83",
       "renormalize_remaining_example_mass_within_theorem": true,
-      "exclude_theorem_when_no_example_remains": true
+      "exclude_theorem_when_no_example_remains": true,
+      "recompute_structure_from_eligible_proof_variants": true
     },
     "structural_reweighting": {
       "bucket_order": ["direct", "multi-step", "branching", "deep"],

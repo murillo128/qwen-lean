@@ -92,13 +92,13 @@ def main() -> int:
         execution_view = _read_json(stage0 / "training-execution-view.json")
         preflight = _read_json(stage0 / "near-max-preflight.json")
         if (
-            preflight.get("schema_version") != "generalist-v3-near-max-preflight-v2"
+            preflight.get("schema_version") != "generalist-v3-near-max-preflight-v3"
             or preflight.get("status") != "passed"
             or preflight.get("execution_view_identity_sha256")
             != execution_view.get("execution_view_sha256")
             or preflight.get("forward_backward", {}).get("optimizer_update_run") is not False
         ):
-            raise RuntimeError("Stage 0 freeze requires the passed 65k no-update preflight")
+            raise RuntimeError("Stage 0 freeze requires the passed 32k no-update preflight")
         structural = freeze_structural_sampling_manifest(
             config,
             binding,

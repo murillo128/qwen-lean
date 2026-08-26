@@ -92,8 +92,11 @@ def run_no_update_near_max_preflight(
     torch.manual_seed(0)
     torch.cuda.manual_seed_all(0)
     torch.cuda.reset_peak_memory_stats(device_index)
+    initial_free_memory = int(torch.cuda.mem_get_info(device_index)[0])
     started = time.perf_counter()
     runtime = load_training_runtime(config, model_snapshot=model_snapshot)  # type: ignore[arg-type]
+    torch.cuda.synchronize(device_index)
+    post_load_free_memory = int(torch.cuda.mem_get_info(device_index)[0])
     example = tokenize_materialized_example(
         materialized,
         runtime.tokenizer,
@@ -140,9 +143,13 @@ def run_no_update_near_max_preflight(
             outputs.last_hidden_state,
             labels,
         )
+    torch.cuda.synchronize(device_index)
+    post_forward_free_memory = int(torch.cuda.mem_get_info(device_index)[0])
     if not bool(torch.isfinite(loss).item()):
         raise RuntimeError("generalist-v3 near-maximum loss is non-finite")
     loss.backward()
+    torch.cuda.synchronize(device_index)
+    post_backward_free_memory = int(torch.cuda.mem_get_info(device_index)[0])
     trainable = [
         parameter for parameter in runtime.model.parameters() if parameter.requires_grad
     ]
@@ -159,9 +166,12 @@ def run_no_update_near_max_preflight(
     peak_allocated = int(torch.cuda.max_memory_allocated(device_index))
     peak_reserved = int(torch.cuda.max_memory_reserved(device_index))
     total_memory = int(properties.total_memory)
+    minimum_allocated_headroom = 1 << 30
+    allocated_headroom = total_memory - peak_allocated
+    memory_gate_passed = allocated_headroom >= minimum_allocated_headroom
     value = {
-        "schema_version": "generalist-v3-near-max-preflight-v2",
-        "status": "passed",
+        "schema_version": "generalist-v3-near-max-preflight-v3",
+        "status": "passed" if memory_gate_passed else "failed-headroom",
         "model": config.model,
         "dataset_binding": binding.to_dict(),
         "training_execution_view_sha256": sha256_file(execution_view_path),
@@ -199,7 +209,16 @@ def run_no_update_near_max_preflight(
             "cuda_device_total_memory_bytes": total_memory,
             "peak_cuda_allocated_bytes": peak_allocated,
             "peak_cuda_reserved_bytes": peak_reserved,
+            "allocated_memory_headroom_bytes": allocated_headroom,
+            "minimum_allocated_memory_headroom_bytes": minimum_allocated_headroom,
+            "allocated_memory_headroom_gate_passed": memory_gate_passed,
             "reserved_memory_headroom_bytes": total_memory - peak_reserved,
+            "free_memory_observations_bytes": {
+                "before_model_load": initial_free_memory,
+                "after_model_load": post_load_free_memory,
+                "after_forward_and_loss": post_forward_free_memory,
+                "after_backward": post_backward_free_memory,
+            },
             "wall_time_seconds": time.perf_counter() - started,
             "torch_cuda_version": torch.version.cuda,
             "cuda_allocator_config": os.environ.get("PYTORCH_CUDA_ALLOC_CONF"),
@@ -230,6 +249,8 @@ def run_no_update_near_max_preflight(
     del labels, attention_mask, input_ids, outputs, loss, runtime
     gc.collect()
     torch.cuda.empty_cache()
+    if not memory_gate_passed:
+        raise RuntimeError("generalist-v3 preflight leaves less than 1 GiB allocated headroom")
     return value
 
 

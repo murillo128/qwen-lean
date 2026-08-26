@@ -28,8 +28,22 @@ allocation. It requested 948 MiB with about 588 MiB free. Forward did not
 complete, so backward did not start. No optimizer was created, no update
 occurred, and canary generation did not start.
 
+Issue #83 next authorized a 32,768-token training execution view. `OBSERVED`:
+exact enumeration quarantines the declared 18 examples, all from six `deep`
+theorems. Each affected theorem loses all three optimizer rows and is explicitly
+excluded with its full removed mass recorded. The resulting view contains
+317,536 examples from 178,442 theorems, and its longest eligible example has
+31,212 tokens.
+
+`BLOCKED`: the exact 31,212-token no-update preflight still failed before the
+first decoder layer completed, in the same FLA Gated DeltaNet chunk-output
+allocation. It requested 488 MiB with about 342 MiB free. Forward did not
+complete; backward and the required 1 GiB allocated-headroom check were not
+reached. No optimizer was created and no model update occurred. Exact compact
+evidence is in `stage0-feasibility-32k.json`.
+
 This remains a contract-feasibility failure, not a model-quality result. The
-amendment explicitly requires a design return if the 65,536-token bound fails;
+amendments explicitly require a design return when their memory bound fails;
 execution therefore did not silently lower the cap, switch GPU, change LoRA
 targets, or add a new sequence mechanism.
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fractions import Fraction
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -15,6 +16,7 @@ from qwen_lean.generalist_v3 import (
     evaluate_collapse_gates,
     positive_500_step_gate,
     select_checkpoint,
+    structural_bucket,
     summarize_canary_candidates,
     tokenize_materialized_example,
 )
@@ -54,8 +56,8 @@ def test_generalist_v3_config_freezes_issue_contract() -> None:
         "eligible": True,
     }
     assert config.training["canonical_context_tokens"] == 262144
-    assert config.training["resolved_context_tokens"] == 65536
-    assert config.training["execution_view"]["expected_quarantined_examples"] == 6
+    assert config.training["resolved_context_tokens"] == 32768
+    assert config.training["execution_view"]["expected_quarantined_examples"] == 18
     assert config.training["sample_theorem_by_structural_multiplier"] is True
     assert config.preservation["anchor_count"] == 512
     assert config.evaluation["interfaces"] == ["whole", "incremental"]
@@ -111,6 +113,40 @@ def test_context_and_anchor_schedule_boundaries() -> None:
     assert set(schedule[:512]) == set(range(512))
     assert set(schedule[512:1024]) == set(range(512))
     assert schedule == anchor_schedule(512, 1025)
+
+
+def test_structural_bucket_recomputes_from_optimizer_eligible_variants() -> None:
+    direct = SimpleNamespace(
+        structural_fingerprint="direct",
+        proof_variant_id="direct-proof",
+        boundaries=(),
+    )
+    deep = SimpleNamespace(
+        structural_fingerprint="deep",
+        proof_variant_id="deep-proof",
+        boundaries=tuple(
+            SimpleNamespace(structural_kind="step") for _ in range(4)
+        ),
+    )
+    record = SimpleNamespace(
+        proof_variants=(deep, direct),
+        provenance="real-source",
+        structural_class=None,
+    )
+    eligible = (
+        DerivedExampleRef(
+            schema_version=DATASET_V3_VIEW_SCHEMA_VERSION,
+            example_id="eligible-direct",
+            statement_id="statement",
+            proof_variant_id="direct-proof",
+            kind="whole",
+            boundary_id=None,
+            mass_numerator=1,
+            mass_denominator=1,
+        ),
+    )
+    assert structural_bucket(record) == "deep"
+    assert structural_bucket(record, eligible) == "direct"
 
 
 def _candidates(*, repeated: bool = False):
