@@ -1,0 +1,167 @@
+{
+  "config": {
+    "file": "config/dataset-v3.json",
+    "sha256": "33e7f0dc629bb2acca6e9adf090723d6c7e3c16923824ef1f0ac680641ff5d15"
+  },
+  "dataset_id": "lean-proof-continuation-v3",
+  "files": {
+    "diagnostics.json": {
+      "bytes": 24436,
+      "committed_snapshot": true,
+      "sha256": "2949fabe3c4ac7c32bf44b231a765668f8d6c35e023bd18295c84efff8bbd743"
+    },
+    "materialization-fixture.json": {
+      "bytes": 10355,
+      "committed_snapshot": true,
+      "sha256": "bcbce5f07653e5de70366d221c01da4180f3783a60d552ded1f859e01431e2f6"
+    },
+    "optimizer-view.jsonl.gz": {
+      "bytes": 33536644,
+      "committed_snapshot": false,
+      "sha256": "0ea4043628dda878ac574e1cde06dfe6bdf69bc602f12f7f83dcfd8e6d07f96d"
+    },
+    "records.jsonl.gz": {
+      "bytes": 106648861,
+      "committed_snapshot": false,
+      "sha256": "10f548fd824fd61edf894cf275d4035f9ef4f0f1860628cf1168e498e3d7dc96"
+    },
+    "test-membership.jsonl": {
+      "bytes": 23297,
+      "committed_snapshot": true,
+      "sha256": "6bb99ed9c476f8ad2dfe7111ecc7b4ec92fbdd6ef21d66ecfe9d71155fdffc19"
+    },
+    "validation-membership.jsonl": {
+      "bytes": 23297,
+      "committed_snapshot": true,
+      "sha256": "0ec547ff16ce0091bc6f48f673585e4253158aef52cd9dc850d299394c6876fb"
+    },
+    "verification.json": {
+      "bytes": 6111,
+      "committed_snapshot": true,
+      "sha256": "49c88e3c0016f9ffcc63ffe86d6b00c85f71edb0c21036fdc800180d42580ddb"
+    }
+  },
+  "fresh_composition": {
+    "batch_size": 160,
+    "forbid_all_v2_synthetic_statement_proof_family_overlap": true,
+    "logic_shapes": [
+      "and",
+      "iff"
+    ],
+    "proof_first_constructs": [
+      "constructor",
+      "apply",
+      "refine"
+    ],
+    "reserve_plans": 640,
+    "role_counts": {
+      "test": 48,
+      "training": 192,
+      "validation": 48
+    },
+    "sealed_test_policy": "test membership is frozen here and unavailable to checkpoint selection or hyperparameter decisions",
+    "seed": "dataset-v3-fresh-composition-v1",
+    "shortcut_suite": [
+      "assumption",
+      "rfl",
+      "simp",
+      "exact-indexed-single-theorem",
+      "simpa-using-indexed-single-theorem"
+    ],
+    "structural_classes": [
+      "direct",
+      "branching",
+      "deep"
+    ],
+    "test_membership_sha256": "6bb99ed9c476f8ad2dfe7111ecc7b4ec92fbdd6ef21d66ecfe9d71155fdffc19",
+    "validation_membership_sha256": "0ec547ff16ce0091bc6f48f673585e4253158aef52cd9dc850d299394c6876fb",
+    "workers": 2
+  },
+  "optimizer_view": {
+    "boundary_policy": "equal continuation mass per eligible variant, then per boundary",
+    "continuation_mass": {
+      "denominator": 2,
+      "numerator": 1
+    },
+    "continuation_unavailable_policy": "reallocate theorem continuation mass to whole proof",
+    "materialization": "reference plus exact boundary; no duplicated proof text",
+    "theorem_mass": {
+      "denominator": 1,
+      "numerator": 1
+    },
+    "truncation": "forbidden",
+    "variant_policy": "equal mass across structurally unique variants",
+    "whole_mass": {
+      "denominator": 2,
+      "numerator": 1
+    }
+  },
+  "proof_policy": {
+    "boundary_extractor": "lean-layout-boundaries-v1",
+    "preserve_source_expression": true,
+    "structural_fingerprint": "dataset-v3-structural-proof-v1",
+    "technical_transformations": [
+      "equations-to-fun-exact",
+      "where-to-structure-exact"
+    ],
+    "unsafe_boundary_fallback": "whole-proof-only"
+  },
+  "rebuild": "uv run python tools/dataset_v3_build.py --target-root artifacts/riemann/sources/PrimeNumberTheoremAnd",
+  "schema_version": "lean-proof-continuation-v3-manifest-v1",
+  "source_contract": {
+    "dataset_v2_records": "data/lean-whole-proof-v2/records.jsonl.gz",
+    "dataset_v2_records_sha256": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c",
+    "exclude_dataset_v2_synthetic": true,
+    "exclude_dataset_v2_validation_test": true,
+    "include_provenance": [
+      "real-mathlib",
+      "external-lean",
+      "mixed-real"
+    ],
+    "include_roles": [
+      "training"
+    ],
+    "policy": "Use Dataset-v2 only as the pinned source/provenance index. Recover source_expression against the exact source checkout; do not use Dataset-v2 transformed completions when the raw expression is a standalone proof."
+  },
+  "summary": {
+    "derived_optimizer_examples": 317554,
+    "proof_variants": 179825,
+    "records": 178544,
+    "roles": {
+      "test": 48,
+      "training": 178448,
+      "validation": 48
+    },
+    "source_preserved_variants": 176051,
+    "structural_boundaries": 138021,
+    "technically_transformed_variants": 3774
+  },
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "host_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "license": "Apache-2.0",
+    "mathlib_input_revision": "v4.32.2",
+    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+  },
+  "validation": {
+    "all_boundaries_reconstruct": true,
+    "all_whole_proofs_accepted": true,
+    "deterministic_id_failures": 0,
+    "diagnostics_file": "diagnostics.json",
+    "materialization_fixture": "materialization-fixture.json",
+    "optimizer_placeholders": 0,
+    "silent_drops": 0,
+    "silent_truncations": 0,
+    "split_isolation": {
+      "cross_role_derivation_families": 0,
+      "cross_role_exact_proofs": 0,
+      "cross_role_statements": 0,
+      "cross_role_structural_proofs": 0
+    },
+    "theorem_mass_violations": 0,
+    "verification_file": "verification.json"
+  }
+}

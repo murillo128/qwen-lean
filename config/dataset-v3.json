@@ -1,0 +1,71 @@
+{
+  "schema_version": "dataset-v3-config-v1",
+  "dataset": {
+    "id": "lean-proof-continuation-v3",
+    "record_schema_version": "lean-proof-continuation-v3",
+    "artifact_subdirectory": "dataset-v3/lean-proof-continuation-v3",
+    "repository_snapshot": "data/lean-proof-continuation-v3"
+  },
+  "target_environment": {
+    "environment_id": "pnt-plus-7715064-mathlib-905b958-lean-4.32.2-v1",
+    "lean_toolchain": "leanprover/lean4:v4.32.2",
+    "host_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+    "host_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+    "mathlib_repository": "https://github.com/leanprover-community/mathlib4",
+    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
+    "mathlib_input_revision": "v4.32.2",
+    "license": "Apache-2.0"
+  },
+  "source_input": {
+    "dataset_v2_records": "data/lean-whole-proof-v2/records.jsonl.gz",
+    "dataset_v2_records_sha256": "a66855d8fa9e5132ea895fa206481e9a38cb8cc1baa7494a2a1f8f910030442c",
+    "policy": "Use Dataset-v2 only as the pinned source/provenance index. Recover source_expression against the exact source checkout; do not use Dataset-v2 transformed completions when the raw expression is a standalone proof.",
+    "include_roles": ["training"],
+    "include_provenance": ["real-mathlib", "external-lean", "mixed-real"],
+    "exclude_dataset_v2_synthetic": true,
+    "exclude_dataset_v2_validation_test": true
+  },
+  "proof_policy": {
+    "preserve_source_expression": true,
+    "technical_transformations": [
+      "equations-to-fun-exact",
+      "where-to-structure-exact"
+    ],
+    "structural_fingerprint": "dataset-v3-structural-proof-v1",
+    "boundary_extractor": "lean-layout-boundaries-v1",
+    "unsafe_boundary_fallback": "whole-proof-only"
+  },
+  "optimizer_view": {
+    "theorem_mass": {"numerator": 1, "denominator": 1},
+    "whole_mass": {"numerator": 1, "denominator": 2},
+    "continuation_mass": {"numerator": 1, "denominator": 2},
+    "variant_policy": "equal mass across structurally unique variants",
+    "boundary_policy": "equal continuation mass per eligible variant, then per boundary",
+    "continuation_unavailable_policy": "reallocate theorem continuation mass to whole proof",
+    "materialization": "reference plus exact boundary; no duplicated proof text",
+    "truncation": "forbidden"
+  },
+  "fresh_composition": {
+    "seed": "dataset-v3-fresh-composition-v1",
+    "reserve_plans": 640,
+    "role_counts": {
+      "training": 192,
+      "validation": 48,
+      "test": 48
+    },
+    "structural_classes": ["direct", "branching", "deep"],
+    "logic_shapes": ["and", "iff"],
+    "proof_first_constructs": ["constructor", "apply", "refine"],
+    "batch_size": 160,
+    "workers": 2,
+    "shortcut_suite": [
+      "assumption",
+      "rfl",
+      "simp",
+      "exact-indexed-single-theorem",
+      "simpa-using-indexed-single-theorem"
+    ],
+    "forbid_all_v2_synthetic_statement_proof_family_overlap": true,
+    "sealed_test_policy": "test membership is frozen here and unavailable to checkpoint selection or hyperparameter decisions"
+  }
+}

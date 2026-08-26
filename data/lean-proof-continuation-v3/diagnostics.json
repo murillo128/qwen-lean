@@ -1,0 +1,867 @@
+{
+  "boundaries_per_theorem": {
+    "count": 178544,
+    "max": 84,
+    "min": 0,
+    "p25": 0,
+    "p50": 0,
+    "p75": 1,
+    "p90": 3,
+    "p95": 4,
+    "p99": 9
+  },
+  "duplicates": {
+    "cosmetic_duplicate_rate": "0.0000111219240928680661754483525649937439177",
+    "cosmetic_duplicates": 2,
+    "raw_variants": 179825,
+    "structurally_unique_variants": 179823
+  },
+  "fresh_composition": {
+    "accepted_roles": {
+      "test": 48,
+      "training": 192,
+      "validation": 48
+    },
+    "first_constructs": {
+      "apply": 111,
+      "constructor": 83,
+      "refine": 94
+    },
+    "logic_shapes": {
+      "and": 242,
+      "iff": 46
+    },
+    "missing_source_constants": 25,
+    "persisted_verification": [
+      {
+        "records": 76,
+        "source_sha256": "9fd5b74f10970ee74f327a45fc3fe116c2bce83e516c2b6fb00432d93a90a3fb",
+        "status": "accepted"
+      },
+      {
+        "records": 62,
+        "source_sha256": "97793a9fa275ccb6b6eb421ca0cd814d81843f9ff5a3089bc98691a879ffc4ba",
+        "status": "accepted"
+      },
+      {
+        "records": 70,
+        "source_sha256": "49731e1b364217042bc172a102de868ff4f8949d041d55344d1c14f5c0ac30be",
+        "status": "accepted"
+      },
+      {
+        "records": 80,
+        "source_sha256": "e13e5a1510c984e5a935bfd0f21890497cb19b96d545270e81ef1546058aefe6",
+        "status": "accepted"
+      }
+    ],
+    "presence_eligible_plans": 630,
+    "requested_roles": {
+      "test": 48,
+      "training": 192,
+      "validation": 48
+    },
+    "reserve_plans": 640,
+    "role_strata": {
+      "test": {
+        "branching:and": 15,
+        "branching:iff": 1,
+        "deep:and": 15,
+        "deep:iff": 1,
+        "direct:and": 15,
+        "direct:iff": 1
+      },
+      "training": {
+        "branching:and": 51,
+        "branching:iff": 13,
+        "deep:and": 51,
+        "deep:iff": 13,
+        "direct:and": 50,
+        "direct:iff": 14
+      },
+      "validation": {
+        "branching:and": 15,
+        "branching:iff": 1,
+        "deep:and": 15,
+        "deep:iff": 1,
+        "direct:and": 15,
+        "direct:iff": 1
+      }
+    },
+    "shortcut_rejections": 150,
+    "structural_classes": {
+      "branching": 96,
+      "deep": 96,
+      "direct": 96
+    },
+    "v2_collision_rejections": {
+      "derivation": 0,
+      "exact-proof": 0,
+      "statement": 0,
+      "structural-proof": 0
+    },
+    "verification_batches": [
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 0,
+        "composition_status": "accepted",
+        "shortcut_rejections": 35,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 54,
+          "deep": 52,
+          "direct": 54
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 1,
+        "composition_status": "accepted",
+        "shortcut_rejections": 38,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 53,
+          "deep": 53,
+          "direct": 54
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 160,
+        "batch": 2,
+        "composition_status": "accepted",
+        "shortcut_rejections": 41,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 53,
+          "deep": 54,
+          "direct": 53
+        }
+      },
+      {
+        "actual_dependency_failures": 0,
+        "audited": 150,
+        "batch": 3,
+        "composition_status": "accepted",
+        "shortcut_rejections": 36,
+        "shortcut_status": "rejected-shortcuts",
+        "structural_classes": {
+          "branching": 50,
+          "deep": 50,
+          "direct": 50
+        }
+      }
+    ]
+  },
+  "lengths_chars": {
+    "continuation_target": {
+      "count": 137827,
+      "max": 22954,
+      "min": 5,
+      "p25": 66,
+      "p50": 156,
+      "p75": 376,
+      "p90": 832,
+      "p95": 1337,
+      "p99": 3185
+    },
+    "whole_optimizer_target": {
+      "count": 179727,
+      "max": 23029,
+      "min": 1,
+      "p25": 25,
+      "p50": 56,
+      "p75": 131,
+      "p90": 316,
+      "p95": 532,
+      "p99": 1346
+    },
+    "whole_proof": {
+      "count": 179825,
+      "max": 23029,
+      "min": 1,
+      "p25": 25,
+      "p50": 56,
+      "p75": 131,
+      "p90": 316,
+      "p95": 532,
+      "p99": 1344
+    }
+  },
+  "optimizer_mass": {
+    "composition_class": {
+      "denominator_mass": "192",
+      "values": {
+        "branching": {
+          "fraction": "0.3333333333333333333333333333333333333333",
+          "mass": "64"
+        },
+        "deep": {
+          "fraction": "0.3333333333333333333333333333333333333333",
+          "mass": "64"
+        },
+        "direct": {
+          "fraction": "0.3333333333333333333333333333333333333333",
+          "mass": "64"
+        }
+      }
+    },
+    "examples": 317554,
+    "first_proof_construct": {
+      "denominator_mass": "178448",
+      "values": {
+        "aesop": {
+          "fraction": "0.002027151267966519468357538831850676197492",
+          "mass": "361.7410894660894660894660894660894660901"
+        },
+        "all_goals": {
+          "fraction": "0.0003653129287841685261308020348542841900785",
+          "mass": "65.18936151567730515098936151567730515112"
+        },
+        "any_goals": {
+          "fraction": "0.00002547771120408527384228989178330162818642",
+          "mass": "4.54644660894660894660894660894660894661"
+        },
+        "apply": {
+          "fraction": "0.01255755802899983361135236131824277260019",
+          "mass": "2240.871115158962308278606172517786284959"
+        },
+        "assumption": {
+          "fraction": "0.00002612593703555776540623666957388825944371",
+          "mass": "4.662121212121212121212121212121212121212"
+        },
+        "branch": {
+          "fraction": "0.02830236810542796699592652622342040613667",
+          "mass": "5050.500983677409854489096751516924634277"
+        },
+        "by_cases": {
+          "fraction": "0.005836657531308198109561596006471621666839",
+          "mass": "1041.539863146885336255047684162847943204"
+        },
+        "by_contra": {
+          "fraction": "0.0004508569196614784116573524094463194840884",
+          "mass": "80.4545155997514996034312227608768192966"
+        },
+        "calc": {
+          "fraction": "0.004961586808904888783992241974225746796357",
+          "mass": "885.3852428754595937258475958166360643164"
+        },
+        "case": {
+          "fraction": "0.0002859616851508046702164876647078745168951",
+          "mass": "51.0292907917907917907917907917907917909"
+        },
+        "cases": {
+          "fraction": "0.005934458946520230028617031905655466657138",
+          "mass": "1058.992330088642008146652109500406714033"
+        },
+        "change": {
+          "fraction": "0.001275056361843053744595700033203941356871",
+          "mass": "227.531257658169254615613479525176927251"
+        },
+        "classical": {
+          "fraction": "0.007715228907290882799401925892664630439327",
+          "mass": "1376.767168048243453787674871694217972637"
+        },
+        "constructor": {
+          "fraction": "0.004729076330980214002982870235680083729501",
+          "mass": "843.894213110757228404287227816639581362"
+        },
+        "constructor-term": {
+          "fraction": "0.03490185749723542245733584386861532024268",
+          "mass": "6228.166666666666666666666666666666666666"
+        },
+        "contradiction": {
+          "fraction": "0.00001526054809084038887679163838044856604885",
+          "mass": "2.723214285714285714285714285714285714286"
+        },
+        "convert": {
+          "fraction": "0.0002296086355588283320731989251670055041348",
+          "mass": "40.97320179820179820179820179820179820185"
+        },
+        "convert!": {
+          "fraction": "0.00397353387081558710816717728184717449434",
+          "mass": "709.0691721792998882782164515910645941659"
+        },
+        "decide": {
+          "fraction": "0.0005299863265489106070115663946920111180848",
+          "mass": "94.575"
+        },
+        "dsimp": {
+          "fraction": "0.00324035911284983362434685389653829863478",
+          "mass": "578.2356029698271105974473841294663147793"
+        },
+        "exact": {
+          "fraction": "0.04945763158631493950819481693572500347261",
+          "mass": "8825.61544131472832535834869254625541968"
+        },
+        "exact_mod_cast": {
+          "fraction": "0.0001771090844658494618146729686225785929901",
+          "mass": "31.6047619047619047619047619047619047619"
+        },
+        "ext": {
+          "fraction": "0.02671154383925621373985931245927931488434",
+          "mass": "4766.621575027592829450414589733475182481"
+        },
+        "first": {
+          "fraction": "0.000001149512491752247871677621520713065588884",
+          "mass": "0.2051282051282051282051282051282051282052"
+        },
+        "fun_prop": {
+          "fraction": "0.00045147650500470369563887003141015514368",
+          "mass": "80.5650793650793650793650793650793650794"
+        },
+        "grind": {
+          "fraction": "0.006494983149712192544245117807493533359993",
+          "mass": "1159.016753099841335135452782511606041024"
+        },
+        "have": {
+          "fraction": "0.02294981302604201530103931365013241552219",
+          "mass": "4095.348234871145546439863442238829285104"
+        },
+        "induction": {
+          "fraction": "0.01340565514577889144812092975535373546281",
+          "mass": "2392.212349453951621134283672983363385867"
+        },
+        "intro": {
+          "fraction": "0.006882555012106760068481689808723211786229",
+          "mass": "1228.178176800427120700420582987039696829"
+        },
+        "intros": {
+          "fraction": "0.00004787635554021279834962252249080905047909",
+          "mass": "8.543439893439893439893439893439893439893"
+        },
+        "left": {
+          "fraction": "0.000008100043194300344842799787657673428318098",
+          "mass": "1.445436507936507936507936507936507936508"
+        },
+        "let": {
+          "fraction": "0.006068351535628067115715559888631070175149",
+          "mass": "1082.885194829757320665210231006437210615"
+        },
+        "linarith": {
+          "fraction": "0.0001587459825330683773302469239837991224214",
+          "mass": "28.32790309106098579782790309106098579786"
+        },
+        "next": {
+          "fraction": "0.000007471831196389611165904539884634926327743",
+          "mass": "1.333333333333333333333333333333333333333"
+        },
+        "norm_num": {
+          "fraction": "0.0002290349756418302997698675991511999760902",
+          "mass": "40.87083333333333333333333333333333333335"
+        },
+        "obtain": {
+          "fraction": "0.01336064028970896221117618342100680327725",
+          "mass": "2384.179538417984888659967579111822031218"
+        },
+        "omega": {
+          "fraction": "0.00002248554200663498610239397471532323141756",
+          "mass": "4.0125"
+        },
+        "positivity": {
+          "fraction": "0.0001133761433680737903816896016304247273494",
+          "mass": "20.23174603174603174603174603174603174604"
+        },
+        "rcases": {
+          "fraction": "0.007961067101104751924130124183786264875084",
+          "mass": "1420.636502057940771357172400348291394429"
+        },
+        "refine": {
+          "fraction": "0.02123462314598171891209857908436915340461",
+          "mass": "3789.276031154145776426167240447506686746"
+        },
+        "rename_i": {
+          "fraction": "0.00001009030775405293472181305051384850542028",
+          "mass": "1.800595238095238095238095238095238095238"
+        },
+        "repeat": {
+          "fraction": "0.00005330094417671751124633757109324221312027",
+          "mass": "9.511446886446886446886446886446886446886"
+        },
+        "rfl": {
+          "fraction": "0.1067131314917784925854503546604326663514",
+          "mass": "19042.74488844488844488844488844488844508"
+        },
+        "right": {
+          "fraction": "0.00001084082651261885548624542617190335293088",
+          "mass": "1.934523809523809523809523809523809523809"
+        },
+        "ring": {
+          "fraction": "0.0004067832509451356398366171521376398987808",
+          "mass": "72.58965756465756465756465756465756465764"
+        },
+        "ring_nf": {
+          "fraction": "0.0001035960500342281029091752663885722255668",
+          "mass": "18.48650793650793650793650793650793650795"
+        },
+        "rintro": {
+          "fraction": "0.003310501189719725320311806135422822551099",
+          "mass": "590.7523163031055439590011812539318385985"
+        },
+        "rw": {
+          "fraction": "0.1024117640846716536209496359131213860332",
+          "mass": "18275.17447738148724535122062942468509486"
+        },
+        "show": {
+          "fraction": "0.0009751727573586042159520147505442941648447",
+          "mass": "174.0176282051282051282051282051282051282"
+        },
+        "simp": {
+          "fraction": "0.08965656681892277102218833152687932998778",
+          "mass": "15999.03503570313064336746338430856267766"
+        },
+        "simp_all": {
+          "fraction": "0.0008377531353638909769942834114436584887715",
+          "mass": "149.4953714994156170626758862052979700043"
+        },
+        "simp_rw": {
+          "fraction": "0.0133859028296486501653640734352889157764",
+          "mass": "2388.687588145142324708888176380436442467"
+        },
+        "simpa": {
+          "fraction": "0.02462121221119471670004520292063190321324",
+          "mass": "4393.606076663274805689666370780921864597"
+        },
+        "specialize": {
+          "fraction": "0.0001119043523466773510702326312059660679023",
+          "mass": "19.96910786755987994378087257344223288503"
+        },
+        "subst": {
+          "fraction": "0.001630580063523966981615855886172581704114",
+          "mass": "290.9737511757248599353862511757248599357"
+        },
+        "suffices": {
+          "fraction": "0.002610759692154544459003798948577092410999",
+          "mass": "465.8848455455941496203099147756849865579"
+        },
+        "term": {
+          "fraction": "0.3580800382557757255148091694312442093299",
+          "mass": "63898.66666666666666666666666666666666651"
+        },
+        "trivial": {
+          "fraction": "0.0001320679520351133370052046641305136777207",
+          "mass": "23.56726190476190476190476190476190476191"
+        },
+        "unfold": {
+          "fraction": "0.001810860516828081608858081556010364402728",
+          "mass": "323.144437506937506937506937506937506938"
+        }
+      }
+    },
+    "logic_shape": {
+      "denominator_mass": "192",
+      "values": {
+        "and": {
+          "fraction": "0.7916666666666666666666666666666666666667",
+          "mass": "152"
+        },
+        "iff": {
+          "fraction": "0.2083333333333333333333333333333333333333",
+          "mass": "40"
+        }
+      }
+    },
+    "proof_form": {
+      "denominator_mass": "178448",
+      "values": {
+        "equations": {
+          "fraction": "0.008258241429809617741115992707492752323741",
+          "mass": "1473.666666666666666666666666666666666667"
+        },
+        "generated-tactic": {
+          "fraction": "0.001075943692280104007890253743387429391195",
+          "mass": "192"
+        },
+        "tactic": {
+          "fraction": "0.4945434617741115992707492752323739504616",
+          "mass": "88250.29166666666666666666666666666671197"
+        },
+        "term": {
+          "fraction": "0.4834071643653426581786664275680683821981",
+          "mass": "86263.04166666666666666666666666666666648"
+        },
+        "where": {
+          "fraction": "0.01271518873845602080157805074867748587824",
+          "mass": "2269"
+        }
+      }
+    },
+    "provenance": {
+      "denominator_mass": "178448",
+      "values": {
+        "external-lean": {
+          "fraction": "0.0001232852147404285842374249080964762844078",
+          "mass": "22"
+        },
+        "real-mathlib": {
+          "fraction": "0.9988007710929794674078723213485160959243",
+          "mass": "178234.0000000000000000000000000000002855"
+        },
+        "synthetic": {
+          "fraction": "0.001075943692280104007890253743387429391195",
+          "mass": "192"
+        }
+      }
+    },
+    "source_vs_transformed": {
+      "denominator_mass": "178448",
+      "values": {
+        "original-source": {
+          "fraction": "0.9790265698317343614573059565438297633636",
+          "mass": "174705.3333333333333333333333333333336127"
+        },
+        "transformed": {
+          "fraction": "0.02097343016826563854269404345617023820197",
+          "mass": "3742.666666666666666666666666666666666666"
+        }
+      }
+    },
+    "total": "178448",
+    "whole_vs_incremental": {
+      "denominator_mass": "178448",
+      "values": {
+        "continuation": {
+          "fraction": "0.1386622433425984040168564511790549629709",
+          "mass": "24744.00000000000000000000000000000003224"
+        },
+        "whole": {
+          "fraction": "0.8613377566574015959831435488209450372047",
+          "mass": "153703.9999999999999999999999999999999991"
+        }
+      }
+    }
+  },
+  "raw": {
+    "composition_class": {
+      "denominator": 288,
+      "values": {
+        "branching": {
+          "count": 96,
+          "fraction": "96/288"
+        },
+        "deep": {
+          "count": 96,
+          "fraction": "96/288"
+        },
+        "direct": {
+          "count": 96,
+          "fraction": "96/288"
+        }
+      }
+    },
+    "first_proof_construct": {
+      "denominator": 179825,
+      "values": {
+        "aesop": {
+          "count": 288,
+          "fraction": "288/179825"
+        },
+        "apply": {
+          "count": 2611,
+          "fraction": "2611/179825"
+        },
+        "by_cases": {
+          "count": 1640,
+          "fraction": "1640/179825"
+        },
+        "by_contra": {
+          "count": 113,
+          "fraction": "113/179825"
+        },
+        "calc": {
+          "count": 726,
+          "fraction": "726/179825"
+        },
+        "cases": {
+          "count": 1236,
+          "fraction": "1236/179825"
+        },
+        "change": {
+          "count": 306,
+          "fraction": "306/179825"
+        },
+        "classical": {
+          "count": 2205,
+          "fraction": "2205/179825"
+        },
+        "constructor": {
+          "count": 1354,
+          "fraction": "1354/179825"
+        },
+        "constructor-term": {
+          "count": 6266,
+          "fraction": "6266/179825"
+        },
+        "convert": {
+          "count": 44,
+          "fraction": "44/179825"
+        },
+        "convert!": {
+          "count": 845,
+          "fraction": "845/179825"
+        },
+        "decide": {
+          "count": 88,
+          "fraction": "88/179825"
+        },
+        "dsimp": {
+          "count": 801,
+          "fraction": "801/179825"
+        },
+        "exact": {
+          "count": 3895,
+          "fraction": "3895/179825"
+        },
+        "exact_mod_cast": {
+          "count": 20,
+          "fraction": "20/179825"
+        },
+        "ext": {
+          "count": 6553,
+          "fraction": "6553/179825"
+        },
+        "fun_prop": {
+          "count": 44,
+          "fraction": "44/179825"
+        },
+        "grind": {
+          "count": 1010,
+          "fraction": "1010/179825"
+        },
+        "have": {
+          "count": 5076,
+          "fraction": "5076/179825"
+        },
+        "induction": {
+          "count": 2270,
+          "fraction": "2270/179825"
+        },
+        "intro": {
+          "count": 1676,
+          "fraction": "1676/179825"
+        },
+        "intros": {
+          "count": 8,
+          "fraction": "8/179825"
+        },
+        "let": {
+          "count": 1470,
+          "fraction": "1470/179825"
+        },
+        "linarith": {
+          "count": 13,
+          "fraction": "13/179825"
+        },
+        "norm_num": {
+          "count": 25,
+          "fraction": "25/179825"
+        },
+        "obtain": {
+          "count": 3306,
+          "fraction": "3306/179825"
+        },
+        "omega": {
+          "count": 1,
+          "fraction": "1/179825"
+        },
+        "positivity": {
+          "count": 2,
+          "fraction": "2/179825"
+        },
+        "rcases": {
+          "count": 2144,
+          "fraction": "2144/179825"
+        },
+        "refine": {
+          "count": 5453,
+          "fraction": "5453/179825"
+        },
+        "rename_i": {
+          "count": 2,
+          "fraction": "2/179825"
+        },
+        "repeat": {
+          "count": 8,
+          "fraction": "8/179825"
+        },
+        "rfl": {
+          "count": 18577,
+          "fraction": "18577/179825"
+        },
+        "ring": {
+          "count": 9,
+          "fraction": "9/179825"
+        },
+        "rintro": {
+          "count": 699,
+          "fraction": "699/179825"
+        },
+        "rw": {
+          "count": 20633,
+          "fraction": "20633/179825"
+        },
+        "show": {
+          "count": 177,
+          "fraction": "177/179825"
+        },
+        "simp": {
+          "count": 14178,
+          "fraction": "14178/179825"
+        },
+        "simp_all": {
+          "count": 88,
+          "fraction": "88/179825"
+        },
+        "simp_rw": {
+          "count": 2586,
+          "fraction": "2586/179825"
+        },
+        "simpa": {
+          "count": 3769,
+          "fraction": "3769/179825"
+        },
+        "specialize": {
+          "count": 9,
+          "fraction": "9/179825"
+        },
+        "subst": {
+          "count": 426,
+          "fraction": "426/179825"
+        },
+        "suffices": {
+          "count": 671,
+          "fraction": "671/179825"
+        },
+        "term": {
+          "count": 65993,
+          "fraction": "65993/179825"
+        },
+        "trivial": {
+          "count": 22,
+          "fraction": "22/179825"
+        },
+        "unfold": {
+          "count": 489,
+          "fraction": "489/179825"
+        }
+      }
+    },
+    "logic_shape": {
+      "denominator": 288,
+      "values": {
+        "and": {
+          "count": 242,
+          "fraction": "242/288"
+        },
+        "iff": {
+          "count": 46,
+          "fraction": "46/288"
+        }
+      }
+    },
+    "proof_form": {
+      "denominator": 179825,
+      "values": {
+        "equations": {
+          "count": 1489,
+          "fraction": "1489/179825"
+        },
+        "generated-tactic": {
+          "count": 288,
+          "fraction": "288/179825"
+        },
+        "tactic": {
+          "count": 88688,
+          "fraction": "88688/179825"
+        },
+        "term": {
+          "count": 87075,
+          "fraction": "87075/179825"
+        },
+        "where": {
+          "count": 2285,
+          "fraction": "2285/179825"
+        }
+      }
+    },
+    "proof_variants": 179825,
+    "provenance": {
+      "denominator": 178544,
+      "values": {
+        "external-lean": {
+          "count": 22,
+          "fraction": "22/178544"
+        },
+        "real-mathlib": {
+          "count": 178234,
+          "fraction": "178234/178544"
+        },
+        "synthetic": {
+          "count": 288,
+          "fraction": "288/178544"
+        }
+      }
+    },
+    "records": 178544,
+    "source_vs_transformed": {
+      "denominator": 179825,
+      "values": {
+        "original-source": {
+          "count": 176051,
+          "fraction": "176051/179825"
+        },
+        "transformed": {
+          "count": 3774,
+          "fraction": "3774/179825"
+        }
+      }
+    },
+    "structurally_unique_proof_variants": 179823,
+    "training_records": 178448
+  },
+  "schema_version": "dataset-v3-diagnostics-v1",
+  "split_isolation": {
+    "cross_role_derivation_families": 0,
+    "cross_role_exact_proofs": 0,
+    "cross_role_statements": 0,
+    "cross_role_structural_proofs": 0
+  },
+  "structurally_unique_variants_per_theorem": {
+    "count": 178544,
+    "max": 7,
+    "min": 1,
+    "p25": 1,
+    "p50": 1,
+    "p75": 1,
+    "p90": 1,
+    "p95": 1,
+    "p99": 1
+  },
+  "theorem_contribution": {
+    "examples_max": 85,
+    "examples_min": 1,
+    "mass_max": "1/1",
+    "mass_min": "1/1"
+  },
+  "theorem_effective_weights": {
+    "maximum": "1/1",
+    "minimum": "1/1",
+    "statements": 178448,
+    "unique_exact_values": [
+      "1/1"
+    ],
+    "violations": 0
+  },
+  "variants_per_theorem": {
+    "count": 178544,
+    "max": 7,
+    "min": 1,
+    "p25": 1,
+    "p50": 1,
+    "p75": 1,
+    "p90": 1,
+    "p95": 1,
+    "p99": 1
+  }
+}
