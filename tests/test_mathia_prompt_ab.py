@@ -18,6 +18,7 @@ from qwen_lean.mathia_prompt_ab import (
     render_arm_prompt,
 )
 from qwen_lean.schema import TaskRecord
+from qwen_lean.verifier import VerificationOutcome
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -198,6 +199,77 @@ def test_verification_result_rejects_workload_environment_mismatch() -> None:
             manifest_sha256="manifest",
             environment_sha256="minif2f-environment",
             generation=generation,
+        )
+
+
+def test_verifier_environment_probe_uses_q0_timeout_and_deduplicates() -> None:
+    calls: dict[str, list[tuple[str, float]]] = {
+        workload_id: [] for workload_id in prompt_ab.WORKLOAD_IDS
+    }
+
+    class FakeVerifier:
+        def __init__(self, workload_id: str) -> None:
+            self.workload_id = workload_id
+
+        def prime_preamble(self, preamble: str, *, timeout_seconds: float):
+            calls[self.workload_id].append((preamble, timeout_seconds))
+            return None
+
+    tasks = {
+        0: _bound_task().task,
+        1: TaskRecord(
+            id="fresh-example",
+            preamble="import PrimeNumberTheoremAnd",
+            declaration="theorem fresh_example : True",
+            declaration_name="fresh_example",
+        ),
+    }
+    generations = [
+        {"task_ordinal": 0, "workload_id": "minif2f-valid-clean-v2"},
+        {"task_ordinal": 0, "workload_id": "minif2f-valid-clean-v2"},
+        {"task_ordinal": 1, "workload_id": "fresh-composition-valid-v2"},
+    ]
+    evidence = prompt_ab._prime_verifier_environments(
+        {
+            workload_id: FakeVerifier(workload_id)
+            for workload_id in prompt_ab.WORKLOAD_IDS
+        },
+        tasks,
+        generations,
+    )
+    assert calls == {
+        "minif2f-valid-clean-v2": [
+            ("import Mathlib", prompt_ab.VERIFIER_ENVIRONMENT_PROBE_TIMEOUT_SECONDS)
+        ],
+        "fresh-composition-valid-v2": [
+            (
+                "import PrimeNumberTheoremAnd",
+                prompt_ab.VERIFIER_ENVIRONMENT_PROBE_TIMEOUT_SECONDS,
+            )
+        ],
+    }
+    assert evidence["minif2f-valid-clean-v2"]["probe_count"] == 1
+    assert evidence["fresh-composition-valid-v2"]["probe_count"] == 1
+
+
+def test_verifier_environment_probe_fails_before_candidate_verification() -> None:
+    class FailedProbeVerifier:
+        def prime_preamble(self, preamble: str, *, timeout_seconds: float):
+            return VerificationOutcome(
+                category="verifier_timeout",
+                lean_exit_code=None,
+                diagnostics={"stdout": "", "stderr": "cold probe timed out"},
+                latency_seconds=timeout_seconds,
+            )
+
+    with pytest.raises(RuntimeError, match="environment probe failed"):
+        prompt_ab._prime_verifier_environments(
+            {
+                workload_id: FailedProbeVerifier()
+                for workload_id in prompt_ab.WORKLOAD_IDS
+            },
+            {0: _bound_task().task},
+            [{"task_ordinal": 0, "workload_id": "minif2f-valid-clean-v2"}],
         )
 
 

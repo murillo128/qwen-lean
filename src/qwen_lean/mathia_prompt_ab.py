@@ -50,6 +50,7 @@ EXPECTED_CANDIDATES_PER_TASK = 8
 EXPECTED_TASKS = 611
 EXPECTED_CANDIDATES_PER_ARM = EXPECTED_TASKS * EXPECTED_CANDIDATES_PER_TASK
 EXPECTED_CANDIDATES_TOTAL = EXPECTED_CANDIDATES_PER_ARM * len(ARM_IDS)
+VERIFIER_ENVIRONMENT_PROBE_TIMEOUT_SECONDS = 120.0
 
 _SOURCE_TASK_KEYS = {
     "artifact_role",
@@ -1571,6 +1572,56 @@ def _verification_progress_snapshot(
     }
 
 
+def _prime_verifier_environments(
+    verifiers: Mapping[str, LeanVerifier],
+    tasks_by_ordinal: Mapping[int, TaskRecord],
+    generations: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Prime shared preambles outside the frozen per-candidate timeout.
+
+    The authoritative Q0 evaluator allows 120 seconds for this environment
+    probe, then applies the frozen 30-second timeout to each candidate.  A cold
+    probe failure is infrastructure failure and must stop the verification
+    session before any durable candidate classification is written.
+    """
+
+    preambles_by_workload: dict[str, set[str]] = defaultdict(set)
+    for generation in generations:
+        task = tasks_by_ordinal[int(generation["task_ordinal"])]
+        preambles_by_workload[str(generation["workload_id"])].add(task.preamble)
+
+    evidence: dict[str, Any] = {}
+    for workload_id in WORKLOAD_IDS:
+        probes = []
+        for preamble in sorted(preambles_by_workload[workload_id]):
+            started = time.perf_counter()
+            failure = verifiers[workload_id].prime_preamble(
+                preamble,
+                timeout_seconds=VERIFIER_ENVIRONMENT_PROBE_TIMEOUT_SECONDS,
+            )
+            elapsed = time.perf_counter() - started
+            if failure is not None:
+                diagnostics = (
+                    failure.diagnostics["stdout"] + failure.diagnostics["stderr"]
+                )
+                raise RuntimeError(
+                    f"{workload_id} verifier environment probe failed as "
+                    f"{failure.category}: {diagnostics}"
+                )
+            probes.append(
+                {
+                    "preamble_sha256": _sha256_text(preamble),
+                    "wall_time_seconds": elapsed,
+                }
+            )
+        evidence[workload_id] = {
+            "timeout_seconds": VERIFIER_ENVIRONMENT_PROBE_TIMEOUT_SECONDS,
+            "probe_count": len(probes),
+            "probes": probes,
+        }
+    return evidence
+
+
 def run_resumable_verification(
     config: PromptABConfig,
     dataset_root: Path,
@@ -1673,6 +1724,13 @@ def run_resumable_verification(
         tasks_by_ordinal = {bound.ordinal: bound.task for bound in bound_tasks}
         batch_count = 0
         try:
+            if not (artifact_root / "PAUSE").exists():
+                session["environment_probes"] = _prime_verifier_environments(
+                    verifiers,
+                    tasks_by_ordinal,
+                    missing,
+                )
+                _replace_json(session_path, session)
             while missing:
                 if (artifact_root / "PAUSE").exists():
                     session["state"] = "paused"

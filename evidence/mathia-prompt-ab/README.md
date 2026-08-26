@@ -39,6 +39,12 @@ Both commands require explicit `--resume`, inventory durable work first, and
 schedule only missing identities. The `pause` command creates a marker consumed
 between bounded chunks; `unpause` clears it before resumption.
 
+Each verification session primes its shared Lean preambles with the same
+120-second environment-probe allowance used by the authoritative Q0 evaluator,
+then retains the frozen 30-second timeout for each candidate. A failed shared
+probe aborts before any candidate classification is finalized, so a cold
+environment timeout cannot be mistaken for a model-level verifier result.
+
 The local inference gate accepts the project RTX 4070 Ti by its Ada compute
 capability 8.9. The exact locked runtime and both workload-specific verifier
 environments have passed pre-inference identity and representative-preamble
