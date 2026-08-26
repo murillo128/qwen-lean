@@ -19,7 +19,21 @@ from qwen_lean.generalist_v3 import (
 )
 from qwen_lean.generalist_v3_training import (
     cache_base_reference_logits,
+    compact_stage0_evidence,
+    measure_checkpoint_anchor_drift,
+    run_bounded_configuration_training,
     run_no_update_near_max_preflight,
+)
+from qwen_lean.generalist_v3_evaluation import (
+    compact_base_canary_evidence,
+    compact_checkpoint_canary_evidence,
+    finalize_existing_base_canary,
+    run_base_validation_canary,
+)
+from qwen_lean.generalist_v3_parity import (
+    build_and_run_hf_parity_sentinel,
+    compact_lora_parity_evidence,
+    run_vllm_parity_sentinel,
 )
 
 
@@ -27,6 +41,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "config/qwen35-4b-generalist-v3.json"
 DEFAULT_PACKAGE = ROOT / "artifacts/dataset-v3/lean-proof-continuation-v3"
 DEFAULT_ARTIFACTS = ROOT / "artifacts/qwen-lean-generalist-v3"
+DEFAULT_VERIFIER_ROOT = ROOT / "artifacts/riemann/sources/PrimeNumberTheoremAnd"
+DEFAULT_EVIDENCE = ROOT / "evidence/qwen-lean-generalist-v3"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -35,6 +51,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--package-root", type=Path, default=DEFAULT_PACKAGE)
     parser.add_argument("--artifact-root", type=Path, default=DEFAULT_ARTIFACTS)
     parser.add_argument("--model-snapshot", type=Path)
+    parser.add_argument("--verifier-root", type=Path, default=DEFAULT_VERIFIER_ROOT)
+    parser.add_argument("--configuration", choices=("C0", "C1", "C2"))
+    parser.add_argument("--optimizer-step", type=int)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("bind")
     subparsers.add_parser("census")
@@ -42,6 +61,17 @@ def _parser() -> argparse.ArgumentParser:
     subparsers.add_parser("freeze-stage0")
     subparsers.add_parser("preflight")
     subparsers.add_parser("cache-base-logits")
+    subparsers.add_parser("compact-stage0")
+    subparsers.add_parser("base-canary")
+    subparsers.add_parser("compact-base-canary")
+    subparsers.add_parser("finalize-base-canary")
+    subparsers.add_parser("parity-hf")
+    subparsers.add_parser("parity-vllm")
+    subparsers.add_parser("compact-parity")
+    subparsers.add_parser("train-bounded")
+    subparsers.add_parser("anchor-drift")
+    subparsers.add_parser("checkpoint-canary")
+    subparsers.add_parser("compact-checkpoint-canary")
     return parser
 
 
@@ -90,15 +120,19 @@ def main() -> int:
     if args.command == "freeze-stage0":
         tokenizer = _tokenizer(config, args.model_snapshot)
         execution_view = _read_json(stage0 / "training-execution-view.json")
+        clean_gpu_baseline = _read_json(stage0 / "clean-gpu-baseline.json")
         preflight = _read_json(stage0 / "near-max-preflight.json")
         if (
-            preflight.get("schema_version") != "generalist-v3-near-max-preflight-v3"
+            preflight.get("schema_version") != "generalist-v3-near-max-preflight-v4"
             or preflight.get("status") != "passed"
+            or clean_gpu_baseline.get("clean_gpu_gate_passed") is not True
+            or preflight.get("clean_gpu_baseline_sha256")
+            != sha256_file(stage0 / "clean-gpu-baseline.json")
             or preflight.get("execution_view_identity_sha256")
             != execution_view.get("execution_view_sha256")
             or preflight.get("forward_backward", {}).get("optimizer_update_run") is not False
         ):
-            raise RuntimeError("Stage 0 freeze requires the passed 32k no-update preflight")
+            raise RuntimeError("Stage 0 freeze requires the passed clean 16k preflight")
         structural = freeze_structural_sampling_manifest(
             config,
             binding,
@@ -134,6 +168,9 @@ def main() -> int:
             "near_max_preflight_sha256": sha256_file(
                 stage0 / "near-max-preflight.json"
             ),
+            "clean_gpu_baseline_sha256": sha256_file(
+                stage0 / "clean-gpu-baseline.json"
+            ),
             "structural_sampling_sha256": sha256_file(
                 stage0 / "structural-sampling.json"
             ),
@@ -157,6 +194,7 @@ def main() -> int:
             config,
             binding,
             stage0 / "training-execution-view.json",
+            stage0 / "clean-gpu-baseline.json",
             stage0 / "near-max-preflight.json",
             model_snapshot=args.model_snapshot,
         )
@@ -171,6 +209,155 @@ def main() -> int:
             stage0 / "base-reference-logits.json",
             model_snapshot=args.model_snapshot,
         )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "compact-stage0":
+        value = compact_stage0_evidence(
+            config,
+            artifact_root,
+            DEFAULT_EVIDENCE / "stage0-16k.json",
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "base-canary":
+        freeze = _read_json(stage0 / "freeze.json")
+        if (
+            freeze.get("validation_canary_sha256")
+            != sha256_file(stage0 / "validation-canary.json")
+            or freeze.get("optimizer_updates") != 0
+        ):
+            raise RuntimeError("Base canary requires the frozen Stage 0 manifest")
+        value = run_base_validation_canary(
+            config,
+            stage0 / "validation-canary.json",
+            binding.package_root / "manifest.json",
+            args.verifier_root,
+            artifact_root / "base-validation-canary",
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "compact-base-canary":
+        value = compact_base_canary_evidence(
+            config,
+            stage0 / "validation-canary.json",
+            artifact_root / "base-validation-canary",
+            DEFAULT_EVIDENCE / "base-validation-canary.json",
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "finalize-base-canary":
+        value = finalize_existing_base_canary(
+            config,
+            stage0 / "validation-canary.json",
+            binding.package_root / "manifest.json",
+            args.verifier_root,
+            artifact_root / "base-validation-canary",
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "parity-hf":
+        value = build_and_run_hf_parity_sentinel(
+            config,
+            binding,
+            stage0 / "anchor-manifest.json",
+            artifact_root / "parity/sentinel-adapter",
+            artifact_root / "parity/hf-runtime.json",
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "parity-vllm":
+        value = run_vllm_parity_sentinel(
+            config,
+            artifact_root / "parity/hf-runtime.json",
+            artifact_root / "parity/sentinel-adapter",
+            artifact_root / "parity/vllm-runtime.json",
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "compact-parity":
+        value = compact_lora_parity_evidence(
+            config,
+            artifact_root / "parity/hf-runtime.json",
+            artifact_root / "parity/vllm-runtime.json",
+            DEFAULT_EVIDENCE / "lora-parity.json",
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "train-bounded":
+        if args.configuration is None:
+            raise ValueError("train-bounded requires --configuration C0/C1/C2")
+        value = run_bounded_configuration_training(
+            config,
+            binding,
+            stage0 / "freeze.json",
+            DEFAULT_EVIDENCE / "base-validation-canary.json",
+            DEFAULT_EVIDENCE / "lora-parity.json",
+            artifact_root / "training-stream.jsonl.gz",
+            artifact_root / "training-stream-manifest.json",
+            stage0 / "anchor-manifest.json",
+            stage0 / "base-reference-logits.safetensors",
+            stage0 / "base-reference-logits.json",
+            artifact_root / "training" / args.configuration,
+            configuration_id=args.configuration,
+            model_snapshot=args.model_snapshot,
+        )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command in {
+        "anchor-drift",
+        "checkpoint-canary",
+        "compact-checkpoint-canary",
+    }:
+        if args.configuration is None or args.optimizer_step not in {100, 250, 500}:
+            raise ValueError(
+                f"{args.command} requires --configuration and "
+                "--optimizer-step 100/250/500"
+            )
+        configuration = args.configuration
+        step = int(args.optimizer_step)
+        checkpoint = artifact_root / "training" / configuration / f"checkpoint-{step}"
+        validation_run = artifact_root / "validation" / configuration / str(step)
+        if args.command == "anchor-drift":
+            value = measure_checkpoint_anchor_drift(
+                config,
+                binding,
+                stage0 / "anchor-manifest.json",
+                stage0 / "base-reference-logits.safetensors",
+                checkpoint,
+                validation_run / "anchor-drift.json",
+                configuration_id=configuration,
+                optimizer_step=step,
+                model_snapshot=args.model_snapshot,
+            )
+        elif args.command == "checkpoint-canary":
+            value = run_base_validation_canary(
+                config,
+                stage0 / "validation-canary.json",
+                binding.package_root / "manifest.json",
+                args.verifier_root,
+                validation_run / "canary",
+                model_snapshot=args.model_snapshot,
+                adapter_dir=checkpoint,
+                checkpoint_id=f"{configuration}-{step}",
+                parity_evidence_path=DEFAULT_EVIDENCE / "lora-parity.json",
+            )
+        else:
+            value = compact_checkpoint_canary_evidence(
+                config,
+                stage0 / "validation-canary.json",
+                validation_run / "canary",
+                DEFAULT_EVIDENCE / "base-validation-canary.json",
+                validation_run / "anchor-drift.json",
+                DEFAULT_EVIDENCE
+                / "validation"
+                / configuration
+                / f"step-{step}.json",
+                configuration_id=configuration,
+                optimizer_step=step,
+            )
         print(json.dumps(value, indent=2, sort_keys=True))
         return 0
     raise AssertionError(args.command)

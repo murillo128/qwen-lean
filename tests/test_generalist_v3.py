@@ -56,11 +56,13 @@ def test_generalist_v3_config_freezes_issue_contract() -> None:
         "eligible": True,
     }
     assert config.training["canonical_context_tokens"] == 262144
-    assert config.training["resolved_context_tokens"] == 32768
-    assert config.training["execution_view"]["expected_quarantined_examples"] == 18
+    assert config.training["resolved_context_tokens"] == 16384
+    assert config.training["execution_view"]["expected_quarantined_examples"] == 51
     assert config.training["sample_theorem_by_structural_multiplier"] is True
     assert config.preservation["anchor_count"] == 512
     assert config.evaluation["interfaces"] == ["whole", "incremental"]
+    assert config.evaluation["inference"]["max_model_len"] == 262144
+    assert config.evaluation["inference"]["engine_version"] == "0.17.0"
 
 
 def test_v3_tokenization_masks_prompt_and_supervises_one_eos() -> None:
@@ -180,6 +182,20 @@ def test_canary_summary_collapse_gate_and_positive_gate() -> None:
     assert gates["short_eos_collapse"] is True
     assert gates["eligible"] is False
     assert positive_500_step_gate(config, collapsed, base, gates) is False
+
+
+def test_incremental_canary_templates_include_the_frozen_prefix() -> None:
+    task_ids = ["t:whole", "t:incremental"]
+    metadata = {
+        "t:whole": {"proof_prefix": ""},
+        "t:incremental": {"proof_prefix": "by\n  intro h\n  "},
+    }
+    summary = summarize_canary_candidates(
+        _candidates(), expected_task_ids=task_ids, task_metadata=metadata
+    )
+    assert summary["whole"]["solved_task_ids"] == ["t:whole"]
+    assert summary["incremental"]["solved_task_ids"] == ["t:incremental"]
+    assert summary["incremental"]["unique_normalized_templates"] == 8
 
 
 def test_selection_is_lexicographic_and_excludes_control() -> None:

@@ -1,4 +1,42 @@
-# qwen-lean generalist v3 Stage-0 feasibility
+# qwen-lean generalist v3 execution evidence
+
+`OBSERVED`: the final issue-authorized 16,384-token Ada execution view and
+unchanged Base validation canary both pass. Compact evidence is in
+`stage0-16k.json` and `base-validation-canary.json`; bulky manifests, cached
+full-vocabulary logits, streams, and candidate-level outputs remain under the
+ignored `artifacts/qwen-lean-generalist-v3/` tree.
+
+The final independent tokenizer census and execution-view enumeration agree on
+exactly 51 quarantined examples (34 continuation, 17 whole), all from 17
+`deep` theorems. Each affected theorem has no remaining optimizer-eligible row
+and is explicitly excluded. The execution view retains 317,503 examples from
+178,431 theorems without mutating Dataset v3, truncating a row, or silently
+dropping evidence. Its longest eligible example is 15,617 tokens.
+
+The clean-GPU gate observed no competing compute process and 97.76% free VRAM
+before model load. The exact NF4 QLoRA/BF16 forward, finite target-only loss,
+backward, and all-LoRA-gradient checks passed on the longest retained example.
+Peak CUDA allocated memory was 15,415,834,624 bytes, leaving 5,573,969,920
+bytes of allocated-memory headroom, above the required 1 GiB. No optimizer was
+created or updated.
+
+The unchanged pinned Base was then evaluated on all 48 validation compositions
+under both whole and incremental interfaces (`96 × 8 = 768` candidates), with
+the native 262,144-token model context and no truncation. Ten interface tasks
+exceed the 16K training-only ceiling; the longest validation input contains
+242,631 tokens and was evaluated intact. Base solved 0/48 whole and 0/48
+incremental tasks; all 768 results were ordinary candidate outcomes (748 Lean
+rejections and 20 empty candidates), with no generation or verifier
+infrastructure errors. Despite zero verified proofs, Base retained high output
+diversity: 322 whole and 381 incremental normalized complete-output templates.
+This is the frozen step-0 comparator, not a successful model-quality result.
+
+The 64,000-microbatch deterministic training stream now has stable canonical
+and gzip byte hashes across repeated complete writes. The frozen 512-anchor
+manifest contains no validation/test theorem, and the exact full-vocabulary
+Base next-token logits are cached before any optimizer update.
+
+## Historical feasibility returns
 
 `OBSERVED`: the exact merged Dataset-v3 package binds successfully and contains
 178,448 training theorems and 317,554 optimizer examples. Under the pinned
@@ -42,10 +80,9 @@ complete; backward and the required 1 GiB allocated-headroom check were not
 reached. No optimizer was created and no model update occurred. Exact compact
 evidence is in `stage0-feasibility-32k.json`.
 
-This remains a contract-feasibility failure, not a model-quality result. The
-amendments explicitly require a design return when their memory bound fails;
-execution therefore did not silently lower the cap, switch GPU, change LoRA
-targets, or add a new sequence mechanism.
+These are historical contract-feasibility failures, not model-quality results.
+Each controlling amendment required a design return; execution did not silently
+lower the cap, switch GPU, change LoRA targets, or add a sequence mechanism.
 
 The earlier design alternatives were:
 

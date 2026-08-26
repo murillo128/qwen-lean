@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 import hashlib
+import io
 import json
 import math
 import random
@@ -45,7 +46,7 @@ CONFIGURATION_IDS = ("C0", "C1", "C2", "C3")
 PRIMARY_CONFIGURATION_IDS = CONFIGURATION_IDS[:3]
 RETAINED_STEPS = (100, 250, 500, 1000, 2000, 4000, 8000)
 STRUCTURAL_BUCKETS = ("direct", "multi-step", "branching", "deep")
-EXECUTION_CONTEXT_TOKENS = 32768
+EXECUTION_CONTEXT_TOKENS = 16384
 
 
 class Tokenizer(Protocol):
@@ -182,7 +183,7 @@ class GeneralistV3Config:
         execution_view = training.get("execution_view", {})
         if (
             execution_view.get("maximum_sequence_tokens") != EXECUTION_CONTEXT_TOKENS
-            or execution_view.get("expected_quarantined_examples") != 18
+            or execution_view.get("expected_quarantined_examples") != 51
             or execution_view.get("renormalize_remaining_example_mass_within_theorem")
             is not True
             or execution_view.get("exclude_theorem_when_no_example_remains") is not True
@@ -239,6 +240,7 @@ class GeneralistV3Config:
         ):
             raise ValueError("generalist-v3 preservation contract differs")
         evaluation = self.evaluation
+        inference = evaluation.get("inference", {})
         if (
             evaluation.get("candidates_per_task") != 8
             or evaluation.get("interfaces") != ["whole", "incremental"]
@@ -247,6 +249,15 @@ class GeneralistV3Config:
             or evaluation.get("sampling", {}).get("top_k") != -1
             or evaluation.get("sampling", {}).get("max_new_tokens") != 1024
             or evaluation.get("sampling", {}).get("seed") != 0
+            or inference.get("execution") != "project-controlled-local-cuda"
+            or inference.get("engine") != "vllm"
+            or inference.get("engine_version") != "0.17.0"
+            or inference.get("dtype") != "bfloat16"
+            or inference.get("tensor_parallel_size") != 1
+            or inference.get("max_model_len") != 262144
+            or inference.get("enforce_eager") is not True
+            or inference.get("language_model_only") is not True
+            or inference.get("use_flashinfer_sampler") is not False
         ):
             raise ValueError("generalist-v3 evaluation contract differs")
 
@@ -376,6 +387,8 @@ def tokenizer_length_census(
     progress_every_records: int = 0,
 ) -> dict[str, Any]:
     bucket_counts = Counter({str(value): 0 for value in CONTEXT_CHOICES})
+    execution_cap = int(config.training["execution_view"]["maximum_sequence_tokens"])
+    above_execution_ceiling_ids: list[str] = []
     maximum: dict[str, Any] | None = None
     example_count = 0
     records = {
@@ -390,6 +403,8 @@ def tokenizer_length_census(
         sequence_tokens = prompt_tokens + target_tokens + 1
         selected = context_for_maximum(sequence_tokens)
         bucket_counts[str(selected)] += 1
+        if sequence_tokens > execution_cap:
+            above_execution_ceiling_ids.append(reference.example_id)
         example_count += 1
         if maximum is None or sequence_tokens > int(maximum["sequence_tokens"]):
             maximum = {
@@ -406,6 +421,15 @@ def tokenizer_length_census(
         raise RuntimeError("Dataset-v3 tokenizer census changed optimizer membership")
     if maximum is None:
         raise RuntimeError("Dataset-v3 tokenizer census is empty")
+    above_execution_ceiling_ids.sort()
+    expected_quarantined = int(
+        config.training["execution_view"]["expected_quarantined_examples"]
+    )
+    if len(above_execution_ceiling_ids) != expected_quarantined:
+        raise RuntimeError(
+            "Dataset-v3 tokenizer census execution-tail count differs: "
+            f"{len(above_execution_ceiling_ids)} != {expected_quarantined}"
+        )
     selected_context = context_for_maximum(int(maximum["sequence_tokens"]))
     if (
         selected_context != int(config.training["canonical_context_tokens"])
@@ -422,6 +446,12 @@ def tokenizer_length_census(
         "context_bucket_counts": dict(bucket_counts),
         "maximum_example": maximum,
         "selected_context_tokens": selected_context,
+        "execution_ceiling_tokens": execution_cap,
+        "examples_above_execution_ceiling": len(above_execution_ceiling_ids),
+        "example_ids_above_execution_ceiling_sha256": _sha256_json(
+            above_execution_ceiling_ids
+        ),
+        "example_ids_above_execution_ceiling": above_execution_ceiling_ids,
         "truncated_or_dropped": 0,
     }
 
@@ -532,6 +562,10 @@ def freeze_training_execution_view(
         != int(config.training["canonical_context_tokens"])
         or int(census.get("maximum_example", {}).get("sequence_tokens", 0))
         != int(config.training["canonical_maximum_observed_sequence_tokens"])
+        or int(census.get("execution_ceiling_tokens", 0))
+        != int(config.training["execution_view"]["maximum_sequence_tokens"])
+        or int(census.get("examples_above_execution_ceiling", -1))
+        != int(config.training["execution_view"]["expected_quarantined_examples"])
     ):
         raise ValueError("training execution view needs the frozen canonical census")
     cap = int(config.training["execution_view"]["maximum_sequence_tokens"])
@@ -599,6 +633,15 @@ def freeze_training_execution_view(
             f"training execution quarantine changed: {len(quarantined)} != "
             f"{expected_quarantined}"
         )
+    quarantined_identity = sorted(str(item["example_id"]) for item in quarantined)
+    if (
+        quarantined_identity != census.get("example_ids_above_execution_ceiling")
+        or _sha256_json(quarantined_identity)
+        != census.get("example_ids_above_execution_ceiling_sha256")
+    ):
+        raise RuntimeError(
+            "training execution quarantine identity differs from independent census"
+        )
     quarantined_ids = {str(item["example_id"]) for item in quarantined}
     affected = sorted({str(item["statement_id"]) for item in quarantined})
     excluded_theorems: list[str] = []
@@ -662,6 +705,10 @@ def freeze_training_execution_view(
         "schema_version": "generalist-v3-training-execution-view-v1",
         "dataset_binding": binding.to_dict(),
         "canonical_tokenizer_census_sha256": sha256_file(census_path),
+        "census_quarantine_identity_sha256": census[
+            "example_ids_above_execution_ceiling_sha256"
+        ],
+        "census_quarantine_identity_matched": True,
         "maximum_sequence_tokens": cap,
         "canonical_optimizer_examples": example_count,
         "quarantined_example_count": len(quarantined),
@@ -939,7 +986,13 @@ def write_training_stream(
     bucket_kind_counts = Counter()
     statement_counts = Counter()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with gzip.open(output_path, "wt", encoding="utf-8", newline="\n") as handle:
+    with (
+        output_path.open("wb") as raw_handle,
+        gzip.GzipFile(
+            filename="", mode="wb", fileobj=raw_handle, mtime=0
+        ) as gzip_handle,
+        io.TextIOWrapper(gzip_handle, encoding="utf-8", newline="\n") as handle,
+    ):
         for stream_index, reference in enumerate(
             deterministic_stream_references(
                 by_statement,
@@ -1272,7 +1325,22 @@ def anchor_schedule(anchor_count: int, steps: int, *, seed: int = 0) -> tuple[in
 
 
 def normalized_template_hash(candidate: str) -> str:
-    return _sha256_text(normalized_proof_structure(normalize_transport(candidate)))
+    normalized = normalize_transport(candidate)
+    try:
+        structure = normalized_proof_structure(normalized)
+    except ValueError:
+        # Arbitrary model output can be lexically incomplete (for example an
+        # unterminated string). Such candidates remain valid evaluation rows
+        # and must be grouped deterministically rather than aborting evidence.
+        structure = f"unparseable-lean-output\n{normalized}"
+    return _sha256_text(structure)
+
+
+def _safe_first_proof_construct(candidate: str) -> str:
+    try:
+        return first_proof_construct(candidate)
+    except ValueError:
+        return "unparseable"
 
 
 def _percentile(values: Sequence[int], percentile: float) -> float:
@@ -1292,6 +1360,7 @@ def summarize_canary_candidates(
     candidates: Sequence[Mapping[str, Any]],
     *,
     expected_task_ids: Sequence[str],
+    task_metadata: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     expected = set(expected_task_ids)
     grouped: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
@@ -1314,7 +1383,13 @@ def summarize_canary_candidates(
         template_occurrences = Counter()
         template_verified = Counter()
         for item in lane_candidates:
-            template = normalized_template_hash(str(item["candidate_text"]))
+            task = None if task_metadata is None else task_metadata[str(item["task_id"])]
+            complete_output = (
+                str(item.get("complete_output_text", item["candidate_text"]))
+                if task is None
+                else str(task.get("proof_prefix", "")) + str(item["candidate_text"])
+            )
+            template = normalized_template_hash(complete_output)
             template_tasks[template].add(str(item["task_id"]).rsplit(":", 1)[0])
             template_occurrences[template] += 1
             template_verified[template] += item["category"] == "verified"
@@ -1328,6 +1403,11 @@ def summarize_canary_candidates(
             "pass_at_8": fmean(pass_at_k(8, value, 8) for value in verified_counts),
             "verified_candidates": sum(verified_counts),
             "verified_density": sum(verified_counts) / len(lane_candidates),
+            "solved_task_ids": sorted(
+                task_id
+                for task_id in task_ids
+                if any(item["category"] == "verified" for item in grouped[task_id])
+            ),
             "finish_reason_counts": dict(Counter(str(item["finish_reason"]) for item in lane_candidates)),
             "generated_tokens": {
                 "minimum": min(token_counts),
@@ -1338,7 +1418,12 @@ def summarize_canary_candidates(
                 "maximum": max(token_counts),
                 "le_64_fraction": sum(value <= 64 for value in token_counts) / len(token_counts),
             },
-            "first_construct_counts": dict(Counter(first_proof_construct(str(item["candidate_text"])) for item in lane_candidates)),
+            "first_construct_counts": dict(
+                Counter(
+                    _safe_first_proof_construct(str(item["candidate_text"]))
+                    for item in lane_candidates
+                )
+            ),
             "unique_normalized_templates": len(template_occurrences),
             "normalized_template_diversity": len(template_occurrences) / len(lane_candidates),
             "dominant_template": {
