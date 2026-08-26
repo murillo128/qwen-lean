@@ -36,6 +36,15 @@ and gzip byte hashes across repeated complete writes. The frozen 512-anchor
 manifest contains no validation/test theorem, and the exact full-vocabulary
 Base next-token logits are cached before any optimizer update.
 
+The mandatory PEFT-to-vLLM parity gate also passed before optimizer creation.
+HF forward checks changed on all four deterministic probes. The vLLM 0.17.0
+worker independently verified all 496 source tensors and the exact semantic
+Q/K/V split used to derive 592 runtime tensors: 248 trained PEFT modules map to
+296 runtime adapter children and exactly 152 fused runtime wrappers, with no
+missing or unexpected module. The adapter changed generated text on two probes;
+all four probes changed either text or first-token probability. This sentinel
+establishes transport activity and completeness only, not model quality.
+
 ## Historical feasibility returns
 
 `OBSERVED`: the exact merged Dataset-v3 package binds successfully and contains

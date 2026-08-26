@@ -5,17 +5,22 @@ import hashlib
 import json
 import os
 import platform
+import re
 import time
+from collections import Counter
 from contextlib import nullcontext
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .dataset_v2 import sha256_file
-from .generalist_v2_parity import inspect_vllm_lora_worker
 from .generalist_v3 import DatasetBinding, GeneralistV3Config, _read_json, _write_json
 from .generalist_v3_training import _resolve_anchor_inputs
 from .prompt import normalize_transport
-from .qwen35_vllm_lora import prepare_qwen35_vllm_adapter
+from .qwen35_vllm_lora import (
+    patch_qwen35_vllm_gdn_lora_mapping,
+    prepare_qwen35_vllm_adapter,
+    qwen35_vllm_runtime_tensor_items,
+)
 
 
 PARITY_GATE_ID = "qwen35-vllm-lora-parity-v2"
@@ -251,6 +256,235 @@ def _vllm_arm(
     return rows
 
 
+def _shape_tree(value: Any) -> Any:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        return [_shape_tree(item) for item in value]
+    return list(value.shape)
+
+
+def inspect_vllm_v3_lora_worker(
+    worker: Any,
+    adapter_id: int,
+    source_adapter_dir: str,
+    runtime_adapter_dir: str,
+    expected_suffix_counts: Mapping[str, int],
+    expected_target_regex: str,
+) -> dict[str, Any]:
+    """Verify the source-to-derived-to-loaded mapping inside the vLLM worker."""
+
+    import safetensors
+    import torch
+    from vllm.lora.layers import BaseLayerWithLoRA
+    from vllm.lora.utils import parse_fine_tuned_lora_name
+
+    model_runner = worker.model_runner
+    worker_manager = model_runner.lora_manager
+    manager = worker_manager._adapter_manager
+    model = manager.model
+    mapper = getattr(model, "hf_to_vllm_mapper", None)
+    if mapper is not None and hasattr(mapper, "get_unstacked_mapper"):
+        mapper = mapper.get_unstacked_mapper()
+
+    source_path = Path(source_adapter_dir)
+    runtime_path = Path(runtime_adapter_dir)
+    adapter_config = json.loads(
+        (source_path / "adapter_config.json").read_text(encoding="utf-8")
+    )
+    errors: list[str] = []
+    transform_errors: list[str] = []
+    source_pairs: dict[str, set[str]] = {}
+    source_shapes: dict[str, dict[str, list[int]]] = {}
+    source_to_runtime: dict[str, set[str]] = {}
+    runtime_pairs: dict[str, set[str]] = {}
+    runtime_shapes: dict[str, dict[str, list[int]]] = {}
+    source_tensor_path = source_path / "adapter_model.safetensors"
+    runtime_tensor_path = runtime_path / "adapter_model.safetensors"
+    with safetensors.safe_open(
+        source_tensor_path, framework="pt", device="cpu"
+    ) as source_handle:
+        source_tensor_keys = list(source_handle.keys())
+        with safetensors.safe_open(
+            runtime_tensor_path, framework="pt", device="cpu"
+        ) as runtime_handle:
+            runtime_tensor_keys = set(runtime_handle.keys())
+            expected_runtime_tensor_keys: set[str] = set()
+            for source_key in source_tensor_keys:
+                source_module, source_is_lora_a = parse_fine_tuned_lora_name(
+                    source_key
+                )
+                source_side = "A" if source_is_lora_a else "B"
+                source_pairs.setdefault(source_module, set()).add(source_side)
+                source_shapes.setdefault(source_module, {})[source_side] = list(
+                    source_handle.get_slice(source_key).get_shape()
+                )
+                expected_items = qwen35_vllm_runtime_tensor_items(
+                    source_key,
+                    source_handle.get_tensor(source_key),
+                    split_gdn_qkv=True,
+                )
+                for runtime_key, expected_tensor in expected_items:
+                    expected_runtime_tensor_keys.add(runtime_key)
+                    runtime_module, runtime_is_lora_a = (
+                        parse_fine_tuned_lora_name(runtime_key, mapper)
+                    )
+                    if runtime_is_lora_a != source_is_lora_a:
+                        transform_errors.append(
+                            f"LoRA A/B side changed: {source_key} -> {runtime_key}"
+                        )
+                    source_to_runtime.setdefault(source_module, set()).add(
+                        runtime_module
+                    )
+                    runtime_side = "A" if runtime_is_lora_a else "B"
+                    runtime_pairs.setdefault(runtime_module, set()).add(runtime_side)
+                    runtime_shapes.setdefault(runtime_module, {})[runtime_side] = list(
+                        expected_tensor.shape
+                    )
+                    if runtime_key not in runtime_tensor_keys:
+                        transform_errors.append(
+                            f"derived adapter omitted tensor: {runtime_key}"
+                        )
+                    elif not torch.equal(
+                        expected_tensor, runtime_handle.get_tensor(runtime_key)
+                    ):
+                        transform_errors.append(
+                            f"derived adapter changed tensor: {runtime_key}"
+                        )
+            unexpected_runtime_tensors = sorted(
+                runtime_tensor_keys - expected_runtime_tensor_keys
+            )
+            if unexpected_runtime_tensors:
+                transform_errors.append(
+                    "derived adapter has unexpected tensors: "
+                    + ", ".join(unexpected_runtime_tensors[:8])
+                )
+
+    suffix_counts = Counter()
+    family_counts = Counter()
+    for source_module, sides in sorted(source_pairs.items()):
+        suffix = source_module.rsplit(".", 1)[-1]
+        suffix_counts[suffix] += 1
+        family_counts[
+            "full_attention"
+            if ".self_attn." in source_module
+            else (
+                "gated_deltanet"
+                if ".linear_attn." in source_module
+                else "mlp" if ".mlp." in source_module else "unknown"
+            )
+        ] += 1
+        if sides != {"A", "B"}:
+            errors.append(f"incomplete source A/B pair: {source_module}")
+        if re.fullmatch(expected_target_regex, source_module) is None:
+            errors.append(f"source module misses target regex: {source_module}")
+    for runtime_module, sides in sorted(runtime_pairs.items()):
+        if sides != {"A", "B"}:
+            errors.append(f"incomplete runtime A/B pair: {runtime_module}")
+
+    expected_counts = {
+        str(key): int(value) for key, value in expected_suffix_counts.items()
+    }
+    if dict(suffix_counts) != expected_counts:
+        errors.append(
+            f"source suffix counts differ: {dict(suffix_counts)} != {expected_counts}"
+        )
+    if adapter_config.get("target_modules") != expected_target_regex:
+        errors.append("adapter target regex differs")
+    if len(source_tensor_keys) != 2 * sum(expected_counts.values()):
+        errors.append("source adapter tensor count differs")
+    errors.extend(transform_errors)
+
+    child_to_parent = {
+        child: parent
+        for parent, children in manager.packed_modules.items()
+        for child in children
+    }
+    expected_loaded_modules = {
+        child_to_parent.get(runtime_module, runtime_module)
+        for runtime_module in runtime_pairs
+    }
+    source_mappings = []
+    for source_module in sorted(source_pairs):
+        runtime_modules = sorted(source_to_runtime.get(source_module, set()))
+        loaded_modules = sorted(
+            {child_to_parent.get(item, item) for item in runtime_modules}
+        )
+        if not runtime_modules or not loaded_modules:
+            errors.append(f"source module has no runtime mapping: {source_module}")
+        source_mappings.append(
+            {
+                "source_module": source_module,
+                "runtime_adapter_modules": runtime_modules,
+                "loaded_runtime_modules": loaded_modules,
+                "source_tensor_shapes": source_shapes[source_module],
+            }
+        )
+
+    registered = manager._registered_adapters[adapter_id]
+    loaded_runtime_modules = set(registered.loras)
+    missing_loaded = sorted(expected_loaded_modules - loaded_runtime_modules)
+    unexpected_loaded = sorted(loaded_runtime_modules - expected_loaded_modules)
+    if missing_loaded:
+        errors.append(f"runtime omitted {len(missing_loaded)} mapped modules")
+    if unexpected_loaded:
+        errors.append(f"runtime has {len(unexpected_loaded)} unexpected modules")
+    if adapter_id not in manager.lora_index_to_id:
+        errors.append("runtime adapter is not active in a GPU LoRA slot")
+
+    loaded_inventory = []
+    for module_name in sorted(loaded_runtime_modules):
+        weights = registered.loras[module_name]
+        wrapper = manager.modules.get(module_name)
+        if wrapper is None or not isinstance(wrapper, BaseLayerWithLoRA):
+            errors.append(f"loaded module has no LoRA wrapper: {module_name}")
+        if weights.lora_a is None or weights.lora_b is None:
+            errors.append(f"loaded module has incomplete weights: {module_name}")
+        loaded_inventory.append(
+            {
+                "runtime_module": module_name,
+                "wrapper_class": None if wrapper is None else type(wrapper).__name__,
+                "lora_a_shapes": _shape_tree(weights.lora_a),
+                "lora_b_shapes": _shape_tree(weights.lora_b),
+            }
+        )
+
+    multimodal_config = worker.vllm_config.model_config.multimodal_config
+    configured_language_model_only = bool(
+        multimodal_config is not None
+        and getattr(multimodal_config, "language_model_only", False)
+    )
+    return {
+        "status": "passed" if not errors else "failed",
+        "errors": errors,
+        "transform_errors": transform_errors,
+        "semantic_transform_verified": not transform_errors,
+        "source_modules_all_mapped": all(
+            bool(source_to_runtime.get(item)) for item in source_pairs
+        ),
+        "model_class": type(model).__name__,
+        "configured_language_model_only": configured_language_model_only,
+        "adapter_id": adapter_id,
+        "adapter_rank": int(registered.rank),
+        "source_tensor_count": len(source_tensor_keys),
+        "runtime_tensor_count": len(runtime_tensor_keys),
+        "peft_module_count": len(source_pairs),
+        "runtime_adapter_module_count": len(runtime_pairs),
+        "loaded_runtime_module_count": len(loaded_runtime_modules),
+        "target_suffix_counts": dict(sorted(suffix_counts.items())),
+        "target_family_counts": dict(sorted(family_counts.items())),
+        "packed_modules_mapping": {
+            key: list(value)
+            for key, value in sorted(manager.packed_modules_mapping.items())
+        },
+        "source_module_mappings": source_mappings,
+        "runtime_adapter_tensor_shapes": runtime_shapes,
+        "loaded_runtime_inventory": loaded_inventory,
+        "missing_loaded_runtime_modules": missing_loaded,
+        "unexpected_loaded_runtime_modules": unexpected_loaded,
+    }
+
+
 def run_vllm_parity_sentinel(
     config: GeneralistV3Config,
     hf_runtime_path: Path,
@@ -271,7 +505,9 @@ def run_vllm_parity_sentinel(
         or hf_runtime.get("adapter") != identity
     ):
         raise ValueError("generalist-v3 vLLM parity HF binding differs")
-    compatibility = prepare_qwen35_vllm_adapter(adapter_dir)
+    compatibility = prepare_qwen35_vllm_adapter(
+        adapter_dir, split_gdn_qkv=True
+    )
     runtime_adapter_dir = Path(str(compatibility["runtime_adapter_dir"]))
     inference = config.evaluation["inference"]
     os.environ["VLLM_USE_FLASHINFER_SAMPLER"] = "0"
@@ -285,6 +521,9 @@ def run_vllm_parity_sentinel(
 
     if vllm.__version__ != inference["engine_version"]:
         raise RuntimeError("generalist-v3 parity vLLM runtime differs")
+    mapping_patch = patch_qwen35_vllm_gdn_lora_mapping(
+        expected_version=str(inference["engine_version"])
+    )
     snapshot = (
         model_snapshot.resolve()
         if model_snapshot is not None
@@ -313,6 +552,7 @@ def run_vllm_parity_sentinel(
         enable_lora=True,
         max_lora_rank=int(config.lora["r"]),
         max_loras=1,
+        worker_cls="qwen_lean.qwen35_vllm_worker.Qwen35Vllm017Worker",
     )
     request = LoRARequest(
         lora_name="qwen-lean-v3-parity-sentinel",
@@ -321,7 +561,7 @@ def run_vllm_parity_sentinel(
     )
     llm.llm_engine.add_lora(request)
     audits = llm.collective_rpc(
-        inspect_vllm_lora_worker,
+        inspect_vllm_v3_lora_worker,
         args=(
             1,
             str(adapter_dir.resolve()),
@@ -334,7 +574,10 @@ def run_vllm_parity_sentinel(
         len(audits) != 1
         or audits[0].get("status") != "passed"
         or audits[0].get("peft_module_count") != 248
-        or audits[0].get("runtime_module_count") != 248
+        or audits[0].get("runtime_adapter_module_count") != 296
+        or audits[0].get("loaded_runtime_module_count") != 152
+        or audits[0].get("semantic_transform_verified") is not True
+        or audits[0].get("source_modules_all_mapped") is not True
     ):
         raise RuntimeError("generalist-v3 vLLM LoRA static mapping audit failed")
     sampling = SamplingParams(
@@ -388,6 +631,7 @@ def run_vllm_parity_sentinel(
         "adapter": identity,
         "hf_runtime_sha256": sha256_file(hf_runtime_path),
         "compatibility": compatibility,
+        "vllm_gdn_mapping_patch": mapping_patch,
         "static_mapping_audit": audits[0],
         "base_arm": base,
         "adapter_arm": adapter,
@@ -424,7 +668,10 @@ def compact_lora_parity_evidence(
         "vllm_static_mapping_complete": (
             audit.get("status") == "passed"
             and audit.get("peft_module_count") == 248
-            and audit.get("runtime_module_count") == 248
+            and audit.get("runtime_adapter_module_count") == 296
+            and audit.get("loaded_runtime_module_count") == 152
+            and audit.get("semantic_transform_verified") is True
+            and audit.get("source_modules_all_mapped") is True
             and not audit.get("missing_loaded_runtime_modules")
             and not audit.get("unexpected_loaded_runtime_modules")
         ),
@@ -458,9 +705,18 @@ def compact_lora_parity_evidence(
         "adapter": hf_runtime.get("adapter"),
         "requirements": requirements,
         "static_mapping": {
-            "raw_tensor_count": audit.get("raw_tensor_count"),
+            "source_tensor_count": audit.get("source_tensor_count"),
+            "runtime_tensor_count": audit.get("runtime_tensor_count"),
             "peft_module_count": audit.get("peft_module_count"),
-            "runtime_module_count": audit.get("runtime_module_count"),
+            "runtime_adapter_module_count": audit.get(
+                "runtime_adapter_module_count"
+            ),
+            "loaded_runtime_module_count": audit.get(
+                "loaded_runtime_module_count"
+            ),
+            "semantic_transform_verified": audit.get(
+                "semantic_transform_verified"
+            ),
             "target_suffix_counts": audit.get("target_suffix_counts"),
             "target_family_counts": audit.get("target_family_counts"),
             "missing_loaded_runtime_modules": audit.get(

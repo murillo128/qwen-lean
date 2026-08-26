@@ -237,16 +237,27 @@ def _generate_candidates(
             from vllm.lora.request import LoRARequest
 
             from .generalist_v3_parity import _adapter_identity
-            from .qwen35_vllm_lora import prepare_qwen35_vllm_adapter
+            from .qwen35_vllm_lora import (
+                patch_qwen35_vllm_gdn_lora_mapping,
+                prepare_qwen35_vllm_adapter,
+            )
 
             identity = _adapter_identity(config, adapter_dir)
-            compatibility = prepare_qwen35_vllm_adapter(adapter_dir)
+            compatibility = prepare_qwen35_vllm_adapter(
+                adapter_dir, split_gdn_qkv=True
+            )
+            mapping_patch = patch_qwen35_vllm_gdn_lora_mapping(
+                expected_version=str(inference["engine_version"])
+            )
             runtime_adapter = Path(str(compatibility["runtime_adapter_dir"]))
             engine_kwargs.update(
                 {
                     "enable_lora": True,
                     "max_lora_rank": int(config.lora["r"]),
                     "max_loras": 1,
+                    "worker_cls": (
+                        "qwen_lean.qwen35_vllm_worker.Qwen35Vllm017Worker"
+                    ),
                 }
             )
             lora_request = LoRARequest(
@@ -257,6 +268,7 @@ def _generate_candidates(
             adapter_binding = {
                 "identity": identity,
                 "compatibility": compatibility,
+                "vllm_gdn_mapping_patch": mapping_patch,
             }
         llm = LLM(**engine_kwargs)
         outputs = llm.generate(
