@@ -83,6 +83,28 @@ Known verified proofs may be used upstream to create proof-aware oracle intuitio
 
 The planner instead generates candidate plans and learns from their **downstream utility**.
 
+## OPEN — bounded planner SFT bootstrap before verifier-reward optimization
+
+A short SFT bootstrap is compatible with the no-gold-plan principle if its purpose is to teach the planner interface, vocabulary, decomposition style, and plan/proof boundary rather than to define the final notion of a correct plan.
+
+A bootstrap dataset must be generated only from planner-visible inputs such as the theorem plus accepted oracle intuition. It must not expose or mechanically extract the hidden source proof. Candidate bootstrap targets may come from teacher-generated plans, synthetic plans, or verifier-filtered planner samples, but the durable optimization signal remains downstream formal utility.
+
+The intended conceptual sequence, if this bootstrap proves useful, is:
+
+```text
+Qwen3.5-4B-Base
+       |
+       v
+bounded planner SFT
+learn plan language / interface
+       |
+       v
+planner RLVR / GRPO
+optimize plans by downstream Lean utility
+```
+
+This is **OPEN**, not an authorization to create a gold tactic-plan corpus from source proofs and not a requirement that every planner experiment use SFT. The planner-variance pre-test and reward-density evidence should determine whether the bootstrap improves the learning problem.
+
 ## ACCEPTED — downstream environment is frozen qwen-lean + Lean
 
 For a theorem `T`, accepted oracle intuition `I`, and candidate plan `P`:
@@ -123,6 +145,8 @@ K / K verified proofs
 that success fraction provides an immediately available plan-level signal.
 
 The exact reward transformation remains OPEN, but the design should preserve candidate-level outcomes so alternatives such as raw success fraction, baseline-relative advantage, or group-relative normalization can be evaluated without regenerating all formal attempts.
+
+Credit assignment must remain attached to the individual sampled plan. If one plan among a group causes a verified proof, that success should not be broadcast as positive reward to unrelated plans in the same group.
 
 ## ACCEPTED — usefulness is relative to the prover baseline
 
@@ -235,6 +259,8 @@ increase probability of the more useful plans
 
 No teacher plan is required because Lean ultimately validates the behavior induced by each plan.
 
+No production-scale hyperparameter should be copied from unrelated large-model recipes. Group size, KL behavior, learning rate, rollout count, and candidate budgets must be measured for the selected Qwen/QLoRA setup and local verifier throughput.
+
 This method is not frozen by this document. #80 must still compare the simplest viable verifier-reward approach against verifier-filtered self-training or preference-style alternatives.
 
 ## Curriculum/reward-density principle
@@ -261,6 +287,53 @@ Useful later controls include:
 - another formal prover where practical.
 
 A large in-distribution gain with no transfer should be described as checkpoint-specific steering rather than broad mathematical planning capability.
+
+## OBSERVED — Granite 4.2 provides an external precedent for the staged pattern
+
+IBM's Granite 4.2 training description, published 2026-08-25, is directly relevant external evidence: <https://huggingface.co/blog/ibm-granite/granite-4-2>.
+
+The reported recipe uses supervised fine-tuning followed by multi-stage GRPO. Its foundational RLVR mixture explicitly includes **formal proving in Lean**, with task-specific verifiers grounding reward. For the 30B model, IBM also reports a second specialized SFT stage that keeps approximately 16% replay from the original SFT mixture while lowering the learning rate. The 8B and 30B models then add multi-turn agentic RL in real environments where the model acts, observes outcomes, recovers from errors, and receives outcome reward.
+
+This does not prove that the same recipe or hyperparameters will work for qwen-lean-planner, but it strengthens several design hypotheses already present here:
+
+- use SFT, when needed, as a behavioral/interface bootstrap rather than the final correctness oracle;
+- use Lean verification as the decisive downstream reward signal;
+- preserve per-candidate/group reward information instead of collapsing learning to aggregate pass@K;
+- choose a curriculum with enough positive-reward density for group-relative learning;
+- consider replay from broader pre-specialization data as an anti-forgetting/anti-collapse control during later focused SFT, without copying IBM's 16% literally;
+- treat interactive Lean execution as a future real-environment trajectory problem rather than only a static text-generation task.
+
+The external precedent therefore supports the broad direction `SFT/bootstrap -> verifier-reward optimization -> later environment-interactive training`, while leaving all project-specific implementation choices evidence-driven.
+
+## OPEN — Lean execution traces and failure-recovery trajectories
+
+A future process/agentic training view can preserve more than final proof text. Lean can expose mechanically grounded trajectories such as:
+
+```text
+proof state
+  -> tactic/action
+  -> resulting proof state
+```
+
+and, in a later interactive environment:
+
+```text
+proof state
+  -> attempted tactic
+  -> Lean diagnostic / failure
+  -> revised tactic
+  -> new proof state
+```
+
+Successful state transitions remain Lean-grounded; diagnostics are environment observations rather than mathematical labels. These traces may be useful both for process supervision and for later multi-turn RL where the policy learns to recover from failed formal actions.
+
+This is not part of the first static planner experiment. It connects the planner direction to the existing proof-state process-supervision and tactic-level proving milestones, and should be implemented only under their own execution contracts.
+
+## OPEN — replay as a specialization-preservation control
+
+The Granite 4.2 second-stage SFT result motivates testing replay when qwen-lean or qwen-lean-planner undergoes a narrow specialization stage. A focused stage may mix a minority of broad earlier SFT examples or another explicit preservation objective so specialization does not erase useful general behavior.
+
+The exact mechanism is OPEN. Replay should be compared against the project's existing Base-preservation/KL-style controls where relevant; neither the approximately 16% Granite mixture nor its learning rate is a transferable default.
 
 ## Future Mathia optimization
 
@@ -332,6 +405,7 @@ Issue #80 owns the unresolved details, including:
 
 - exact frozen planner Base revision;
 - exact frozen qwen-lean worker;
+- whether a bounded no-proof-leakage SFT bootstrap is useful before RLVR;
 - planner prompt/serialization;
 - plan/proof boundary;
 - plan count and formal attempts per plan;
@@ -340,6 +414,7 @@ Issue #80 owns the unresolved details, including:
 - verifier failure semantics;
 - matched-seed policy;
 - RL versus self-training mechanism;
+- replay/preservation controls for any focused specialization stage;
 - checkpoint selection;
 - transfer requirements.
 
@@ -350,8 +425,11 @@ This document does not:
 - alter `PLAN.md`;
 - schedule the planner relative to existing phases;
 - give source proofs to the planner;
+- make a source-proof-derived gold plan corpus the core planner supervision;
 - train Mathia;
+- freeze SFT as a mandatory planner bootstrap;
 - freeze GRPO as the final algorithm;
+- copy Granite 4.2 hyperparameters into the project;
 - merge planner and prover weights;
 - claim Riemann progress;
 - authorize open-conjecture execution.
