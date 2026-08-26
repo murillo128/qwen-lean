@@ -123,11 +123,7 @@ def test_generation_inventory_skips_one_complete_atomic_task(
     manifest_sha256 = "manifest"
     slots = {
         arm_id: [
-            {
-                "candidate_id": f"{arm_id}-{index}",
-                "candidate_index": index,
-                "sampling_seed": 0,
-            }
+            f"{arm_id}-{index}"
             for index in range(8)
         ]
         for arm_id in ("A", "B")
@@ -188,10 +184,10 @@ def test_committed_execution_manifest_has_every_unique_candidate_slot() -> None:
     }
     assert manifest["prompt_integrity_gate"]["passed"] is True
     candidate_ids = [
-        slot["candidate_id"]
+        candidate_id
         for task in manifest["tasks"]
         for arm_id in ("A", "B")
-        for slot in task["candidate_slots"][arm_id]
+        for candidate_id in task["candidate_slots"][arm_id]
     ]
     assert len(candidate_ids) == 9_776
     assert len(set(candidate_ids)) == 9_776

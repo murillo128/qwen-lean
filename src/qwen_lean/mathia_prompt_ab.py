@@ -642,7 +642,7 @@ def build_execution_manifest(
         prompt_hashes = {
             arm_id: _sha256_text(prompts[arm_id]) for arm_id in ARM_IDS
         }
-        slots: dict[str, list[dict[str, Any]]] = {}
+        slots: dict[str, list[str]] = {}
         for arm_id in ARM_IDS:
             candidates = []
             for candidate_index in range(EXPECTED_CANDIDATES_PER_TASK):
@@ -659,13 +659,7 @@ def build_execution_manifest(
                 if candidate_id in all_candidate_ids:
                     raise ValueError("candidate identity collision")
                 all_candidate_ids.add(candidate_id)
-                candidates.append(
-                    {
-                        "candidate_id": candidate_id,
-                        "candidate_index": candidate_index,
-                        "sampling_seed": int(config.generation["seed"]),
-                    }
-                )
+                candidates.append(candidate_id)
             slots[arm_id] = candidates
         tasks.append(
             {
@@ -928,12 +922,14 @@ def _validate_generation_shard(
         raise ValueError(
             f"completed generation shard differs: {arm_id}/{task_entry['task_id']}"
         )
-    for observed, expected in zip(candidates, expected_slots, strict=True):
+    for candidate_index, (observed, expected_id) in enumerate(
+        zip(candidates, expected_slots, strict=True)
+    ):
         raw_text = observed.get("raw_continuation")
         if (
-            observed.get("candidate_id") != expected["candidate_id"]
-            or observed.get("candidate_index") != expected["candidate_index"]
-            or observed.get("sampling_seed") != expected["sampling_seed"]
+            observed.get("candidate_id") != expected_id
+            or observed.get("candidate_index") != candidate_index
+            or observed.get("sampling_seed") != 0
             or not isinstance(raw_text, str)
             or observed.get("raw_continuation_sha256") != _sha256_text(raw_text)
             or observed.get("finish_reason")
@@ -942,7 +938,7 @@ def _validate_generation_shard(
             or observed.get("token_count") < 0
         ):
             raise ValueError(
-                f"completed candidate bytes/identity differ: {expected['candidate_id']}"
+                f"completed candidate bytes/identity differ: {expected_id}"
             )
     return list(candidates)
 
@@ -1255,12 +1251,14 @@ def run_resumable_generation(
                         raise ValueError("vLLM chunk returned an incomplete task")
                     slots = task_entry["candidate_slots"][arm_id]
                     candidate_rows = []
-                    for candidate, slot in zip(task_candidates, slots, strict=True):
+                    for candidate, candidate_id in zip(
+                        task_candidates, slots, strict=True
+                    ):
                         candidate_rows.append(
                             {
-                                "candidate_id": slot["candidate_id"],
+                                "candidate_id": candidate_id,
                                 "candidate_index": candidate.candidate_index,
-                                "sampling_seed": slot["sampling_seed"],
+                                "sampling_seed": int(config.generation["seed"]),
                                 "raw_continuation": candidate.text,
                                 "raw_continuation_sha256": _sha256_text(candidate.text),
                                 "token_count": candidate.token_count,
@@ -1800,15 +1798,17 @@ def _arm_workload_summary(
     generated_tokens: list[int] = []
     for task in task_entries:
         verified_indices = []
-        for slot in task["candidate_slots"][arm_id]:
-            candidate_id = str(slot["candidate_id"])
+        for candidate_index, candidate_id_value in enumerate(
+            task["candidate_slots"][arm_id]
+        ):
+            candidate_id = str(candidate_id_value)
             generation = generation_by_id[candidate_id]
             verification = verification_by_id[candidate_id]
             category_counts[str(verification["category"])] += 1
             finish_counts[str(generation["finish_reason"])] += 1
             generated_tokens.append(int(generation["token_count"]))
             if verification["category"] == "verified":
-                verified_indices.append(int(slot["candidate_index"]))
+                verified_indices.append(candidate_index)
         verified_counts.append(len(verified_indices))
         for k in solved_within:
             solved_within[k] += any(index < k for index in verified_indices)
