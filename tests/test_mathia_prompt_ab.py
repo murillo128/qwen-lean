@@ -108,6 +108,99 @@ def test_config_rejects_prompt_wording_drift(tmp_path: Path) -> None:
         PromptABConfig.load(path)
 
 
+def test_cuda_gate_accepts_project_rtx_4070_ti_by_ada_capability() -> None:
+    prompt_ab._validate_cuda_device_identity(
+        "NVIDIA GeForce RTX 4070 Ti", 8, 9, [8, 9]
+    )
+    with pytest.raises(RuntimeError, match="compute capability 8.6"):
+        prompt_ab._validate_cuda_device_identity(
+            "NVIDIA GeForce RTX 3090", 8, 6, [8, 9]
+        )
+
+
+def test_verifier_environments_are_bound_per_workload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = PromptABConfig.load(CONFIG_PATH)
+    roots = {
+        workload_id: tmp_path / workload_id
+        for workload_id in prompt_ab.WORKLOAD_IDS
+    }
+    expected_revisions: dict[Path, str] = {}
+    for workload_id, root in roots.items():
+        contract = config.verifier["environments"][workload_id]
+        root.mkdir()
+        (root / "lean-toolchain").write_text(
+            contract["lean_toolchain"] + "\n", encoding="utf-8"
+        )
+        (root / "lake-manifest.json").write_text(
+            json.dumps(
+                {
+                    "packages": [
+                        {"name": "mathlib", "rev": contract["mathlib_revision"]}
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        mathlib_root = root / ".lake/packages/mathlib"
+        mathlib_root.mkdir(parents=True)
+        expected_revisions[root.resolve()] = contract["project_revision"]
+        expected_revisions[mathlib_root.resolve()] = contract["mathlib_revision"]
+
+    def fake_git_output(root: Path, *args: str) -> str:
+        assert args == ("rev-parse", "HEAD")
+        return expected_revisions[root.resolve()]
+
+    monkeypatch.setattr(prompt_ab, "_git_output", fake_git_output)
+    bundle = prompt_ab.verifier_environment_identities(config, roots)
+    assert set(bundle["environments"]) == set(prompt_ab.WORKLOAD_IDS)
+    assert (
+        bundle["environments"]["minif2f-valid-clean-v2"]["project_revision"]
+        == "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+    )
+    assert (
+        bundle["environments"]["fresh-composition-valid-v2"][
+            "project_revision"
+        ]
+        == "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+    )
+    hashes = bundle["environment_sha256_by_workload"]
+    assert hashes["minif2f-valid-clean-v2"] != hashes[
+        "fresh-composition-valid-v2"
+    ]
+    with pytest.raises(ValueError, match="must bind both"):
+        prompt_ab.verifier_environment_identities(
+            config, {"minif2f-valid-clean-v2": roots["minif2f-valid-clean-v2"]}
+        )
+
+
+def test_verification_result_rejects_workload_environment_mismatch() -> None:
+    generation = {
+        "candidate_id": "candidate",
+        "arm_id": "A",
+        "workload_id": "minif2f-valid-clean-v2",
+        "task_id": "example",
+        "candidate_index": 0,
+        "raw_continuation_sha256": "raw",
+    }
+    value = {
+        "schema_version": prompt_ab.VERIFICATION_RESULT_SCHEMA_VERSION,
+        "manifest_sha256": "manifest",
+        **generation,
+        "verifier_environment_sha256": "fresh-environment",
+        "category": "verified",
+        "diagnostics": {},
+    }
+    with pytest.raises(ValueError, match="durable verification result differs"):
+        prompt_ab._validate_verification_result(
+            value,
+            manifest_sha256="manifest",
+            environment_sha256="minif2f-environment",
+            generation=generation,
+        )
+
+
 def test_atomic_write_once_rejects_nonidentical_replacement(tmp_path: Path) -> None:
     path = tmp_path / "immutable.json"
     _write_once_json(path, {"value": 1})

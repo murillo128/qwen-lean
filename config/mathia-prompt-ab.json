@@ -81,14 +81,24 @@
     "use_flashinfer_sampler": false,
     "quantization": null,
     "cpu_offload_gb": 0.0,
-    "expected_cuda_device_name_fragment": "Ada"
+    "expected_cuda_compute_capability": [8, 9]
   },
   "verifier": {
-    "project_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
-    "project_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
-    "lean_toolchain": "leanprover/lean4:v4.32.2",
-    "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c",
-    "timeout_seconds": 30.0
+    "timeout_seconds": 30.0,
+    "environments": {
+      "minif2f-valid-clean-v2": {
+        "project_repository": "https://github.com/google-deepmind/miniF2F",
+        "project_revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+        "lean_toolchain": "leanprover/lean4:v4.27.0",
+        "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "fresh-composition-valid-v2": {
+        "project_repository": "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd",
+        "project_revision": "7715064f690d0689f30889846f4e2c5e7ec0c47e",
+        "lean_toolchain": "leanprover/lean4:v4.32.2",
+        "mathlib_revision": "905b95818eb32af7874a58b427f50c1711a5e96c"
+      }
+    }
   },
   "analysis": {
     "pass_at_k": [1, 4, 8],

@@ -152,6 +152,7 @@ class PromptABConfig:
             "use_flashinfer_sampler": False,
             "quantization": None,
             "cpu_offload_gb": 0.0,
+            "expected_cuda_compute_capability": [8, 9],
         }
         if any(engine.get(key) != expected for key, expected in required_engine.items()):
             raise ValueError("Mathia prompt A/B vLLM contract differs from #78 Q0")
@@ -180,6 +181,37 @@ class PromptABConfig:
             "comment_suffix": "\n-/",
         }:
             raise ValueError("arm B prompt wording differs")
+        verifier = value.get("verifier", {})
+        if verifier != {
+            "timeout_seconds": 30.0,
+            "environments": {
+                "minif2f-valid-clean-v2": {
+                    "project_repository": (
+                        "https://github.com/google-deepmind/miniF2F"
+                    ),
+                    "project_revision": (
+                        "f0a20e14c1eeccd859d51bb4c2b3ee487889c303"
+                    ),
+                    "lean_toolchain": "leanprover/lean4:v4.27.0",
+                    "mathlib_revision": (
+                        "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+                    ),
+                },
+                "fresh-composition-valid-v2": {
+                    "project_repository": (
+                        "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd"
+                    ),
+                    "project_revision": (
+                        "7715064f690d0689f30889846f4e2c5e7ec0c47e"
+                    ),
+                    "lean_toolchain": "leanprover/lean4:v4.32.2",
+                    "mathlib_revision": (
+                        "905b95818eb32af7874a58b427f50c1711a5e96c"
+                    ),
+                },
+            },
+        }:
+            raise ValueError("Mathia prompt A/B verifier contract differs from #78 Q0")
 
 
 @dataclass(frozen=True)
@@ -1014,6 +1046,21 @@ def inventory_generations(
     }
 
 
+def _validate_cuda_device_identity(
+    device_name: str,
+    major: int,
+    minor: int,
+    expected_capability: Sequence[int],
+) -> None:
+    observed = [major, minor]
+    if observed != list(expected_capability):
+        raise RuntimeError(
+            "project Ada GPU not detected: "
+            f"{device_name} has compute capability {major}.{minor}, expected "
+            f"{expected_capability[0]}.{expected_capability[1]}"
+        )
+
+
 def _runtime_identity(config: PromptABConfig) -> dict[str, Any]:
     try:
         import torch
@@ -1040,8 +1087,12 @@ def _runtime_identity(config: PromptABConfig) -> dict[str, Any]:
         raise RuntimeError("Mathia prompt A/B generation requires local CUDA")
     index = torch.cuda.current_device()
     properties = torch.cuda.get_device_properties(index)
-    if config.engine["expected_cuda_device_name_fragment"] not in properties.name:
-        raise RuntimeError(f"project Ada GPU not detected: {properties.name}")
+    _validate_cuda_device_identity(
+        properties.name,
+        properties.major,
+        properties.minor,
+        config.engine["expected_cuda_compute_capability"],
+    )
     return {
         "python": platform.python_version(),
         "torch": torch.__version__,
@@ -1334,17 +1385,22 @@ def run_resumable_generation(
 
 
 def verifier_environment_identity(
-    config: PromptABConfig, lean_project_root: Path
+    config: PromptABConfig,
+    workload_id: str,
+    lean_project_root: Path,
 ) -> dict[str, Any]:
+    if workload_id not in WORKLOAD_IDS:
+        raise ValueError(f"unknown verifier workload: {workload_id}")
+    contract = config.verifier["environments"][workload_id]
     root = lean_project_root.resolve()
     revision = _git_output(root, "rev-parse", "HEAD")
-    if revision != config.verifier["project_revision"]:
+    if revision != contract["project_revision"]:
         raise ValueError(
             f"verifier project revision mismatch: expected "
-            f"{config.verifier['project_revision']}, got {revision}"
+            f"{contract['project_revision']}, got {revision}"
         )
     toolchain = (root / "lean-toolchain").read_text(encoding="utf-8").strip()
-    if toolchain != config.verifier["lean_toolchain"]:
+    if toolchain != contract["lean_toolchain"]:
         raise ValueError("verifier Lean toolchain differs")
     lake_manifest = _read_json(root / "lake-manifest.json")
     mathlib_entries = [
@@ -1353,19 +1409,43 @@ def verifier_environment_identity(
     if len(mathlib_entries) != 1:
         raise ValueError("verifier project does not bind exactly one mathlib")
     mathlib_revision = str(mathlib_entries[0]["rev"])
-    if mathlib_revision != config.verifier["mathlib_revision"]:
+    if mathlib_revision != contract["mathlib_revision"]:
         raise ValueError("verifier mathlib manifest revision differs")
     mathlib_root = root / ".lake" / "packages" / "mathlib"
     actual_mathlib = _git_output(mathlib_root, "rev-parse", "HEAD")
     if actual_mathlib != mathlib_revision:
         raise ValueError("verifier mathlib checkout revision differs")
     return {
-        "project_repository": config.verifier["project_repository"],
+        "workload_id": workload_id,
+        "project_repository": contract["project_repository"],
         "project_revision": revision,
         "lean_toolchain": toolchain,
         "mathlib_revision": mathlib_revision,
         "timeout_seconds": float(config.verifier["timeout_seconds"]),
         "classification": sorted(RESULT_CATEGORIES),
+    }
+
+
+def verifier_environment_identities(
+    config: PromptABConfig,
+    lean_project_roots: Mapping[str, Path],
+) -> dict[str, Any]:
+    if set(lean_project_roots) != set(WORKLOAD_IDS):
+        raise ValueError("verifier project roots must bind both issue #86 workloads")
+    environments = {
+        workload_id: verifier_environment_identity(
+            config, workload_id, lean_project_roots[workload_id]
+        )
+        for workload_id in WORKLOAD_IDS
+    }
+    environment_sha256_by_workload = {
+        workload_id: _sha256_json(environments[workload_id])
+        for workload_id in WORKLOAD_IDS
+    }
+    return {
+        "environments": environments,
+        "environment_sha256_by_workload": environment_sha256_by_workload,
+        "environment_set_sha256": _sha256_json(environments),
     }
 
 
@@ -1399,7 +1479,7 @@ def inventory_verifications(
     manifest: Mapping[str, Any],
     artifact_root: Path,
     manifest_sha256: str,
-    environment_sha256: str,
+    environment_sha256_by_workload: Mapping[str, str],
     generation_inventory: Mapping[str, Any],
 ) -> dict[str, Any]:
     expected = generation_inventory["candidates_by_id"]
@@ -1419,7 +1499,9 @@ def inventory_verifications(
         _validate_verification_result(
             value,
             manifest_sha256=manifest_sha256,
-            environment_sha256=environment_sha256,
+            environment_sha256=environment_sha256_by_workload[
+                str(generation["workload_id"])
+            ],
             generation=generation,
         )
         if candidate_id in results_by_id:
@@ -1460,8 +1542,7 @@ def _verification_progress_snapshot(
     manifest_sha256: str,
     generation_inventory: Mapping[str, Any],
     verification_inventory: Mapping[str, Any],
-    environment: Mapping[str, Any],
-    environment_sha256: str,
+    environment_bundle: Mapping[str, Any],
 ) -> dict[str, Any]:
     return {
         "schema_version": "mathia-prompt-ab-verification-progress-v1",
@@ -1479,8 +1560,13 @@ def _verification_progress_snapshot(
         "verification_result_set_sha256": verification_inventory[
             "result_set_sha256"
         ],
-        "verifier_environment": environment,
-        "verifier_environment_sha256": environment_sha256,
+        "verifier_environments": environment_bundle["environments"],
+        "verifier_environment_sha256_by_workload": environment_bundle[
+            "environment_sha256_by_workload"
+        ],
+        "verifier_environment_set_sha256": environment_bundle[
+            "environment_set_sha256"
+        ],
     }
 
 
@@ -1491,7 +1577,7 @@ def run_resumable_verification(
     repository_root: Path,
     manifest_path: Path,
     artifact_root: Path,
-    lean_project_root: Path,
+    lean_project_roots: Mapping[str, Path],
     *,
     workers: int = 8,
     batch_candidates: int = 64,
@@ -1513,14 +1599,15 @@ def run_resumable_verification(
     )
     if generation_inventory["completed_candidate_count"] == 0:
         raise ValueError("verification has no durable generation candidates")
-    environment = verifier_environment_identity(config, lean_project_root)
-    environment_sha256 = _sha256_json(environment)
+    environment_bundle = verifier_environment_identities(config, lean_project_roots)
+    environment_sha256_by_workload = environment_bundle[
+        "environment_sha256_by_workload"
+    ]
     _write_once_json(
-        artifact_root / "verifier-environment.json",
+        artifact_root / "verifier-environments.json",
         {
-            "schema_version": "mathia-prompt-ab-verifier-environment-v1",
-            "environment": environment,
-            "environment_sha256": environment_sha256,
+            "schema_version": "mathia-prompt-ab-verifier-environments-v1",
+            **environment_bundle,
         },
     )
     with _ArtifactLock(
@@ -1532,7 +1619,7 @@ def run_resumable_verification(
             manifest,
             artifact_root,
             manifest_sha256,
-            environment_sha256,
+            environment_sha256_by_workload,
             generation_inventory,
         )
         completed = set(verification_inventory["results_by_id"])
@@ -1553,8 +1640,7 @@ def run_resumable_verification(
                 manifest_sha256=manifest_sha256,
                 generation_inventory=generation_inventory,
                 verification_inventory=verification_inventory,
-                environment=environment,
-                environment_sha256=environment_sha256,
+                environment_bundle=environment_bundle,
             )
             _replace_json(artifact_root / "progress" / "verification.json", snapshot)
             return snapshot
@@ -1568,13 +1654,21 @@ def run_resumable_verification(
             "workers": workers,
             "batch_candidates": batch_candidates,
             "completed_batches": 0,
-            "verifier_environment_sha256": environment_sha256,
+            "verifier_environment_sha256_by_workload": (
+                environment_sha256_by_workload
+            ),
+            "verifier_environment_set_sha256": environment_bundle[
+                "environment_set_sha256"
+            ],
         }
         _replace_json(session_path, session)
-        verifier = LeanVerifier(
-            lean_project_root,
-            timeout_seconds=float(config.verifier["timeout_seconds"]),
-        )
+        verifiers = {
+            workload_id: LeanVerifier(
+                lean_project_roots[workload_id],
+                timeout_seconds=float(config.verifier["timeout_seconds"]),
+            )
+            for workload_id in WORKLOAD_IDS
+        }
         tasks_by_ordinal = {bound.ordinal: bound.task for bound in bound_tasks}
         batch_count = 0
         try:
@@ -1587,6 +1681,7 @@ def run_resumable_verification(
 
                 def verify_one(generation: Mapping[str, Any]) -> tuple[dict[str, Any], Any]:
                     task = tasks_by_ordinal[int(generation["task_ordinal"])]
+                    workload_id = str(generation["workload_id"])
                     generated = GeneratedCandidate(
                         task=task,
                         candidate_index=int(generation["candidate_index"]),
@@ -1598,7 +1693,9 @@ def run_resumable_verification(
                         ),
                         generation_error=generation.get("generation_error"),
                     )
-                    return dict(generation), _verify_candidate(verifier, generated)
+                    return dict(generation), _verify_candidate(
+                        verifiers[workload_id], generated
+                    )
 
                 with ThreadPoolExecutor(max_workers=workers) as executor:
                     futures = [executor.submit(verify_one, item) for item in batch]
@@ -1616,7 +1713,11 @@ def run_resumable_verification(
                             "raw_continuation_sha256": generation[
                                 "raw_continuation_sha256"
                             ],
-                            "verifier_environment_sha256": environment_sha256,
+                            "verifier_environment_sha256": (
+                                environment_sha256_by_workload[
+                                    str(generation["workload_id"])
+                                ]
+                            ),
                             "category": outcome.category,
                             "lean_exit_code": outcome.lean_exit_code,
                             "diagnostics": outcome.diagnostics,
@@ -1640,15 +1741,14 @@ def run_resumable_verification(
                     manifest,
                     artifact_root,
                     manifest_sha256,
-                    environment_sha256,
+                    environment_sha256_by_workload,
                     generation_inventory,
                 )
                 snapshot = _verification_progress_snapshot(
                     manifest_sha256=manifest_sha256,
                     generation_inventory=generation_inventory,
                     verification_inventory=verification_inventory,
-                    environment=environment,
-                    environment_sha256=environment_sha256,
+                    environment_bundle=environment_bundle,
                 )
                 _replace_json(
                     artifact_root / "progress" / "verification.json", snapshot
@@ -1675,7 +1775,7 @@ def run_resumable_verification(
             manifest,
             artifact_root,
             manifest_sha256,
-            environment_sha256,
+            environment_sha256_by_workload,
             generation_inventory,
         )
         session["completed_verifications_at_end"] = verification_inventory[
@@ -1686,8 +1786,7 @@ def run_resumable_verification(
             manifest_sha256=manifest_sha256,
             generation_inventory=generation_inventory,
             verification_inventory=verification_inventory,
-            environment=environment,
-            environment_sha256=environment_sha256,
+            environment_bundle=environment_bundle,
         )
         _replace_json(artifact_root / "progress" / "verification.json", snapshot)
         return snapshot
@@ -1880,7 +1979,7 @@ def compact_results(
     repository_root: Path,
     manifest_path: Path,
     artifact_root: Path,
-    lean_project_root: Path,
+    lean_project_roots: Mapping[str, Path],
     output_path: Path,
     readme_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -1893,13 +1992,15 @@ def compact_results(
     )
     if generation_inventory["completed_candidate_count"] != EXPECTED_CANDIDATES_TOTAL:
         raise ValueError("cannot score before all 9,776 generation slots are durable")
-    environment = verifier_environment_identity(config, lean_project_root)
-    environment_sha256 = _sha256_json(environment)
+    environment_bundle = verifier_environment_identities(config, lean_project_roots)
+    environment_sha256_by_workload = environment_bundle[
+        "environment_sha256_by_workload"
+    ]
     verification_inventory = inventory_verifications(
         manifest,
         artifact_root,
         manifest_sha256,
-        environment_sha256,
+        environment_sha256_by_workload,
         generation_inventory,
     )
     if verification_inventory["completed_verification_count"] != EXPECTED_CANDIDATES_TOTAL:
@@ -1957,8 +2058,13 @@ def compact_results(
         "config_sha256": manifest["config_sha256"],
         "model": config.model,
         "generation_contract": manifest["generation_contract"],
-        "verifier_environment": environment,
-        "verifier_environment_sha256": environment_sha256,
+        "verifier_environments": environment_bundle["environments"],
+        "verifier_environment_sha256_by_workload": (
+            environment_sha256_by_workload
+        ),
+        "verifier_environment_set_sha256": environment_bundle[
+            "environment_set_sha256"
+        ],
         "completion_integrity_gate": {
             "passed": True,
             "candidate_identities_per_arm": {
@@ -2067,6 +2173,18 @@ def _common_paths(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--manifest", type=Path, required=True)
 
 
+def _verifier_paths(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--minif2f-project-root", type=Path, required=True)
+    parser.add_argument("--fresh-project-root", type=Path, required=True)
+
+
+def _verifier_project_roots(args: argparse.Namespace) -> dict[str, Path]:
+    return {
+        "minif2f-valid-clean-v2": args.minif2f_project_root,
+        "fresh-composition-valid-v2": args.fresh_project_root,
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Resumable issue #86 Mathia prompt A/B execution"
@@ -2086,7 +2204,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify")
     _common_paths(verify)
     verify.add_argument("--artifacts", type=Path, required=True)
-    verify.add_argument("--lean-project-root", type=Path, required=True)
+    _verifier_paths(verify)
     verify.add_argument("--workers", type=int, default=8)
     verify.add_argument("--batch-candidates", type=int, default=64)
     verify.add_argument("--max-batches", type=int)
@@ -2095,7 +2213,7 @@ def build_parser() -> argparse.ArgumentParser:
     compact = subparsers.add_parser("compact")
     _common_paths(compact)
     compact.add_argument("--artifacts", type=Path, required=True)
-    compact.add_argument("--lean-project-root", type=Path, required=True)
+    _verifier_paths(compact)
     compact.add_argument("--output", type=Path, required=True)
     compact.add_argument("--readme", type=Path)
 
@@ -2137,7 +2255,8 @@ def _cli_summary(command: str, value: Mapping[str, Any]) -> dict[str, Any]:
                 "pending_generated_candidates",
                 "category_counts",
                 "verification_result_set_sha256",
-                "verifier_environment_sha256",
+                "verifier_environment_sha256_by_workload",
+                "verifier_environment_set_sha256",
             )
         }
     if command == "compact":
@@ -2190,7 +2309,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.repository_root,
             args.manifest,
             args.artifacts,
-            args.lean_project_root,
+            _verifier_project_roots(args),
             workers=args.workers,
             batch_candidates=args.batch_candidates,
             max_batches=args.max_batches,
@@ -2204,7 +2323,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.repository_root,
             args.manifest,
             args.artifacts,
-            args.lean_project_root,
+            _verifier_project_roots(args),
             args.output,
             args.readme,
         )
