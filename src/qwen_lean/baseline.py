@@ -57,6 +57,7 @@ class LoRAAdapterSpec:
     rank: int
     base_model_id: str
     base_model_revision: str
+    runtime_path: Path | None = None
 
     def validate(self, config: Phase1Config) -> None:
         if not self.adapter_id or self.adapter_id == self.base_model_id:
@@ -69,12 +70,19 @@ class LoRAAdapterSpec:
             raise ValueError("adapter base revision differs from the inference config")
         if not (self.path / "adapter_config.json").is_file():
             raise ValueError(f"adapter config does not exist: {self.path}")
+        if self.runtime_path is not None and not (
+            self.runtime_path / "adapter_config.json"
+        ).is_file():
+            raise ValueError(f"runtime adapter config does not exist: {self.runtime_path}")
 
     def metadata(self) -> dict[str, Any]:
         return {
             "enabled": True,
             "adapter_id": self.adapter_id,
             "adapter_path": str(self.path.resolve()),
+            "runtime_adapter_path": (
+                None if self.runtime_path is None else str(self.runtime_path.resolve())
+            ),
             "adapter_rank": self.rank,
             "base_model_id": self.base_model_id,
             "base_model_revision": self.base_model_revision,
@@ -551,7 +559,9 @@ def _generate_candidates(
             from vllm.lora.request import LoRARequest
 
             generate_kwargs["lora_request"] = LoRARequest(
-                adapter.adapter_id, 1, str(adapter.path.resolve())
+                adapter.adapter_id,
+                1,
+                str((adapter.runtime_path or adapter.path).resolve()),
             )
         outputs = llm.generate(
             prompts,

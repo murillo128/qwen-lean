@@ -61,6 +61,41 @@ class LeanVerifier:
 
         return self._run_source(reconstruct_source(task, candidate), started=started)
 
+    def verify_raw_completion(
+        self,
+        *,
+        preamble: str,
+        model_input: str,
+        candidate: str,
+    ) -> VerificationOutcome:
+        """Verify a raw completion after an arbitrary frozen model input."""
+
+        started = time.perf_counter()
+        normalized = normalize_transport(candidate)
+        if not normalized:
+            return VerificationOutcome(
+                category="empty_candidate",
+                lean_exit_code=None,
+                diagnostics={"stdout": "", "stderr": "candidate is empty"},
+                latency_seconds=time.perf_counter() - started,
+            )
+        probe = self._probe_preamble(preamble)
+        if probe is not None:
+            return VerificationOutcome(
+                category=probe.category,
+                lean_exit_code=probe.lean_exit_code,
+                diagnostics={
+                    "stdout": probe.diagnostics["stdout"],
+                    "stderr": (
+                        "verifier environment probe failed: "
+                        f"{probe.diagnostics['stderr']}"
+                    ),
+                },
+                latency_seconds=time.perf_counter() - started,
+            )
+        source = f"{preamble.rstrip()}\n\n{model_input}{normalized}\n"
+        return self._run_source(source, started=started)
+
     def _probe_preamble(self, preamble: str) -> VerificationOutcome | None:
         return self.prime_preamble(preamble, timeout_seconds=self.timeout_seconds)
 
@@ -86,6 +121,21 @@ class LeanVerifier:
                     None if outcome.category == "verified" else outcome
                 )
             return self._preamble_probes[preamble]
+
+    def prime_task(
+        self, task: TaskRecord, candidate: str, *, timeout_seconds: float
+    ) -> VerificationOutcome | None:
+        """Validate a full task and cache its source prefix as usable context."""
+
+        outcome = self._run_source(
+            reconstruct_source(task, candidate),
+            timeout_seconds=timeout_seconds,
+        )
+        if outcome.category != "verified":
+            return outcome
+        with self._preamble_probe_lock:
+            self._preamble_probes[task.preamble] = None
+        return None
 
     def _run_source(
         self,
