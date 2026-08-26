@@ -53,7 +53,10 @@ def test_generalist_v3_config_freezes_issue_contract() -> None:
         "base_kl_lambda": 0.1,
         "eligible": True,
     }
-    assert config.training["resolved_context_tokens"] == 262144
+    assert config.training["canonical_context_tokens"] == 262144
+    assert config.training["resolved_context_tokens"] == 65536
+    assert config.training["execution_view"]["expected_quarantined_examples"] == 6
+    assert config.training["sample_theorem_by_structural_multiplier"] is True
     assert config.preservation["anchor_count"] == 512
     assert config.evaluation["interfaces"] == ["whole", "incremental"]
 
@@ -173,4 +176,3 @@ def test_base_forward_kl_is_zero_for_identical_logits() -> None:
     logits = torch.tensor([1.0, 2.0, 3.0])
     assert base_forward_kl(logits, logits).item() == pytest.approx(0.0, abs=1e-7)
     assert base_forward_kl(logits, torch.tensor([3.0, 2.0, 1.0])).item() > 0
-

@@ -33,6 +33,7 @@ from .generalist_v3 import (
     GeneralistV3Config,
     _read_json,
     _write_json,
+    load_execution_training_index,
     load_training_index,
     tokenize_materialized_example,
 )
@@ -45,18 +46,18 @@ def _package_versions(names: tuple[str, ...]) -> dict[str, str]:
 def _maximum_materialized_example(
     config: GeneralistV3Config,
     binding: DatasetBinding,
-    census: Mapping[str, Any],
+    execution_view: Mapping[str, Any],
 ) -> dict[str, Any]:
-    maximum = census.get("maximum_example", {})
+    maximum = execution_view.get("maximum_eligible_example", {})
     if (
-        census.get("schema_version") != "generalist-v3-tokenizer-census-v1"
-        or int(census.get("selected_context_tokens", 0))
+        execution_view.get("schema_version")
+        != "generalist-v3-training-execution-view-v1"
+        or int(execution_view.get("maximum_sequence_tokens", 0))
         != int(config.training["resolved_context_tokens"])
-        or int(maximum.get("sequence_tokens", 0))
-        != int(config.training["maximum_observed_sequence_tokens"])
+        or int(maximum.get("sequence_tokens", 0)) > int(config.training["resolved_context_tokens"])
     ):
-        raise ValueError("near-maximum preflight needs the frozen tokenizer census")
-    records, examples = load_training_index(binding)
+        raise ValueError("near-maximum preflight needs the frozen training execution view")
+    records, examples = load_execution_training_index(config, binding, execution_view)
     statement_id = str(maximum["statement_id"])
     example_id = str(maximum["example_id"])
     matches = [item for item in examples[statement_id] if item.example_id == example_id]
@@ -68,7 +69,7 @@ def _maximum_materialized_example(
 def run_no_update_near_max_preflight(
     config: GeneralistV3Config,
     binding: DatasetBinding,
-    census_path: Path,
+    execution_view_path: Path,
     output_path: Path,
     *,
     model_snapshot: Path | None = None,
@@ -76,8 +77,9 @@ def run_no_update_near_max_preflight(
     """Run the exact near-maximum forward/backward without an optimizer update."""
 
     config.validate()
-    census = _read_json(census_path)
-    materialized = _maximum_materialized_example(config, binding, census)
+    execution_view = _read_json(execution_view_path)
+    maximum = execution_view["maximum_eligible_example"]
+    materialized = _maximum_materialized_example(config, binding, execution_view)
     try:
         import torch
         from torch.nn.attention import SDPBackend, sdpa_kernel
@@ -97,8 +99,8 @@ def run_no_update_near_max_preflight(
         runtime.tokenizer,
         maximum_sequence_tokens=int(config.training["resolved_context_tokens"]),
     )
-    if len(example.input_ids) != int(config.training["maximum_observed_sequence_tokens"]):
-        raise RuntimeError("near-maximum tokenization differs from the frozen census")
+    if len(example.input_ids) != int(maximum["sequence_tokens"]):
+        raise RuntimeError("near-maximum tokenization differs from the frozen execution view")
     device = next(
         parameter.device
         for parameter in runtime.model.parameters()
@@ -158,11 +160,12 @@ def run_no_update_near_max_preflight(
     peak_reserved = int(torch.cuda.max_memory_reserved(device_index))
     total_memory = int(properties.total_memory)
     value = {
-        "schema_version": "generalist-v3-near-max-preflight-v1",
+        "schema_version": "generalist-v3-near-max-preflight-v2",
         "status": "passed",
         "model": config.model,
         "dataset_binding": binding.to_dict(),
-        "tokenizer_census_sha256": sha256_file(census_path),
+        "training_execution_view_sha256": sha256_file(execution_view_path),
+        "execution_view_identity_sha256": execution_view["execution_view_sha256"],
         "near_maximum_example": {
             "statement_id": example.statement_id,
             "example_id": example.proof_variant_id,
@@ -355,4 +358,3 @@ def base_forward_kl(base_logits: Any, current_logits: Any) -> Any:
     if not bool(torch.isfinite(value).item()) or float(value.detach().item()) < -1e-6:
         raise RuntimeError("generalist-v3 Base-preservation KL is invalid")
     return value.clamp_min(0.0)
-

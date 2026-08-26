@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import random
+from bisect import bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import asdict, dataclass
@@ -20,6 +21,7 @@ from .dataset_v3 import (
     normalized_proof_structure,
     read_records,
     read_view,
+    representative_variants,
 )
 from .dataset_v3_schema import DatasetV3Record, DerivedExampleRef
 from .generalist_v2 import (
@@ -42,6 +44,8 @@ CONTEXT_CHOICES = (4096, 8192, 16384, 32768, 65536, 131072, 262144)
 CONFIGURATION_IDS = ("C0", "C1", "C2", "C3")
 PRIMARY_CONFIGURATION_IDS = CONFIGURATION_IDS[:3]
 RETAINED_STEPS = (100, 250, 500, 1000, 2000, 4000, 8000)
+STRUCTURAL_BUCKETS = ("direct", "multi-step", "branching", "deep")
+EXECUTION_CONTEXT_TOKENS = 65536
 
 
 class Tokenizer(Protocol):
@@ -167,14 +171,39 @@ class GeneralistV3Config:
         training = self.training
         if tuple(training.get("context_choices", ())) != CONTEXT_CHOICES:
             raise ValueError("generalist-v3 context choices differ")
-        if int(training.get("resolved_context_tokens", 0)) != 262144:
-            raise ValueError("generalist-v3 no-truncation context differs")
-        if int(training.get("maximum_observed_sequence_tokens", 0)) != 157034:
-            raise ValueError("generalist-v3 observed maximum sequence differs")
+        if (
+            int(training.get("canonical_context_tokens", 0)) != 262144
+            or int(training.get("canonical_maximum_observed_sequence_tokens", 0))
+            != 157034
+            or int(training.get("resolved_context_tokens", 0))
+            != EXECUTION_CONTEXT_TOKENS
+        ):
+            raise ValueError("generalist-v3 canonical/execution context contract differs")
+        execution_view = training.get("execution_view", {})
+        if (
+            execution_view.get("maximum_sequence_tokens") != EXECUTION_CONTEXT_TOKENS
+            or execution_view.get("expected_quarantined_examples") != 6
+            or execution_view.get("renormalize_remaining_example_mass_within_theorem")
+            is not True
+            or execution_view.get("exclude_theorem_when_no_example_remains") is not True
+        ):
+            raise ValueError("generalist-v3 execution-view contract differs")
+        structural = training.get("structural_reweighting", {})
+        if (
+            tuple(structural.get("bucket_order", ())) != STRUCTURAL_BUCKETS
+            or structural.get("raw_multiplier") != "sqrt((1/K)/f_b)"
+            or structural.get("lower_bound") != 0.75
+            or structural.get("upper_bound") != 1.5
+            or structural.get("normalize_training_set_mean_to") != 1.0
+        ):
+            raise ValueError("generalist-v3 structural reweighting contract differs")
         if tuple(training.get("retained_steps", ())) != RETAINED_STEPS:
             raise ValueError("generalist-v3 retained steps differ")
         if (
             training.get("stream_seed") != 0
+            or training.get("sample_theorem_uniformly") is not False
+            or training.get("sample_theorem_by_structural_multiplier") is not True
+            or training.get("sample_example_by_exact_mass") is not True
             or training.get("gradient_accumulation_steps") != 8
             or training.get("warmup_steps") != 100
             or training.get("packing") is not False
@@ -203,6 +232,8 @@ class GeneralistV3Config:
             or preservation.get("incremental_anchors") != 256
             or preservation.get("reference_logits") != "full-vocabulary"
             or preservation.get("loss_direction") != "KL(p_base||p_current)"
+            or preservation.get("maximum_anchor_fraction_per_structural_bucket")
+            != 0.4
         ):
             raise ValueError("generalist-v3 preservation contract differs")
         evaluation = self.evaluation
@@ -375,9 +406,9 @@ def tokenizer_length_census(
         raise RuntimeError("Dataset-v3 tokenizer census is empty")
     selected_context = context_for_maximum(int(maximum["sequence_tokens"]))
     if (
-        selected_context != int(config.training["resolved_context_tokens"])
+        selected_context != int(config.training["canonical_context_tokens"])
         or int(maximum["sequence_tokens"])
-        != int(config.training["maximum_observed_sequence_tokens"])
+        != int(config.training["canonical_maximum_observed_sequence_tokens"])
     ):
         raise ValueError("Dataset-v3 tokenizer census differs from the frozen config")
     return {
@@ -418,6 +449,378 @@ def load_training_index(
     return records, normalized
 
 
+def structural_bucket(record: DatasetV3Record) -> str:
+    """Assign the frozen #83 proof-execution structural bucket."""
+
+    variants = representative_variants(record)
+    maximum_boundaries = max((len(item.boundaries) for item in variants), default=0)
+    maximum_branches = max(
+        (
+            sum(boundary.structural_kind == "branch" for boundary in item.boundaries)
+            for item in variants
+        ),
+        default=0,
+    )
+    if maximum_boundaries >= 4 or maximum_branches >= 2:
+        inferred = "deep"
+    elif maximum_branches >= 1:
+        inferred = "branching"
+    elif maximum_boundaries >= 1:
+        inferred = "multi-step"
+    else:
+        inferred = "direct"
+    explicit = record.structural_class if record.provenance == "synthetic" else None
+    if explicit is None:
+        return inferred
+    if explicit not in STRUCTURAL_BUCKETS:
+        raise ValueError(f"unsupported Dataset-v3 structural class: {explicit}")
+    return max((inferred, explicit), key=STRUCTURAL_BUCKETS.index)
+
+
+def _fraction_dict(value: Fraction) -> dict[str, int]:
+    return {"numerator": value.numerator, "denominator": value.denominator}
+
+
+def _execution_view_binding_matches(
+    binding: DatasetBinding, execution_view: Mapping[str, Any]
+) -> bool:
+    observed = execution_view.get("dataset_binding", {})
+    return all(
+        observed.get(key) == getattr(binding, key)
+        for key in (
+            "manifest_sha256",
+            "records_sha256",
+            "optimizer_view_sha256",
+            "validation_membership_sha256",
+            "test_membership_sha256",
+            "training_theorems",
+            "validation_theorems",
+            "test_theorems",
+            "derived_optimizer_examples",
+        )
+    )
+
+
+def freeze_training_execution_view(
+    config: GeneralistV3Config,
+    binding: DatasetBinding,
+    tokenizer: Tokenizer,
+    census_path: Path,
+    output_path: Path,
+    *,
+    progress_every_examples: int = 0,
+) -> dict[str, Any]:
+    """Freeze the explicit <=65,536-token optimizer view without mutating Dataset v3."""
+
+    config.validate()
+    census = _read_json(census_path)
+    if (
+        census.get("schema_version") != "generalist-v3-tokenizer-census-v1"
+        or int(census.get("selected_context_tokens", 0))
+        != int(config.training["canonical_context_tokens"])
+        or int(census.get("maximum_example", {}).get("sequence_tokens", 0))
+        != int(config.training["canonical_maximum_observed_sequence_tokens"])
+    ):
+        raise ValueError("training execution view needs the frozen canonical census")
+    cap = int(config.training["execution_view"]["maximum_sequence_tokens"])
+    records, by_statement = load_training_index(binding)
+    quarantined: list[dict[str, Any]] = []
+    maximum_eligible: dict[str, Any] | None = None
+    token_totals: Counter[tuple[str, str]] = Counter()
+    token_counts: Counter[tuple[str, str]] = Counter()
+    example_count = 0
+    for statement_id in sorted(by_statement):
+        record = records[statement_id]
+        bucket = structural_bucket(record)
+        for reference in by_statement[statement_id]:
+            materialized = materialize_example(record, reference)
+            prompt_tokens = len(
+                tokenizer.encode(materialized["model_input"], add_special_tokens=False)
+            )
+            target_tokens = len(
+                tokenizer.encode(materialized["target"], add_special_tokens=False)
+            )
+            sequence_tokens = prompt_tokens + target_tokens + 1
+            detail = {
+                "statement_id": statement_id,
+                "example_id": reference.example_id,
+                "task_kind": reference.kind,
+                "structural_bucket": bucket,
+                "prompt_tokens": prompt_tokens,
+                "target_tokens_excluding_eos": target_tokens,
+                "sequence_tokens": sequence_tokens,
+            }
+            if sequence_tokens > cap:
+                quarantined.append(
+                    {
+                        **detail,
+                        "status": config.training["execution_view"]["quarantine_label"],
+                    }
+                )
+            else:
+                if maximum_eligible is None or sequence_tokens > int(
+                    maximum_eligible["sequence_tokens"]
+                ):
+                    maximum_eligible = detail
+                key = (bucket, reference.kind)
+                token_totals[key] += target_tokens
+                token_counts[key] += 1
+            example_count += 1
+            if progress_every_examples and example_count % progress_every_examples == 0:
+                print(
+                    json.dumps(
+                        {
+                            "execution_view_examples": example_count,
+                            "total": binding.derived_optimizer_examples,
+                        }
+                    ),
+                    flush=True,
+                )
+    quarantined.sort(key=lambda item: (item["statement_id"], item["example_id"]))
+    if example_count != binding.derived_optimizer_examples or maximum_eligible is None:
+        raise RuntimeError("training execution view did not enumerate the frozen optimizer view")
+    expected_quarantined = int(
+        config.training["execution_view"]["expected_quarantined_examples"]
+    )
+    if len(quarantined) != expected_quarantined:
+        raise RuntimeError(
+            f"training execution quarantine changed: {len(quarantined)} != "
+            f"{expected_quarantined}"
+        )
+    quarantined_ids = {str(item["example_id"]) for item in quarantined}
+    affected = sorted({str(item["statement_id"]) for item in quarantined})
+    excluded_theorems: list[str] = []
+    mass_renormalization: list[dict[str, Any]] = []
+    eligible_ids: list[str] = []
+    for statement_id in sorted(by_statement):
+        remaining = [
+            item
+            for item in by_statement[statement_id]
+            if item.example_id not in quarantined_ids
+        ]
+        eligible_ids.extend(item.example_id for item in remaining)
+        if not remaining:
+            excluded_theorems.append(statement_id)
+        if statement_id in affected:
+            eligible_mass = sum(
+                (
+                    Fraction(item.mass_numerator, item.mass_denominator)
+                    for item in remaining
+                ),
+                Fraction(0, 1),
+            )
+            mass_renormalization.append(
+                {
+                    "statement_id": statement_id,
+                    "frozen_example_count": len(by_statement[statement_id]),
+                    "eligible_example_count": len(remaining),
+                    "eligible_frozen_mass": _fraction_dict(eligible_mass),
+                    "renormalization_factor": (
+                        None
+                        if not remaining
+                        else _fraction_dict(Fraction(1, 1) / eligible_mass)
+                    ),
+                }
+            )
+    retained_examples = example_count - len(quarantined)
+    target_length_by_bucket_kind = []
+    for key in sorted(token_counts):
+        bucket, kind = key
+        target_length_by_bucket_kind.append(
+            {
+                "structural_bucket": bucket,
+                "task_kind": kind,
+                "examples": token_counts[key],
+                "mean_target_tokens_excluding_eos": token_totals[key] / token_counts[key],
+            }
+        )
+    value = {
+        "schema_version": "generalist-v3-training-execution-view-v1",
+        "dataset_binding": binding.to_dict(),
+        "canonical_tokenizer_census_sha256": sha256_file(census_path),
+        "maximum_sequence_tokens": cap,
+        "canonical_optimizer_examples": example_count,
+        "quarantined_example_count": len(quarantined),
+        "quarantined_unique_theorems": len(affected),
+        "retained_example_count": retained_examples,
+        "retained_theorem_count": len(by_statement) - len(excluded_theorems),
+        "retained_example_fraction": _fraction_dict(Fraction(retained_examples, example_count)),
+        "quarantined_examples_sha256": _sha256_json(quarantined),
+        "quarantined_examples": quarantined,
+        "affected_structural_bucket_counts": dict(
+            sorted(Counter(item["structural_bucket"] for item in quarantined).items())
+        ),
+        "affected_task_kind_counts": dict(
+            sorted(Counter(item["task_kind"] for item in quarantined).items())
+        ),
+        "mass_renormalization_sha256": _sha256_json(mass_renormalization),
+        "mass_renormalization": mass_renormalization,
+        "excluded_theorem_count": len(excluded_theorems),
+        "excluded_theorem_ids_sha256": _sha256_json(excluded_theorems),
+        "excluded_theorem_ids": excluded_theorems,
+        "eligible_example_ids_sha256": _sha256_json(eligible_ids),
+        "maximum_eligible_example": maximum_eligible,
+        "target_length_by_structural_bucket_and_kind": target_length_by_bucket_kind,
+        "dataset_v3_mutated": False,
+        "truncated_examples": 0,
+        "silent_drops": 0,
+        "semantic_test_accessed": False,
+    }
+    value["execution_view_sha256"] = _sha256_json(value)
+    _write_json(output_path, value)
+    return value
+
+
+def load_execution_training_index(
+    config: GeneralistV3Config,
+    binding: DatasetBinding,
+    execution_view: Mapping[str, Any],
+) -> tuple[dict[str, DatasetV3Record], dict[str, tuple[DerivedExampleRef, ...]]]:
+    """Load the frozen #83 eligibility view and renormalize exact within-theorem mass."""
+
+    if (
+        execution_view.get("schema_version")
+        != "generalist-v3-training-execution-view-v1"
+        or not _execution_view_binding_matches(binding, execution_view)
+        or int(execution_view.get("maximum_sequence_tokens", 0))
+        != int(config.training["resolved_context_tokens"])
+        or int(execution_view.get("quarantined_example_count", -1))
+        != int(config.training["execution_view"]["expected_quarantined_examples"])
+    ):
+        raise ValueError("generalist-v3 training execution view differs")
+    records, frozen = load_training_index(binding)
+    quarantined = {
+        str(item["example_id"]) for item in execution_view["quarantined_examples"]
+    }
+    normalized: dict[str, tuple[DerivedExampleRef, ...]] = {}
+    eligible_ids: list[str] = []
+    for statement_id in sorted(frozen):
+        remaining = [item for item in frozen[statement_id] if item.example_id not in quarantined]
+        if not remaining:
+            continue
+        total = sum(
+            (Fraction(item.mass_numerator, item.mass_denominator) for item in remaining),
+            Fraction(0, 1),
+        )
+        references = tuple(
+            DerivedExampleRef(
+                schema_version=item.schema_version,
+                example_id=item.example_id,
+                statement_id=item.statement_id,
+                proof_variant_id=item.proof_variant_id,
+                kind=item.kind,
+                boundary_id=item.boundary_id,
+                mass_numerator=(
+                    Fraction(item.mass_numerator, item.mass_denominator) / total
+                ).numerator,
+                mass_denominator=(
+                    Fraction(item.mass_numerator, item.mass_denominator) / total
+                ).denominator,
+            )
+            for item in remaining
+        )
+        if sum(
+            (Fraction(item.mass_numerator, item.mass_denominator) for item in references),
+            Fraction(0, 1),
+        ) != Fraction(1, 1):
+            raise RuntimeError(f"execution-view theorem mass differs: {statement_id}")
+        normalized[statement_id] = references
+        eligible_ids.extend(item.example_id for item in references)
+    if len(eligible_ids) != int(execution_view["retained_example_count"]):
+        raise RuntimeError("execution-view retained example count differs")
+    if _sha256_json(eligible_ids) != execution_view["eligible_example_ids_sha256"]:
+        raise RuntimeError("execution-view eligible membership hash differs")
+    return {key: records[key] for key in normalized}, normalized
+
+
+def freeze_structural_sampling_manifest(
+    config: GeneralistV3Config,
+    binding: DatasetBinding,
+    execution_view: Mapping[str, Any],
+    output_path: Path,
+) -> dict[str, Any]:
+    all_records, _ = load_training_index(binding)
+    eligible_records, eligible_examples = load_execution_training_index(
+        config, binding, execution_view
+    )
+    pre_mapping = {key: structural_bucket(value) for key, value in all_records.items()}
+    mapping = {key: structural_bucket(value) for key, value in eligible_records.items()}
+    pre_counts = Counter(pre_mapping.values())
+    counts = Counter(mapping.values())
+    nonempty = [bucket for bucket in STRUCTURAL_BUCKETS if counts[bucket]]
+    theorem_count = len(mapping)
+    bounded: dict[str, float] = {}
+    rows: list[dict[str, Any]] = []
+    for bucket in nonempty:
+        frequency = counts[bucket] / theorem_count
+        raw = math.sqrt((1.0 / len(nonempty)) / frequency)
+        bounded[bucket] = min(1.5, max(0.75, raw))
+    bounded_mean = math.fsum(counts[b] * bounded[b] for b in nonempty) / theorem_count
+    normalized = {bucket: bounded[bucket] / bounded_mean for bucket in nonempty}
+    total_weight = math.fsum(counts[b] * normalized[b] for b in nonempty)
+    for bucket in nonempty:
+        frequency = counts[bucket] / theorem_count
+        raw = math.sqrt((1.0 / len(nonempty)) / frequency)
+        rows.append(
+            {
+                "structural_bucket": bucket,
+                "pre_quarantine_theorems": pre_counts[bucket],
+                "eligible_theorems": counts[bucket],
+                "raw_theorem_fraction": frequency,
+                "raw_multiplier": raw,
+                "bounded_multiplier": bounded[bucket],
+                "normalized_multiplier": normalized[bucket],
+                "expected_optimizer_mass_fraction": (
+                    counts[bucket] * normalized[bucket] / total_weight
+                ),
+                "eligible_whole_examples": sum(
+                    item.kind == "whole"
+                    for statement_id, refs in eligible_examples.items()
+                    if mapping[statement_id] == bucket
+                    for item in refs
+                ),
+                "eligible_incremental_examples": sum(
+                    item.kind == "continuation"
+                    for statement_id, refs in eligible_examples.items()
+                    if mapping[statement_id] == bucket
+                    for item in refs
+                ),
+            }
+        )
+    canonical_mapping = [
+        {"statement_id": statement_id, "structural_bucket": mapping[statement_id]}
+        for statement_id in sorted(mapping)
+    ]
+    value = {
+        "schema_version": "generalist-v3-structural-sampling-v1",
+        "dataset_binding": binding.to_dict(),
+        "execution_view_sha256": str(execution_view["execution_view_sha256"]),
+        "bucket_order": list(STRUCTURAL_BUCKETS),
+        "inference_rule": {
+            "deep": "max_boundaries>=4 or max_branch_boundaries>=2",
+            "branching": "otherwise max_branch_boundaries>=1",
+            "multi-step": "otherwise max_boundaries>=1",
+            "direct": "otherwise",
+            "synthetic_override": "take more complex explicit structural_class",
+        },
+        "eligible_theorems": theorem_count,
+        "nonempty_bucket_count": len(nonempty),
+        "pre_quarantine_bucket_counts": dict(
+            (bucket, pre_counts[bucket]) for bucket in STRUCTURAL_BUCKETS
+        ),
+        "post_quarantine_bucket_counts": dict(
+            (bucket, counts[bucket]) for bucket in STRUCTURAL_BUCKETS
+        ),
+        "multipliers": rows,
+        "normalized_theorem_multiplier_mean": total_weight / theorem_count,
+        "theorem_to_bucket_mapping_sha256": _sha256_json(canonical_mapping),
+        "semantic_validation_or_test_accessed": False,
+    }
+    value["structural_sampling_sha256"] = _sha256_json(value)
+    _write_json(output_path, value)
+    return value
+
+
 def choose_exact_mass_reference(
     references: Sequence[DerivedExampleRef], threshold: Fraction
 ) -> DerivedExampleRef:
@@ -436,16 +839,31 @@ def deterministic_stream_references(
     *,
     microbatches: int,
     seed: int = 0,
+    theorem_weights: Mapping[str, float] | None = None,
 ) -> Iterator[DerivedExampleRef]:
     if microbatches < 1 or seed != 0:
         raise ValueError("generalist-v3 stream requires positive rows and seed=0")
     statement_ids = sorted(examples_by_statement)
     if not statement_ids:
         raise ValueError("generalist-v3 stream has no training theorems")
+    if theorem_weights is None:
+        weights = [1.0] * len(statement_ids)
+    else:
+        if set(theorem_weights) != set(statement_ids):
+            raise ValueError("structural theorem weights differ from execution membership")
+        weights = [float(theorem_weights[item]) for item in statement_ids]
+        if any(not math.isfinite(item) or item <= 0 for item in weights):
+            raise ValueError("structural theorem weights must be finite and positive")
+    cumulative: list[float] = []
+    running = 0.0
+    for weight in weights:
+        running += weight
+        cumulative.append(running)
     rng = random.Random(seed)
     denominator = 1 << 256
     for _ in range(microbatches):
-        statement_id = statement_ids[rng.randrange(len(statement_ids))]
+        statement_threshold = rng.random() * cumulative[-1]
+        statement_id = statement_ids[bisect_right(cumulative, statement_threshold)]
         threshold = Fraction(rng.getrandbits(256), denominator)
         yield choose_exact_mass_reference(examples_by_statement[statement_id], threshold)
 
@@ -453,22 +871,49 @@ def deterministic_stream_references(
 def write_training_stream(
     config: GeneralistV3Config,
     binding: DatasetBinding,
+    execution_view: Mapping[str, Any],
+    structural_manifest: Mapping[str, Any],
     output_path: Path,
     manifest_path: Path,
 ) -> dict[str, Any]:
-    records, by_statement = load_training_index(binding)
+    records, by_statement = load_execution_training_index(config, binding, execution_view)
+    if (
+        structural_manifest.get("schema_version")
+        != "generalist-v3-structural-sampling-v1"
+        or structural_manifest.get("execution_view_sha256")
+        != execution_view.get("execution_view_sha256")
+    ):
+        raise ValueError("training stream needs the frozen structural manifest")
+    bucket_multipliers = {
+        str(item["structural_bucket"]): float(item["normalized_multiplier"])
+        for item in structural_manifest["multipliers"]
+    }
+    statement_buckets = {
+        statement_id: structural_bucket(record) for statement_id, record in records.items()
+    }
+    theorem_weights = {
+        statement_id: bucket_multipliers[statement_buckets[statement_id]]
+        for statement_id in by_statement
+    }
     microbatches = int(config.training["maximum_optimizer_steps"]) * int(
         config.training["gradient_accumulation_steps"]
     )
     digest = hashlib.sha256()
     kind_counts = Counter()
+    bucket_counts = Counter()
+    bucket_kind_counts = Counter()
     statement_counts = Counter()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(output_path, "wt", encoding="utf-8", newline="\n") as handle:
         for stream_index, reference in enumerate(
-            deterministic_stream_references(by_statement, microbatches=microbatches),
+            deterministic_stream_references(
+                by_statement,
+                microbatches=microbatches,
+                theorem_weights=theorem_weights,
+            ),
         ):
             materialized = materialize_example(records[reference.statement_id], reference)
+            bucket = statement_buckets[reference.statement_id]
             row = {
                 "schema_version": "generalist-v3-stream-row-v1",
                 "stream_index": stream_index,
@@ -477,6 +922,7 @@ def write_training_stream(
                 "statement_id": reference.statement_id,
                 "example_id": reference.example_id,
                 "task_kind": reference.kind,
+                "structural_bucket": bucket,
                 "model_input": materialized["model_input"],
                 "target": materialized["target"],
                 "model_input_sha256": _sha256_text(materialized["model_input"]),
@@ -486,17 +932,47 @@ def write_training_stream(
             handle.write(encoded + "\n")
             digest.update(encoded.encode("utf-8") + b"\n")
             kind_counts[reference.kind] += 1
+            bucket_counts[bucket] += 1
+            bucket_kind_counts[(bucket, reference.kind)] += 1
             statement_counts[reference.statement_id] += 1
+    expected_by_bucket = {
+        str(item["structural_bucket"]): float(item["expected_optimizer_mass_fraction"])
+        for item in structural_manifest["multipliers"]
+    }
+    agreement = {}
+    for bucket, expected in expected_by_bucket.items():
+        observed = bucket_counts[bucket] / microbatches
+        ordinary_limit = max(
+            0.005,
+            6.0 * math.sqrt(expected * (1.0 - expected) / microbatches),
+        )
+        agreement[bucket] = {
+            "expected_fraction": expected,
+            "observed_fraction": observed,
+            "absolute_difference": abs(observed - expected),
+            "ordinary_finite_sample_limit": ordinary_limit,
+            "passed": abs(observed - expected) <= ordinary_limit,
+        }
+    if not all(item["passed"] for item in agreement.values()):
+        raise RuntimeError("structurally reweighted stream differs from expected distribution")
     manifest = {
         "schema_version": "generalist-v3-training-stream-v1",
         "stream_id": config.training["stream_id"],
         "seed": 0,
-        "sampling": "uniform-theorem-then-exact-example-mass-with-replacement",
+        "sampling": "structural-theorem-weight-then-renormalized-exact-example-mass-with-replacement",
         "dataset_binding": binding.to_dict(),
+        "execution_view_sha256": execution_view["execution_view_sha256"],
+        "structural_sampling_sha256": structural_manifest["structural_sampling_sha256"],
         "microbatches": microbatches,
         "optimizer_steps": int(config.training["maximum_optimizer_steps"]),
         "gradient_accumulation_steps": 8,
         "kind_counts": dict(sorted(kind_counts.items())),
+        "structural_bucket_counts": dict(sorted(bucket_counts.items())),
+        "structural_bucket_kind_counts": {
+            f"{bucket}:{kind}": count
+            for (bucket, kind), count in sorted(bucket_kind_counts.items())
+        },
+        "structural_distribution_agreement": agreement,
         "unique_theorems_sampled": len(statement_counts),
         "maximum_theorem_draws": max(statement_counts.values()),
         "minimum_sampled_theorem_draws": min(statement_counts.values()),
@@ -527,26 +1003,48 @@ def _length_bucket(tokens: int, boundaries: Sequence[int]) -> str:
 def _balanced_hash_selection(
     candidates: Sequence[dict[str, Any]], *, count: int, seed: int
 ) -> list[dict[str, Any]]:
-    by_stratum: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    by_bucket_stratum: dict[
+        str, dict[tuple[str, str, str], list[dict[str, Any]]]
+    ] = defaultdict(lambda: defaultdict(list))
     for candidate in candidates:
-        key = (str(candidate["first_construct"]), str(candidate["length_bucket"]))
-        by_stratum[key].append(candidate)
-    for key, values in by_stratum.items():
-        values.sort(
-            key=lambda item: (
-                not bool(item["preferred_length"]),
-                hashlib.sha256(
-                    f"generalist-v3-anchor-v1\0{seed}\0{item['example_id']}".encode()
-                ).digest(),
-            )
+        bucket = str(candidate["structural_bucket"])
+        key = (
+            str(candidate["proof_form"]),
+            str(candidate["first_construct"]),
+            str(candidate["length_bucket"]),
         )
+        by_bucket_stratum[bucket][key].append(candidate)
+    bucket_orders: dict[str, list[dict[str, Any]]] = {}
+    for bucket, by_stratum in by_bucket_stratum.items():
+        for values in by_stratum.values():
+            values.sort(
+                key=lambda item: (
+                    not bool(item["preferred_length"]),
+                    hashlib.sha256(
+                        f"generalist-v3-anchor-v2\0{seed}\0{item['example_id']}".encode()
+                    ).digest(),
+                )
+            )
+        order: list[dict[str, Any]] = []
+        cursor = 0
+        keys = sorted(by_stratum)
+        while True:
+            progressed = False
+            for key in keys:
+                values = by_stratum[key]
+                if cursor < len(values):
+                    order.append(values[cursor])
+                    progressed = True
+            if not progressed:
+                break
+            cursor += 1
+        bucket_orders[bucket] = order
     selected: list[dict[str, Any]] = []
-    stratum_keys = sorted(by_stratum)
     cursor = 0
     while len(selected) < count:
         progressed = False
-        for key in stratum_keys:
-            values = by_stratum[key]
+        for bucket in STRUCTURAL_BUCKETS:
+            values = bucket_orders.get(bucket, [])
             if cursor < len(values):
                 selected.append(values[cursor])
                 progressed = True
@@ -562,13 +1060,23 @@ def freeze_anchor_manifest(
     config: GeneralistV3Config,
     binding: DatasetBinding,
     tokenizer: Tokenizer,
+    execution_view: Mapping[str, Any],
+    structural_manifest: Mapping[str, Any],
     output_path: Path,
 ) -> dict[str, Any]:
-    records, by_statement = load_training_index(binding)
+    records, by_statement = load_execution_training_index(config, binding, execution_view)
+    if (
+        structural_manifest.get("schema_version")
+        != "generalist-v3-structural-sampling-v1"
+        or structural_manifest.get("execution_view_sha256")
+        != execution_view.get("execution_view_sha256")
+    ):
+        raise ValueError("anchor selection needs the frozen structural manifest")
     boundaries = tuple(int(value) for value in config.preservation["length_buckets"])
     candidates: dict[str, list[dict[str, Any]]] = {"whole": [], "continuation": []}
     for statement_id in sorted(by_statement):
         record = records[statement_id]
+        bucket = structural_bucket(record)
         variants = {item.proof_variant_id: item for item in record.proof_variants}
         for reference in by_statement[statement_id]:
             materialized = materialize_example(record, reference)
@@ -582,6 +1090,7 @@ def freeze_anchor_manifest(
                     "task_kind": reference.kind,
                     "boundary_id": reference.boundary_id,
                     "proof_form": variants[reference.proof_variant_id].proof_form,
+                    "structural_bucket": bucket,
                     "first_construct": target_construct,
                     "input_tokens": tokens,
                     "length_bucket": _length_bucket(tokens, boundaries),
@@ -595,10 +1104,18 @@ def freeze_anchor_manifest(
     ]
     if len(selected) != 512 or len({item["example_id"] for item in selected}) != 512:
         raise RuntimeError("generalist-v3 anchor selection is not 512 unique examples")
+    bucket_counts = Counter(item["structural_bucket"] for item in selected)
+    maximum_fraction = float(
+        config.preservation["maximum_anchor_fraction_per_structural_bucket"]
+    )
+    if max(bucket_counts.values()) / len(selected) > maximum_fraction:
+        raise RuntimeError("generalist-v3 anchors exceed the structural-bucket cap")
     selected.sort(key=lambda item: (item["task_kind"], item["example_id"]))
     value = {
         "schema_version": "generalist-v3-anchor-manifest-v1",
         "dataset_binding": binding.to_dict(),
+        "execution_view_sha256": execution_view["execution_view_sha256"],
+        "structural_sampling_sha256": structural_manifest["structural_sampling_sha256"],
         "selection_seed": 0,
         "selection_rule": config.preservation["selection_rule"],
         "anchor_count": len(selected),
@@ -606,6 +1123,8 @@ def freeze_anchor_manifest(
         "proof_form_counts": dict(Counter(item["proof_form"] for item in selected)),
         "first_construct_counts": dict(Counter(item["first_construct"] for item in selected)),
         "length_bucket_counts": dict(Counter(item["length_bucket"] for item in selected)),
+        "structural_bucket_counts": dict(sorted(bucket_counts.items())),
+        "maximum_structural_bucket_fraction": max(bucket_counts.values()) / len(selected),
         "preferred_length_count": sum(bool(item["preferred_length"]) for item in selected),
         "anchors_sha256": _sha256_json(selected),
         "anchors": selected,

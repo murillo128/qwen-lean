@@ -1,0 +1,104 @@
+{
+  "schema_version": "generalist-v3-stage0-feasibility-65k-v1",
+  "status": "design-return-required",
+  "dataset_binding": {
+    "accepted_merge_commit": "17fa650412d211405e23c1ca3f7765b6c2a94032",
+    "manifest_sha256": "ff73265f882e975e339fd4238fc465e4dd733856c68a6032ad8e435ae73b8dc7",
+    "records_sha256": "10f548fd824fd61edf894cf275d4035f9ef4f0f1860628cf1168e498e3d7dc96",
+    "optimizer_view_sha256": "0ea4043628dda878ac574e1cde06dfe6bdf69bc602f12f7f83dcfd8e6d07f96d",
+    "training_theorems": 178448,
+    "derived_optimizer_examples": 317554
+  },
+  "training_execution_view": {
+    "maximum_sequence_tokens": 65536,
+    "local_manifest_file_sha256": "9e8585b507e7f973908e0bfc80dcd5dde3a7ec27d3f012903b1d962ab4f47b07",
+    "execution_view_identity_sha256": "8840a2e4fc20f94ad1c89fdd652696407a3ef6b4235f759dee911bbcf402d870",
+    "quarantined_examples": 6,
+    "quarantined_unique_theorems": 2,
+    "quarantined_structural_buckets": {
+      "deep": 6
+    },
+    "quarantined_task_kinds": {
+      "continuation": 4,
+      "whole": 2
+    },
+    "excluded_theorems_with_no_eligible_examples": 2,
+    "excluded_theorem_ids_sha256": "b4548b3a23eb7976e632a815f17ea81e6e0a4a72685377c0de2055a9f17fc84e",
+    "retained_examples": 317548,
+    "retained_theorems": 178446,
+    "retained_example_fraction": {
+      "numerator": 158774,
+      "denominator": 158777
+    },
+    "maximum_eligible_example": {
+      "statement_id": "f4f26289674c187a8e40dd23874e17813c9e5637041d5e9971eab7aa1ff867a1",
+      "example_id": "05d8a39d05adf78a60f3aee9d57961079c820d20bd95c2c423937e0b7a7372c2",
+      "task_kind": "whole",
+      "structural_bucket": "deep",
+      "prompt_tokens": 60530,
+      "target_tokens_excluding_eos": 93,
+      "sequence_tokens": 60624
+    },
+    "dataset_v3_mutated": false,
+    "truncated_examples": 0,
+    "silent_drops": 0
+  },
+  "near_maximum_preflight": {
+    "command": "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True uv run --frozen --project tools/qwen35-generalist python tools/qwen35_v3.py preflight",
+    "input_sequence_tokens": 60624,
+    "configured_context_ceiling_tokens": 65536,
+    "optimizer_created": false,
+    "optimizer_updates": 0,
+    "forward_completed": false,
+    "backward_started": false,
+    "failure": {
+      "category": "cuda-out-of-memory",
+      "stage": "decoder-layer-0 FLA chunk_gated_delta_rule chunk_fwd_o torch.empty_like(v)",
+      "requested_allocation_bytes": 994050048,
+      "requested_allocation_reported": "948.00 MiB",
+      "gpu_total_capacity_reported": "19.55 GiB",
+      "gpu_free_at_failure_reported": "588.31 MiB",
+      "process_gpu_use_reported": "18.96 GiB",
+      "pytorch_allocated_reported": "18.52 GiB",
+      "pytorch_reserved_unallocated_reported": "121.51 MiB"
+    }
+  },
+  "runtime": {
+    "execution": "project-controlled-local-cuda",
+    "gpu": "NVIDIA RTX 4000 Ada Generation",
+    "gpu_total_memory_mib": 20475,
+    "driver_version": "580.173.02",
+    "python": "3.12.14",
+    "packages": {
+      "accelerate": "1.14.0",
+      "bitsandbytes": "0.50.1",
+      "datasets": "5.0.1",
+      "flash-linear-attention": "0.5.2",
+      "peft": "0.20.0",
+      "torch": "2.13.0",
+      "transformers": "5.15.1",
+      "trl": "1.10.0"
+    }
+  },
+  "protocol": {
+    "base_canary_generation_started": false,
+    "adapter_training_started": false,
+    "optimizer_updates": 0,
+    "sealed_test_generation_or_verification_started": false,
+    "sealed_test_per_task_outcomes_inspected": false,
+    "metadata_only_test_access_previously_disclosed": true,
+    "metadata_only_access_classified_seal_safe_by_issue_amendment": true
+  },
+  "validation": {
+    "full_repository_suite": "391 passed, 2 isolated-runtime skips",
+    "python_compilation": "passed",
+    "json_parse": "passed",
+    "git_diff_check": "passed"
+  },
+  "conclusion": {
+    "marker": "BLOCKED",
+    "finding": "The exact amended 65,536-token execution view still cannot pass the mandatory no-update forward/backward gate on the project 20 GiB Ada under the frozen NF4 QLoRA, LoRA-target, BF16-compute runtime.",
+    "required_workflow_state": "design-required",
+    "model_quality_interpretation": "none; failure occurred before Base canary generation or any optimizer update"
+  }
+}

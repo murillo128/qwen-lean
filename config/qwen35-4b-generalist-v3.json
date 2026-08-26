@@ -96,9 +96,10 @@
     "modules_to_save": null
   },
   "training": {
-    "stream_id": "dataset-v3-theorem-mass-stream-seed0-v1",
+    "stream_id": "dataset-v3-quarantined-structural-stream-seed0-v1",
     "stream_seed": 0,
-    "sample_theorem_uniformly": true,
+    "sample_theorem_uniformly": false,
+    "sample_theorem_by_structural_multiplier": true,
     "sample_example_by_exact_mass": true,
     "sample_with_replacement": true,
     "maximum_optimizer_steps": 8000,
@@ -115,8 +116,23 @@
     "packing": false,
     "truncation": false,
     "context_choices": [4096, 8192, 16384, 32768, 65536, 131072, 262144],
-    "resolved_context_tokens": 262144,
-    "maximum_observed_sequence_tokens": 157034,
+    "canonical_context_tokens": 262144,
+    "canonical_maximum_observed_sequence_tokens": 157034,
+    "resolved_context_tokens": 65536,
+    "execution_view": {
+      "maximum_sequence_tokens": 65536,
+      "expected_quarantined_examples": 6,
+      "quarantine_label": "long-context-quarantined / optimizer-ineligible-for-#83",
+      "renormalize_remaining_example_mass_within_theorem": true,
+      "exclude_theorem_when_no_example_remains": true
+    },
+    "structural_reweighting": {
+      "bucket_order": ["direct", "multi-step", "branching", "deep"],
+      "raw_multiplier": "sqrt((1/K)/f_b)",
+      "lower_bound": 0.75,
+      "upper_bound": 1.5,
+      "normalize_training_set_mean_to": 1.0
+    },
     "retained_steps": [100, 250, 500, 1000, 2000, 4000, 8000],
     "configurations": {
       "C0": {"learning_rate": 0.00003, "base_kl_lambda": 0.0, "eligible": false},
@@ -130,7 +146,8 @@
     "whole_anchors": 256,
     "incremental_anchors": 256,
     "selection_seed": 0,
-    "selection_rule": "hash-order round-robin over task-kind, first-construct and coarse-input-length strata; prefer <=4096-token inputs",
+    "selection_rule": "hash-order round-robin over task-kind, structural-bucket, proof-form/first-construct and coarse-input-length strata; prefer <=4096-token inputs; no eligible structural bucket above 40% when enough examples exist",
+    "maximum_anchor_fraction_per_structural_bucket": 0.4,
     "length_buckets": [256, 512, 1024, 2048, 4096],
     "reference_position": "final-input-next-token",
     "reference_logits": "full-vocabulary",
