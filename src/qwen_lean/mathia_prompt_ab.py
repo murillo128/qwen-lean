@@ -144,6 +144,7 @@ class PromptABConfig:
             "transformers_version": "5.15.1",
             "dtype": "bfloat16",
             "tensor_parallel_size": 1,
+            "gpu_memory_utilization": 0.89,
             "max_model_len": 32768,
             "max_num_seqs": 16,
             "enforce_eager": True,

@@ -12,9 +12,9 @@ order: 223 `minif2f-valid-clean-v2` tasks and 388
 for each task in each arm (4,888 per arm; 9,776 total).
 
 - execution-manifest SHA-256:
-  `13f608dd40fdcf8036a42375940622699c1146ce5cb5bc567cc2a93de02dcd99`
+  `a878484aed23f127755e85dc03e077aabc1a2b8b8ecd8ca76fe3803a16e15cba`
 - generation-config SHA-256:
-  `334225b4fa2a03a0a8dcb09da87dd0e6f97fe627deed7d8b56ec7eb63b2ee779`
+  `2169b897acbff7a5882780643b56130d19258d18ca4794b68a3db28768a693ff`
 - ordered 611-task ID SHA-256:
   `ffee81b7463a8f43de102c9b5ef7a4e8d0fc0cf4a461a33cfe757b119011a3d4`
 - frozen instruction SHA-256:
@@ -43,6 +43,15 @@ The local inference gate accepts the project RTX 4070 Ti by its Ada compute
 capability 8.9. The exact locked runtime and both workload-specific verifier
 environments have passed pre-inference identity and representative-preamble
 checks.
+
+The vLLM allocation target is 0.89 rather than Q0's 0.95 because the current
+WSL display reservation leaves 10.78/11.99 GiB free before engine startup. This
+changes only the local cache-allocation ceiling: BF16 weights, 32,768-token
+context, request seeds, sampling, prompt bytes, and candidate budget remain
+unchanged. The adjustment was made with zero durable candidates after the 0.95
+engine preflight stopped before model loading. At 0.89 the exact engine then
+initialized successfully under a pre-set `PAUSE` marker with a 47,489-token KV
+cache and zero forward passes or durable candidates.
 
 Raw generations and verifier diagnostics remain outside Git under `artifacts/`.
 The final compact evidence will bind every shard/result hash and process-session
