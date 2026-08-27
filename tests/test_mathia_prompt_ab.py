@@ -26,6 +26,12 @@ CONFIG_PATH = REPOSITORY_ROOT / "config/mathia-prompt-ab.json"
 MANIFEST_PATH = (
     REPOSITORY_ROOT / "evidence/mathia-prompt-ab/execution-manifest.json"
 )
+RESULTS_PATH = REPOSITORY_ROOT / "evidence/mathia-prompt-ab/results.json"
+RESULTS_README_PATH = REPOSITORY_ROOT / "evidence/mathia-prompt-ab/README.md"
+FORMAT_DIAGNOSTIC_PATH = (
+    REPOSITORY_ROOT
+    / "evidence/mathia-prompt-ab/format-contamination-diagnostic.json"
+)
 
 
 def _bound_task() -> BoundTask:
@@ -356,3 +362,21 @@ def test_committed_execution_manifest_has_every_unique_candidate_slot() -> None:
     ]
     assert len(candidate_ids) == 9_776
     assert len(set(candidate_ids)) == 9_776
+
+
+def test_committed_results_readme_is_reproducible_and_reports_boundaries() -> None:
+    results = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
+    readme = RESULTS_README_PATH.read_text(encoding="utf-8")
+    diagnostic = json.loads(FORMAT_DIAGNOSTIC_PATH.read_text(encoding="utf-8"))
+
+    assert readme == prompt_ab.render_results_readme(results)
+    assert "## Against the unchanged Q0 reference" in readme
+    assert "does not establish that frozen intuition improves" in readme
+    assert "## Scoring-excluded format diagnostic" in readme
+    assert diagnostic["decision_marker"] == "OBSERVED"
+    assert diagnostic["arms"]["B"][
+        "raw_rejections_with_verified_mechanical_variant"
+    ] == 22
+    assert diagnostic["scoring_boundary"].startswith(
+        "Mechanical wrapper variants are diagnostic only."
+    )

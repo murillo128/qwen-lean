@@ -1,66 +1,34 @@
 # Qwen3.5-4B-Base Mathia prompt A/B
 
-This directory is the compact, repository-owned evidence for issue #86. The
-current checkpoint freezes the complete prompt/candidate manifest before any
-model generation.
+**OBSERVED:** This artifact reports issue #86 without regenerating Q0. Arm B produced a statistically clear paired solved@8 advantage over Arm A; adopt the frozen explicit proof-task wording as the default qwen-lean intuition interface.
 
-## Prompt-freeze gate
+| workload | arm | solved@8 | verified candidates | pass@1 | pass@4 | pass@8 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| minif2f-valid-clean-v2 | A | 39/223 | 61/1784 | 0.034193 | 0.109353 | 0.174888 |
+| minif2f-valid-clean-v2 | B | 61/223 | 113/1784 | 0.063341 | 0.180397 | 0.273543 |
+| fresh-composition-valid-v2 | A | 2/388 | 2/3104 | 0.000644 | 0.002577 | 0.005155 |
+| fresh-composition-valid-v2 | B | 19/388 | 21/3104 | 0.006765 | 0.025957 | 0.048969 |
+| combined | A | 41/611 | 63/4888 | 0.012889 | 0.041548 | 0.067103 |
+| combined | B | 80/611 | 134/4888 | 0.027414 | 0.082324 | 0.130933 |
 
-**ACCEPTED:** `execution-manifest.json` binds 611 tasks in authoritative Q0
-order: 223 `minif2f-valid-clean-v2` tasks and 388
-`fresh-composition-valid-v2` tasks. It defines 8 stable candidate identities
-for each task in each arm (4,888 per arm; 9,776 total).
+## Paired combined result
 
-- execution-manifest SHA-256:
-  `a878484aed23f127755e85dc03e077aabc1a2b8b8ecd8ca76fe3803a16e15cba`
-- generation-config SHA-256:
-  `2169b897acbff7a5882780643b56130d19258d18ca4794b68a3db28768a693ff`
-- ordered 611-task ID SHA-256:
-  `ffee81b7463a8f43de102c9b5ef7a4e8d0fc0cf4a461a33cfe757b119011a3d4`
-- frozen instruction SHA-256:
-  `2d3d5a28792bf8c0f61740d7dd427a8d251e65093fc0052af0c14839beaac691`
+A-only/B-only/both/neither solved@8: 17/56/24/514. Exact two-sided McNemar p=5.26868e-06.
 
-The materializer revalidated the Mathia freeze, all accepted intuition hashes,
-the source-projected theorem/context bytes, Dataset-v2 package hashes, and the
-unregenerated Q0 evidence from issue #78. Arm A and B use identical task order,
-intuition bytes, public context, and declaration bytes. Arm B differs only by
-the exact frozen task-instruction bytes in issue #86. Oracle/source proofs,
-Q0/Q4/DeepSeek results, and final-test information are not prompt inputs.
+## Against the unchanged Q0 reference
 
-## Interruption safety
+| interface | solved@8 | pass@1 | pass@4 | pass@8 | Q0 fail -> pass | Q0 pass -> fail | McNemar p |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Q0 | 73/611 | 0.026391 | 0.077718 | 0.119476 | — | — | — |
+| A | 41/611 | 0.012889 | 0.041548 | 0.067103 | 15 | 47 | 5.77837e-05 |
+| B | 80/611 | 0.027414 | 0.082324 | 0.130933 | 30 | 23 | 0.410103 |
 
-Generation finalizes one atomic eight-candidate task shard at a time and never
-reschedules a valid completed shard. Verification finalizes one result per
-candidate, keyed by candidate identity, raw-generation hash, and the frozen
-Lean environment selected by workload. MiniF2F uses
-`miniF2F@f0a20e14c1eeccd859d51bb4c2b3ee487889c303`; fresh composition uses
-`PrimeNumberTheoremAnd@7715064f690d0689f30889846f4e2c5e7ec0c47e`.
-Both commands require explicit `--resume`, inventory durable work first, and
-schedule only missing identities. The `pause` command creates a marker consumed
-between bounded chunks; `unpause` clears it before resumption.
+Q0 is the unchanged authoritative Dataset-v2 Base evidence from issue #78 restricted to the same 611 tasks. Raw generations and Lean outcomes remain in the bound outside-Git artifact root; the committed JSON binds their atomic shard/result hashes and restart history.
 
-Each verification session primes its shared Lean preambles with the same
-120-second environment-probe allowance used by the authoritative Q0 evaluator,
-then retains the frozen 30-second timeout for each candidate. A failed shared
-probe aborts before any candidate classification is finalized, so a cold
-environment timeout cannot be mistaken for a model-level verifier result.
+**OBSERVED:** Arm A regressed significantly against Q0, while Arm B was statistically indistinguishable from Q0. The result supports the explicit instruction over raw intuition context, but does not establish that frozen intuition improves on theorem-only Q0.
 
-The local inference gate accepts the project RTX 4070 Ti by its Ada compute
-capability 8.9. The exact locked runtime and both workload-specific verifier
-environments have passed pre-inference identity and representative-preamble
-checks.
+## Scoring-excluded format diagnostic
 
-The vLLM allocation target is 0.89 rather than Q0's 0.95 because the current
-WSL display reservation leaves 10.78/11.99 GiB free before engine startup. This
-changes only the local cache-allocation ceiling: BF16 weights, 32,768-token
-context, request seeds, sampling, prompt bytes, and candidate budget remain
-unchanged. The adjustment was made with zero durable candidates after the 0.95
-engine preflight stopped before model loading. At 0.89 the exact engine then
-initialized successfully under a pre-set `PAUSE` marker with a 47,489-token KV
-cache and zero `llm.generate` calls, model outputs, or durable candidates. vLLM's
-normal internal dummy/profile forward during engine initialization remained
-local and is not a scientific candidate.
+`format-contamination-diagnostic.json` records a bounded mechanical wrapper check requested during execution. Transformed variants are diagnostic only and do not modify the raw-continuation classifications or any official metric above.
 
-Raw generations and verifier diagnostics remain outside Git under `artifacts/`.
-The final compact evidence will bind every shard/result hash and process-session
-history. No candidate has been generated at this checkpoint.
+No model was trained, no Q0 candidate was regenerated, and this result does not automatically change the training contract.

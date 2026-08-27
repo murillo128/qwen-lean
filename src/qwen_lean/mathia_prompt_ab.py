@@ -2200,6 +2200,7 @@ def render_results_readme(results: Mapping[str, Any]) -> str:
             )
     paired = results["combined"]["A_vs_B"]
     outcomes = paired["paired_outcomes"]
+    q0 = results["combined"]["q0_reference"]
     lines.extend(
         [
             "",
@@ -2210,10 +2211,49 @@ def render_results_readme(results: Mapping[str, Any]) -> str:
             f"{outcomes['both_solved']}/{outcomes['neither_solved']}. Exact "
             f"two-sided McNemar p={paired['exact_two_sided_mcnemar_p']:.6g}.",
             "",
+            "## Against the unchanged Q0 reference",
+            "",
+            "| interface | solved@8 | pass@1 | pass@4 | pass@8 | "
+            "Q0 fail -> pass | Q0 pass -> fail | McNemar p |",
+            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            f"| Q0 | {q0['tasks_solved_within_8']}/{q0['task_count']} | "
+            f"{q0['pass_at_k']['pass@1']:.6f} | "
+            f"{q0['pass_at_k']['pass@4']:.6f} | "
+            f"{q0['pass_at_k']['pass@8']:.6f} | — | — | — |",
+        ]
+    )
+    for arm_id in ARM_IDS:
+        arm = results["combined"]["arms"][arm_id]
+        comparison = results["combined"][f"Q0_vs_{arm_id}"]
+        comparison_outcomes = comparison["paired_outcomes"]
+        lines.append(
+            f"| {arm_id} | {arm['tasks_solved_within_k']['solved@8']}/"
+            f"{arm['task_count']} | {arm['pass_at_k']['pass@1']:.6f} | "
+            f"{arm['pass_at_k']['pass@4']:.6f} | "
+            f"{arm['pass_at_k']['pass@8']:.6f} | "
+            f"{comparison_outcomes['candidate_only']} | "
+            f"{comparison_outcomes['reference_only']} | "
+            f"{comparison['exact_two_sided_mcnemar_p']:.6g} |"
+        )
+    lines.extend(
+        [
+            "",
             "Q0 is the unchanged authoritative Dataset-v2 Base evidence from issue "
             "#78 restricted to the same 611 tasks. Raw generations and Lean outcomes "
             "remain in the bound outside-Git artifact root; the committed JSON binds "
             "their atomic shard/result hashes and restart history.",
+            "",
+            "**OBSERVED:** Arm A regressed significantly against Q0, while Arm B was "
+            "statistically indistinguishable from Q0. The result supports the explicit "
+            "instruction over raw intuition context, but does not establish that frozen "
+            "intuition improves on theorem-only Q0.",
+            "",
+            "## Scoring-excluded format diagnostic",
+            "",
+            "`format-contamination-diagnostic.json` records a bounded mechanical "
+            "wrapper check requested during execution. Transformed variants are "
+            "diagnostic only and do not modify the raw-continuation classifications or "
+            "any official metric above.",
             "",
             "No model was trained, no Q0 candidate was regenerated, and this result "
             "does not automatically change the training contract.",
