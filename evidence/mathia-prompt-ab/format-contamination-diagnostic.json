@@ -1,0 +1,72 @@
+{
+  "schema_version": "mathia-prompt-ab-format-contamination-diagnostic-v1",
+  "decision_marker": "OBSERVED",
+  "experiment_id": "qwen35-4b-base-mathia-prompt-ab-v1",
+  "manifest_sha256": "a878484aed23f127755e85dc03e077aabc1a2b8b8ecd8ca76fe3803a16e15cba",
+  "verifier_environment_set_sha256": "b4bf6652242cbb9109949b2df52c79804c4c11497cf17c1c7138bc6bc69c1c00",
+  "scoring_boundary": "Mechanical wrapper variants are diagnostic only. They do not modify raw continuations or issue #86 scientific classifications and are excluded from every official metric in results.json.",
+  "scope": {
+    "candidate_prefix_per_arm": 2184,
+    "prefix_selection": "immutable manifest order",
+    "coverage_caveat": "This is a bounded checkpoint diagnostic, not an exhaustive scan of either complete arm."
+  },
+  "arms": {
+    "A": {
+      "source_artifact_sha256": "2f4052714b80915024534c6d6bc94577b8c476ad6e4191777d8d37ccc2870e75",
+      "scientific_frontier_binding_sha256": "bd5b23f09385d453693839f48dbdada3e723f4bf34e9813388ea1375bfbc2e80",
+      "scientific_category_counts": {
+        "lean_rejected": 2088,
+        "verified": 61,
+        "verifier_timeout": 35,
+        "verifier_error": 0
+      },
+      "suspicious_raw_rejections": 72,
+      "mechanical_variants_tested": 75,
+      "variant_category_counts": {
+        "lean_rejected": 75,
+        "verified": 0,
+        "verifier_timeout": 0,
+        "verifier_error": 0
+      },
+      "raw_rejections_with_verified_mechanical_variant": 0,
+      "variant_set_sha256": "d8247e1d6c3431ae5258979aa503c1bb29bf6c93811cc19ce7609c4ca8f7b33b"
+    },
+    "B": {
+      "source_artifact_sha256": "425c98512c4d87e70db577f6adf7c27e5cd4d0894a8570c91bc42dc14413ebeb",
+      "scientific_frontier_binding_sha256": "273cb157ac35635fbb168569fbdc9fb2d8d48ac66c326c056fe5c2c3bb8aeaf9",
+      "scientific_category_counts": {
+        "lean_rejected": 2049,
+        "verified": 117,
+        "verifier_timeout": 18,
+        "verifier_error": 0
+      },
+      "raw_marker_counts_among_lean_rejected": {
+        "starts_extra_by": 219,
+        "starts_lean3_begin_wrapper": 47,
+        "contains_markdown_fence": 2,
+        "contains_latex_style_delimiter": 3,
+        "contains_sorry_or_admit": 235
+      },
+      "suspicious_raw_rejections": 190,
+      "mechanical_variants_tested": 194,
+      "variant_category_counts": {
+        "lean_rejected": 171,
+        "verified": 22,
+        "verifier_timeout": 1,
+        "verifier_error": 0
+      },
+      "raw_rejections_with_verified_mechanical_variant": 22,
+      "verified_variant_rate_among_scientific_rejections": {
+        "numerator": 22,
+        "denominator": 2049
+      },
+      "verified_variant_rate_over_full_prefix": {
+        "numerator": 22,
+        "denominator": 2184
+      },
+      "variant_set_sha256": "ba1d3ef09a7292a0991bba19122be561f0ad5cd9481c55f0ee3f723a9e7afd37"
+    }
+  },
+  "interpretation": "The explicit Arm B instruction improved the official paired Lean-verified result, but it did not eliminate output-format contamination. In the exact 2184-candidate B prefix, selected deterministic wrapper-only transforms exposed valid Lean proofs in 22 raw candidates that correctly remained scientific lean_rejected under the frozen raw-continuation evaluator. No such recovery occurred in the matched-size Arm A diagnostic.",
+  "limitations": "The diagnostic recognizes selected obvious wrappers only, is not an exhaustive parser, does not repair proof logic, covers only the exact prefix, and leaves one B mechanical variant inconclusive at the frozen 30-second verifier timeout."
+}

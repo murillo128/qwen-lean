@@ -1,0 +1,17 @@
+[project]
+name = "mathia-prompt-ab-runtime"
+version = "0.1.0"
+description = "Isolated resumable runtime for issue #86"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "qwen-lean",
+  "torch==2.13.0",
+  "transformers==5.15.1",
+  "vllm @ https://wheels.vllm.ai/41f179b57aa8ab6f634f508128ce1f1efadd0eb1/vllm-0.27.2rc1.dev203%2Bg41f179b57-cp38-abi3-manylinux_2_28_x86_64.whl",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+qwen-lean = { path = "../..", editable = true }
