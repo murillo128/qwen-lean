@@ -1393,7 +1393,23 @@ def summarize_canary_candidates(
             template_tasks[template].add(str(item["task_id"]).rsplit(":", 1)[0])
             template_occurrences[template] += 1
             template_verified[template] += item["category"] == "verified"
-        dominant = max(template_occurrences, key=template_occurrences.get)
+        dominant = max(
+            template_occurrences,
+            key=lambda template: (
+                template_occurrences[template],
+                len(template_tasks[template]),
+                template,
+            ),
+        )
+        template_statistics = [
+            {
+                "sha256": template,
+                "theorem_count": len(template_tasks[template]),
+                "occurrences": template_occurrences[template],
+                "verified_occurrences": template_verified[template],
+            }
+            for template in sorted(template_occurrences)
+        ]
         return {
             "task_count": len(task_ids),
             "candidate_count": len(lane_candidates),
@@ -1414,6 +1430,7 @@ def summarize_canary_candidates(
                 "p25": _percentile(token_counts, 0.25),
                 "median": _percentile(token_counts, 0.5),
                 "p75": _percentile(token_counts, 0.75),
+                "p90": _percentile(token_counts, 0.9),
                 "p95": _percentile(token_counts, 0.95),
                 "maximum": max(token_counts),
                 "le_64_fraction": sum(value <= 64 for value in token_counts) / len(token_counts),
@@ -1426,6 +1443,7 @@ def summarize_canary_candidates(
             ),
             "unique_normalized_templates": len(template_occurrences),
             "normalized_template_diversity": len(template_occurrences) / len(lane_candidates),
+            "template_statistics": template_statistics,
             "dominant_template": {
                 "sha256": dominant,
                 "theorem_count": len(template_tasks[dominant]),
@@ -1464,19 +1482,34 @@ def evaluate_collapse_gates(
 ) -> dict[str, Any]:
     gates = config.collapse_gates
     repeated_lanes = []
+    repeated_templates = []
     for interface in ("whole", "incremental"):
         lane = summary[interface]
-        dominant = lane["dominant_template"]
-        theorem_fraction = dominant["theorem_count"] / lane["task_count"]
-        verified_fraction = (
-            dominant["verified_occurrences"] / dominant["occurrences"]
-            if dominant["occurrences"]
-            else 0.0
-        )
-        if (
-            theorem_fraction >= gates["repeated_template"]["theorem_fraction_gte"]
-            and verified_fraction < gates["repeated_template"]["verified_occurrence_fraction_lt"]
-        ):
+        for template in lane["template_statistics"]:
+            theorem_fraction = template["theorem_count"] / lane["task_count"]
+            verified_fraction = (
+                template["verified_occurrences"] / template["occurrences"]
+                if template["occurrences"]
+                else 0.0
+            )
+            if (
+                theorem_fraction
+                >= gates["repeated_template"]["theorem_fraction_gte"]
+                and verified_fraction
+                < gates["repeated_template"]["verified_occurrence_fraction_lt"]
+            ):
+                repeated_templates.append(
+                    {
+                        "interface": interface,
+                        "sha256": template["sha256"],
+                        "theorem_count": template["theorem_count"],
+                        "occurrences": template["occurrences"],
+                        "verified_occurrences": template["verified_occurrences"],
+                        "theorem_fraction": theorem_fraction,
+                        "verified_occurrence_fraction": verified_fraction,
+                    }
+                )
+        if any(item["interface"] == interface for item in repeated_templates):
             repeated_lanes.append(interface)
     whole = summary["whole"]
     whole_candidates = whole["candidate_count"]
@@ -1496,6 +1529,7 @@ def evaluate_collapse_gates(
     return {
         "repeated_template_collapse": bool(repeated_lanes),
         "repeated_template_interfaces": repeated_lanes,
+        "repeated_templates": repeated_templates,
         "short_eos_collapse": short_eos,
         "catastrophic_base_coverage_loss": catastrophic_coverage,
         "eligible": not repeated_lanes and not short_eos and not catastrophic_coverage,

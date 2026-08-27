@@ -20,6 +20,18 @@ COLORS = {
     "C2": "#ea580c",
     "C3": "#16a34a",
 }
+MAJOR_CONSTRUCTS = (
+    "exact",
+    "constructor",
+    "apply",
+    "refine",
+    "rw",
+    "simp",
+    "intro",
+    "have",
+    "other",
+)
+STRUCTURAL_GROUPS = ("direct", "branching", "deep")
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -113,10 +125,12 @@ def _lane_summary(lane: Mapping[str, Any]) -> dict[str, Any]:
         "normalized_template_diversity": float(
             lane["normalized_template_diversity"]
         ),
+        "unique_normalized_templates": int(lane["unique_normalized_templates"]),
         "finish_reason_counts": finish_reasons,
         "eos_fraction": finish_reasons.get("eos", 0) / candidates,
         "generated_tokens": dict(lane["generated_tokens"]),
         "first_construct_counts": dict(lane["first_construct_counts"]),
+        "template_statistics": [dict(item) for item in lane["template_statistics"]],
         "dominant_template": dict(lane["dominant_template"]),
     }
 
@@ -154,6 +168,189 @@ def _rolling_mean(values: Sequence[float], window: int) -> list[float]:
             total -= values[index - window]
         result.append(total / min(index + 1, window))
     return result
+
+
+def _major_construct_counts(lane: Mapping[str, Any]) -> dict[str, int]:
+    result = {construct: 0 for construct in MAJOR_CONSTRUCTS}
+    for construct, count in lane["first_construct_counts"].items():
+        if construct in {"simp", "simp_all", "simp_rw", "simpa"}:
+            category = "simp"
+        elif construct in {"intro", "intros"}:
+            category = "intro"
+        elif construct in result and construct != "other":
+            category = construct
+        else:
+            category = "other"
+        result[category] += int(count)
+    return result
+
+
+def _trajectory_metric_rows(
+    base_point: Mapping[str, Any], points: Sequence[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+
+    def add(
+        point: Mapping[str, Any],
+        interface: str,
+        structural_group: str,
+        metric: str,
+        value: float | int,
+        *,
+        numerator: float | int | None = None,
+        denominator: float | int | None = None,
+    ) -> None:
+        row = {
+            "config": point.get("configuration_id", "Base"),
+            "optimizer_step": int(point["optimizer_step"]),
+            "interface": interface,
+            "structural_group": structural_group,
+            "metric": metric,
+            "value": value,
+        }
+        if numerator is not None:
+            row["numerator"] = numerator
+        if denominator is not None:
+            row["denominator"] = denominator
+        rows.append(row)
+
+    for point in (base_point, *points):
+        validation = point["validation"]
+        for interface in ("whole", "incremental"):
+            lane = validation[interface]
+            task_count = int(lane["task_count"])
+            candidate_count = int(lane["candidate_count"])
+            add(
+                point,
+                interface,
+                "aggregate",
+                "solved_at_8",
+                int(lane["solved_at_8"]),
+                numerator=int(lane["solved_at_8"]),
+                denominator=task_count,
+            )
+            add(
+                point,
+                interface,
+                "aggregate",
+                "verified_candidate_density",
+                float(lane["verified_density"]),
+                numerator=int(lane["verified_candidates"]),
+                denominator=candidate_count,
+            )
+            eos = int(lane["finish_reason_counts"].get("eos", 0))
+            add(
+                point,
+                interface,
+                "aggregate",
+                "eos_finish_fraction",
+                eos / candidate_count,
+                numerator=eos,
+                denominator=candidate_count,
+            )
+            for percentile in ("median", "p75", "p90"):
+                add(
+                    point,
+                    interface,
+                    "aggregate",
+                    f"generated_tokens_{percentile}",
+                    float(lane["generated_tokens"][percentile]),
+                    denominator=candidate_count,
+                )
+            add(
+                point,
+                interface,
+                "aggregate",
+                "normalized_template_diversity",
+                float(lane["normalized_template_diversity"]),
+                numerator=int(lane["unique_normalized_templates"]),
+                denominator=candidate_count,
+            )
+            for construct, count in _major_construct_counts(lane).items():
+                add(
+                    point,
+                    interface,
+                    "aggregate",
+                    f"first_construct_fraction_{construct}",
+                    count / candidate_count,
+                    numerator=count,
+                    denominator=candidate_count,
+                )
+
+        combined = validation["combined"]
+        add(
+            point,
+            "combined",
+            "aggregate",
+            "solved_at_8",
+            int(combined["solved_at_8"]),
+            numerator=int(combined["solved_at_8"]),
+            denominator=int(combined["interface_task_count"]),
+        )
+        add(
+            point,
+            "combined",
+            "aggregate",
+            "verified_candidate_density",
+            float(combined["verified_density"]),
+            numerator=int(combined["verified_candidates"]),
+            denominator=int(combined["candidate_count"]),
+        )
+        add(
+            point,
+            "combined",
+            "aggregate",
+            "normalized_template_diversity",
+            float(combined["normalized_template_diversity"]),
+            denominator=int(combined["candidate_count"]),
+        )
+        base_solved = int(base_point["validation"]["combined"]["solved_at_8"])
+        retained = (
+            base_solved
+            if point.get("configuration_id") is None
+            else int(point["base_comparison"]["retained_base_solved_interface_tasks"])
+        )
+        add(
+            point,
+            "combined",
+            "aggregate",
+            "base_solved_retention_count",
+            retained,
+            numerator=retained,
+            denominator=base_solved,
+        )
+        add(
+            point,
+            "combined",
+            "aggregate",
+            "mean_anchor_kl",
+            float(point["anchor_drift"]["mean_anchor_kl"]),
+            denominator=int(point["anchor_drift"]["anchor_count"]),
+        )
+
+        for structural_group in STRUCTURAL_GROUPS:
+            structural = point["structural_summary"][structural_group]
+            for interface in ("whole", "incremental"):
+                lane = structural[interface]
+                add(
+                    point,
+                    interface,
+                    structural_group,
+                    "solved_at_8",
+                    int(lane["solved_at_8"]),
+                    numerator=int(lane["solved_at_8"]),
+                    denominator=int(lane["task_count"]),
+                )
+                add(
+                    point,
+                    interface,
+                    structural_group,
+                    "verified_candidate_density",
+                    float(lane["verified_density"]),
+                    numerator=int(lane["verified_candidates"]),
+                    denominator=int(lane["candidate_count"]),
+                )
+    return rows
 
 
 def _svg_chart(
@@ -266,6 +463,7 @@ def compact_bounded_trajectory_evidence(
         "checkpoint_id": "Base",
         "optimizer_step": 0,
         "validation": _validation_summary(base),
+        "structural_summary": base["structural_summary"],
         "anchor_drift": {
             "anchor_count": 512,
             "all_finite": True,
@@ -277,7 +475,7 @@ def compact_bounded_trajectory_evidence(
         "compact_evidence_sha256": sha256_file(base_evidence_path),
     }
     points: list[dict[str, Any]] = []
-    training_curves: dict[str, dict[str, list[float]]] = {}
+    training_trajectories: dict[str, list[dict[str, Any]]] = {}
     shared_stream_identity: tuple[str, str] | None = None
     training_bindings: dict[str, Any] = {}
 
@@ -315,22 +513,23 @@ def compact_bounded_trajectory_evidence(
             "training_log_sha256": sha256_file(log_path),
             "runtime": dict(training["runtime"]),
         }
-        curve_fields = {
-            "sft_loss": [
-                _finite_number(row["sft_loss_mean"], "sft_loss") for row in rows
-            ],
-            "preservation_kl": [
-                _finite_number(row["preservation_kl"], "preservation_kl")
-                for row in rows
-            ],
-            "gradient_norm": [
-                _finite_number(row["gradient_norm_before_clipping"], "gradient_norm")
-                for row in rows
-            ],
-        }
-        training_curves[identifier] = {
-            key: _rolling_mean(values, 25) for key, values in curve_fields.items()
-        }
+        training_trajectories[identifier] = [
+            {
+                "optimizer_step": int(row["optimizer_step"]),
+                "learning_rate": _finite_number(row["learning_rate"], "learning_rate"),
+                "sft_loss": _finite_number(row["sft_loss_mean"], "sft_loss"),
+                "preservation_kl": _finite_number(
+                    row["preservation_kl"], "preservation_kl"
+                ),
+                "weighted_preservation_kl": _finite_number(
+                    row["weighted_preservation_kl"], "weighted_preservation_kl"
+                ),
+                "gradient_norm_before_clipping": _finite_number(
+                    row["gradient_norm_before_clipping"], "gradient_norm"
+                ),
+            }
+            for row in rows
+        ]
 
         for step in CHECKPOINT_STEPS:
             checkpoint = training["checkpoints"].get(str(step))
@@ -398,115 +597,255 @@ def compact_bounded_trajectory_evidence(
     ):
         raise ValueError("generalist-v3 failed step-500 gate evidence differs")
 
-    validation_series = []
-    for identifier in CONFIGURATION_IDS:
-        config_points = [
-            base_point,
-            *[point for point in points if point["configuration_id"] == identifier],
+    metric_rows = _trajectory_metric_rows(base_point, points)
+
+    def metric_series(
+        metric: str, interface: str, structural_group: str = "aggregate"
+    ) -> list[tuple[str, list[tuple[float, float]]]]:
+        base_values = [
+            (float(row["optimizer_step"]), float(row["value"]))
+            for row in metric_rows
+            if row["config"] == "Base"
+            and row["interface"] == interface
+            and row["structural_group"] == structural_group
+            and row["metric"] == metric
         ]
-        validation_series.append(
-            (
-                identifier,
-                [(point["optimizer_step"], point) for point in config_points],
+        if len(base_values) != 1:
+            raise ValueError(
+                f"generalist-v3 trajectory Base metric is incomplete: "
+                f"{interface}/{structural_group}/{metric}"
             )
-        )
-    validation_svg = _svg_chart(
-        title="Qwen-Lean v3 bounded validation trajectory",
-        panels=(
-            (
-                "Lean coverage",
-                "combined solved@8",
-                [
+        series = []
+        for identifier in CONFIGURATION_IDS:
+            values = [
+                (float(row["optimizer_step"]), float(row["value"]))
+                for row in metric_rows
+                if row["config"] == identifier
+                and row["interface"] == interface
+                and row["structural_group"] == structural_group
+                and row["metric"] == metric
+            ]
+            series.append((identifier, sorted([*base_values, *values])))
+        return series
+
+    plot_root = output_path.parent
+    plot_svgs: dict[str, tuple[Path, str]] = {
+        "validation": (
+            validation_plot_path,
+            _svg_chart(
+                title="Qwen-Lean v3 bounded validation overview",
+                panels=(
                     (
-                        identifier,
-                        [
-                            (step, point["validation"]["combined"]["solved_at_8"])
-                            for step, point in values
-                        ],
-                    )
-                    for identifier, values in validation_series
-                ],
-            ),
-            (
-                "Lean-valid candidate density",
-                "verified density",
-                [
+                        "Combined Lean coverage",
+                        "solved@8",
+                        metric_series("solved_at_8", "combined"),
+                    ),
                     (
-                        identifier,
-                        [
-                            (step, point["validation"]["combined"]["verified_density"])
-                            for step, point in values
-                        ],
-                    )
-                    for identifier, values in validation_series
-                ],
-            ),
-            (
-                "Output diversity",
-                "normalized diversity",
-                [
+                        "Combined Lean-valid density",
+                        "verified density",
+                        metric_series("verified_candidate_density", "combined"),
+                    ),
                     (
-                        identifier,
-                        [
-                            (
-                                step,
-                                point["validation"]["combined"][
-                                    "normalized_template_diversity"
-                                ],
-                            )
-                            for step, point in values
-                        ],
-                    )
-                    for identifier, values in validation_series
-                ],
-            ),
-            (
-                "Direct drift from Base",
-                "mean anchor KL",
-                [
+                        "Combined output diversity",
+                        "normalized diversity",
+                        metric_series("normalized_template_diversity", "combined"),
+                    ),
                     (
-                        identifier,
-                        [
-                            (step, point["anchor_drift"]["mean_anchor_kl"])
-                            for step, point in values
-                        ],
-                    )
-                    for identifier, values in validation_series
-                ],
+                        "Direct drift from Base",
+                        "mean anchor KL",
+                        metric_series("mean_anchor_kl", "combined"),
+                    ),
+                ),
             ),
         ),
-    )
-    training_svg = _svg_chart(
-        title="Qwen-Lean v3 bounded optimizer trajectory (25-step trailing means)",
-        panels=tuple(
-            (
-                title,
-                label,
-                [
+        "coverage": (
+            plot_root / "bounded-coverage-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 solved@8 trajectory by interface",
+                panels=tuple(
                     (
-                        identifier,
-                        list(
-                            zip(
-                                range(1, 501),
-                                training_curves[identifier][field],
-                                strict=True,
-                            )
+                        f"{interface} solved@8",
+                        "solved tasks",
+                        metric_series("solved_at_8", interface),
+                    )
+                    for interface in ("whole", "incremental")
+                ),
+            ),
+        ),
+        "verified_density": (
+            plot_root / "bounded-density-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 verified-candidate density by interface",
+                panels=tuple(
+                    (
+                        f"{interface} verified density",
+                        "verified density",
+                        metric_series("verified_candidate_density", interface),
+                    )
+                    for interface in ("whole", "incremental")
+                ),
+            ),
+        ),
+        "base_retention": (
+            plot_root / "bounded-base-retention-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 Base-solved retention (Base solved 0/96)",
+                panels=(
+                    (
+                        "Retained Base-solved interface tasks",
+                        "retained tasks",
+                        metric_series("base_solved_retention_count", "combined"),
+                    ),
+                ),
+            ),
+        ),
+        "eos": (
+            plot_root / "bounded-eos-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 EOS finish fraction by interface",
+                panels=tuple(
+                    (
+                        f"{interface} EOS fraction",
+                        "EOS fraction",
+                        metric_series("eos_finish_fraction", interface),
+                    )
+                    for interface in ("whole", "incremental")
+                ),
+            ),
+        ),
+        "length": (
+            plot_root / "bounded-length-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 generated-token trajectory by interface",
+                panels=tuple(
+                    (
+                        f"{interface} generated tokens {percentile}",
+                        "generated tokens",
+                        metric_series(f"generated_tokens_{percentile}", interface),
+                    )
+                    for interface in ("whole", "incremental")
+                    for percentile in ("median", "p75", "p90")
+                ),
+            ),
+        ),
+        "diversity": (
+            plot_root / "bounded-diversity-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 normalized-template diversity by interface",
+                panels=tuple(
+                    (
+                        f"{interface} normalized diversity",
+                        "normalized diversity",
+                        metric_series("normalized_template_diversity", interface),
+                    )
+                    for interface in ("whole", "incremental")
+                ),
+            ),
+        ),
+        "first_construct": (
+            plot_root / "bounded-first-construct-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 first-proof-construct fractions",
+                panels=tuple(
+                    (
+                        f"{interface}: {construct}",
+                        "candidate fraction",
+                        metric_series(
+                            f"first_construct_fraction_{construct}", interface
                         ),
                     )
-                    for identifier in CONFIGURATION_IDS
-                ],
-            )
-            for title, label, field in (
-                ("Target-only SFT loss", "loss", "sft_loss"),
-                ("Unweighted Base-preservation KL", "KL", "preservation_kl"),
-                ("Gradient norm before clipping", "gradient norm", "gradient_norm"),
-            )
+                    for interface in ("whole", "incremental")
+                    for construct in MAJOR_CONSTRUCTS
+                ),
+            ),
         ),
-    )
-    validation_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    validation_plot_path.write_text(validation_svg, encoding="utf-8")
-    training_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    training_plot_path.write_text(training_svg, encoding="utf-8")
+        "structural": (
+            plot_root / "bounded-structural-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 structural capability trajectory",
+                panels=tuple(
+                    (
+                        f"{structural_group} {interface} {label}",
+                        y_label,
+                        metric_series(metric, interface, structural_group),
+                    )
+                    for structural_group in STRUCTURAL_GROUPS
+                    for interface in ("whole", "incremental")
+                    for metric, label, y_label in (
+                        ("solved_at_8", "solved@8", "solved tasks"),
+                        (
+                            "verified_candidate_density",
+                            "verified density",
+                            "verified density",
+                        ),
+                    )
+                ),
+            ),
+        ),
+        "drift": (
+            plot_root / "bounded-drift-trajectory.svg",
+            _svg_chart(
+                title="Qwen-Lean v3 Base-preservation drift",
+                panels=(
+                    (
+                        "Mean anchor KL",
+                        "mean anchor KL",
+                        metric_series("mean_anchor_kl", "combined"),
+                    ),
+                ),
+            ),
+        ),
+        "training": (
+            training_plot_path,
+            _svg_chart(
+                title="Qwen-Lean v3 raw per-step optimizer trajectory",
+                panels=tuple(
+                    (
+                        title,
+                        label,
+                        [
+                            (
+                                identifier,
+                                [
+                                    (
+                                        float(row["optimizer_step"]),
+                                        float(row[field]),
+                                    )
+                                    for row in training_trajectories[identifier]
+                                ],
+                            )
+                            for identifier in CONFIGURATION_IDS
+                        ],
+                    )
+                    for title, label, field in (
+                        ("Target-only SFT loss", "loss", "sft_loss"),
+                        (
+                            "Unweighted Base-preservation KL",
+                            "KL",
+                            "preservation_kl",
+                        ),
+                        (
+                            "Weighted Base-preservation KL",
+                            "weighted KL",
+                            "weighted_preservation_kl",
+                        ),
+                        (
+                            "Gradient norm before clipping",
+                            "gradient norm",
+                            "gradient_norm_before_clipping",
+                        ),
+                    )
+                ),
+            ),
+        ),
+    }
+    for path, svg in plot_svgs.values():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(svg, encoding="utf-8")
+    plot_records = {
+        name: {"path": path.name, "sha256": sha256_file(path)}
+        for name, (path, _) in plot_svgs.items()
+    }
 
     evidence = {
         "schema_version": "generalist-v3-bounded-trajectory-evidence-v1",
@@ -522,22 +861,15 @@ def compact_bounded_trajectory_evidence(
         },
         "base": base_point,
         "checkpoints": points,
+        "validation_metric_rows": metric_rows,
+        "training_trajectories": training_trajectories,
         "training_bindings": training_bindings,
         "shared_training_stream": {
             "training_stream_sha256": shared_stream_identity[0],
             "training_stream_manifest_sha256": shared_stream_identity[1],
             "all_configurations_matched": True,
         },
-        "plots": {
-            "validation": {
-                "path": validation_plot_path.name,
-                "sha256": sha256_file(validation_plot_path),
-            },
-            "training": {
-                "path": training_plot_path.name,
-                "sha256": sha256_file(training_plot_path),
-            },
-        },
+        "plots": plot_records,
         "protocol": {
             "base_and_all_retained_checkpoints_included": True,
             "configurations": list(CONFIGURATION_IDS),
@@ -545,6 +877,9 @@ def compact_bounded_trajectory_evidence(
             "maximum_optimizer_updates": 500,
             "optimizer_updates_beyond_500": 0,
             "all_validation_compositions_evaluated": True,
+            "structural_groups_available": list(STRUCTURAL_GROUPS),
+            "raw_training_objective_rows_included": True,
+            "raw_retained_checkpoint_values_included": True,
             "truncation": False,
             "silent_exclusions": 0,
             "sealed_test_accessed": False,

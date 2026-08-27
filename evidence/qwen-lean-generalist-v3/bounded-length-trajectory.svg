@@ -1,0 +1,287 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1555" viewBox="0 0 1000 1555">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.line{fill:none;stroke-width:2.5}.point{stroke:#fff;stroke-width:1}</style>
+<text x="80.0" y="38" font-size="22" font-weight="700">Qwen-Lean v3 generated-token trajectory by interface</text>
+<text x="80.0" y="58.0" font-size="16" font-weight="700">whole generated tokens median</text>
+<line class="grid" x1="80.0" y1="240.00" x2="965.0" y2="240.00"/>
+<text x="70.0" y="244.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="197.50" x2="965.0" y2="197.50"/>
+<text x="70.0" y="201.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="155.00" x2="965.0" y2="155.00"/>
+<text x="70.0" y="159.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="112.50" x2="965.0" y2="112.50"/>
+<text x="70.0" y="116.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="70.00" x2="965.0" y2="70.00"/>
+<text x="70.0" y="74.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="240.0" x2="965.0" y2="240.0"/>
+<line class="axis" x1="80.0" y1="70.0" x2="80.0" y2="240.0"/>
+<text x="22.0" y="155.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 155.0)">generated tokens</text>
+<text x="80.00" y="260.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="260.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="260.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="260.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,82.59 257.00,237.54 522.50,237.23 965.00,237.23"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="237.54" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="237.23" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="237.23" r="3.5"/>
+<line x1="605.0" y1="52.0" x2="627.0" y2="52.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="56.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,82.59 257.00,239.08 522.50,193.12 965.00,233.85"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="239.08" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="193.12" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="233.85" r="3.5"/>
+<line x1="695.0" y1="52.0" x2="717.0" y2="52.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="56.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,82.59 257.00,237.62 522.50,148.92 965.00,234.54"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="237.62" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="148.92" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="234.54" r="3.5"/>
+<line x1="785.0" y1="52.0" x2="807.0" y2="52.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="56.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,82.59 257.00,237.23 522.50,212.72 965.00,236.62"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="237.23" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="212.72" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="236.62" r="3.5"/>
+<line x1="875.0" y1="52.0" x2="897.0" y2="52.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="56.0" font-size="11">C3</text>
+<text x="522.5" y="278.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="303.0" font-size="16" font-weight="700">whole generated tokens p75</text>
+<line class="grid" x1="80.0" y1="485.00" x2="965.0" y2="485.00"/>
+<text x="70.0" y="489.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="442.50" x2="965.0" y2="442.50"/>
+<text x="70.0" y="446.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="400.00" x2="965.0" y2="400.00"/>
+<text x="70.0" y="404.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="357.50" x2="965.0" y2="357.50"/>
+<text x="70.0" y="361.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="315.00" x2="965.0" y2="315.00"/>
+<text x="70.0" y="319.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="485.0" x2="965.0" y2="485.0"/>
+<line class="axis" x1="80.0" y1="315.0" x2="80.0" y2="485.0"/>
+<text x="22.0" y="400.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 400.0)">generated tokens</text>
+<text x="80.00" y="505.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="505.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="505.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="505.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,327.59 257.00,476.28 522.50,477.81 965.00,472.51"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="327.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="476.28" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="477.81" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="472.51" r="3.5"/>
+<line x1="605.0" y1="297.0" x2="627.0" y2="297.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="301.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,327.59 257.00,472.28 522.50,327.59 965.00,327.59"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="327.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="472.28" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="327.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="327.59" r="3.5"/>
+<line x1="695.0" y1="297.0" x2="717.0" y2="297.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="301.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,327.59 257.00,434.08 522.50,327.59 965.00,327.59"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="327.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="434.08" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="327.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="327.59" r="3.5"/>
+<line x1="785.0" y1="297.0" x2="807.0" y2="297.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="301.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,327.59 257.00,327.59 522.50,327.59 965.00,327.59"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="327.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="327.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="327.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="327.59" r="3.5"/>
+<line x1="875.0" y1="297.0" x2="897.0" y2="297.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="301.0" font-size="11">C3</text>
+<text x="522.5" y="523.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="548.0" font-size="16" font-weight="700">whole generated tokens p90</text>
+<line class="grid" x1="80.0" y1="730.00" x2="965.0" y2="730.00"/>
+<text x="70.0" y="734.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="687.50" x2="965.0" y2="687.50"/>
+<text x="70.0" y="691.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="645.00" x2="965.0" y2="645.00"/>
+<text x="70.0" y="649.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="602.50" x2="965.0" y2="602.50"/>
+<text x="70.0" y="606.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="560.00" x2="965.0" y2="560.00"/>
+<text x="70.0" y="564.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="730.0" x2="965.0" y2="730.0"/>
+<line class="axis" x1="80.0" y1="560.0" x2="80.0" y2="730.0"/>
+<text x="22.0" y="645.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 645.0)">generated tokens</text>
+<text x="80.00" y="750.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="750.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="750.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="750.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,572.59 257.00,572.59 522.50,572.59 965.00,572.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="572.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="572.59" r="3.5"/>
+<line x1="605.0" y1="542.0" x2="627.0" y2="542.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="546.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,572.59 257.00,572.59 522.50,572.59 965.00,572.59"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="572.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="572.59" r="3.5"/>
+<line x1="695.0" y1="542.0" x2="717.0" y2="542.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="546.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,572.59 257.00,572.59 522.50,572.59 965.00,572.59"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="572.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="572.59" r="3.5"/>
+<line x1="785.0" y1="542.0" x2="807.0" y2="542.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="546.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,572.59 257.00,572.59 522.50,572.59 965.00,572.59"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="572.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="572.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="572.59" r="3.5"/>
+<line x1="875.0" y1="542.0" x2="897.0" y2="542.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="546.0" font-size="11">C3</text>
+<text x="522.5" y="768.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="793.0" font-size="16" font-weight="700">incremental generated tokens median</text>
+<line class="grid" x1="80.0" y1="975.00" x2="965.0" y2="975.00"/>
+<text x="70.0" y="979.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="932.50" x2="965.0" y2="932.50"/>
+<text x="70.0" y="936.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="890.00" x2="965.0" y2="890.00"/>
+<text x="70.0" y="894.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="847.50" x2="965.0" y2="847.50"/>
+<text x="70.0" y="851.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="805.00" x2="965.0" y2="805.00"/>
+<text x="70.0" y="809.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="975.0" x2="965.0" y2="975.0"/>
+<line class="axis" x1="80.0" y1="805.0" x2="80.0" y2="975.0"/>
+<text x="22.0" y="890.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 890.0)">generated tokens</text>
+<text x="80.00" y="995.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="995.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="995.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="995.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,817.59 257.00,958.01 522.50,961.63 965.00,966.08"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="817.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="958.01" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="961.63" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="966.08" r="3.5"/>
+<line x1="605.0" y1="787.0" x2="627.0" y2="787.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="791.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,817.59 257.00,955.32 522.50,962.32 965.00,948.79"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="817.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="955.32" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="962.32" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="948.79" r="3.5"/>
+<line x1="695.0" y1="787.0" x2="717.0" y2="787.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="791.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,817.59 257.00,950.79 522.50,955.17 965.00,956.78"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="817.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="950.79" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="955.17" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="956.78" r="3.5"/>
+<line x1="785.0" y1="787.0" x2="807.0" y2="787.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="791.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,817.59 257.00,947.18 522.50,954.48 965.00,951.25"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="817.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="947.18" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="954.48" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="951.25" r="3.5"/>
+<line x1="875.0" y1="787.0" x2="897.0" y2="787.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="791.0" font-size="11">C3</text>
+<text x="522.5" y="1013.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1038.0" font-size="16" font-weight="700">incremental generated tokens p75</text>
+<line class="grid" x1="80.0" y1="1220.00" x2="965.0" y2="1220.00"/>
+<text x="70.0" y="1224.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1177.50" x2="965.0" y2="1177.50"/>
+<text x="70.0" y="1181.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="1135.00" x2="965.0" y2="1135.00"/>
+<text x="70.0" y="1139.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="1092.50" x2="965.0" y2="1092.50"/>
+<text x="70.0" y="1096.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="1050.00" x2="965.0" y2="1050.00"/>
+<text x="70.0" y="1054.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="1220.0" x2="965.0" y2="1220.0"/>
+<line class="axis" x1="80.0" y1="1050.0" x2="80.0" y2="1220.0"/>
+<text x="22.0" y="1135.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1135.0)">generated tokens</text>
+<text x="80.00" y="1240.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1240.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1240.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1240.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1062.59 257.00,1126.92 522.50,1161.39 965.00,1197.36"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1062.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1126.92" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1161.39" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1197.36" r="3.5"/>
+<line x1="605.0" y1="1032.0" x2="627.0" y2="1032.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1036.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1062.59 257.00,1148.94 522.50,1172.77 965.00,1100.18"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1062.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1148.94" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1172.77" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1100.18" r="3.5"/>
+<line x1="695.0" y1="1032.0" x2="717.0" y2="1032.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1036.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1062.59 257.00,1088.72 522.50,1153.29 965.00,1157.05"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1062.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1088.72" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1153.29" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1157.05" r="3.5"/>
+<line x1="785.0" y1="1032.0" x2="807.0" y2="1032.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1036.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1062.59 257.00,1102.25 522.50,1131.57 965.00,1139.45"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1062.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1102.25" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1131.57" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1139.45" r="3.5"/>
+<line x1="875.0" y1="1032.0" x2="897.0" y2="1032.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1036.0" font-size="11">C3</text>
+<text x="522.5" y="1258.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1283.0" font-size="16" font-weight="700">incremental generated tokens p90</text>
+<line class="grid" x1="80.0" y1="1465.00" x2="965.0" y2="1465.00"/>
+<text x="70.0" y="1469.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1422.50" x2="965.0" y2="1422.50"/>
+<text x="70.0" y="1426.50" font-size="11" text-anchor="end">276.5</text>
+<line class="grid" x1="80.0" y1="1380.00" x2="965.0" y2="1380.00"/>
+<text x="70.0" y="1384.00" font-size="11" text-anchor="end">553</text>
+<line class="grid" x1="80.0" y1="1337.50" x2="965.0" y2="1337.50"/>
+<text x="70.0" y="1341.50" font-size="11" text-anchor="end">829.4</text>
+<line class="grid" x1="80.0" y1="1295.00" x2="965.0" y2="1295.00"/>
+<text x="70.0" y="1299.00" font-size="11" text-anchor="end">1106</text>
+<line class="axis" x1="80.0" y1="1465.0" x2="965.0" y2="1465.0"/>
+<line class="axis" x1="80.0" y1="1295.0" x2="80.0" y2="1465.0"/>
+<text x="22.0" y="1380.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1380.0)">generated tokens</text>
+<text x="80.00" y="1485.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1485.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1485.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1485.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1307.59 257.00,1307.59 522.50,1307.59 965.00,1307.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1307.59" r="3.5"/>
+<line x1="605.0" y1="1277.0" x2="627.0" y2="1277.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1281.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1307.59 257.00,1307.59 522.50,1307.59 965.00,1307.59"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1307.59" r="3.5"/>
+<line x1="695.0" y1="1277.0" x2="717.0" y2="1277.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1281.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1307.59 257.00,1307.59 522.50,1307.59 965.00,1307.59"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1307.59" r="3.5"/>
+<line x1="785.0" y1="1277.0" x2="807.0" y2="1277.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1281.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1307.59 257.00,1307.59 522.50,1307.59 965.00,1307.59"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1307.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1307.59" r="3.5"/>
+<line x1="875.0" y1="1277.0" x2="897.0" y2="1277.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1281.0" font-size="11">C3</text>
+<text x="522.5" y="1503.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+</svg>

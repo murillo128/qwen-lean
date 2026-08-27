@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1065" viewBox="0 0 1000 1065">
 <rect width="100%" height="100%" fill="#ffffff"/>
 <style>text{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.line{fill:none;stroke-width:2.5}.point{stroke:#fff;stroke-width:1}</style>
-<text x="80.0" y="38" font-size="22" font-weight="700">Qwen-Lean v3 bounded validation trajectory</text>
-<text x="80.0" y="58.0" font-size="16" font-weight="700">Lean coverage</text>
+<text x="80.0" y="38" font-size="22" font-weight="700">Qwen-Lean v3 bounded validation overview</text>
+<text x="80.0" y="58.0" font-size="16" font-weight="700">Combined Lean coverage</text>
 <line class="grid" x1="80.0" y1="240.00" x2="965.0" y2="240.00"/>
 <text x="70.0" y="244.00" font-size="11" text-anchor="end">0</text>
 <line class="grid" x1="80.0" y1="197.50" x2="965.0" y2="197.50"/>
@@ -15,7 +15,7 @@
 <text x="70.0" y="74.00" font-size="11" text-anchor="end">6.48</text>
 <line class="axis" x1="80.0" y1="240.0" x2="965.0" y2="240.0"/>
 <line class="axis" x1="80.0" y1="70.0" x2="80.0" y2="240.0"/>
-<text x="22.0" y="155.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 155.0)">combined solved@8</text>
+<text x="22.0" y="155.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 155.0)">solved@8</text>
 <text x="80.00" y="260.0" font-size="11" text-anchor="middle">0</text>
 <text x="257.00" y="260.0" font-size="11" text-anchor="middle">100</text>
 <text x="522.50" y="260.0" font-size="11" text-anchor="middle">250</text>
@@ -49,7 +49,7 @@
 <line x1="875.0" y1="52.0" x2="897.0" y2="52.0" stroke="#16a34a" stroke-width="3"/>
 <text x="903.0" y="56.0" font-size="11">C3</text>
 <text x="522.5" y="278.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
-<text x="80.0" y="303.0" font-size="16" font-weight="700">Lean-valid candidate density</text>
+<text x="80.0" y="303.0" font-size="16" font-weight="700">Combined Lean-valid density</text>
 <line class="grid" x1="80.0" y1="485.00" x2="965.0" y2="485.00"/>
 <text x="70.0" y="489.00" font-size="11" text-anchor="end">0</text>
 <line class="grid" x1="80.0" y1="442.50" x2="965.0" y2="442.50"/>
@@ -96,7 +96,7 @@
 <line x1="875.0" y1="297.0" x2="897.0" y2="297.0" stroke="#16a34a" stroke-width="3"/>
 <text x="903.0" y="301.0" font-size="11">C3</text>
 <text x="522.5" y="523.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
-<text x="80.0" y="548.0" font-size="16" font-weight="700">Output diversity</text>
+<text x="80.0" y="548.0" font-size="16" font-weight="700">Combined output diversity</text>
 <line class="grid" x1="80.0" y1="730.00" x2="965.0" y2="730.00"/>
 <text x="70.0" y="734.00" font-size="11" text-anchor="end">0</text>
 <line class="grid" x1="80.0" y1="687.50" x2="965.0" y2="687.50"/>

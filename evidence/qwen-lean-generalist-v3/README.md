@@ -53,6 +53,12 @@ steps 100, 250, and 500. No optimizer update beyond step 500 occurred. The
 machine-readable Base-plus-12 trajectory is in `bounded-trajectory.json`; the
 validation and optimizer trajectories are plotted in
 `bounded-validation-trajectory.svg` and `bounded-training-trajectory.svg`.
+The complete deterministic plot package also includes separate whole and
+incremental coverage, verified density, EOS, median/p75/p90 length, diversity,
+Base-retention, first-construct, structural-capability, and anchor-drift SVGs.
+The aggregate JSON retains the 637 denominator-bearing validation metric rows,
+all 2,000 raw per-step objective rows, and every normalized template's theorem,
+occurrence, and verification counts needed to regenerate and audit those views.
 
 | Configuration | LR | Base KL weight | Step 100 solved / verified | Step 250 solved / verified | Step 500 solved / verified | Step 500 mean anchor KL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -62,8 +68,10 @@ validation and optimizer trajectories are plotted in
 | C3 rescue | 1e-5 | 0.3 | 0 / 0 | 2 / 2 | 0 / 0 | 0.3780 |
 
 Every solved and verified count is measured over the same complete 96-task,
-768-candidate validation canary. Every retained checkpoint failed the hard
-repeated-template gate in the whole-proof lane and is therefore ineligible,
+768-candidate validation canary. The hard gate evaluates every normalized
+template, rather than only the most frequent template. Every retained
+checkpoint failed the hard repeated-template gate in the whole-proof lane and
+is therefore ineligible,
 including the early checkpoints with nonzero Lean verification. C0 was always a
 diagnostic-only arm; its verified candidates coincided with much larger direct
 Base drift. C1, C2, and C3 show that the cached-logit preservation term

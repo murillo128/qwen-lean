@@ -1,6 +1,7 @@
 from qwen_lean.generalist_v3_reporting import (
     _checkpoint_training_summary,
     _lane_summary,
+    _major_construct_counts,
     _rolling_mean,
     _svg_chart,
 )
@@ -38,8 +39,28 @@ def test_lane_summary_includes_eos_lengths_and_proof_constructs() -> None:
         "verified_density": 0.125,
         "normalized_template_diversity": 0.75,
         "finish_reason_counts": {"eos": 6, "token_limit": 2},
-        "generated_tokens": {"median": 42.0, "le_64_fraction": 0.75},
-        "first_construct_counts": {"exact": 3, "constructor": 2, "term": 3},
+        "generated_tokens": {
+            "median": 42.0,
+            "p75": 64.0,
+            "p90": 96.0,
+            "le_64_fraction": 0.75,
+        },
+        "first_construct_counts": {
+            "exact": 1,
+            "constructor": 2,
+            "simp_all": 2,
+            "intros": 1,
+            "term": 2,
+        },
+        "unique_normalized_templates": 6,
+        "template_statistics": [
+            {
+                "sha256": "abc",
+                "occurrences": 2,
+                "theorem_count": 1,
+                "verified_occurrences": 1,
+            }
+        ],
         "dominant_template": {
             "sha256": "abc",
             "occurrences": 2,
@@ -51,6 +72,19 @@ def test_lane_summary_includes_eos_lengths_and_proof_constructs() -> None:
     assert summary["eos_fraction"] == 0.75
     assert summary["generated_tokens"]["median"] == 42.0
     assert summary["first_construct_counts"]["constructor"] == 2
+    assert summary["unique_normalized_templates"] == 6
+    assert summary["template_statistics"][0]["sha256"] == "abc"
+    assert _major_construct_counts(summary) == {
+        "exact": 1,
+        "constructor": 2,
+        "apply": 0,
+        "refine": 0,
+        "rw": 0,
+        "simp": 2,
+        "intro": 1,
+        "have": 0,
+        "other": 2,
+    }
 
 
 def test_reporting_svg_and_rolling_mean_are_deterministic() -> None:

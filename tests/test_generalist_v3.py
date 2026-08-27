@@ -190,6 +190,54 @@ def test_canary_summary_collapse_gate_and_positive_gate() -> None:
     assert positive_500_step_gate(config, collapsed, base, gates) is False
 
 
+def test_repeated_template_gate_checks_every_template() -> None:
+    config = GeneralistV3Config.load(ROOT / "config/qwen35-4b-generalist-v3.json")
+
+    def lane(*, templates):
+        return {
+            "task_count": 48,
+            "candidate_count": 384,
+            "solved_at_8": 1,
+            "finish_reason_counts": {"eos": 100, "token_limit": 284},
+            "generated_tokens": {"le_64_fraction": 0.1},
+            "dominant_template": templates[0],
+            "template_statistics": templates,
+        }
+
+    dense_but_narrow = {
+        "sha256": "dense",
+        "theorem_count": 10,
+        "occurrences": 80,
+        "verified_occurrences": 0,
+    }
+    wide_contract_violation = {
+        "sha256": "wide",
+        "theorem_count": 24,
+        "occurrences": 24,
+        "verified_occurrences": 0,
+    }
+    safe = {
+        "sha256": "safe",
+        "theorem_count": 1,
+        "occurrences": 1,
+        "verified_occurrences": 0,
+    }
+    summary = {
+        "whole": lane(templates=[dense_but_narrow, wide_contract_violation]),
+        "incremental": lane(templates=[safe]),
+        "combined": {"solved_at_8": 2},
+    }
+    base = {
+        "whole": {"solved_at_8": 0},
+        "combined": {"solved_at_8": 0},
+    }
+    gates = evaluate_collapse_gates(config, summary, base, retained_base_solved=0)
+    assert gates["repeated_template_collapse"] is True
+    assert gates["repeated_template_interfaces"] == ["whole"]
+    assert [item["sha256"] for item in gates["repeated_templates"]] == ["wide"]
+    assert gates["eligible"] is False
+
+
 def test_incremental_canary_templates_include_the_frozen_prefix() -> None:
     task_ids = ["t:whole", "t:incremental"]
     metadata = {
@@ -202,6 +250,8 @@ def test_incremental_canary_templates_include_the_frozen_prefix() -> None:
     assert summary["whole"]["solved_task_ids"] == ["t:whole"]
     assert summary["incremental"]["solved_task_ids"] == ["t:incremental"]
     assert summary["incremental"]["unique_normalized_templates"] == 8
+    assert len(summary["incremental"]["template_statistics"]) == 8
+    assert summary["incremental"]["generated_tokens"]["p90"] == 8.0
 
 
 def test_selection_is_lexicographic_and_excludes_control() -> None:
