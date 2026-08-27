@@ -68,3 +68,49 @@ The Q0-pass/B-fail selection compares two stochastic n=8 samples from different 
 `q0-b-regressions/raw-b-candidates.jsonl` contains exactly 184 untouched Arm-B continuations. `q0-b-regressions/q0-verified-candidates.jsonl` contains all 31 authoritative verified Q0 continuations for the same tasks. All transformed candidates are separate in `q0-b-regressions/transformed-b-candidates.jsonl` and reference their source raw SHA-256.
 
 A fresh checkout can audit the committed subset with `uv run pytest -q tests/test_mathia_prompt_ab_regressions.py`. Recomputing the Lean diagnostic additionally requires the frozen #86 artifact root, both frozen Lean projects, and the hash-matching Q0 recovery archive; the complete CLI is available through `python -m qwen_lean.mathia_prompt_ab_regressions --help`.
+
+## Structural Q0/B transitions
+
+The frozen structural field covers 388/611 matched tasks. The remaining 223 MiniF2F tasks have a null structural class; no class is inferred for them. `multi-step` is not present as a pre-existing class in the frozen manifest.
+
+| structural class | coverage | both | Q0 only | B only | neither |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| direct | 129 | 4 | 5 | 4 | 116 |
+| multi-step | unavailable | — | — | — | — |
+| branching | 133 | 1 | 0 | 5 | 127 |
+| deep | 126 | 3 | 1 | 2 | 120 |
+| unavailable (MiniF2F) | 223 | 42 | 17 | 19 | 145 |
+
+These are paired descriptive counts only; the report does not value one structural class over another or infer causal guidance effects.
+
+## Unknown-reference call sites and single-node oracle
+
+Official diagnostics contain 32 unknown-reference occurrences across 23 Arm-B candidates. The first call site is reconstructed for 23 candidates and the prefix replays through the captured state for 22 candidates.
+
+| single-node oracle outcome | candidates |
+| --- | ---: |
+| oracle_closes_parent | 0 |
+| oracle_advances_then_fails | 1 |
+| oracle_reaches_second_unknown | 1 |
+| oracle_no_material_progress | 0 |
+| oracle_not_testable | 21 |
+
+Anti-vacuity flags: `root_target_restatement`=0, `current_subgoal_oracle`=0, `strict_intermediate_fact`=0, `equivalence_not_determined`=2.
+
+Bounded mechanical reference evidence classes: `candidate_formal_obligation_extracted`=4, `exact_bounded_declaration_match`=2, `undetermined`=17. Only `exact_bounded_declaration_match` denotes a frozen-environment name match; candidate obligations are syntax/state extractions. Neither is a semantic API attribution.
+
+Candidate-node extraction status: `candidate_formal_obligation_extracted`=5, `candidate_node_not_determined`=18. The extracted objects preserve only the exact goal/context before a mechanically identified proof-producing call; node quality remains undetermined.
+
+Every intervention is scoring-excluded, replaces at most the first unknown expression with `(by sorry)`, and never supplies a second unknown. The evidence records exact prefix/state/type bindings and does not decide whether a missing node is useful or which architecture component owns it.
+
+## Stopping and control evidence
+
+`No goals to be solved` occurs in 29 official candidate diagnostics. Ordered raw line-prefix hashes are retained for a future authorized prefix-recovery study, but none is marked recovered here. Token limits remain separate: 48 candidates across 17 tasks.
+
+## Availability and interpretation boundary
+
+- MiniF2F structural classes: unavailable in the frozen manifest.
+- `multi-step` structural class: unavailable in the frozen manifest.
+- Call sites whose line-boundary prefix or contextual type cannot be reconstructed are recorded as `oracle_not_testable`.
+- Closed-goal history before a call is not exposed by the frozen tactic-state snapshot and is recorded as unavailable rather than estimated.
+- Architectural, causal, node-quality, and training interpretation remains deferred to ChatGPT/user review.

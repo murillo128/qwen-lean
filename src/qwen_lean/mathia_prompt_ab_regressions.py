@@ -3,12 +3,18 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
+import signal
+import subprocess
+import tempfile
+import time
 from collections import Counter, deque
+from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Mapping, Sequence
+from typing import Any
 
 from .dataset_v2 import sha256_file
 from .mathia_prompt_ab import (
@@ -23,20 +29,20 @@ from .mathia_prompt_ab import (
     _load_q0_reference,
     _sha256_json,
     _sha256_text,
-    bind_tasks,
     inventory_generations,
     inventory_verifications,
     validate_execution_manifest,
     verifier_environment_identities,
 )
+from .prompt import normalize_transport, render_prompt, render_proof_request
 from .schema import TaskRecord
 from .verifier import LeanVerifier, VerificationOutcome
 
-
-ANALYSIS_SCHEMA_VERSION = "mathia-q0-b-regression-analysis-v2"
+ANALYSIS_SCHEMA_VERSION = "mathia-q0-b-regression-analysis-v3"
 RAW_B_SCHEMA_VERSION = "mathia-q0-b-regression-raw-b-candidate-v1"
 RAW_Q0_SCHEMA_VERSION = "mathia-q0-b-regression-q0-verified-candidate-v1"
 TRANSFORMED_SCHEMA_VERSION = "mathia-q0-b-regression-transformed-candidate-v1"
+ORACLE_SCHEMA_VERSION = "mathia-q0-b-regression-single-node-oracle-v1"
 EXPECTED_REGRESSION_TASKS = 23
 EXPECTED_REGRESSION_COUNTS = {
     "minif2f-valid-clean-v2": 17,
@@ -70,6 +76,17 @@ _THEOREM_REPETITION = re.compile(r"(?m)^\s*(?:theorem|lemma)\s+[A-Za-z0-9_'.]+")
 _UNKNOWN_REFERENCE = re.compile(
     r"Unknown (?P<kind>identifier|constant|declaration) "
     r"`(?P<name>[^`\r\n]+)`",
+    re.IGNORECASE,
+)
+_UNKNOWN_REFERENCE_AT = re.compile(
+    r"Candidate\.lean:(?P<line>[0-9]+):(?P<column>[0-9]+):[^\r\n]*?"
+    r"Unknown (?P<kind>identifier|constant|declaration) "
+    r"`(?P<name>[^`\r\n]+)`",
+    re.IGNORECASE,
+)
+_LEAN_ERROR_AT = re.compile(
+    r"Candidate\.lean:(?P<line>[0-9]+):(?P<column>[0-9]+): "
+    r"error(?:\([^\r\n)]*\))?: (?P<message>[^\r\n]*)",
     re.IGNORECASE,
 )
 _QUALIFIED_LEAN_IDENTIFIER = re.compile(
@@ -161,12 +178,120 @@ _TACTIC_FAMILIES = (
     "simp",
 )
 
+_STRUCTURAL_CLASSES = ("direct", "branching", "deep")
+_TRANSITION_BUCKETS = ("both", "q0_only", "b_only", "neither")
+_ORACLE_OUTCOMES = (
+    "oracle_closes_parent",
+    "oracle_advances_then_fails",
+    "oracle_reaches_second_unknown",
+    "oracle_no_material_progress",
+    "oracle_not_testable",
+)
+_ANTI_VACUITY_FLAGS = (
+    "root_target_restatement",
+    "current_subgoal_oracle",
+    "strict_intermediate_fact",
+    "equivalence_not_determined",
+)
+_LEAN_TOKEN = re.compile(
+    r"[A-Za-z_][A-Za-z0-9_'.\u2080-\u2089]*|[0-9]+|[^\s]"
+)
+
+_DIAGNOSTIC_PRELUDE = r'''
+namespace QwenLeanIssue93Diagnostic
+
+open Lean Elab Term Tactic Meta
+
+elab "__qwenCaptureAndClose" : tactic => do
+  let goals <- getUnsolvedGoals
+  logInfo m!"QWEN_STATE_BEGIN\n{goalsToMessageData goals}\nQWEN_STATE_END"
+  for goal in goals do
+    goal.withContext do
+      goal.assign (<- mkSorry (<- goal.getType) true)
+  setGoals []
+
+syntax "__qwenOracle" str : term
+elab_rules : term <= expectedType
+  | `(__qwenOracle $name:str) => do
+    let expectedType <- instantiateMVars expectedType
+    if expectedType.hasExprMVar then
+      tryPostpone
+    let unknown := name.getString
+    let exactDeclarationExists := (<- getEnv).contains unknown.toName
+    let proposition <- isProp expectedType
+    logInfo m!"QWEN_ORACLE_BEGIN\nunknown: {unknown}\ntype_begin\n{expectedType}\ntype_end\nis_prop: {proposition}\nexact_declaration_exists: {exactDeclarationExists}\ncurrent_defeq: not_checked\nroot_defeq: not_checked\nQWEN_ORACLE_END"
+    mkSorry expectedType true
+
+syntax "__qwenOracleCompare" str "," term "," term : term
+elab_rules : term <= expectedType
+  | `(__qwenOracleCompare $name:str, $current, $root) => do
+    let expectedType <- instantiateMVars expectedType
+    if expectedType.hasExprMVar then
+      tryPostpone
+    let unknown := name.getString
+    let currentType <- elabType current
+    let rootType <- elabType root
+    let currentDefEq <- isDefEq expectedType currentType
+    let rootDefEq <- isDefEq expectedType rootType
+    let exactDeclarationExists := (<- getEnv).contains unknown.toName
+    let proposition <- isProp expectedType
+    logInfo m!"QWEN_ORACLE_BEGIN\nunknown: {unknown}\ntype_begin\n{expectedType}\ntype_end\nis_prop: {proposition}\nexact_declaration_exists: {exactDeclarationExists}\ncurrent_defeq: {currentDefEq}\nroot_defeq: {rootDefEq}\nQWEN_ORACLE_END"
+    mkSorry expectedType true
+
+syntax "#qwenCheckDecl" str : command
+elab_rules : command
+  | `(#qwenCheckDecl $name:str) => do
+    let candidate := name.getString
+    let observed := (<- getEnv).contains candidate.toName
+    logInfo m!"QWEN_DECL|{candidate}|{observed}"
+
+end QwenLeanIssue93Diagnostic
+'''.strip()
+
+_STATE_MESSAGE = re.compile(
+    r"QWEN_STATE_BEGIN\n(?P<state>.*?)\nQWEN_STATE_END", re.DOTALL
+)
+_ORACLE_MESSAGE = re.compile(
+    r"QWEN_ORACLE_BEGIN\n(?P<body>.*?)\nQWEN_ORACLE_END", re.DOTALL
+)
+_DECLARATION_CHECK_MESSAGE = re.compile(
+    r"QWEN_DECL\|(?P<name>[^|\r\n]+)\|(?P<exists>true|false)"
+)
+
 
 @dataclass(frozen=True)
 class MechanicalVariant:
     transform_sequence: tuple[str, ...]
     transformed_text: str
     transformed_sha256: str
+
+
+@dataclass(frozen=True)
+class UnknownReferenceSite:
+    workload: str
+    task_id: str
+    task_ordinal: int
+    candidate_index: int
+    candidate_id: str
+    raw_sha256: str
+    raw_text: str
+    unknown_name: str
+    unknown_kind: str
+    source_line: int
+    source_column: int
+    raw_start: int
+    raw_end: int
+    command_start: int
+    command_end: int
+
+
+@dataclass(frozen=True)
+class DiagnosticRun:
+    category: str
+    lean_exit_code: int | None
+    stdout: str
+    stderr: str
+    latency_seconds: float
 
 
 def _iter_jsonl_bytes(path: Path) -> Iterator[tuple[int, bytes, dict[str, Any]]]:
@@ -188,6 +313,450 @@ def _write_jsonl(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
     payload = _jsonl_payload(rows)
     _atomic_write(path, payload)
     return hashlib.sha256(payload).hexdigest()
+
+
+def structural_transition_evidence(
+    manifest: Mapping[str, Any],
+    verification_by_id: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    members: list[dict[str, Any]] = []
+    for task in manifest["tasks"]:
+        q0_solved = int(task["q0_verified_candidate_count"]) > 0
+        b_solved = any(
+            verification_by_id[str(candidate_id)]["category"] == "verified"
+            for candidate_id in task["candidate_slots"]["B"]
+        )
+        if q0_solved and b_solved:
+            transition = "both"
+        elif q0_solved:
+            transition = "q0_only"
+        elif b_solved:
+            transition = "b_only"
+        else:
+            transition = "neither"
+        structural_class = task.get("metadata", {}).get("structural_class")
+        if structural_class not in _STRUCTURAL_CLASSES:
+            structural_class = None
+        members.append(
+            {
+                "ordinal": int(task["ordinal"]),
+                "workload": str(task["workload_id"]),
+                "task_id": str(task["task_id"]),
+                "structural_class": structural_class,
+                "q0_solved_at_8": q0_solved,
+                "b_solved_at_8": b_solved,
+                "transition_bucket": transition,
+            }
+        )
+
+    by_class: dict[str, Any] = {}
+    for structural_class in _STRUCTURAL_CLASSES:
+        selected = [
+            row for row in members if row["structural_class"] == structural_class
+        ]
+        counts = Counter(str(row["transition_bucket"]) for row in selected)
+        by_class[structural_class] = {
+            "availability": "available",
+            "task_count": len(selected),
+            "transition_counts": {
+                bucket: counts[bucket] for bucket in _TRANSITION_BUCKETS
+            },
+        }
+    unavailable = [row for row in members if row["structural_class"] is None]
+    unavailable_counts = Counter(
+        str(row["transition_bucket"]) for row in unavailable
+    )
+    classified_workloads = Counter(
+        str(row["workload"])
+        for row in members
+        if row["structural_class"] is not None
+    )
+    unavailable_workloads = Counter(
+        str(row["workload"])
+        for row in members
+        if row["structural_class"] is None
+    )
+    return {
+        "population_task_count": len(members),
+        "classification_source": {
+            "field": "execution-manifest.tasks[].metadata.structural_class",
+            "rule": (
+                "Use only the frozen Dataset-v2 fresh-composition value when it is "
+                "exactly direct, branching, or deep; preserve all other values as "
+                "unavailable without inferring from Q0/B outcomes or output length."
+            ),
+            "outcome_independent": True,
+        },
+        "coverage": {
+            "classified_task_count": len(members) - len(unavailable),
+            "unavailable_task_count": len(unavailable),
+            "classified_workloads": dict(sorted(classified_workloads.items())),
+            "unavailable_workloads": dict(sorted(unavailable_workloads.items())),
+            "multi_step": (
+                "not_available: no pre-existing multi-step structural class is present "
+                "in the frozen 611-task manifest"
+            ),
+        },
+        "aggregate_by_structural_class": {
+            "direct": by_class["direct"],
+            "multi-step": {
+                "availability": "not_available",
+                "task_count": None,
+                "transition_counts": None,
+            },
+            "branching": by_class["branching"],
+            "deep": by_class["deep"],
+            "unavailable": {
+                "availability": "structural_class_null",
+                "task_count": len(unavailable),
+                "transition_counts": {
+                    bucket: unavailable_counts[bucket]
+                    for bucket in _TRANSITION_BUCKETS
+                },
+            },
+        },
+        "members": members,
+        "sampling_caveat": (
+            "Paired solved@8 transitions are descriptive outcomes from stochastic n=8 "
+            "samples; this stratification does not establish a causal guidance effect."
+        ),
+    }
+
+
+def _run_diagnostic_source(
+    project_root: Path,
+    source: str,
+    *,
+    timeout_seconds: float,
+) -> DiagnosticRun:
+    started = time.perf_counter()
+    try:
+        with tempfile.TemporaryDirectory(prefix="qwen-lean-issue93-") as temporary_dir:
+            source_path = Path(temporary_dir) / "Candidate.lean"
+            source_path.write_text(source, encoding="utf-8", newline="\n")
+            process = subprocess.Popen(
+                ["lake", "env", "lean", str(source_path)],
+                cwd=project_root.resolve(),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                start_new_session=True,
+            )
+            try:
+                stdout, stderr = process.communicate(timeout=timeout_seconds)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    process.kill()
+                stdout, stderr = process.communicate()
+                return DiagnosticRun(
+                    category="verifier_timeout",
+                    lean_exit_code=None,
+                    stdout=stdout.replace(str(source_path), "Candidate.lean"),
+                    stderr=stderr.replace(str(source_path), "Candidate.lean"),
+                    latency_seconds=time.perf_counter() - started,
+                )
+    except (OSError, ValueError) as error:
+        return DiagnosticRun(
+            category="verifier_error",
+            lean_exit_code=None,
+            stdout="",
+            stderr=str(error),
+            latency_seconds=time.perf_counter() - started,
+        )
+
+    stdout = stdout.replace(str(source_path), "Candidate.lean")
+    stderr = stderr.replace(str(source_path), "Candidate.lean")
+    has_error = any(
+        ": error" in line for stream in (stdout, stderr) for line in stream.splitlines()
+    )
+    return DiagnosticRun(
+        category=(
+            "verified" if process.returncode == 0 and not has_error else "lean_rejected"
+        ),
+        lean_exit_code=process.returncode,
+        stdout=stdout,
+        stderr=stderr,
+        latency_seconds=time.perf_counter() - started,
+    )
+
+
+def _instrumented_source(
+    task: TaskRecord,
+    candidate: str,
+    *,
+    declaration_queries: Sequence[str] = (),
+) -> str:
+    queries = "\n".join(
+        f"#qwenCheckDecl {json.dumps(name, ensure_ascii=False)}"
+        for name in declaration_queries
+    )
+    middle = _DIAGNOSTIC_PRELUDE + ("\n" + queries if queries else "")
+    return (
+        f"{task.preamble}\n\n{middle}\n\n{render_proof_request(task.declaration)}"
+        f"{normalize_transport(candidate)}\n"
+    )
+
+
+def _plain_source(task: TaskRecord, candidate: str) -> str:
+    return f"{render_prompt(task)}{normalize_transport(candidate)}\n"
+
+
+def _combined_diagnostics(run: DiagnosticRun) -> str:
+    return run.stdout + "\n" + run.stderr
+
+
+def _parse_state(run: DiagnosticRun) -> dict[str, Any] | None:
+    match = _STATE_MESSAGE.search(_combined_diagnostics(run))
+    if match is None:
+        return None
+    state = match.group("state").strip()
+    target_matches = list(re.finditer(r"(?m)^\u22a2\s?", state))
+    if not target_matches:
+        return None
+    first_target = target_matches[0]
+    next_case = re.search(r"\n\ncase\s", state[first_target.end() :])
+    target_end = (
+        first_target.end() + next_case.start()
+        if next_case is not None
+        else len(state)
+    )
+    context = state[: first_target.start()].strip()
+    context_lines = [
+        line
+        for line in context.splitlines()
+        if line.strip() and not line.startswith("case ")
+    ]
+    focused_goal = state[first_target.end() : target_end].strip()
+    return {
+        "proof_state": state,
+        "proof_state_sha256": _sha256_text(state),
+        "open_goal_count": len(target_matches),
+        "focused_goal": focused_goal,
+        "focused_goal_sha256": _sha256_text(focused_goal),
+        "focused_local_context": context,
+        "focused_local_context_lines": context_lines,
+    }
+
+
+def _parse_oracle_message(run: DiagnosticRun) -> dict[str, Any] | None:
+    match = _ORACLE_MESSAGE.search(_combined_diagnostics(run))
+    if match is None:
+        return None
+    body = match.group("body")
+    type_match = re.search(r"type_begin\n(?P<type>.*?)\ntype_end", body, re.DOTALL)
+    if type_match is None:
+        return None
+
+    def value(label: str) -> str | None:
+        observed = re.search(rf"(?m)^{re.escape(label)}: ([^\r\n]+)$", body)
+        return observed.group(1) if observed is not None else None
+
+    def boolean(label: str) -> bool | None:
+        observed = value(label)
+        if observed == "true":
+            return True
+        if observed == "false":
+            return False
+        return None
+
+    inferred_type = type_match.group("type").strip()
+    return {
+        "unknown_name": value("unknown"),
+        "inferred_type": inferred_type,
+        "inferred_type_contains_metavariables": (
+            re.search(r"\?m\.[0-9]+|\?_", inferred_type) is not None
+        ),
+        "inferred_type_is_proposition": boolean("is_prop"),
+        "exact_unknown_declaration_exists": boolean(
+            "exact_declaration_exists"
+        ),
+        "definitionally_equal_to_current_goal": boolean("current_defeq"),
+        "definitionally_equal_to_root_target": boolean("root_defeq"),
+    }
+
+
+def _line_column_offset(text: str, line: int, column: int, needle: str) -> int | None:
+    lines = text.splitlines(keepends=True)
+    if line < 1 or line > len(lines):
+        return None
+    line_text = lines[line - 1]
+    starts = [match.start() for match in re.finditer(re.escape(needle), line_text)]
+    if not starts:
+        return None
+    expected = max(column - 1, 0)
+    start = min(starts, key=lambda value: abs(value - expected))
+    return sum(len(value) for value in lines[: line - 1]) + start
+
+
+def _locate_first_unknown_site(
+    task: Mapping[str, Any],
+    bound: BoundTask,
+    raw: Mapping[str, Any],
+    official_result: Mapping[str, Any],
+) -> tuple[UnknownReferenceSite | None, str | None]:
+    raw_text = str(raw["raw_text"])
+    normalized_text = normalize_transport(raw_text)
+    if "\r" in raw_text or not raw_text.startswith(normalized_text):
+        return None, "raw continuation has non-suffix transport normalization"
+    diagnostics = _diagnostic_text(official_result)
+    observations = list(_UNKNOWN_REFERENCE_AT.finditer(diagnostics))
+    if not observations:
+        return None, "official unknown-reference diagnostic has no source position"
+    official_source = _plain_source(bound.task, raw_text)
+    source_prefix_length = len(render_prompt(bound.task))
+    located: list[tuple[int, re.Match[str]]] = []
+    for observation in observations:
+        offset = _line_column_offset(
+            official_source,
+            int(observation.group("line")),
+            int(observation.group("column")),
+            observation.group("name"),
+        )
+        if offset is not None and offset >= source_prefix_length:
+            located.append((offset, observation))
+    if not located:
+        return None, "unknown-reference source position cannot be bound to raw text"
+    source_offset, observation = min(located, key=lambda item: item[0])
+    raw_start = source_offset - source_prefix_length
+    unknown_name = observation.group("name")
+    raw_end = raw_start + len(unknown_name)
+    if raw_text[raw_start:raw_end] != unknown_name:
+        return None, "unknown-reference source span differs from raw text"
+    command_start = raw_text.rfind("\n", 0, raw_start) + 1
+    command_end = raw_text.find("\n", raw_end)
+    if command_end < 0:
+        command_end = len(raw_text)
+    return (
+        UnknownReferenceSite(
+            workload=str(task["workload_id"]),
+            task_id=str(task["task_id"]),
+            task_ordinal=int(task["ordinal"]),
+            candidate_index=int(raw["candidate_index"]),
+            candidate_id=str(raw["candidate_id"]),
+            raw_sha256=str(raw["raw_sha256"]),
+            raw_text=raw_text,
+            unknown_name=unknown_name,
+            unknown_kind=observation.group("kind").lower(),
+            source_line=int(observation.group("line")),
+            source_column=int(observation.group("column")),
+            raw_start=raw_start,
+            raw_end=raw_end,
+            command_start=command_start,
+            command_end=command_end,
+        ),
+        None,
+    )
+
+
+def _oracle_span_ends(site: UnknownReferenceSite) -> list[int]:
+    ends = [site.raw_end]
+    depth = 0
+    index = site.raw_end
+    last_nonspace = site.raw_end
+    while index < site.command_end:
+        char = site.raw_text[index]
+        if char in "([{":
+            depth += 1
+        elif char in ")]}":
+            if depth == 0:
+                break
+            depth -= 1
+            if depth == 0:
+                ends.append(index + 1)
+        elif depth == 0 and char in ",;":
+            break
+        if not char.isspace():
+            last_nonspace = index + 1
+        elif depth == 0 and last_nonspace > ends[-1]:
+            ends.append(last_nonspace)
+        index += 1
+    if last_nonspace > ends[-1]:
+        ends.append(last_nonspace)
+    if re.search(r"\bfun\b.*=>", site.raw_text[site.raw_end : site.command_end]):
+        ends.append(site.command_end)
+    return sorted({end for end in ends if end <= site.command_end})
+
+
+def _text_size(value: str | None) -> dict[str, int] | None:
+    if value is None:
+        return None
+    return {
+        "serialized_character_count": len(value),
+        "serialized_utf8_byte_count": len(value.encode("utf-8")),
+        "lexical_token_count": len(_LEAN_TOKEN.findall(value)),
+    }
+
+
+def _bounded_declaration_candidates(site: UnknownReferenceSite, declaration: str) -> list[str]:
+    name = site.unknown_name
+    candidates = {name}
+    parts = name.split(".")
+    if parts:
+        capitalized = parts.copy()
+        capitalized[0] = capitalized[0][:1].upper() + capitalized[0][1:]
+        candidates.add(".".join(capitalized))
+        pascal = parts.copy()
+        pascal[0] = "".join(
+            component[:1].upper() + component[1:]
+            for component in pascal[0].split("_")
+            if component
+        )
+        candidates.add(".".join(pascal))
+    if "." not in name:
+        namespace_sources = declaration + "\n" + site.raw_text
+        namespaces = {
+            identifier.split(".", 1)[0]
+            for identifier in _qualified_lean_identifiers(namespace_sources)
+        }
+        candidates.update(f"{namespace}.{name}" for namespace in namespaces)
+    return sorted(candidate for candidate in candidates if 0 < len(candidate) <= 256)[:32]
+
+
+def _syntactic_reference_usage(site: UnknownReferenceSite) -> str:
+    before = site.raw_text[site.command_start : site.raw_start]
+    after = site.raw_text[site.raw_end : site.command_end]
+    if before.strip() == "":
+        return "command_head_reference_kind_not_determined"
+    if re.match(r"\s+(?:\(|\{|\[|[A-Za-z0-9_'\u2080-\u2089])", after):
+        return "term_application"
+    if "." in site.unknown_name:
+        return "namespace_qualified_term_reference"
+    return "term_reference"
+
+
+def _candidate_formal_obligation_rule(site: UnknownReferenceSite) -> str | None:
+    before = site.raw_text[site.command_start : site.raw_start]
+    if re.search(r"\bapply\s*$", before):
+        return "unknown_reference_is_apply_tactic_head"
+    if re.search(r"\b(?:exact|refine)\s*$", before):
+        return "unknown_reference_is_exact_or_refine_proof_term_head"
+    if re.search(r"\brw\s*\[[^\]\n]*$", before):
+        return "unknown_reference_is_rewrite_rule"
+    if re.search(r"\b(?:linarith|nlinarith)\s*\[[^\]\n]*$", before):
+        return "unknown_reference_is_arithmetic_tactic_lemma_argument"
+    return None
+
+
+def _explicit_argument_text(site: UnknownReferenceSite) -> str:
+    expression_end = max(_oracle_span_ends(site))
+    return site.raw_text[site.raw_end:expression_end]
+
+
+def _ordered_line_prefixes(raw_text: str) -> list[dict[str, Any]]:
+    boundaries = [match.end() for match in re.finditer(r"\n", raw_text)]
+    if not boundaries or boundaries[-1] != len(raw_text):
+        boundaries.append(len(raw_text))
+    return [
+        {
+            "prefix_index": index,
+            "end_character_offset": end,
+            "utf8_byte_count": len(raw_text[:end].encode("utf-8")),
+            "prefix_sha256": _sha256_text(raw_text[:end]),
+        }
+        for index, end in enumerate(boundaries)
+    ]
 
 
 def reconstruct_regression_tasks(
@@ -702,6 +1271,811 @@ def _build_variant_jobs(
     return jobs
 
 
+def _diagnostic_run_payload(run: DiagnosticRun) -> dict[str, Any]:
+    return {
+        "category": run.category,
+        "lean_exit_code": run.lean_exit_code,
+        "diagnostics": {"stdout": run.stdout, "stderr": run.stderr},
+    }
+
+
+def _first_error(
+    run: DiagnosticRun,
+    *,
+    at_or_after: tuple[int, int] | None = None,
+) -> dict[str, Any] | None:
+    matches = list(_LEAN_ERROR_AT.finditer(_combined_diagnostics(run)))
+    if at_or_after is not None:
+        matches = [
+            match
+            for match in matches
+            if (int(match.group("line")), int(match.group("column")))
+            >= at_or_after
+        ]
+    if not matches:
+        return None
+    match = min(
+        matches,
+        key=lambda value: (int(value.group("line")), int(value.group("column"))),
+    )
+    return {
+        "line": int(match.group("line")),
+        "column": int(match.group("column")),
+        "message": match.group("message"),
+    }
+
+
+def _furthest_prefix_from_error(
+    task: TaskRecord,
+    transformed_text: str,
+    error: Mapping[str, Any] | None,
+) -> str:
+    if error is None:
+        return transformed_text
+    source = _plain_source(task, transformed_text)
+    lines = source.splitlines(keepends=True)
+    line = int(error["line"])
+    if line < 1 or line > len(lines):
+        return ""
+    source_offset = sum(len(value) for value in lines[: line - 1])
+    raw_offset = source_offset - len(render_prompt(task))
+    return transformed_text[: max(0, min(raw_offset, len(transformed_text)))]
+
+
+def _structural_progress(
+    root_state: Mapping[str, Any], current_state: Mapping[str, Any]
+) -> bool:
+    return not (
+        int(root_state["open_goal_count"]) == int(current_state["open_goal_count"])
+        and root_state["focused_goal"] == current_state["focused_goal"]
+        and root_state["focused_local_context_lines"]
+        == current_state["focused_local_context_lines"]
+    )
+
+
+def _build_unknown_reference_evidence(
+    regressions: Sequence[Mapping[str, Any]],
+    raw_b_rows: Sequence[Mapping[str, Any]],
+    tasks_by_id: Mapping[tuple[str, str], BoundTask],
+    verification_by_id: Mapping[str, Mapping[str, Any]],
+    config: PromptABConfig,
+    lean_project_roots: Mapping[str, Path],
+    environment_sha256_by_workload: Mapping[str, str],
+    *,
+    workers: int,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    raw_by_id = {str(row["candidate_id"]): row for row in raw_b_rows}
+    specs: list[dict[str, Any]] = []
+    total_unknown_occurrences = 0
+    for task in regressions:
+        key = (str(task["workload_id"]), str(task["task_id"]))
+        for candidate_id_value in task["candidate_slots"]["B"]:
+            candidate_id = str(candidate_id_value)
+            result = verification_by_id[candidate_id]
+            observations = candidate_diagnostic_observations(result)
+            references = observations["unknown_references"]
+            total_unknown_occurrences += len(references)
+            if not references:
+                continue
+            raw = raw_by_id[candidate_id]
+            site, location_failure = _locate_first_unknown_site(
+                task, tasks_by_id[key], raw, result
+            )
+            specs.append(
+                {
+                    "task": task,
+                    "key": key,
+                    "raw": raw,
+                    "result": result,
+                    "all_unknown_references": references,
+                    "site": site,
+                    "location_failure": location_failure,
+                }
+            )
+
+    located_sites = [spec["site"] for spec in specs if spec["site"] is not None]
+    queries_by_task: dict[tuple[str, str], set[str]] = {}
+    for site in located_sites:
+        assert isinstance(site, UnknownReferenceSite)
+        bound = tasks_by_id[(site.workload, site.task_id)]
+        queries_by_task.setdefault((site.workload, site.task_id), set()).update(
+            _bounded_declaration_candidates(site, bound.task.declaration)
+        )
+
+    timeout_seconds = float(config.verifier["timeout_seconds"])
+
+    def root_job(key: tuple[str, str]) -> tuple[tuple[str, str], dict[str, Any]]:
+        bound = tasks_by_id[key]
+        queries = sorted(queries_by_task[key])
+        run = _run_diagnostic_source(
+            lean_project_roots[key[0]],
+            _instrumented_source(
+                bound.task,
+                "__qwenCaptureAndClose",
+                declaration_queries=queries,
+            ),
+            timeout_seconds=timeout_seconds,
+        )
+        declaration_checks = {
+            match.group("name"): match.group("exists") == "true"
+            for match in _DECLARATION_CHECK_MESSAGE.finditer(
+                _combined_diagnostics(run)
+            )
+        }
+        return key, {
+            "state": _parse_state(run),
+            "declaration_checks": declaration_checks,
+            "run": run,
+        }
+
+    root_results: dict[tuple[str, str], dict[str, Any]] = {}
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(root_job, key) for key in sorted(queries_by_task)]
+        for future in as_completed(futures):
+            key, result = future.result()
+            root_results[key] = result
+
+    def candidate_job(spec: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+        task = spec["task"]
+        raw = spec["raw"]
+        key = spec["key"]
+        bound = tasks_by_id[key]
+        site = spec["site"]
+        base = {
+            "workload": key[0],
+            "task_id": key[1],
+            "candidate_index": int(raw["candidate_index"]),
+            "candidate_id": str(raw["candidate_id"]),
+            "source_raw_sha256": str(raw["raw_sha256"]),
+            "all_official_unknown_references": spec["all_unknown_references"],
+            "official_verifier_classification": spec["result"]["category"],
+            "official_verification_result_sha256": raw[
+                "official_verification_result_sha256"
+            ],
+            "verifier_environment_sha256": environment_sha256_by_workload[key[0]],
+            "scoring_excluded": True,
+        }
+        if site is None:
+            reason = str(spec["location_failure"])
+            first_reference = (
+                spec["all_unknown_references"][0]
+                if spec["all_unknown_references"]
+                else None
+            )
+            evidence = {
+                **base,
+                "first_unknown_call_site_reconstructed": False,
+                "first_unknown_reference": first_reference,
+                "availability_limitation": reason,
+                "candidate_node_status": "candidate_node_not_determined",
+                "candidate_node_not_determined_reason": (
+                    "the first unknown-reference call site is unavailable"
+                ),
+                "candidate_formal_obligation": None,
+                "oracle_outcome": "oracle_not_testable",
+            }
+            oracle = {
+                "schema_version": ORACLE_SCHEMA_VERSION,
+                **base,
+                "first_unknown_reference": first_reference,
+                "oracle_outcome": "oracle_not_testable",
+                "oracle_not_testable_reason": reason,
+                "transformed_text": None,
+                "transformed_sha256": None,
+            }
+            return evidence, oracle
+
+        assert isinstance(site, UnknownReferenceSite)
+        root_result = root_results.get(key)
+        root_state = root_result["state"] if root_result is not None else None
+        declaration_candidates = _bounded_declaration_candidates(
+            site, bound.task.declaration
+        )
+        declaration_checks = (
+            root_result["declaration_checks"] if root_result is not None else {}
+        )
+        known_matches = sorted(
+            name for name in declaration_candidates if declaration_checks.get(name)
+        )
+        exact_raw_prefix = site.raw_text[: site.command_start]
+        failing_action = site.raw_text[site.command_start : site.command_end]
+        failing_indentation_match = re.match(r"[ \t]*", failing_action)
+        failing_indentation = (
+            failing_indentation_match.group(0)
+            if failing_indentation_match is not None
+            else "  "
+        )
+        capture_candidate = exact_raw_prefix + (
+            "" if exact_raw_prefix.endswith("\n") else "\n"
+        ) + failing_indentation + "__qwenCaptureAndClose"
+        prefix_run = _run_diagnostic_source(
+            lean_project_roots[key[0]],
+            _instrumented_source(bound.task, capture_candidate),
+            timeout_seconds=timeout_seconds,
+        )
+        current_state = _parse_state(prefix_run)
+        prefix_closes_parent = False
+        if current_state is None:
+            prefix_only = _run_diagnostic_source(
+                lean_project_roots[key[0]],
+                _plain_source(bound.task, exact_raw_prefix),
+                timeout_seconds=timeout_seconds,
+            )
+            prefix_closes_parent = prefix_only.category == "verified"
+        else:
+            prefix_only = None
+
+        candidate_node_rule = _candidate_formal_obligation_rule(site)
+        candidate_formal_obligation = None
+        if current_state is not None and candidate_node_rule is not None:
+            candidate_formal_obligation = {
+                "source_binding": {
+                    "workload": key[0],
+                    "task_id": key[1],
+                    "candidate_id": site.candidate_id,
+                    "source_raw_sha256": site.raw_sha256,
+                    "official_source_line": site.source_line,
+                    "official_source_column": site.source_column,
+                },
+                "public_context_sha256": task["public_context_sha256"],
+                "verifier_environment_sha256": environment_sha256_by_workload[
+                    key[0]
+                ],
+                "extraction_rule": candidate_node_rule,
+                "exact_goal_before_call": current_state["focused_goal"],
+                "local_context_before_call": current_state[
+                    "focused_local_context"
+                ],
+                "explicit_argument_text": _explicit_argument_text(site),
+                "interpretation": "not_determined",
+            }
+        if candidate_formal_obligation is not None:
+            candidate_node_status = "candidate_formal_obligation_extracted"
+            candidate_node_not_determined_reason = None
+        elif current_state is None:
+            candidate_node_status = "candidate_node_not_determined"
+            candidate_node_not_determined_reason = (
+                "the proof state immediately before the failing action is unavailable"
+            )
+        else:
+            candidate_node_status = "candidate_node_not_determined"
+            candidate_node_not_determined_reason = (
+                "a theorem/lemma application position is not mechanically established "
+                "by the bounded syntax rule"
+            )
+
+        raw_window_start = max(0, site.raw_start - 160)
+        raw_window_end = min(len(site.raw_text), site.raw_end + 160)
+        evidence_base = {
+            **base,
+            "first_unknown_call_site_reconstructed": True,
+            "first_unknown_reference": {
+                "name": site.unknown_name,
+                "kind": site.unknown_kind,
+            },
+            "source_span": {
+                "official_source_line": site.source_line,
+                "official_source_column": site.source_column,
+                "raw_start_character_offset": site.raw_start,
+                "raw_end_character_offset": site.raw_end,
+            },
+            "raw_text_around_reference": site.raw_text[
+                raw_window_start:raw_window_end
+            ],
+            "failing_action": failing_action,
+            "candidate_prefix_immediately_before_failing_action": exact_raw_prefix,
+            "candidate_prefix_sha256": _sha256_text(exact_raw_prefix),
+            "candidate_prefix_accepted_by_lean": current_state is not None,
+            "candidate_prefix_closes_parent_before_failing_action": (
+                prefix_closes_parent
+            ),
+            "prefix_replay_result": _diagnostic_run_payload(prefix_run),
+            "proof_state_immediately_before_failing_action": current_state,
+            "already_closed_goal_count": None,
+            "already_closed_goal_count_availability": (
+                "not observable from the frozen tactic-state snapshot"
+            ),
+            "syntactic_reference_usage": _syntactic_reference_usage(site),
+            "exact_text_after_reference_in_failing_action": site.raw_text[
+                site.raw_end : site.command_end
+            ],
+            "bounded_declaration_candidates_checked": declaration_candidates,
+            "known_nearby_or_qualified_declaration_matches": known_matches,
+            "mechanical_reference_evidence_class": (
+                "exact_bounded_declaration_match"
+                if known_matches
+                else (
+                    "candidate_formal_obligation_extracted"
+                    if candidate_formal_obligation is not None
+                    else "undetermined"
+                )
+            ),
+            "declaration_match_rule": (
+                "Exact frozen-environment membership only over the original name, a "
+                "capitalized/PascalCase first namespace component, and exact namespace "
+                "prefixes already present in the task declaration or candidate."
+            ),
+            "candidate_node_status": candidate_node_status,
+            "candidate_node_not_determined_reason": (
+                candidate_node_not_determined_reason
+            ),
+            "candidate_formal_obligation": candidate_formal_obligation,
+        }
+        if root_state is None or current_state is None:
+            reason = (
+                "root proof state unavailable"
+                if root_state is None
+                else (
+                    "prefix already closes parent before failing action"
+                    if prefix_closes_parent
+                    else "prefix state is not Lean-replayable at the line boundary"
+                )
+            )
+            evidence = {
+                **evidence_base,
+                "availability_limitation": reason,
+                "oracle_outcome": "oracle_not_testable",
+            }
+            oracle = {
+                "schema_version": ORACLE_SCHEMA_VERSION,
+                **base,
+                "first_unknown_reference": evidence_base[
+                    "first_unknown_reference"
+                ],
+                "candidate_prefix_sha256": evidence_base["candidate_prefix_sha256"],
+                "oracle_outcome": "oracle_not_testable",
+                "oracle_not_testable_reason": reason,
+                "transformed_text": None,
+                "transformed_sha256": None,
+            }
+            return evidence, oracle
+
+        selected_end: int | None = None
+        base_oracle_message: dict[str, Any] | None = None
+        oracle_probe_run: DiagnosticRun | None = None
+        oracle_run: DiagnosticRun | None = None
+        transformed_text: str | None = None
+        unknown_literal = json.dumps(site.unknown_name, ensure_ascii=False)
+        for span_end in _oracle_span_ends(site):
+            sentinel = f"(__qwenOracle {unknown_literal})"
+            probe_text = (
+                site.raw_text[: site.raw_start]
+                + sentinel
+                + site.raw_text[span_end:]
+            )
+            observed_run = _run_diagnostic_source(
+                lean_project_roots[key[0]],
+                _instrumented_source(bound.task, probe_text),
+                timeout_seconds=timeout_seconds,
+            )
+            observed_message = _parse_oracle_message(observed_run)
+            if (
+                observed_message is not None
+                and not observed_message["inferred_type_contains_metavariables"]
+            ):
+                candidate_transformed_text = (
+                    site.raw_text[: site.raw_start]
+                    + "(by sorry)"
+                    + site.raw_text[span_end:]
+                )
+                candidate_oracle_run = _run_diagnostic_source(
+                    lean_project_roots[key[0]],
+                    _plain_source(bound.task, candidate_transformed_text),
+                    timeout_seconds=timeout_seconds,
+                )
+                same_site_syntax_error = any(
+                    int(error.group("line")) == site.source_line
+                    and "unexpected token" in error.group("message").lower()
+                    for error in _LEAN_ERROR_AT.finditer(
+                        _combined_diagnostics(candidate_oracle_run)
+                    )
+                )
+                if same_site_syntax_error:
+                    continue
+                selected_end = span_end
+                base_oracle_message = observed_message
+                oracle_probe_run = observed_run
+                oracle_run = candidate_oracle_run
+                transformed_text = candidate_transformed_text
+                break
+
+        if (
+            selected_end is None
+            or base_oracle_message is None
+            or oracle_probe_run is None
+            or oracle_run is None
+            or transformed_text is None
+        ):
+            reason = "contextual oracle type cannot be inferred for any bounded expression span"
+            evidence = {
+                **evidence_base,
+                "root_proof_state": root_state,
+                "availability_limitation": reason,
+                "oracle_outcome": "oracle_not_testable",
+            }
+            oracle = {
+                "schema_version": ORACLE_SCHEMA_VERSION,
+                **base,
+                "first_unknown_reference": evidence_base[
+                    "first_unknown_reference"
+                ],
+                "candidate_prefix_sha256": evidence_base["candidate_prefix_sha256"],
+                "oracle_outcome": "oracle_not_testable",
+                "oracle_not_testable_reason": reason,
+                "transformed_text": None,
+                "transformed_sha256": None,
+            }
+            return evidence, oracle
+
+        replaced_expression = site.raw_text[site.raw_start:selected_end]
+        transformed_sha256 = _sha256_text(transformed_text)
+
+        compare_sentinel = (
+            f"(__qwenOracleCompare {unknown_literal}, "
+            f"({current_state['focused_goal']}), ({root_state['focused_goal']}))"
+        )
+        compare_text = (
+            site.raw_text[: site.raw_start]
+            + compare_sentinel
+            + site.raw_text[selected_end:]
+        )
+        compare_run = _run_diagnostic_source(
+            lean_project_roots[key[0]],
+            _instrumented_source(bound.task, compare_text),
+            timeout_seconds=timeout_seconds,
+        )
+        comparison = _parse_oracle_message(compare_run)
+        oracle_message = dict(base_oracle_message)
+        if (
+            comparison is not None
+            and not comparison["inferred_type_contains_metavariables"]
+        ):
+            oracle_message.update(
+                {
+                    "definitionally_equal_to_current_goal": comparison[
+                        "definitionally_equal_to_current_goal"
+                    ],
+                    "definitionally_equal_to_root_target": comparison[
+                        "definitionally_equal_to_root_target"
+                    ],
+                }
+            )
+
+        later_unknowns = [
+            {
+                "name": match.group("name"),
+                "kind": match.group("kind").lower(),
+                "line": int(match.group("line")),
+                "column": int(match.group("column")),
+            }
+            for match in _UNKNOWN_REFERENCE_AT.finditer(
+                _combined_diagnostics(oracle_run)
+            )
+            if match.group("name") != site.unknown_name
+        ]
+        next_error = _first_error(
+            oracle_run,
+            at_or_after=(site.source_line, site.source_column),
+        )
+        if oracle_run.category == "verified":
+            outcome = "oracle_closes_parent"
+        elif later_unknowns:
+            outcome = "oracle_reaches_second_unknown"
+        elif next_error is not None and (
+            int(next_error["line"]), int(next_error["column"])
+        ) > (site.source_line, site.source_column):
+            outcome = "oracle_advances_then_fails"
+        else:
+            outcome = "oracle_no_material_progress"
+
+        progress = _structural_progress(root_state, current_state)
+        new_context_lines = [
+            line
+            for line in current_state["focused_local_context_lines"]
+            if line not in root_state["focused_local_context_lines"]
+        ]
+        root_defeq = oracle_message["definitionally_equal_to_root_target"]
+        current_defeq = oracle_message["definitionally_equal_to_current_goal"]
+        if root_defeq is True and not progress:
+            anti_vacuity_flag = "root_target_restatement"
+        elif current_defeq is True and progress:
+            anti_vacuity_flag = "current_subgoal_oracle"
+        elif (
+            oracle_message["inferred_type_is_proposition"] is True
+            and root_defeq is False
+            and current_defeq is False
+        ):
+            anti_vacuity_flag = "strict_intermediate_fact"
+        else:
+            anti_vacuity_flag = "equivalence_not_determined"
+
+        furthest_prefix = _furthest_prefix_from_error(
+            bound.task, transformed_text, next_error
+        )
+        candidate_node = None
+        if anti_vacuity_flag in {
+            "current_subgoal_oracle",
+            "strict_intermediate_fact",
+        }:
+            candidate_node = {
+                "source_binding": {
+                    "workload": key[0],
+                    "task_id": key[1],
+                    "candidate_id": site.candidate_id,
+                    "source_raw_sha256": site.raw_sha256,
+                    "official_source_line": site.source_line,
+                    "official_source_column": site.source_column,
+                },
+                "public_context_sha256": task["public_context_sha256"],
+                "verifier_environment_sha256": environment_sha256_by_workload[
+                    key[0]
+                ],
+                "local_context": current_state["focused_local_context"],
+                "exact_proposition": oracle_message["inferred_type"],
+                "interpretation": "not_determined",
+            }
+        mechanical_reference_class = (
+            "exact_bounded_declaration_match"
+            if known_matches
+            else (
+                "candidate_formal_obligation_extracted"
+                if candidate_formal_obligation is not None
+                else (
+                    "oracle_candidate_node_extracted"
+                    if candidate_node is not None
+                    else "undetermined"
+                )
+            )
+        )
+
+        evidence = {
+            **evidence_base,
+            "root_proof_state": root_state,
+            "oracle_expression_span": {
+                "raw_start_character_offset": site.raw_start,
+                "raw_end_character_offset": selected_end,
+                "exact_replaced_expression": replaced_expression,
+                "exact_supplied_argument_text": replaced_expression[
+                    len(site.unknown_name) :
+                ],
+            },
+            "oracle_inferred_type": oracle_message["inferred_type"],
+            "oracle_type_is_proposition": oracle_message[
+                "inferred_type_is_proposition"
+            ],
+            "oracle_definitionally_equal_to_root_target": root_defeq,
+            "oracle_definitionally_equal_to_current_goal": current_defeq,
+            "oracle_equivalence_check_available": comparison is not None,
+            "call_occurs_before_observable_proof_state_progress": not progress,
+            "new_local_context_lines_before_call": new_context_lines,
+            "root_target_restatement_with_same_effective_context": (
+                root_defeq is True
+                and not progress
+                and not new_context_lines
+            ),
+            "size_diagnostics": {
+                "root_target": _text_size(root_state["focused_goal"]),
+                "current_goal": _text_size(current_state["focused_goal"]),
+                "oracle_type": _text_size(oracle_message["inferred_type"]),
+            },
+            "anti_vacuity_flag": anti_vacuity_flag,
+            "oracle_outcome": outcome,
+            "second_unknown_references_after_oracle": later_unknowns,
+            "next_failure_after_oracle": next_error,
+            "furthest_valid_prefix_after_oracle": furthest_prefix,
+            "furthest_valid_prefix_after_oracle_sha256": _sha256_text(
+                furthest_prefix
+            ),
+            "oracle_transform_sha256": transformed_sha256,
+            "candidate_node": candidate_node,
+            "mechanical_reference_evidence_class": mechanical_reference_class,
+        }
+        oracle = {
+            "schema_version": ORACLE_SCHEMA_VERSION,
+            **base,
+            "first_unknown_reference": evidence_base["first_unknown_reference"],
+            "source_span": evidence_base["source_span"],
+            "candidate_prefix_sha256": evidence_base["candidate_prefix_sha256"],
+            "candidate_prefix_accepted_by_lean": True,
+            "proof_state_immediately_before_failing_action": current_state,
+            "exact_replaced_expression": replaced_expression,
+            "replacement": "(by sorry)",
+            "single_node_only": True,
+            "transformed_text": transformed_text,
+            "transformed_sha256": transformed_sha256,
+            "inferred_oracle_type": oracle_message["inferred_type"],
+            "anti_vacuity_flag": anti_vacuity_flag,
+            "oracle_outcome": outcome,
+            "second_unknown_references_after_oracle": later_unknowns,
+            "next_failure_after_oracle": next_error,
+            "furthest_valid_prefix_after_oracle": furthest_prefix,
+            "furthest_valid_prefix_after_oracle_sha256": _sha256_text(
+                furthest_prefix
+            ),
+            "oracle_verification": _diagnostic_run_payload(oracle_run),
+            "oracle_probe_diagnostics_sha256": _sha256_text(
+                _combined_diagnostics(oracle_probe_run)
+            ),
+            "equivalence_probe_diagnostics_sha256": _sha256_text(
+                _combined_diagnostics(compare_run)
+            ),
+            "candidate_node": candidate_node,
+            "mechanical_reference_evidence_class": mechanical_reference_class,
+        }
+        return evidence, oracle
+
+    evidence_rows: list[dict[str, Any]] = []
+    oracle_rows: list[dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(candidate_job, spec) for spec in specs]
+        for future in as_completed(futures):
+            evidence, oracle = future.result()
+            evidence_rows.append(evidence)
+            oracle_rows.append(oracle)
+    evidence_rows.sort(
+        key=lambda row: (
+            next(
+                int(task["ordinal"])
+                for task in regressions
+                if task["workload_id"] == row["workload"]
+                and task["task_id"] == row["task_id"]
+            ),
+            int(row["candidate_index"]),
+        )
+    )
+    oracle_rows.sort(
+        key=lambda row: (
+            next(
+                int(task["ordinal"])
+                for task in regressions
+                if task["workload_id"] == row["workload"]
+                and task["task_id"] == row["task_id"]
+            ),
+            int(row["candidate_index"]),
+        )
+    )
+    outcome_counts = Counter(str(row["oracle_outcome"]) for row in evidence_rows)
+    flag_counts = Counter(
+        str(row["anti_vacuity_flag"])
+        for row in evidence_rows
+        if row.get("anti_vacuity_flag") is not None
+    )
+    candidate_nodes = [
+        row["candidate_node"]
+        for row in evidence_rows
+        if row.get("candidate_node") is not None
+    ]
+    candidate_formal_obligations = [
+        row["candidate_formal_obligation"]
+        for row in evidence_rows
+        if row.get("candidate_formal_obligation") is not None
+    ]
+    reference_class_counts = Counter(
+        str(row.get("mechanical_reference_evidence_class", "undetermined"))
+        for row in evidence_rows
+    )
+    return (
+        {
+            "official_unknown_reference_candidate_count": len(specs),
+            "official_unknown_reference_occurrence_count": (
+                total_unknown_occurrences
+            ),
+            "first_call_site_reconstructed_count": sum(
+                bool(row["first_unknown_call_site_reconstructed"])
+                for row in evidence_rows
+            ),
+            "prefix_replay_accepted_count": sum(
+                bool(row.get("candidate_prefix_accepted_by_lean"))
+                for row in evidence_rows
+            ),
+            "oracle_outcome_counts": {
+                outcome: outcome_counts[outcome] for outcome in _ORACLE_OUTCOMES
+            },
+            "anti_vacuity_flag_counts": {
+                flag: flag_counts[flag] for flag in _ANTI_VACUITY_FLAGS
+            },
+            "candidate_nodes_for_future_prove_the_node_experiment": candidate_nodes,
+            "candidate_formal_obligations_from_unknown_call_sites": (
+                candidate_formal_obligations
+            ),
+            "candidate_node_status_counts": dict(
+                sorted(
+                    Counter(
+                        str(row["candidate_node_status"])
+                        for row in evidence_rows
+                    ).items()
+                )
+            ),
+            "mechanical_reference_evidence_class_counts": dict(
+                sorted(reference_class_counts.items())
+            ),
+            "call_sites": evidence_rows,
+            "availability_and_scope": {
+                "diagnostic_timeout_seconds": timeout_seconds,
+                "first_unknown_only": True,
+                "recursive_oracle_injection": False,
+                "official_rescoring": False,
+                "model_inference_or_regeneration": False,
+                "semantic_api_or_decomposition_judgment": "not_determined",
+                "candidate_formal_obligation_rule": (
+                    "Preserve the captured focused goal only when the unknown is "
+                    "mechanically the head after apply/exact/refine, a rw rule, or an "
+                    "explicit linarith/nlinarith lemma argument; all other positions "
+                    "are candidate_node_not_determined."
+                ),
+            },
+        },
+        oracle_rows,
+    )
+
+
+def _stopping_control_evidence(
+    task_rows: Sequence[Mapping[str, Any]],
+    raw_b_rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    raw_by_id = {str(row["candidate_id"]): row for row in raw_b_rows}
+    no_goals: list[dict[str, Any]] = []
+    for task in task_rows:
+        for candidate in task["b_candidate_diagnostics"]:
+            if "no_goals_to_be_solved" not in candidate["diagnostic_categories"]:
+                continue
+            raw = raw_by_id[str(candidate["candidate_id"])]
+            no_goals.append(
+                {
+                    "workload": task["workload"],
+                    "task_id": task["task_id"],
+                    "candidate_index": candidate["candidate_index"],
+                    "candidate_id": candidate["candidate_id"],
+                    "source_raw_sha256": raw["raw_sha256"],
+                    "ordered_line_prefixes": _ordered_line_prefixes(
+                        str(raw["raw_text"])
+                    ),
+                    "prefixes_lean_verified": False,
+                    "recovery_classification_changed": False,
+                }
+            )
+    no_goals.sort(
+        key=lambda row: (
+            str(row["workload"]),
+            str(row["task_id"]),
+            int(row["candidate_index"]),
+        )
+    )
+    token_limited = [
+        {
+            "workload": row["workload"],
+            "task_id": row["task_id"],
+            "candidate_index": row["candidate_index"],
+            "candidate_id": row["candidate_id"],
+            "source_raw_sha256": row["raw_sha256"],
+            "generated_token_count": row["generated_token_count"],
+        }
+        for row in raw_b_rows
+        if row["finish_reason"] == "token_limit"
+    ]
+    return {
+        "no_goals_to_be_solved": {
+            "official_candidate_count": len(no_goals),
+            "candidates": no_goals,
+            "scope": (
+                "Ordered raw line-boundary prefix hashes only; no prefix is classified "
+                "as recovered or Lean-verified by this diagnostic."
+            ),
+        },
+        "token_limit": {
+            "candidate_count": len(token_limited),
+            "task_count": len(
+                {(row["workload"], row["task_id"]) for row in token_limited}
+            ),
+            "candidates": token_limited,
+        },
+        "separation_rule": (
+            "No-goals control evidence, token-limit stopping evidence, unknown-reference "
+            "evidence, and output-format recoveries are reported independently."
+        ),
+    }
+
+
 def _diagnostic_tags(
     raw_rows: Sequence[Mapping[str, Any]],
     official_results: Sequence[Mapping[str, Any]],
@@ -1197,6 +2571,9 @@ def render_regression_analysis(analysis: Mapping[str, Any]) -> str:
     counts = aggregate["classification_counts"]
     facts = aggregate["observed_diagnostic_facts"]
     bindings = analysis["source_bindings"]
+    structural = analysis["structural_transition_evidence"]
+    unknown = analysis["unknown_reference_evidence"]
+    stopping = analysis["stopping_control_evidence"]
     lines = [
         "# Q0-pass / Arm-B-fail regression retrospective",
         "",
@@ -1332,6 +2709,120 @@ def render_regression_analysis(analysis: Mapping[str, Any]) -> str:
             "`python -m qwen_lean.mathia_prompt_ab_regressions --help`.",
         ]
     )
+    lines.extend(
+        [
+            "",
+            "## Structural Q0/B transitions",
+            "",
+            f"The frozen structural field covers "
+            f"{structural['coverage']['classified_task_count']}/"
+            f"{structural['population_task_count']} matched tasks. The remaining "
+            f"{structural['coverage']['unavailable_task_count']} MiniF2F tasks have a "
+            "null structural class; no class is inferred for them. `multi-step` is not "
+            "present as a pre-existing class in the frozen manifest.",
+            "",
+            "| structural class | coverage | both | Q0 only | B only | neither |",
+            "| --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for structural_class in ("direct", "multi-step", "branching", "deep"):
+        row = structural["aggregate_by_structural_class"][structural_class]
+        transition_counts = row["transition_counts"]
+        if transition_counts is None:
+            lines.append(
+                f"| {structural_class} | unavailable | — | — | — | — |"
+            )
+        else:
+            lines.append(
+                f"| {structural_class} | {row['task_count']} | "
+                f"{transition_counts['both']} | {transition_counts['q0_only']} | "
+                f"{transition_counts['b_only']} | {transition_counts['neither']} |"
+            )
+    unavailable = structural["aggregate_by_structural_class"]["unavailable"]
+    unavailable_counts = unavailable["transition_counts"]
+    lines.extend(
+        [
+            f"| unavailable (MiniF2F) | {unavailable['task_count']} | "
+            f"{unavailable_counts['both']} | {unavailable_counts['q0_only']} | "
+            f"{unavailable_counts['b_only']} | {unavailable_counts['neither']} |",
+            "",
+            "These are paired descriptive counts only; the report does not value one "
+            "structural class over another or infer causal guidance effects.",
+            "",
+            "## Unknown-reference call sites and single-node oracle",
+            "",
+            f"Official diagnostics contain "
+            f"{unknown['official_unknown_reference_occurrence_count']} unknown-reference "
+            f"occurrences across {unknown['official_unknown_reference_candidate_count']} "
+            "Arm-B candidates. The first call site is reconstructed for "
+            f"{unknown['first_call_site_reconstructed_count']} candidates and the prefix "
+            f"replays through the captured state for "
+            f"{unknown['prefix_replay_accepted_count']} candidates.",
+            "",
+            "| single-node oracle outcome | candidates |",
+            "| --- | ---: |",
+        ]
+    )
+    for outcome in _ORACLE_OUTCOMES:
+        lines.append(
+            f"| {outcome} | {unknown['oracle_outcome_counts'][outcome]} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Anti-vacuity flags: "
+            + ", ".join(
+                f"`{flag}`={unknown['anti_vacuity_flag_counts'][flag]}"
+                for flag in _ANTI_VACUITY_FLAGS
+            )
+            + ".",
+            "",
+            "Bounded mechanical reference evidence classes: "
+            + ", ".join(
+                f"`{classification}`={count}"
+                for classification, count in unknown[
+                    "mechanical_reference_evidence_class_counts"
+                ].items()
+            )
+            + ". Only `exact_bounded_declaration_match` denotes a frozen-environment "
+            "name match; candidate obligations are syntax/state extractions. Neither "
+            "is a semantic API attribution.",
+            "",
+            "Candidate-node extraction status: "
+            + ", ".join(
+                f"`{status}`={count}"
+                for status, count in unknown["candidate_node_status_counts"].items()
+            )
+            + ". The extracted objects preserve only the exact goal/context before a "
+            "mechanically identified proof-producing call; node quality remains "
+            "undetermined.",
+            "",
+            "Every intervention is scoring-excluded, replaces at most the first "
+            "unknown expression with `(by sorry)`, and never supplies a second unknown. "
+            "The evidence records exact prefix/state/type bindings and does not decide "
+            "whether a missing node is useful or which architecture component owns it.",
+            "",
+            "## Stopping and control evidence",
+            "",
+            f"`No goals to be solved` occurs in "
+            f"{stopping['no_goals_to_be_solved']['official_candidate_count']} official "
+            "candidate diagnostics. Ordered raw line-prefix hashes are retained for a "
+            "future authorized prefix-recovery study, but none is marked recovered here. "
+            f"Token limits remain separate: {stopping['token_limit']['candidate_count']} "
+            f"candidates across {stopping['token_limit']['task_count']} tasks.",
+            "",
+            "## Availability and interpretation boundary",
+            "",
+            "- MiniF2F structural classes: unavailable in the frozen manifest.",
+            "- `multi-step` structural class: unavailable in the frozen manifest.",
+            "- Call sites whose line-boundary prefix or contextual type cannot be "
+            "reconstructed are recorded as `oracle_not_testable`.",
+            "- Closed-goal history before a call is not exposed by the frozen tactic-state "
+            "snapshot and is recorded as unavailable rather than estimated.",
+            "- Architectural, causal, node-quality, and training interpretation remains "
+            "deferred to ChatGPT/user review.",
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -1347,6 +2838,7 @@ def run_regression_analysis(
     raw_b_output: Path,
     q0_verified_output: Path,
     transformed_output: Path,
+    oracle_output: Path,
     analysis_output: Path,
     readme_output: Path,
     *,
@@ -1371,6 +2863,9 @@ def run_regression_analysis(
     )
     if verification_inventory["completed_verification_count"] != EXPECTED_CANDIDATES_TOTAL:
         raise ValueError("#86 verification inventory is incomplete")
+    structural_transitions = structural_transition_evidence(
+        manifest, verification_inventory["results_by_id"]
+    )
     regressions = reconstruct_regression_tasks(
         manifest, verification_inventory["results_by_id"]
     )
@@ -1439,6 +2934,18 @@ def run_regression_analysis(
         tasks_by_id,
         verification_inventory["results_by_id"],
     )
+    unknown_reference_evidence, oracle_rows = _build_unknown_reference_evidence(
+        regressions,
+        raw_b_rows,
+        tasks_by_id,
+        verification_inventory["results_by_id"],
+        config,
+        lean_project_roots,
+        environment_bundle["environment_sha256_by_workload"],
+        workers=workers,
+    )
+    oracle_sha256 = _write_jsonl(oracle_output, oracle_rows)
+    stopping_control_evidence = _stopping_control_evidence(task_rows, raw_b_rows)
     analysis = {
         "schema_version": ANALYSIS_SCHEMA_VERSION,
         "decision_marker": "OBSERVED",
@@ -1471,6 +2978,7 @@ def run_regression_analysis(
             "verifier_environment_sha256_by_workload": environment_bundle[
                 "environment_sha256_by_workload"
             ],
+            "diagnostic_prelude_sha256": _sha256_text(_DIAGNOSTIC_PRELUDE),
         },
         "committed_evidence": {
             "raw_b_candidates": {
@@ -1493,6 +3001,13 @@ def run_regression_analysis(
                 ),
                 "row_count": len(transformed_rows),
                 "sha256": transformed_sha256,
+            },
+            "single_node_oracle_candidates": {
+                "path": str(
+                    oracle_output.resolve().relative_to(repository_root.resolve())
+                ),
+                "row_count": len(oracle_rows),
+                "sha256": oracle_sha256,
             },
         },
         "mechanical_transform_contract": {
@@ -1542,6 +3057,9 @@ def run_regression_analysis(
             ),
             "semantic_equivalence_or_ownership_inferred": False,
         },
+        "structural_transition_evidence": structural_transitions,
+        "unknown_reference_evidence": unknown_reference_evidence,
+        "stopping_control_evidence": stopping_control_evidence,
         "aggregate": _aggregate(task_rows),
         "tasks": task_rows,
     }
@@ -1566,6 +3084,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--raw-b-output", type=Path, required=True)
     parser.add_argument("--q0-verified-output", type=Path, required=True)
     parser.add_argument("--transformed-output", type=Path, required=True)
+    parser.add_argument("--oracle-output", type=Path, required=True)
     parser.add_argument("--analysis-output", type=Path, required=True)
     parser.add_argument("--readme-output", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=8)
@@ -1589,6 +3108,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.raw_b_output,
         args.q0_verified_output,
         args.transformed_output,
+        args.oracle_output,
         args.analysis_output,
         args.readme_output,
         workers=args.workers,

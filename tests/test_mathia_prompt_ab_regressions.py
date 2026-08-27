@@ -8,7 +8,12 @@ from pathlib import Path
 from qwen_lean.mathia_prompt_ab_regressions import (
     ANALYSIS_SCHEMA_VERSION,
     RAW_B_SCHEMA_VERSION,
+    UnknownReferenceSite,
+    _candidate_formal_obligation_rule,
+    _explicit_argument_text,
     _obvious_local_premise_identifiers,
+    _oracle_span_ends,
+    _ordered_line_prefixes,
     _qualified_lean_identifiers,
     _write_jsonl,
     candidate_diagnostic_observations,
@@ -16,8 +21,8 @@ from qwen_lean.mathia_prompt_ab_regressions import (
     mechanical_variants,
     reconstruct_regression_tasks,
     render_regression_analysis,
+    structural_transition_evidence,
 )
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,6 +59,81 @@ def test_reconstruct_regression_tasks_uses_frozen_q0_and_all_b_slots() -> None:
     assert [
         task["task_id"] for task in reconstruct_regression_tasks(manifest, results)
     ] == ["regression"]
+
+
+def test_structural_transition_evidence_uses_only_frozen_manifest_classes() -> None:
+    tasks = []
+    results: dict[str, dict[str, str]] = {}
+    fixtures = [
+        ("fresh-composition-valid-v2", "direct", 1, ["lean_rejected"]),
+        ("fresh-composition-valid-v2", "deep", 0, ["verified"]),
+        ("minif2f-valid-clean-v2", None, 1, ["verified"]),
+    ]
+    for ordinal, (workload, structural, q0_count, categories) in enumerate(fixtures):
+        candidate_ids = [f"candidate-{ordinal}-{index}" for index in range(len(categories))]
+        tasks.append(
+            {
+                "ordinal": ordinal,
+                "workload_id": workload,
+                "task_id": f"task-{ordinal}",
+                "metadata": {"structural_class": structural},
+                "q0_verified_candidate_count": q0_count,
+                "candidate_slots": {"B": candidate_ids},
+            }
+        )
+        for candidate_id, category in zip(candidate_ids, categories, strict=True):
+            results[candidate_id] = {"category": category}
+
+    evidence = structural_transition_evidence({"tasks": tasks}, results)
+
+    assert evidence["population_task_count"] == 3
+    assert evidence["aggregate_by_structural_class"]["direct"][
+        "transition_counts"
+    ]["q0_only"] == 1
+    assert evidence["aggregate_by_structural_class"]["deep"][
+        "transition_counts"
+    ]["b_only"] == 1
+    assert evidence["aggregate_by_structural_class"]["unavailable"][
+        "transition_counts"
+    ]["both"] == 1
+    assert evidence["aggregate_by_structural_class"]["multi-step"][
+        "availability"
+    ] == "not_available"
+
+
+def test_oracle_span_and_ordered_prefix_rules_are_bounded_and_hash_bound() -> None:
+    raw_text = "  nlinarith [missing (show True by trivial), h]\n  exact h"
+    start = raw_text.index("missing")
+    site = UnknownReferenceSite(
+        workload="fixture",
+        task_id="fixture",
+        task_ordinal=0,
+        candidate_index=0,
+        candidate_id="candidate",
+        raw_sha256=hashlib.sha256(raw_text.encode()).hexdigest(),
+        raw_text=raw_text,
+        unknown_name="missing",
+        unknown_kind="identifier",
+        source_line=1,
+        source_column=start + 1,
+        raw_start=start,
+        raw_end=start + len("missing"),
+        command_start=0,
+        command_end=raw_text.index("\n"),
+    )
+
+    span_ends = _oracle_span_ends(site)
+    assert site.raw_end in span_ends
+    assert raw_text.index("), h]") + 1 in span_ends
+    assert _candidate_formal_obligation_rule(site) == (
+        "unknown_reference_is_arithmetic_tactic_lemma_argument"
+    )
+    assert _explicit_argument_text(site) == " (show True by trivial)"
+    prefixes = _ordered_line_prefixes(raw_text)
+    assert prefixes[-1]["end_character_offset"] == len(raw_text)
+    assert prefixes[-1]["prefix_sha256"] == hashlib.sha256(
+        raw_text.encode()
+    ).hexdigest()
 
 
 def test_mechanical_variants_cover_each_permitted_wrapper_without_repair() -> None:
@@ -223,6 +303,7 @@ def test_committed_regression_evidence_is_complete_and_self_consistent() -> None
     raw_b = read_jsonl("raw-b-candidates.jsonl")
     q0_verified = read_jsonl("q0-verified-candidates.jsonl")
     transformed = read_jsonl("transformed-b-candidates.jsonl")
+    oracle = read_jsonl("single-node-oracle-candidates.jsonl")
     analysis = json.loads(
         (evidence_root / "q0-b-regression-analysis.json").read_bytes()
     )
@@ -271,7 +352,8 @@ def test_committed_regression_evidence_is_complete_and_self_consistent() -> None
             "q0_raw_recovery_archive_sha256"
         ]
 
-    raw_sha256s = {row["raw_sha256"] for row in raw_b}
+    raw_by_sha256 = {row["raw_sha256"]: row for row in raw_b}
+    raw_sha256s = set(raw_by_sha256)
     for row in transformed:
         assert row["source_raw_sha256"] in raw_sha256s
         assert row["scoring_excluded"] is True
@@ -280,11 +362,45 @@ def test_committed_regression_evidence_is_complete_and_self_consistent() -> None
         ).hexdigest() == row["transformed_sha256"]
         assert row["transform_sequence"]
 
+    assert len(oracle) == 23
+    for row in oracle:
+        assert row["source_raw_sha256"] in raw_sha256s
+        assert row["scoring_excluded"] is True
+        assert row["oracle_outcome"] in {
+            "oracle_closes_parent",
+            "oracle_advances_then_fails",
+            "oracle_reaches_second_unknown",
+            "oracle_no_material_progress",
+            "oracle_not_testable",
+        }
+        if row["transformed_text"] is not None:
+            assert row["replacement"] == "(by sorry)"
+            assert row["single_node_only"] is True
+            source_text = str(raw_by_sha256[row["source_raw_sha256"]]["raw_text"])
+            start = int(row["source_span"]["raw_start_character_offset"])
+            replaced = str(row["exact_replaced_expression"])
+            end = start + len(replaced)
+            assert source_text[start:end] == replaced
+            assert row["transformed_text"] == (
+                source_text[:start] + "(by sorry)" + source_text[end:]
+            )
+            assert str(row["transformed_text"]).count("(by sorry)") == (
+                source_text.count("(by sorry)") + 1
+            )
+            assert hashlib.sha256(
+                str(row["transformed_text"]).encode("utf-8")
+            ).hexdigest() == row["transformed_sha256"]
+
     committed = analysis["committed_evidence"]
     for key, name, rows in (
         ("raw_b_candidates", "raw-b-candidates.jsonl", raw_b),
         ("q0_verified_candidates", "q0-verified-candidates.jsonl", q0_verified),
         ("transformed_b_candidates", "transformed-b-candidates.jsonl", transformed),
+        (
+            "single_node_oracle_candidates",
+            "single-node-oracle-candidates.jsonl",
+            oracle,
+        ),
     ):
         path = subset_root / name
         assert committed[key]["path"] == f"evidence/mathia-prompt-ab/q0-b-regressions/{name}"
@@ -345,10 +461,70 @@ def test_committed_regression_evidence_is_complete_and_self_consistent() -> None
     assert facts["arm_b_candidate_count"] == 184
     assert analysis["official_86_results_modified"] is False
     assert analysis["model_inference_or_regeneration_performed"] is False
+    structural = analysis["structural_transition_evidence"]
+    assert structural["population_task_count"] == 611
+    assert structural["coverage"]["classified_task_count"] == 388
+    assert structural["coverage"]["unavailable_task_count"] == 223
+    assert structural["coverage"]["classified_workloads"] == {
+        "fresh-composition-valid-v2": 388
+    }
+    assert structural["coverage"]["unavailable_workloads"] == {
+        "minif2f-valid-clean-v2": 223
+    }
+    assert sum(
+        row["task_count"]
+        for name, row in structural["aggregate_by_structural_class"].items()
+        if name in {"direct", "branching", "deep", "unavailable"}
+    ) == 611
+    unknown = analysis["unknown_reference_evidence"]
+    assert unknown["official_unknown_reference_candidate_count"] == 23
+    assert unknown["official_unknown_reference_occurrence_count"] == 32
+    assert sum(unknown["oracle_outcome_counts"].values()) == 23
+    assert sum(unknown["candidate_node_status_counts"].values()) == 23
+    for call_site in unknown["call_sites"]:
+        if call_site["candidate_node_status"] == (
+            "candidate_formal_obligation_extracted"
+        ):
+            obligation = call_site["candidate_formal_obligation"]
+            assert obligation["exact_goal_before_call"] == call_site[
+                "proof_state_immediately_before_failing_action"
+            ]["focused_goal"]
+            assert obligation["source_binding"]["source_raw_sha256"] == call_site[
+                "source_raw_sha256"
+            ]
+            assert obligation["interpretation"] == "not_determined"
+            assert call_site["candidate_node_not_determined_reason"] is None
+        else:
+            assert call_site["candidate_node_status"] == (
+                "candidate_node_not_determined"
+            )
+            assert call_site["candidate_formal_obligation"] is None
+            assert call_site["candidate_node_not_determined_reason"]
+    assert sum(unknown["anti_vacuity_flag_counts"].values()) == sum(
+        row["transformed_text"] is not None for row in oracle
+    )
+    stopping = analysis["stopping_control_evidence"]
+    assert stopping["no_goals_to_be_solved"]["official_candidate_count"] == 29
+    for row in stopping["no_goals_to_be_solved"]["candidates"]:
+        source_text = str(raw_by_sha256[row["source_raw_sha256"]]["raw_text"])
+        for prefix in row["ordered_line_prefixes"]:
+            end = int(prefix["end_character_offset"])
+            assert prefix["prefix_sha256"] == hashlib.sha256(
+                source_text[:end].encode("utf-8")
+            ).hexdigest()
+            assert prefix["utf8_byte_count"] == len(
+                source_text[:end].encode("utf-8")
+            )
+        assert row["prefixes_lean_verified"] is False
+        assert row["recovery_classification_changed"] is False
+    assert stopping["token_limit"]["candidate_count"] == 48
+    assert stopping["token_limit"]["task_count"] == 17
     report = (
         evidence_root / "Q0_B_REGRESSION_ANALYSIS.md"
     ).read_text(encoding="utf-8")
     assert report == render_regression_analysis(analysis)
     assert "## Observed diagnostic facts" in report
+    assert "## Structural Q0/B transitions" in report
+    assert "## Unknown-reference call sites and single-node oracle" in report
     assert "## Training questions" not in report
     assert "Prioritize" not in report
