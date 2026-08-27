@@ -33,7 +33,7 @@ from .schema import TaskRecord
 from .verifier import LeanVerifier, VerificationOutcome
 
 
-ANALYSIS_SCHEMA_VERSION = "mathia-q0-b-regression-analysis-v1"
+ANALYSIS_SCHEMA_VERSION = "mathia-q0-b-regression-analysis-v2"
 RAW_B_SCHEMA_VERSION = "mathia-q0-b-regression-raw-b-candidate-v1"
 RAW_Q0_SCHEMA_VERSION = "mathia-q0-b-regression-q0-verified-candidate-v1"
 TRANSFORMED_SCHEMA_VERSION = "mathia-q0-b-regression-transformed-candidate-v1"
@@ -67,8 +67,73 @@ _NATURAL_LANGUAGE_SUFFIX = re.compile(
 )
 _SORRY_ADMIT = re.compile(r"\b(?:sorry|admit)\b")
 _THEOREM_REPETITION = re.compile(r"(?m)^\s*(?:theorem|lemma)\s+[A-Za-z0-9_'.]+")
-_UNKNOWN_IDENTIFIER = re.compile(
-    r"unknown(?:Identifier| constant| identifier| declaration)", re.IGNORECASE
+_UNKNOWN_REFERENCE = re.compile(
+    r"Unknown (?P<kind>identifier|constant|declaration) "
+    r"`(?P<name>[^`\r\n]+)`",
+    re.IGNORECASE,
+)
+_QUALIFIED_LEAN_IDENTIFIER = re.compile(
+    r"(?<![A-Za-z0-9_'])"
+    r"(?:[A-Za-z_][A-Za-z0-9_']*\.)+[A-Za-z_][A-Za-z0-9_']*"
+)
+_DECLARATION_BINDER = re.compile(
+    r"[({]\s*(?P<names>[A-Za-z_][A-Za-z0-9_'₀-₉]*"
+    r"(?:\s+[A-Za-z_][A-Za-z0-9_'₀-₉]*)*)\s*:"
+)
+_LOCAL_PREMISE_NAME = re.compile(
+    r"h(?:[0-9₀-₉]+|[A-Za-z](?:[0-9₀-₉])?)?\Z"
+)
+
+_DIAGNOSTIC_CATEGORY_PATTERNS = (
+    (
+        "unknown_identifier",
+        re.compile(r"Unknown identifier `[^`\r\n]+`", re.IGNORECASE),
+    ),
+    (
+        "unknown_constant",
+        re.compile(r"Unknown constant `[^`\r\n]+`", re.IGNORECASE),
+    ),
+    (
+        "unknown_declaration",
+        re.compile(r"Unknown declaration `[^`\r\n]+`", re.IGNORECASE),
+    ),
+    ("unsolved_goals", re.compile(r"\bunsolved goals?\b", re.IGNORECASE)),
+    (
+        "no_goals_to_be_solved",
+        re.compile(r"\bNo goals to be solved\b", re.IGNORECASE),
+    ),
+    (
+        "type_mismatch",
+        re.compile(r"\b(?:application )?type mismatch\b", re.IGNORECASE),
+    ),
+    (
+        "elaboration_error",
+        re.compile(
+            r"\b(?:failed to synthesize|cannot synthesize|invalid field|"
+            r"function expected|failed to infer)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "syntax_error",
+        re.compile(
+            r"\b(?:unexpected token|unexpected end of input|unexpected identifier|"
+            r"unterminated|Invalid `end`)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "tactic_failure",
+        re.compile(
+            r"\b(?:unknown tactic|Tactic `[^`]+` failed|linarith failed|"
+            r"made no progress|failed to close the goal)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "sorry_or_admit_rejected",
+        re.compile(r"declaration uses `(?:sorry|admit)`", re.IGNORECASE),
+    ),
 )
 
 _TACTIC_FAMILIES = (
@@ -251,6 +316,62 @@ def _tactic_families(text: str) -> set[str]:
         for tactic in _TACTIC_FAMILIES
         if re.search(rf"\b{re.escape(tactic)}\b", text)
     }
+
+
+def _diagnostic_text(result: Mapping[str, Any]) -> str:
+    diagnostics = result.get("diagnostics", {})
+    return (
+        str(diagnostics.get("stdout", ""))
+        + "\n"
+        + str(diagnostics.get("stderr", ""))
+    )
+
+
+def candidate_diagnostic_observations(
+    result: Mapping[str, Any],
+) -> dict[str, Any]:
+    text = _diagnostic_text(result)
+    unknown_references = sorted(
+        {
+            (match.group("kind").lower(), match.group("name"))
+            for match in _UNKNOWN_REFERENCE.finditer(text)
+        }
+    )
+    return {
+        "diagnostic_categories": [
+            category
+            for category, pattern in _DIAGNOSTIC_CATEGORY_PATTERNS
+            if pattern.search(text) is not None
+        ],
+        "unknown_references": [
+            {"kind": kind, "name": name} for kind, name in unknown_references
+        ],
+        "diagnostic_text_sha256": _sha256_text(text),
+    }
+
+
+def _qualified_lean_identifiers(text: str) -> set[str]:
+    return set(_QUALIFIED_LEAN_IDENTIFIER.findall(text))
+
+
+def _obvious_local_premise_identifiers(declaration: str) -> set[str]:
+    return {
+        name
+        for match in _DECLARATION_BINDER.finditer(declaration)
+        for name in match.group("names").split()
+        if _LOCAL_PREMISE_NAME.fullmatch(name) is not None
+    }
+
+
+def _contains_lean_identifier(text: str, identifier: str) -> bool:
+    return (
+        re.search(
+            rf"(?<![A-Za-z0-9_'₀-₉]){re.escape(identifier)}"
+            rf"(?![A-Za-z0-9_'₀-₉])",
+            text,
+        )
+        is not None
+    )
 
 
 def _load_q0_candidates(
@@ -586,7 +707,8 @@ def _diagnostic_tags(
     official_results: Sequence[Mapping[str, Any]],
     q0_rows: Sequence[Mapping[str, Any]],
     intuition_text: str,
-) -> tuple[list[str], dict[str, Any]]:
+    declaration: str,
+) -> tuple[list[str], dict[str, Any], list[dict[str, Any]]]:
     q0_family_sets = [
         _tactic_families(str(row["raw_text"])) for row in q0_rows
     ]
@@ -594,34 +716,82 @@ def _diagnostic_tags(
     b_family_sets = [_tactic_families(str(row["raw_text"])) for row in raw_rows]
     b_families = set().union(*b_family_sets)
     intuition_families = _tactic_families(intuition_text)
-    diagnostic_texts = [
-        str(result.get("diagnostics", {}).get("stdout", ""))
-        + str(result.get("diagnostics", {}).get("stderr", ""))
-        for result in official_results
+    candidate_diagnostics = [
+        {
+            "candidate_index": raw["candidate_index"],
+            "candidate_id": raw["candidate_id"],
+            "raw_sha256": raw["raw_sha256"],
+            "official_verifier_classification": result["category"],
+            "official_lean_exit_code": result["lean_exit_code"],
+            **candidate_diagnostic_observations(result),
+        }
+        for raw, result in zip(raw_rows, official_results, strict=True)
     ]
-    unknown_identifier_candidate_count = sum(
-        _UNKNOWN_IDENTIFIER.search(text) is not None for text in diagnostic_texts
+    unknown_reference_candidate_count = sum(
+        any(
+            category
+            in {"unknown_identifier", "unknown_constant", "unknown_declaration"}
+            for category in row["diagnostic_categories"]
+        )
+        for row in candidate_diagnostics
+    )
+    q0_lengths = [
+        {
+            "candidate_index": int(row["candidate_index"]),
+            "candidate_id": str(row["candidate_id"]),
+            "raw_sha256": str(row["raw_sha256"]),
+            "generated_token_count": int(row["generated_token_count"]),
+            "character_count": len(str(row["raw_text"])),
+            "utf8_byte_count": len(str(row["raw_text"]).encode("utf-8")),
+        }
+        for row in q0_rows
+    ]
+    shortest_q0_token_index = min(
+        range(len(q0_rows)),
+        key=lambda index: (
+            q0_lengths[index]["generated_token_count"],
+            q0_lengths[index]["candidate_index"],
+        ),
+    )
+    shortest_q0_character_index = min(
+        range(len(q0_rows)),
+        key=lambda index: (
+            q0_lengths[index]["character_count"],
+            q0_lengths[index]["candidate_index"],
+        ),
+    )
+    shortest_q0_tokens = q0_lengths[shortest_q0_token_index][
+        "generated_token_count"
+    ]
+    shortest_q0_families = q0_family_sets[shortest_q0_token_index]
+    q0_texts = [str(row["raw_text"]) for row in q0_rows]
+    b_texts = [str(row["raw_text"]) for row in raw_rows]
+    obvious_premises = _obvious_local_premise_identifiers(declaration)
+    q0_premises = {
+        premise
+        for premise in obvious_premises
+        if any(_contains_lean_identifier(text, premise) for text in q0_texts)
+    }
+    b_premises = {
+        premise
+        for premise in obvious_premises
+        if any(_contains_lean_identifier(text, premise) for text in b_texts)
+    }
+    q0_qualified_identifiers = set().union(
+        *(_qualified_lean_identifiers(text) for text in q0_texts)
+    )
+    b_qualified_identifiers = set().union(
+        *(_qualified_lean_identifiers(text) for text in b_texts)
     )
     tags: list[str] = []
     if any(row["finish_reason"] == "token_limit" for row in raw_rows):
         tags.append("incomplete_or_token_limited")
-    if unknown_identifier_candidate_count:
+    if unknown_reference_candidate_count:
         tags.append("hallucinated_lemma_or_api")
     if q0_families and b_families:
         overlap = len(q0_families & b_families) / len(q0_families)
         if overlap < 0.5:
             tags.append("different_proof_family_from_q0")
-    shortest_q0_index = min(
-        range(len(q0_rows)),
-        key=lambda index: (
-            int(q0_rows[index]["generated_token_count"]),
-            int(q0_rows[index]["candidate_index"]),
-        ),
-    )
-    shortest_q0_tokens = int(
-        q0_rows[shortest_q0_index]["generated_token_count"]
-    )
-    shortest_q0_families = q0_family_sets[shortest_q0_index]
     if (
         shortest_q0_tokens <= 64
         and shortest_q0_families
@@ -639,24 +809,85 @@ def _diagnostic_tags(
     if not tags:
         tags.append("cannot_determine")
     features = {
+        "q0_verified_candidate_lengths": q0_lengths,
+        "shortest_q0_verified_by_generated_tokens": q0_lengths[
+            shortest_q0_token_index
+        ],
+        "shortest_q0_verified_by_character_count": q0_lengths[
+            shortest_q0_character_index
+        ],
         "q0_tactic_families": sorted(q0_families),
         "q0_tactic_families_by_verified_candidate": [
-            sorted(families) for families in q0_family_sets
+            {
+                "candidate_index": int(row["candidate_index"]),
+                "raw_sha256": str(row["raw_sha256"]),
+                "families": sorted(families),
+            }
+            for row, families in zip(q0_rows, q0_family_sets, strict=True)
         ],
         "b_tactic_families": sorted(b_families),
+        "b_tactic_families_by_candidate": [
+            {
+                "candidate_index": int(row["candidate_index"]),
+                "candidate_id": str(row["candidate_id"]),
+                "raw_sha256": str(row["raw_sha256"]),
+                "families": sorted(families),
+            }
+            for row, families in zip(raw_rows, b_family_sets, strict=True)
+        ],
+        "q0_b_shared_tactic_families": sorted(q0_families & b_families),
+        "q0_only_tactic_families": sorted(q0_families - b_families),
+        "b_only_tactic_families": sorted(b_families - q0_families),
         "intuition_explicit_tactic_families": sorted(intuition_families),
+        "intuition_tactic_families_also_observed_in_b": sorted(
+            intuition_families & b_families
+        ),
+        "intuition_tactic_families_not_observed_in_b": sorted(
+            intuition_families - b_families
+        ),
         "shortest_q0_verified_generated_tokens": shortest_q0_tokens,
+        "shortest_q0_verified_character_count": q0_lengths[
+            shortest_q0_character_index
+        ]["character_count"],
         "shortest_q0_verified_tactic_families": sorted(shortest_q0_families),
         "q0_b_tactic_family_overlap_fraction": (
             len(q0_families & b_families) / len(q0_families)
             if q0_families
             else None
         ),
-        "official_unknown_identifier_candidate_count": (
-            unknown_identifier_candidate_count
+        "official_unknown_reference_candidate_count": (
+            unknown_reference_candidate_count
+        ),
+        "obvious_local_premise_identifiers_in_declaration": sorted(
+            obvious_premises
+        ),
+        "q0_obvious_local_premise_identifiers_observed": sorted(q0_premises),
+        "b_obvious_local_premise_identifiers_observed": sorted(b_premises),
+        "q0_b_shared_obvious_local_premise_identifiers": sorted(
+            q0_premises & b_premises
+        ),
+        "q0_only_obvious_local_premise_identifiers": sorted(
+            q0_premises - b_premises
+        ),
+        "q0_qualified_lean_identifiers": sorted(q0_qualified_identifiers),
+        "q0_qualified_identifiers_also_observed_in_b": sorted(
+            q0_qualified_identifiers & b_qualified_identifiers
+        ),
+        "q0_qualified_identifiers_not_observed_in_b": sorted(
+            q0_qualified_identifiers - b_qualified_identifiers
+        ),
+        "q0_qualified_identifier_overlap_fraction": (
+            len(q0_qualified_identifiers & b_qualified_identifiers)
+            / len(q0_qualified_identifiers)
+            if q0_qualified_identifiers
+            else None
+        ),
+        "direct_text_comparison_scope": (
+            "Exact lexical occurrence only; no semantic equivalence, route quality, "
+            "architectural ownership, or causal attribution is inferred."
         ),
     }
-    return tags, features
+    return tags, features, candidate_diagnostics
 
 
 def _task_analysis(
@@ -705,15 +936,19 @@ def _task_analysis(
             verification_by_id[str(candidate_id)]
             for candidate_id in task["candidate_slots"]["B"]
         ]
-        tags: list[str] = []
-        features: dict[str, Any] = {}
-        if classification == "CONTENT_OR_SEARCH":
-            tags, features = _diagnostic_tags(
-                raw_rows,
-                official_results,
-                q0_task_rows,
-                bound.intuition_text,
-            )
+        computed_tags, features, candidate_diagnostics = _diagnostic_tags(
+            raw_rows,
+            official_results,
+            q0_task_rows,
+            bound.intuition_text,
+            bound.task.declaration,
+        )
+        tags = computed_tags if classification == "CONTENT_OR_SEARCH" else []
+        diagnostic_category_counts = Counter(
+            category
+            for row in candidate_diagnostics
+            for category in row["diagnostic_categories"]
+        )
         category_counts = Counter(str(row["official_verifier_classification"]) for row in raw_rows)
         finish_counts = Counter(str(row["finish_reason"]) for row in raw_rows)
         if classification == "FORMAT_ONLY":
@@ -735,7 +970,7 @@ def _task_analysis(
                 )
             if "hallucinated_lemma_or_api" in tags:
                 observations.append(
-                    f"{features['official_unknown_identifier_candidate_count']}/8 "
+                    f"{features['official_unknown_reference_candidate_count']}/8 "
                     "official diagnostics report an unknown identifier/API"
                 )
             if "different_proof_family_from_q0" in tags:
@@ -788,6 +1023,10 @@ def _task_analysis(
                 "b_candidate_result_distribution": dict(sorted(category_counts.items())),
                 "b_finish_reason_distribution": dict(sorted(finish_counts.items())),
                 "b_token_limit_candidate_count": finish_counts["token_limit"],
+                "b_official_diagnostic_category_counts": dict(
+                    sorted(diagnostic_category_counts.items())
+                ),
+                "b_candidate_diagnostics": candidate_diagnostics,
                 "b_candidate_markers": [
                     {
                         "candidate_index": row["candidate_index"],
@@ -847,6 +1086,41 @@ def _aggregate(task_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     total = len(task_rows)
     format_only = classification_counts["FORMAT_ONLY"]
     content = classification_counts["CONTENT_OR_SEARCH"]
+    diagnostic_candidate_counts = Counter(
+        category
+        for row in task_rows
+        for candidate in row["b_candidate_diagnostics"]
+        for category in candidate["diagnostic_categories"]
+    )
+    diagnostic_task_counts = Counter(
+        category
+        for row in task_rows
+        for category in {
+            category
+            for candidate in row["b_candidate_diagnostics"]
+            for category in candidate["diagnostic_categories"]
+        }
+    )
+    unknown_reference_kind_counts = Counter(
+        reference["kind"]
+        for row in task_rows
+        for candidate in row["b_candidate_diagnostics"]
+        for reference in candidate["unknown_references"]
+    )
+    format_marker_candidate_counts = Counter(
+        marker
+        for row in task_rows
+        for candidate in row["b_candidate_markers"]
+        for marker in (
+            "duplicated_by",
+            "theorem_repetition",
+            "markdown_fence",
+            "lean3_begin",
+            "natural_language_contamination",
+            "sorry_or_admit",
+        )
+        if candidate[marker]
+    )
     lost_simple_examples = [
         str(row["task_id"])
         for row in task_rows
@@ -875,31 +1149,44 @@ def _aggregate(task_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "verified_mechanical_variants": len(recoveries),
         "format_error_type_counts_among_recoveries": dict(sorted(format_types.items())),
         "content_or_search_diagnostic_tag_counts": dict(sorted(tag_counts.items())),
-        "training_questions": {
-            "1_output_protocol_attribution": (
-                f"Confirmed FORMAT_ONLY failures account for {format_only}/{total} "
-                f"tasks ({format_only / total:.1%})."
+        "observed_diagnostic_facts": {
+            "final_output_formatting_recovery_lower_bound": {
+                "task_count": format_only,
+                "task_fraction": format_only / total,
+                "unique_candidate_proof_count": len(recoverable_candidates),
+                "verified_mechanical_variant_count": len(recoveries),
+            },
+            "content_or_search_after_mechanical_cleanup": {
+                "task_count": content,
+                "task_fraction": content / total,
+            },
+            "inconclusive_task_count": classification_counts["INCONCLUSIVE"],
+            "arm_b_candidate_count": total * EXPECTED_CANDIDATES_PER_TASK,
+            "arm_b_token_limit_candidate_count": sum(
+                int(row["b_token_limit_candidate_count"]) for row in task_rows
             ),
-            "2_residual_search_or_formalization": (
-                f"After removing confirmed format-only cases, {content}/{total} "
-                f"tasks ({content / total:.1%}) remain CONTENT_OR_SEARCH; causal harm "
-                "from guidance is not established by stochastic n=8 samples."
+            "tasks_with_arm_b_token_limit": sum(
+                int(row["b_token_limit_candidate_count"]) > 0 for row in task_rows
             ),
-            "3_training_priority": (
-                "Prioritize a combination: output-protocol SFT addresses the confirmed "
-                "serialization failures, while the larger residual motivates proof-search "
-                "and theorem+guidance conditioning work. This retrospective cannot choose "
-                "between guidance gating and planner training."
+            "format_marker_candidate_counts": dict(
+                sorted(format_marker_candidate_counts.items())
             ),
-            "4_guidance_away_from_simple_q0_examples": lost_simple_examples,
-            "4_guidance_away_interpretation": (
-                "These are observable short-Q0/B tactic-family divergences only; the "
-                "stochastic comparison cannot establish that Mathia guidance caused them."
+            "official_diagnostic_category_candidate_counts": dict(
+                sorted(diagnostic_candidate_counts.items())
             ),
-            "5_guidance_useful_but_lean_translation_failed_examples": translation_examples,
-            "5_guidance_translation_interpretation": (
-                "In these tasks B visibly attempts a tactic family named by the frozen "
-                "intuition, but all eight candidates still fail Lean."
+            "official_diagnostic_category_task_counts": dict(
+                sorted(diagnostic_task_counts.items())
+            ),
+            "unknown_reference_kind_occurrence_counts": dict(
+                sorted(unknown_reference_kind_counts.items())
+            ),
+            "lost_simple_q0_strategy_examples": lost_simple_examples,
+            "intuition_tactic_family_also_observed_in_b_examples": (
+                translation_examples
+            ),
+            "interpretation_boundary": (
+                "Architectural ownership, causal attribution, and future-training "
+                "recommendations are intentionally deferred to ChatGPT/user review."
             ),
         },
     }
@@ -908,6 +1195,7 @@ def _aggregate(task_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 def render_regression_analysis(analysis: Mapping[str, Any]) -> str:
     aggregate = analysis["aggregate"]
     counts = aggregate["classification_counts"]
+    facts = aggregate["observed_diagnostic_facts"]
     bindings = analysis["source_bindings"]
     lines = [
         "# Q0-pass / Arm-B-fail regression retrospective",
@@ -956,8 +1244,8 @@ def render_regression_analysis(analysis: Mapping[str, Any]) -> str:
             "",
             "## Per-task evidence",
             "",
-            "| workload | task | Q0 verified | B finish eos/token limit | variants | classification | tags |",
-            "| --- | --- | ---: | ---: | ---: | --- | --- |",
+            "| workload | task | Q0 verified | B finish eos/token limit | variants | classification | diagnostic categories | tags |",
+            "| --- | --- | ---: | ---: | ---: | --- | --- | --- |",
         ]
     )
     for row in analysis["tasks"]:
@@ -967,42 +1255,64 @@ def render_regression_analysis(analysis: Mapping[str, Any]) -> str:
             f"{row['q0_verified_candidate_count']} | {finish.get('eos', 0)}/"
             f"{finish.get('token_limit', 0)} | {row['mechanical_variants_tested']} | "
             f"{row['primary_classification']} | "
+            f"{', '.join(row['b_official_diagnostic_category_counts']) or '—'} | "
             f"{', '.join(row['diagnostic_tags']) or '—'} |"
         )
     lines.extend(
         [
             "",
-            "## Training questions",
+            "## Observed diagnostic facts",
             "",
-            f"1. {aggregate['training_questions']['1_output_protocol_attribution']}",
-            f"2. {aggregate['training_questions']['2_residual_search_or_formalization']}",
-            f"3. {aggregate['training_questions']['3_training_priority']}",
-            "4. Observable short-Q0/B tactic-family divergences: "
+            "- Final-output formatting lower bound: "
+            f"{facts['final_output_formatting_recovery_lower_bound']['task_count']}/"
+            f"{aggregate['total_regressions']} tasks and "
+            f"{facts['final_output_formatting_recovery_lower_bound']['unique_candidate_proof_count']} "
+            "candidate proofs are mechanically recoverable.",
+            "- Not recovered by the frozen mechanical transform set: "
+            f"{facts['content_or_search_after_mechanical_cleanup']['task_count']}/"
+            f"{aggregate['total_regressions']} tasks; "
+            f"{facts['inconclusive_task_count']} tasks are inconclusive.",
+            "- Token-limit observations: "
+            f"{facts['arm_b_token_limit_candidate_count']}/"
+            f"{facts['arm_b_candidate_count']} B candidates across "
+            f"{facts['tasks_with_arm_b_token_limit']} tasks.",
+            "- Official diagnostic categories by candidate: "
+            + (", ".join(
+                f"`{category}`={count}"
+                for category, count in facts[
+                    "official_diagnostic_category_candidate_counts"
+                ].items()
+            ) or "none detected by the declared rules")
+            + ".",
+            "- Exact output-format markers by candidate: "
+            + (", ".join(
+                f"`{marker}`={count}"
+                for marker, count in facts["format_marker_candidate_counts"].items()
+            ) or "none")
+            + ".",
+            "- Observable short-Q0/B tactic-family divergences: "
             + (", ".join(
                 f"`{task_id}`"
-                for task_id in aggregate["training_questions"][
-                    "4_guidance_away_from_simple_q0_examples"
+                for task_id in facts[
+                    "lost_simple_q0_strategy_examples"
                 ]
             ) or "none under the deterministic tag rule")
-            + ". "
-            + aggregate["training_questions"]["4_guidance_away_interpretation"],
-            "5. Cases where an explicit intuition tactic family appears "
-            "in B but formalization still fails: "
+            + ".",
+            "- Tasks where an explicit intuition tactic family also appears in B: "
             + (", ".join(
                 f"`{task_id}`"
-                for task_id in aggregate["training_questions"][
-                    "5_guidance_useful_but_lean_translation_failed_examples"
+                for task_id in facts[
+                    "intuition_tactic_family_also_observed_in_b_examples"
                 ]
             ) or "none under the deterministic tag rule")
-            + ". "
-            + aggregate["training_questions"][
-                "5_guidance_translation_interpretation"
-            ],
+            + ".",
+            "- " + facts["interpretation_boundary"],
             "",
             "The Q0-pass/B-fail selection compares two stochastic n=8 samples from "
             "different prompt-conditioned distributions. FORMAT_ONLY is directly "
             "confirmed by Lean; CONTENT_OR_SEARCH establishes an observable distribution "
-            "change after strict wrapper transforms, not causal harm from the intuition.",
+            "change after strict wrapper transforms, not causal harm from the intuition. "
+            "No architectural owner or future training method is assigned here.",
             "",
             "## Permanent raw evidence boundary",
             "",
@@ -1205,6 +1515,32 @@ def run_regression_analysis(
             "guidance_followed_but_formalization_failed": "an explicit tactic family named in the intuition also occurs in B",
             "guidance_seems_ignored": "the intuition names a tactic family absent from B",
             "cannot_determine": "none of the deterministic observable rules above applies",
+        },
+        "official_diagnostic_category_rules": {
+            "unknown_identifier": "official diagnostic contains the exact phrase Unknown identifier",
+            "unknown_constant": "official diagnostic contains the exact phrase Unknown constant",
+            "unknown_declaration": "official diagnostic contains the exact phrase Unknown declaration",
+            "unsolved_goals": "official diagnostic contains unsolved goal or unsolved goals",
+            "no_goals_to_be_solved": "official diagnostic contains the exact phrase No goals to be solved",
+            "type_mismatch": "official diagnostic explicitly reports type mismatch or application type mismatch",
+            "elaboration_error": "official diagnostic explicitly reports failed/cannot synthesize, invalid field, function expected, or failed to infer",
+            "syntax_error": "official diagnostic explicitly reports an unexpected token/end/identifier, unterminated input, or invalid end",
+            "tactic_failure": "official diagnostic explicitly reports unknown tactic, tactic failure, linarith failure, no progress, or failure to close a goal",
+            "sorry_or_admit_rejected": "official diagnostic explicitly says the declaration uses sorry or admit",
+        },
+        "observable_text_comparison_rules": {
+            "tactic_families": (
+                "exact lexical occurrence of a closed, declared tactic-family vocabulary"
+            ),
+            "obvious_local_premises": (
+                "conventional declaration binder identifiers h, h+number, or h+one-letter "
+                "suffix, compared by exact identifier occurrence in Q0 and B text"
+            ),
+            "qualified_lean_identifiers": (
+                "qualified dotted identifiers observed in verified Q0 text, compared "
+                "by exact lexical occurrence in B text"
+            ),
+            "semantic_equivalence_or_ownership_inferred": False,
         },
         "aggregate": _aggregate(task_rows),
         "tasks": task_rows,

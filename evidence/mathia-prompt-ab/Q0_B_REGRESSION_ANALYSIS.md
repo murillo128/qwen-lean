@@ -24,41 +24,44 @@ The regression membership is reconstructed from the frozen manifest and all offi
 
 ## Per-task evidence
 
-| workload | task | Q0 verified | B finish eos/token limit | variants | classification | tags |
-| --- | --- | ---: | ---: | ---: | --- | --- |
-| minif2f-valid-clean-v2 | `mathd_algebra_116` | 1 | 5/3 | 2 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_149` | 3 | 6/2 | 2 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_algebra_462` | 1 | 8/0 | 4 | FORMAT_ONLY | — |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_33` | 2 | 8/0 | 0 | CONTENT_OR_SEARCH | hallucinated_lemma_or_api, different_proof_family_from_q0 |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_188` | 2 | 7/1 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_45` | 1 | 7/1 | 3 | CONTENT_OR_SEARCH | incomplete_or_token_limited |
-| minif2f-valid-clean-v2 | `mathd_algebra_245` | 1 | 8/0 | 1 | CONTENT_OR_SEARCH | hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `aime_1984_p15` | 1 | 7/1 | 3 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_102` | 2 | 8/0 | 3 | FORMAT_ONLY | — |
-| minif2f-valid-clean-v2 | `mathd_algebra_55` | 3 | 8/0 | 2 | CONTENT_OR_SEARCH | cannot_determine |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_284` | 1 | 7/1 | 1 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_algebra_234` | 2 | 7/1 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api, lost_simple_q0_strategy |
-| minif2f-valid-clean-v2 | `mathd_algebra_493` | 1 | 7/1 | 1 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `mathd_numbertheory_403` | 1 | 4/4 | 1 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| minif2f-valid-clean-v2 | `induction_sum_odd` | 1 | 6/2 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, guidance_followed_but_formalization_failed |
-| minif2f-valid-clean-v2 | `mathd_algebra_206` | 1 | 7/1 | 3 | FORMAT_ONLY | — |
-| minif2f-valid-clean-v2 | `amc12a_2016_p3` | 1 | 8/0 | 1 | CONTENT_OR_SEARCH | cannot_determine |
-| fresh-composition-valid-v2 | `66a407e8ba866f6356cf064b5be0dcca8f0bcaa4fa7cf9ab44ad5e1a00807105` | 1 | 3/5 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, lost_simple_q0_strategy |
-| fresh-composition-valid-v2 | `8bb1136d99be78c7e97bd883b56df9e6bcda0b302a1d1b1f7420b67489ad2cba` | 1 | 1/7 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| fresh-composition-valid-v2 | `9920d4f31cbebb14a7c51aec86da6209186dfa2fc05b6d19496aeb9432530f3b` | 1 | 2/6 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| fresh-composition-valid-v2 | `b55a5364a22998e67db4ebbb3caf976203dd1b852f58e0ae09cef552471b1feb` | 1 | 5/3 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| fresh-composition-valid-v2 | `d4217004bec55ff93b35a3174d56eabb37ba727ed6f5f936546d2cbae769a9ac` | 1 | 4/4 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api |
-| fresh-composition-valid-v2 | `d4938ddb0414e0fcf87c08d685820aca623ca4ced7a8e1d1bef51d9c4da8b294` | 1 | 3/5 | 0 | CONTENT_OR_SEARCH | incomplete_or_token_limited, hallucinated_lemma_or_api, different_proof_family_from_q0 |
+| workload | task | Q0 verified | B finish eos/token limit | variants | classification | diagnostic categories | tags |
+| --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| minif2f-valid-clean-v2 | `mathd_algebra_116` | 1 | 5/3 | 2 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, type_mismatch, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_149` | 3 | 6/2 | 2 | CONTENT_OR_SEARCH | syntax_error, tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_algebra_462` | 1 | 8/0 | 4 | FORMAT_ONLY | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | — |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_33` | 2 | 8/0 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, type_mismatch, unknown_identifier, unsolved_goals | hallucinated_lemma_or_api, different_proof_family_from_q0 |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_188` | 2 | 7/1 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, type_mismatch, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_45` | 1 | 7/1 | 3 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | incomplete_or_token_limited |
+| minif2f-valid-clean-v2 | `mathd_algebra_245` | 1 | 8/0 | 1 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unknown_identifier, unsolved_goals | hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `aime_1984_p15` | 1 | 7/1 | 3 | CONTENT_OR_SEARCH | syntax_error, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_102` | 2 | 8/0 | 3 | FORMAT_ONLY | no_goals_to_be_solved, syntax_error, unsolved_goals | — |
+| minif2f-valid-clean-v2 | `mathd_algebra_55` | 3 | 8/0 | 2 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | cannot_determine |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_284` | 1 | 7/1 | 1 | CONTENT_OR_SEARCH | syntax_error, tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_algebra_234` | 2 | 7/1 | 0 | CONTENT_OR_SEARCH | tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api, lost_simple_q0_strategy |
+| minif2f-valid-clean-v2 | `mathd_algebra_493` | 1 | 7/1 | 1 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `mathd_numbertheory_403` | 1 | 4/4 | 1 | CONTENT_OR_SEARCH | elaboration_error, no_goals_to_be_solved, syntax_error, tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| minif2f-valid-clean-v2 | `induction_sum_odd` | 1 | 6/2 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | incomplete_or_token_limited, guidance_followed_but_formalization_failed |
+| minif2f-valid-clean-v2 | `mathd_algebra_206` | 1 | 7/1 | 3 | FORMAT_ONLY | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | — |
+| minif2f-valid-clean-v2 | `amc12a_2016_p3` | 1 | 8/0 | 1 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unsolved_goals | cannot_determine |
+| fresh-composition-valid-v2 | `66a407e8ba866f6356cf064b5be0dcca8f0bcaa4fa7cf9ab44ad5e1a00807105` | 1 | 3/5 | 0 | CONTENT_OR_SEARCH | sorry_or_admit_rejected, syntax_error, tactic_failure, type_mismatch, unsolved_goals | incomplete_or_token_limited, lost_simple_q0_strategy |
+| fresh-composition-valid-v2 | `8bb1136d99be78c7e97bd883b56df9e6bcda0b302a1d1b1f7420b67489ad2cba` | 1 | 1/7 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, sorry_or_admit_rejected, syntax_error, tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| fresh-composition-valid-v2 | `9920d4f31cbebb14a7c51aec86da6209186dfa2fc05b6d19496aeb9432530f3b` | 1 | 2/6 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unknown_constant, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| fresh-composition-valid-v2 | `b55a5364a22998e67db4ebbb3caf976203dd1b852f58e0ae09cef552471b1feb` | 1 | 5/3 | 0 | CONTENT_OR_SEARCH | elaboration_error, no_goals_to_be_solved, sorry_or_admit_rejected, syntax_error, tactic_failure, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| fresh-composition-valid-v2 | `d4217004bec55ff93b35a3174d56eabb37ba727ed6f5f936546d2cbae769a9ac` | 1 | 4/4 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, syntax_error, tactic_failure, unknown_constant, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api |
+| fresh-composition-valid-v2 | `d4938ddb0414e0fcf87c08d685820aca623ca4ced7a8e1d1bef51d9c4da8b294` | 1 | 3/5 | 0 | CONTENT_OR_SEARCH | no_goals_to_be_solved, sorry_or_admit_rejected, syntax_error, tactic_failure, unknown_identifier, unsolved_goals | incomplete_or_token_limited, hallucinated_lemma_or_api, different_proof_family_from_q0 |
 
-## Training questions
+## Observed diagnostic facts
 
-1. Confirmed FORMAT_ONLY failures account for 3/23 tasks (13.0%).
-2. After removing confirmed format-only cases, 20/23 tasks (87.0%) remain CONTENT_OR_SEARCH; causal harm from guidance is not established by stochastic n=8 samples.
-3. Prioritize a combination: output-protocol SFT addresses the confirmed serialization failures, while the larger residual motivates proof-search and theorem+guidance conditioning work. This retrospective cannot choose between guidance gating and planner training.
-4. Observable short-Q0/B tactic-family divergences: `mathd_algebra_234`, `66a407e8ba866f6356cf064b5be0dcca8f0bcaa4fa7cf9ab44ad5e1a00807105`. These are observable short-Q0/B tactic-family divergences only; the stochastic comparison cannot establish that Mathia guidance caused them.
-5. Cases where an explicit intuition tactic family appears in B but formalization still fails: `induction_sum_odd`. In these tasks B visibly attempts a tactic family named by the frozen intuition, but all eight candidates still fail Lean.
+- Final-output formatting lower bound: 3/23 tasks and 4 candidate proofs are mechanically recoverable.
+- Not recovered by the frozen mechanical transform set: 20/23 tasks; 0 tasks are inconclusive.
+- Token-limit observations: 48/184 B candidates across 17 tasks.
+- Official diagnostic categories by candidate: `elaboration_error`=2, `no_goals_to_be_solved`=29, `sorry_or_admit_rejected`=5, `syntax_error`=67, `tactic_failure`=59, `type_mismatch`=5, `unknown_constant`=11, `unknown_identifier`=12, `unsolved_goals`=94.
+- Exact output-format markers by candidate: `duplicated_by`=25, `lean3_begin`=3, `sorry_or_admit`=16, `theorem_repetition`=4.
+- Observable short-Q0/B tactic-family divergences: `mathd_algebra_234`, `66a407e8ba866f6356cf064b5be0dcca8f0bcaa4fa7cf9ab44ad5e1a00807105`.
+- Tasks where an explicit intuition tactic family also appears in B: `induction_sum_odd`.
+- Architectural ownership, causal attribution, and future-training recommendations are intentionally deferred to ChatGPT/user review.
 
-The Q0-pass/B-fail selection compares two stochastic n=8 samples from different prompt-conditioned distributions. FORMAT_ONLY is directly confirmed by Lean; CONTENT_OR_SEARCH establishes an observable distribution change after strict wrapper transforms, not causal harm from the intuition.
+The Q0-pass/B-fail selection compares two stochastic n=8 samples from different prompt-conditioned distributions. FORMAT_ONLY is directly confirmed by Lean; CONTENT_OR_SEARCH establishes an observable distribution change after strict wrapper transforms, not causal harm from the intuition. No architectural owner or future training method is assigned here.
 
 ## Permanent raw evidence boundary
 
