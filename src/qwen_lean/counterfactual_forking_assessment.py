@@ -55,7 +55,34 @@ HANDOFF_COMMIT = "bcd72d5203d82e27d50e42ec6d2d2afa061c2504"
 HANDOFF_MANIFEST_SHA256 = (
     "e17eef9ea8fdd566908b6c70b6305ee9f671d62f924e3f2ee677fe9f4bb33f3a"
 )
+RELEASE_TRANSPORT = {
+    "release_tag": "issue-92-counterfactual-parent-handoff",
+    "release_url": (
+        "https://github.com/murillo128/qwen-lean/releases/tag/"
+        "issue-92-counterfactual-parent-handoff"
+    ),
+    "asset_name": "qwen-lean-issue92-counterfactual-parent-handoff.tar.zst",
+    "asset_size_bytes": 539601,
+    "asset_sha256": (
+        "2418ed7694c95b970075c0c170e26e796638d0ec34749a5f420fdc39acb052ef"
+    ),
+    "package_metadata_schema": (
+        "qwen-lean-issue92-counterfactual-parent-handoff-package-v1"
+    ),
+    "package_metadata_sha256": (
+        "ee8145ca6adb40fd28cd704273618cb9f8cf0c7f50f0dd61d8aa760537d890c5"
+    ),
+    "sha256sums_sha256": (
+        "7a5073bbbeccbd2c704ab1b2eb1f8ea9434e59ece8b0b553cf7134bec22c8cda"
+    ),
+    "compact_generations_sha256": (
+        "e0383d34d4c59833c70582178dabcd28c7e90e6c7642cbf09a488189d79e4210"
+    ),
+    "record_count": 120,
+    "extraction_order": "frozen handoff manifest candidate order",
+}
 TOTAL_GENERATION_BUDGET = 4096
+LOCAL_GPU_MEMORY_UTILIZATION = 0.89
 FORK_FRACTIONS = (0.15, 0.30, 0.45, 0.60, 0.75, 0.90)
 DISCOVERY_SEEDS = tuple(range(100, 106))
 CONFIRMATION_SEEDS = tuple(range(1000, 1012))
@@ -101,6 +128,10 @@ class CounterfactualForkingConfig:
     @property
     def parent_selection(self) -> dict[str, Any]:
         return self.value["parent_selection"]
+
+    @property
+    def execution(self) -> dict[str, Any]:
+        return self.value["execution"]
 
     @property
     def forks(self) -> dict[str, Any]:
@@ -188,6 +219,10 @@ def validate_counterfactual_config(config: CounterfactualForkingConfig) -> None:
             "raw_generation_artifact_path": (
                 "artifacts/qwen35-native-thinking/full/generations.jsonl"
             ),
+            "release_transport": RELEASE_TRANSPORT,
+        },
+        "execution": {
+            "gpu_memory_utilization": LOCAL_GPU_MEMORY_UTILIZATION,
         },
         "parent_selection": {
             "candidate_index": 0,
@@ -271,9 +306,29 @@ def load_handoff_manifest(config: CounterfactualForkingConfig) -> dict[str, Any]
 
 
 def validate_handoff_records(
-    manifest: dict[str, Any], generations_path: Path
+    manifest: dict[str, Any],
+    generations_path: Path,
+    *,
+    release_package_path: Path | None = None,
+    release_transport: Mapping[str, Any] | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """Validate every referenced record while allowing harmless later appends."""
+    records, _ = _validate_handoff_records_with_transport(
+        manifest,
+        generations_path,
+        release_package_path=release_package_path,
+        release_transport=release_transport,
+    )
+    return records
+
+
+def _validate_handoff_records_with_transport(
+    manifest: dict[str, Any],
+    generations_path: Path,
+    *,
+    release_package_path: Path | None,
+    release_transport: Mapping[str, Any] | None,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Validate the source JSONL or its byte-preserving compact Release package."""
     candidates = manifest["candidates"]
     expected_by_line: dict[int, dict[str, Any]] = {}
     expected_ids: set[str] = set()
@@ -292,43 +347,242 @@ def validate_handoff_records(
             "required #89 raw generation artifact is absent: "
             f"{generations_path.resolve()}"
         )
-    located: dict[str, dict[str, Any]] = {}
+    maximum_source_line = max(expected_by_line)
+    compact_lines: list[str] = []
+    source_lines: list[tuple[dict[str, Any], str]] = []
+    observed_line_count = 0
+    source_detected = False
     with generations_path.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
-            expected = expected_by_line.get(line_number)
-            if expected is None:
-                continue
+            observed_line_count = line_number
             raw_line = line.removesuffix("\n")
-            observed_record_sha256 = _sha256_text(raw_line)
-            if observed_record_sha256 != expected["raw_generation_record_sha256"]:
-                raise ValueError(
-                    "referenced #89 record bytes changed at line "
-                    f"{line_number}: {expected['candidate_id']}"
-                )
-            record = json.loads(raw_line)
-            _validate_handoff_record(expected, record)
-            if record.get("arm") != "t1" or record.get("enable_thinking") is not True:
-                raise ValueError(
-                    f"#89 record is not a native-thinking T1 parent: "
-                    f"{expected['candidate_id']}"
-                )
-            if record.get("model_revision") != MODEL_REVISION:
-                raise ValueError(
-                    f"#89 parent model revision changed: {expected['candidate_id']}"
-                )
-            if record.get("generation_config_sha256") != manifest["source"].get(
-                "generation_config_sha256"
+            if line_number <= len(candidates):
+                compact_lines.append(raw_line)
+            expected = expected_by_line.get(line_number)
+            if expected is not None:
+                source_lines.append((expected, raw_line))
+            if (
+                line_number >= maximum_source_line
+                and len(source_lines) == len(expected_by_line)
             ):
-                raise ValueError(
-                    f"#89 parent generation config changed: {expected['candidate_id']}"
-                )
-            located[str(expected["candidate_id"])] = record
-            if len(located) == len(expected_by_line):
+                source_detected = True
                 break
+    if source_detected:
+        selected_lines = source_lines
+        transport = {
+            "mode": "source_append_only_jsonl",
+            "referenced_original_line_minimum": min(expected_by_line),
+            "referenced_original_line_maximum": maximum_source_line,
+            "observed_line_count_at_least": observed_line_count,
+            "later_appends_allowed": True,
+        }
+    elif observed_line_count == len(candidates):
+        if release_package_path is None or release_transport is None:
+            raise ValueError(
+                "compact #89 parent JSONL requires its pinned Release package "
+                "and transport metadata"
+            )
+        transport = _validate_release_package(
+            manifest,
+            generations_path,
+            release_package_path,
+            release_transport,
+        )
+        selected_lines = list(zip(candidates, compact_lines, strict=True))
+    else:
+        raise ValueError(
+            "#89 artifact is neither the append-only source JSONL nor the exact "
+            f"{len(candidates)}-record compact Release payload"
+        )
+
+    located: dict[str, dict[str, Any]] = {}
+    for expected, raw_line in selected_lines:
+        observed_record_sha256 = _sha256_text(raw_line)
+        if observed_record_sha256 != expected["raw_generation_record_sha256"]:
+            raise ValueError(
+                "referenced #89 record bytes changed at original line "
+                f"{expected['raw_generation_jsonl_line_number']}: "
+                f"{expected['candidate_id']}"
+            )
+        record = json.loads(raw_line)
+        _validate_handoff_record(expected, record)
+        if record.get("arm") != "t1" or record.get("enable_thinking") is not True:
+            raise ValueError(
+                f"#89 record is not a native-thinking T1 parent: "
+                f"{expected['candidate_id']}"
+            )
+        if record.get("model_revision") != MODEL_REVISION:
+            raise ValueError(
+                f"#89 parent model revision changed: {expected['candidate_id']}"
+            )
+        if record.get("generation_config_sha256") != manifest["source"].get(
+            "generation_config_sha256"
+        ):
+            raise ValueError(
+                f"#89 parent generation config changed: {expected['candidate_id']}"
+            )
+        located[str(expected["candidate_id"])] = record
     missing = sorted(expected_ids - set(located))
     if missing:
         raise ValueError(f"#89 artifact is missing referenced records: {missing[:5]}")
-    return located
+    transport["validated_record_count"] = len(located)
+    transport["record_hashes_match_handoff"] = True
+    return located, transport
+
+
+def _validate_release_package(
+    manifest: dict[str, Any],
+    generations_path: Path,
+    release_package_path: Path,
+    release_transport: Mapping[str, Any],
+) -> dict[str, Any]:
+    expected_asset_name = str(release_transport["asset_name"])
+    if not release_package_path.is_file():
+        raise FileNotFoundError(
+            f"pinned #89 Release package is absent: {release_package_path.resolve()}"
+        )
+    if release_package_path.name != expected_asset_name:
+        raise ValueError("#89 Release asset name differs from the pinned transport")
+    if release_package_path.stat().st_size != int(
+        release_transport["asset_size_bytes"]
+    ):
+        raise ValueError("#89 Release asset size differs from the pinned transport")
+    if _file_sha256(release_package_path) != release_transport["asset_sha256"]:
+        raise ValueError("#89 Release asset SHA-256 differs from the pinned transport")
+
+    package_dir = generations_path.parent
+    metadata_path = package_dir / "metadata.json"
+    sums_path = package_dir / "SHA256SUMS"
+    packaged_manifest_path = package_dir / "counterfactual-forking-handoff.json"
+    for path in (metadata_path, sums_path, packaged_manifest_path):
+        if not path.is_file():
+            raise FileNotFoundError(f"#89 Release package lacks {path.name}")
+    if _file_sha256(metadata_path) != release_transport["package_metadata_sha256"]:
+        raise ValueError("#89 Release package metadata hash changed")
+    if _file_sha256(sums_path) != release_transport["sha256sums_sha256"]:
+        raise ValueError("#89 Release SHA256SUMS hash changed")
+    if (
+        _file_sha256(generations_path)
+        != release_transport["compact_generations_sha256"]
+    ):
+        raise ValueError("#89 compact parent JSONL hash changed")
+    if _file_sha256(packaged_manifest_path) != HANDOFF_MANIFEST_SHA256:
+        raise ValueError("#89 packaged handoff manifest hash changed")
+
+    checksums = _load_sha256sums(sums_path)
+    expected_checksums = {
+        "counterfactual-forking-handoff.json": HANDOFF_MANIFEST_SHA256,
+        "generations.jsonl": str(release_transport["compact_generations_sha256"]),
+        "metadata.json": str(release_transport["package_metadata_sha256"]),
+    }
+    if checksums != expected_checksums:
+        raise ValueError("#89 Release SHA256SUMS payload differs from the pinned files")
+    observed_paths = {
+        "counterfactual-forking-handoff.json": packaged_manifest_path,
+        "generations.jsonl": generations_path,
+        "metadata.json": metadata_path,
+    }
+    for filename, expected_sha256 in checksums.items():
+        if _file_sha256(observed_paths[filename]) != expected_sha256:
+            raise ValueError(f"#89 Release checksum failed for {filename}")
+
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    candidates = manifest["candidates"]
+    if int(release_transport["record_count"]) != len(candidates):
+        raise ValueError("#89 Release transport record count changed")
+    task_ids = {str(candidate["task_id"]) for candidate in candidates}
+    line_numbers = [
+        int(candidate["raw_generation_jsonl_line_number"])
+        for candidate in candidates
+    ]
+    required_metadata = {
+        "schema_version": release_transport["package_metadata_schema"],
+        "producer_issue": 89,
+        "consumer_issue": 92,
+        "handoff_commit": HANDOFF_COMMIT,
+        "record_count": len(candidates),
+        "task_count": len(task_ids),
+        "candidate_count_per_task": len(candidates) // len(task_ids),
+        "extraction_order": release_transport["extraction_order"],
+        "source_generation_artifact": (
+            "artifacts/qwen35-native-thinking/full/generations.jsonl"
+        ),
+        "referenced_jsonl_line_range": {
+            "minimum": min(line_numbers),
+            "maximum": max(line_numbers),
+        },
+    }
+    for field, expected in required_metadata.items():
+        if metadata.get(field) != expected:
+            raise ValueError(f"#89 Release package metadata changed: {field}")
+    integrity = metadata.get("integrity", {})
+    required_integrity = {
+        "status": "PASS",
+        "byte_preserved_original_jsonl_lines": True,
+        "candidates_regenerated": False,
+        "records_reconstructed_from_parsed_json": False,
+        "reasoning_text_retokenized": False,
+        "fail_closed": True,
+    }
+    for field, expected in required_integrity.items():
+        if integrity.get(field) != expected:
+            raise ValueError(f"#89 Release integrity metadata changed: {field}")
+    required_hashes = {
+        "raw_generation_record_sha256",
+        "raw_response_sha256",
+        "raw_response_token_ids_sha256",
+    }
+    if not required_hashes.issubset(set(integrity.get("validated_hashes", []))):
+        raise ValueError("#89 Release metadata lacks required hash validations")
+    payload_files = {
+        str(row["filename"]): {
+            "sha256": str(row["sha256"]),
+            "size_bytes": int(row["size_bytes"]),
+        }
+        for row in metadata.get("payload_files", [])
+    }
+    expected_payload_files = {
+        "generations.jsonl": {
+            "sha256": str(release_transport["compact_generations_sha256"]),
+            "size_bytes": generations_path.stat().st_size,
+        },
+        "counterfactual-forking-handoff.json": {
+            "sha256": HANDOFF_MANIFEST_SHA256,
+            "size_bytes": packaged_manifest_path.stat().st_size,
+        },
+    }
+    if payload_files != expected_payload_files:
+        raise ValueError("#89 Release payload metadata differs from extracted files")
+    return {
+        "mode": "immutable_github_release_compact_jsonl",
+        "release_tag": release_transport["release_tag"],
+        "release_url": release_transport["release_url"],
+        "asset_name": expected_asset_name,
+        "asset_size_bytes": release_package_path.stat().st_size,
+        "asset_sha256": release_transport["asset_sha256"],
+        "package_metadata_schema": metadata["schema_version"],
+        "package_metadata_sha256": release_transport["package_metadata_sha256"],
+        "compact_generations_sha256": release_transport[
+            "compact_generations_sha256"
+        ],
+        "extraction_order": release_transport["extraction_order"],
+    }
+
+
+def _load_sha256sums(path: Path) -> dict[str, str]:
+    checksums: dict[str, str] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        digest, filename = line.split(maxsplit=1)
+        filename = filename.removeprefix("*")
+        if (
+            len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)
+            or Path(filename).name != filename
+            or filename in checksums
+        ):
+            raise ValueError("invalid #89 Release SHA256SUMS entry")
+        checksums[filename] = digest
+    return checksums
 
 
 def _validate_handoff_record(expected: dict[str, Any], record: dict[str, Any]) -> None:
@@ -467,13 +721,19 @@ def materialize_parent_trajectories(
     generations_path: Path,
     tokenizer: Any,
     *,
+    release_package_path: Path | None = None,
     parser: Callable[
         [CounterfactualForkingConfig, Any, str, Sequence[int]], dict[str, Any]
     ]
     | None = None,
 ) -> tuple[list[ParentTrajectory], dict[str, Any]]:
     manifest = load_handoff_manifest(config)
-    records_by_id = validate_handoff_records(manifest, generations_path)
+    records_by_id, parent_transport = _validate_handoff_records_with_transport(
+        manifest,
+        generations_path,
+        release_package_path=release_package_path,
+        release_transport=config.handoff["release_transport"],
+    )
     tasks, mathia_binding = load_mathia_tasks(config.native, mathia_root)
     tasks_by_id = {task.task_id: task for task in tasks}
     selected_index = int(config.parent_selection["candidate_index"])
@@ -611,6 +871,7 @@ def materialize_parent_trajectories(
         "parser_parity_failures": parity_rejected,
         "ineligible_short_parents": ineligible_short,
         "mathia_binding": mathia_binding,
+        "parent_transport": parent_transport,
     }
 
 
@@ -894,7 +1155,7 @@ def _engine_args(config: CounterfactualForkingConfig, snapshot_path: Path) -> An
         tokenizer_revision=str(native.model["tokenizer_revision"]),
         dtype=str(native.engine["dtype"]),
         tensor_parallel_size=int(native.engine["tensor_parallel_size"]),
-        gpu_memory_utilization=float(native.engine["gpu_memory_utilization"]),
+        gpu_memory_utilization=float(config.execution["gpu_memory_utilization"]),
         max_model_len=int(native.engine["max_model_len"]),
         max_num_seqs=int(native.engine["max_num_seqs"]),
         enforce_eager=bool(native.engine["enforce_eager"]),
@@ -1096,11 +1357,16 @@ def run_fork_generation(
     artifact_dir: Path,
     *,
     phase: str,
+    parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
     snapshot_path = _resolve_model_snapshot(config.native)
     tokenizer = _load_tokenizer(config.native, snapshot_path=snapshot_path)
     parents, integrity = materialize_parent_trajectories(
-        config, mathia_root, parent_generations_path, tokenizer
+        config,
+        mathia_root,
+        parent_generations_path,
+        tokenizer,
+        release_package_path=parent_release_package_path,
     )
     if phase == "discovery":
         expected = discovery_requests(config, parents)
@@ -1127,6 +1393,16 @@ def run_fork_generation(
 
     _configure_fork_runtime()
     runtime = _fork_local_runtime(config)
+    runtime.update(
+        {
+            "engine_gpu_memory_utilization": config.execution[
+                "gpu_memory_utilization"
+            ],
+            "parent_engine_gpu_memory_utilization": config.native.engine[
+                "gpu_memory_utilization"
+            ],
+        }
+    )
     runtime_versions = _validated_package_versions()
     _assert_no_other_compute_process(int(runtime["cuda_device_index"]))
     monitor = _GpuMemoryMonitor(int(runtime["cuda_device_index"]), required=True)
@@ -1289,11 +1565,16 @@ def run_fork_verification(
     phase: str,
     project_roots: Mapping[str, Path],
     workers: int | None = None,
+    parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
     snapshot_path = _resolve_model_snapshot(config.native)
     tokenizer = _load_tokenizer(config.native, snapshot_path=snapshot_path)
     parents, integrity = materialize_parent_trajectories(
-        config, mathia_root, parent_generations_path, tokenizer
+        config,
+        mathia_root,
+        parent_generations_path,
+        tokenizer,
+        release_package_path=parent_release_package_path,
     )
     expected = _expected_phase_requests(config, parents, artifact_dir, phase)
     generation_records = load_fork_generation_records(
@@ -1306,7 +1587,10 @@ def run_fork_verification(
         )
     tasks = [parent.task for parent in parents]
     tasks_by_id = {task.task_id: task for task in tasks}
-    environments = validate_lean_environments(config.native, tasks, project_roots)
+    environment_tasks, _ = load_mathia_tasks(config.native, mathia_root)
+    environments = validate_lean_environments(
+        config.native, environment_tasks, project_roots
+    )
     verification_path = _phase_verification_path(artifact_dir, phase)
     prior = load_fork_verification_records(verification_path, expected)
     latest = latest_verifications(prior)
@@ -1776,11 +2060,16 @@ def write_preinference_evidence(
     output_path: Path,
     *,
     project_roots: Mapping[str, Path],
+    parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
     snapshot_path = _resolve_model_snapshot(config.native)
     tokenizer = _load_tokenizer(config.native, snapshot_path=snapshot_path)
     parents, integrity = materialize_parent_trajectories(
-        config, mathia_root, parent_generations_path, tokenizer
+        config,
+        mathia_root,
+        parent_generations_path,
+        tokenizer,
+        release_package_path=parent_release_package_path,
     )
     requests = preflight_requests(config, parents)
     generations = load_fork_generation_records(
@@ -1794,8 +2083,9 @@ def write_preinference_evidence(
         _phase_verification_path(artifact_dir, "preflight"), requests
     )
     rows = _complete_phase_rows(generations, verification_records)
+    environment_tasks, _ = load_mathia_tasks(config.native, mathia_root)
     environments = validate_lean_environments(
-        config.native, [parent.task for parent in parents], project_roots
+        config.native, environment_tasks, project_roots
     )
     runtime_versions = _validated_package_versions()
     evidence = {
@@ -1812,6 +2102,7 @@ def write_preinference_evidence(
             ],
             "referenced_record_count": integrity["referenced_record_count"],
             "all_referenced_records_integrity": True,
+            "transport": integrity["parent_transport"],
         },
         "parent_selection": {
             "candidate_index": 0,
@@ -1859,6 +2150,12 @@ def write_preinference_evidence(
             "reasoning_parser": config.native.engine["reasoning_parser"],
             "dtype": config.native.engine["dtype"],
             "vllm_version": VLLM_VERSION,
+            "engine_gpu_memory_utilization": config.execution[
+                "gpu_memory_utilization"
+            ],
+            "parent_engine_gpu_memory_utilization": config.native.engine[
+                "gpu_memory_utilization"
+            ],
             "resolved_snapshot": snapshot_path.name,
             "package_versions": runtime_versions,
             "fork_generation_config_sha256": fork_generation_config_sha256(config),
@@ -1924,6 +2221,7 @@ def run_counterfactual_preflight(
     *,
     project_roots: Mapping[str, Path],
     workers: int | None = None,
+    parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
     generation = run_fork_generation(
         config,
@@ -1931,6 +2229,7 @@ def run_counterfactual_preflight(
         parent_generations_path,
         artifact_dir,
         phase="preflight",
+        parent_release_package_path=parent_release_package_path,
     )
     verification = run_fork_verification(
         config,
@@ -1940,6 +2239,7 @@ def run_counterfactual_preflight(
         phase="preflight",
         project_roots=project_roots,
         workers=workers,
+        parent_release_package_path=parent_release_package_path,
     )
     evidence = write_preinference_evidence(
         config,
@@ -1948,6 +2248,7 @@ def run_counterfactual_preflight(
         artifact_dir,
         output_path,
         project_roots=project_roots,
+        parent_release_package_path=parent_release_package_path,
     )
     return {
         "generation": generation,
@@ -2220,6 +2521,8 @@ def write_final_evidence(
     artifact_dir: Path,
     preflight_path: Path,
     evidence_dir: Path,
+    *,
+    parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
     preflight = json.loads(preflight_path.read_text(encoding="utf-8"))
     if (
@@ -2230,7 +2533,11 @@ def write_final_evidence(
     snapshot_path = _resolve_model_snapshot(config.native)
     tokenizer = _load_tokenizer(config.native, snapshot_path=snapshot_path)
     parents, integrity = materialize_parent_trajectories(
-        config, mathia_root, parent_generations_path, tokenizer
+        config,
+        mathia_root,
+        parent_generations_path,
+        tokenizer,
+        release_package_path=parent_release_package_path,
     )
     discovery_expected = discovery_requests(config, parents)
     discovery_generations = load_fork_generation_records(
@@ -2299,11 +2606,18 @@ def write_final_evidence(
             "confirmation_seeds": list(CONFIRMATION_SEEDS),
             "total_generation_budget": TOTAL_GENERATION_BUDGET,
             "fork_fractions": list(FORK_FRACTIONS),
+            "engine_gpu_memory_utilization": config.execution[
+                "gpu_memory_utilization"
+            ],
+            "parent_engine_gpu_memory_utilization": config.native.engine[
+                "gpu_memory_utilization"
+            ],
         },
         "integrity": {
             "referenced_parent_record_count": integrity["referenced_record_count"],
             "eligible_parent_count": integrity["eligible_parent_count"],
             "all_parent_parser_parity_passed": True,
+            "parent_transport": integrity["parent_transport"],
             "pre_inference_evidence_sha256": _file_sha256(preflight_path),
         },
         "identities": {

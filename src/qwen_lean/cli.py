@@ -709,6 +709,11 @@ def _parser() -> argparse.ArgumentParser:
         "--parent-generations", type=Path, required=True
     )
     counterfactual_preflight.add_argument(
+        "--parent-package",
+        type=Path,
+        help="pinned GitHub Release archive when using the compact parent JSONL",
+    )
+    counterfactual_preflight.add_argument(
         "--minif2f-root", type=Path, required=True
     )
     counterfactual_preflight.add_argument(
@@ -735,6 +740,11 @@ def _parser() -> argparse.ArgumentParser:
     counterfactual_generate.add_argument(
         "--parent-generations", type=Path, required=True
     )
+    counterfactual_generate.add_argument(
+        "--parent-package",
+        type=Path,
+        help="pinned GitHub Release archive when using the compact parent JSONL",
+    )
     counterfactual_generate.add_argument("--artifact-dir", type=Path, required=True)
     counterfactual_generate.add_argument(
         "--phase", choices=("discovery", "confirmation"), required=True
@@ -752,6 +762,11 @@ def _parser() -> argparse.ArgumentParser:
     counterfactual_verify.add_argument("--mathia-root", type=Path, required=True)
     counterfactual_verify.add_argument(
         "--parent-generations", type=Path, required=True
+    )
+    counterfactual_verify.add_argument(
+        "--parent-package",
+        type=Path,
+        help="pinned GitHub Release archive when using the compact parent JSONL",
     )
     counterfactual_verify.add_argument(
         "--minif2f-root", type=Path, required=True
@@ -777,6 +792,11 @@ def _parser() -> argparse.ArgumentParser:
     counterfactual_evidence.add_argument("--mathia-root", type=Path, required=True)
     counterfactual_evidence.add_argument(
         "--parent-generations", type=Path, required=True
+    )
+    counterfactual_evidence.add_argument(
+        "--parent-package",
+        type=Path,
+        help="pinned GitHub Release archive when using the compact parent JSONL",
     )
     counterfactual_evidence.add_argument("--artifact-dir", type=Path, required=True)
     counterfactual_evidence.add_argument(
@@ -2344,6 +2364,7 @@ def main(argv: list[str] | None = None) -> int:
                 "fresh-composition-valid-v2": args.mathlib_root,
             },
             workers=args.workers,
+            parent_release_package_path=args.parent_package,
         )
         print(json.dumps(summary, indent=2))
         return 0
@@ -2355,6 +2376,7 @@ def main(argv: list[str] | None = None) -> int:
             args.parent_generations,
             args.artifact_dir,
             phase=args.phase,
+            parent_release_package_path=args.parent_package,
         )
         print(json.dumps(summary, indent=2))
         return 0
@@ -2374,6 +2396,7 @@ def main(argv: list[str] | None = None) -> int:
                 "fresh-composition-valid-v2": args.mathlib_root,
             },
             workers=args.workers,
+            parent_release_package_path=args.parent_package,
         )
         print(json.dumps(summary, indent=2))
         return 0
@@ -2386,6 +2409,7 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.preflight,
             args.evidence_dir,
+            parent_release_package_path=args.parent_package,
         )
         print(json.dumps(evidence, indent=2))
         return 0

@@ -11,6 +11,8 @@ from qwen_lean.counterfactual_forking_assessment import (
     DISCOVERY_SEEDS,
     FORK_GENERATION_SCHEMA,
     FORK_VERIFICATION_SCHEMA,
+    HANDOFF_COMMIT,
+    HANDOFF_MANIFEST_SHA256,
     CounterfactualForkingConfig,
     ForkRequest,
     ParentTrajectory,
@@ -62,6 +64,11 @@ def test_config_freezes_parent_forks_budgets_and_independent_seeds() -> None:
     assert tuple(config.discovery["seeds"]) == DISCOVERY_SEEDS
     assert tuple(config.confirmation["seeds"]) == CONFIRMATION_SEEDS
     assert set(DISCOVERY_SEEDS).isdisjoint(CONFIRMATION_SEEDS)
+    assert config.handoff["release_transport"]["release_tag"] == (
+        "issue-92-counterfactual-parent-handoff"
+    )
+    assert config.execution["gpu_memory_utilization"] == 0.89
+    assert config.native.engine["gpu_memory_utilization"] == 0.9
     assert len(fork_generation_config_sha256(config)) == 64
 
 
@@ -116,6 +123,142 @@ def test_handoff_integrity_uses_exact_line_and_allows_later_appends(
     )
     with pytest.raises(ValueError, match="record bytes changed"):
         validate_handoff_records(manifest, artifact)
+
+
+def test_compact_release_transport_validates_package_and_frozen_record_order(
+    tmp_path: Path,
+) -> None:
+    record = _parent_record("candidate-a", [10, 20, 30])
+    raw_line = json.dumps(record, sort_keys=True, separators=(",", ":"))
+    expected = {
+        key: record[key]
+        for key in (
+            "candidate_id",
+            "workload",
+            "task_id",
+            "candidate_index",
+            "seed",
+            "prompt_sha256",
+            "rendered_prompt_sha256",
+            "raw_response_sha256",
+            "raw_response_token_count",
+            "reasoning_token_count",
+            "final_token_count",
+            "finish_reason",
+        )
+    }
+    expected.update(
+        {
+            "raw_generation_jsonl_line_number": 2445,
+            "raw_generation_record_sha256": hashlib.sha256(
+                raw_line.encode()
+            ).hexdigest(),
+            "raw_response_token_ids_sha256": _json_hash([10, 20, 30]),
+        }
+    )
+    manifest = {
+        "source": {"generation_config_sha256": "generation"},
+        "candidates": [expected],
+    }
+    package_dir = tmp_path / "extracted"
+    package_dir.mkdir()
+    generations = package_dir / "generations.jsonl"
+    generations.write_text(raw_line + "\n", encoding="utf-8")
+    packaged_manifest = package_dir / "counterfactual-forking-handoff.json"
+    packaged_manifest.write_bytes(
+        (ROOT / "evidence/qwen35-native-thinking/counterfactual-forking-handoff.json")
+        .read_bytes()
+    )
+    generations_sha256 = _file_hash(generations)
+    metadata = {
+        "schema_version": "test-package-v1",
+        "producer_issue": 89,
+        "consumer_issue": 92,
+        "handoff_commit": HANDOFF_COMMIT,
+        "record_count": 1,
+        "task_count": 1,
+        "candidate_count_per_task": 1,
+        "extraction_order": "frozen handoff manifest candidate order",
+        "source_generation_artifact": (
+            "artifacts/qwen35-native-thinking/full/generations.jsonl"
+        ),
+        "referenced_jsonl_line_range": {"minimum": 2445, "maximum": 2445},
+        "integrity": {
+            "status": "PASS",
+            "byte_preserved_original_jsonl_lines": True,
+            "candidates_regenerated": False,
+            "records_reconstructed_from_parsed_json": False,
+            "reasoning_text_retokenized": False,
+            "fail_closed": True,
+            "validated_hashes": [
+                "raw_generation_record_sha256",
+                "raw_response_sha256",
+                "raw_response_token_ids_sha256",
+            ],
+        },
+        "payload_files": [
+            {
+                "filename": "generations.jsonl",
+                "sha256": generations_sha256,
+                "size_bytes": generations.stat().st_size,
+            },
+            {
+                "filename": "counterfactual-forking-handoff.json",
+                "sha256": HANDOFF_MANIFEST_SHA256,
+                "size_bytes": packaged_manifest.stat().st_size,
+            },
+        ],
+    }
+    metadata_path = package_dir / "metadata.json"
+    metadata_path.write_text(
+        json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    metadata_sha256 = _file_hash(metadata_path)
+    sums_path = package_dir / "SHA256SUMS"
+    sums_path.write_text(
+        "\n".join(
+            (
+                f"{HANDOFF_MANIFEST_SHA256}  counterfactual-forking-handoff.json",
+                f"{generations_sha256}  generations.jsonl",
+                f"{metadata_sha256}  metadata.json",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    package = tmp_path / "parent.tar.zst"
+    package.write_bytes(b"immutable package bytes")
+    release_transport = {
+        "release_tag": "test-release",
+        "release_url": "https://github.com/example/repo/releases/tag/test-release",
+        "asset_name": package.name,
+        "asset_size_bytes": package.stat().st_size,
+        "asset_sha256": _file_hash(package),
+        "package_metadata_schema": "test-package-v1",
+        "package_metadata_sha256": metadata_sha256,
+        "sha256sums_sha256": _file_hash(sums_path),
+        "compact_generations_sha256": generations_sha256,
+        "record_count": 1,
+        "extraction_order": "frozen handoff manifest candidate order",
+    }
+
+    located = validate_handoff_records(
+        manifest,
+        generations,
+        release_package_path=package,
+        release_transport=release_transport,
+    )
+
+    assert located == {"candidate-a": record}
+    package.write_bytes(b"tampered package bytes")
+    with pytest.raises(ValueError, match="asset size|asset SHA-256"):
+        validate_handoff_records(
+            manifest,
+            generations,
+            release_package_path=package,
+            release_transport=release_transport,
+        )
 
 
 def test_discovery_requests_use_exact_prefix_tokens_and_restart_binding() -> None:
@@ -466,6 +609,10 @@ def _json_hash(value: object) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+
+
+def _file_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class _CapturingVerifier:

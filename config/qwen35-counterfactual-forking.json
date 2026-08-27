@@ -5,7 +5,23 @@
     "commit": "bcd72d5203d82e27d50e42ec6d2d2afa061c2504",
     "manifest_path": "evidence/qwen35-native-thinking/counterfactual-forking-handoff.json",
     "manifest_sha256": "e17eef9ea8fdd566908b6c70b6305ee9f671d62f924e3f2ee677fe9f4bb33f3a",
-    "raw_generation_artifact_path": "artifacts/qwen35-native-thinking/full/generations.jsonl"
+    "raw_generation_artifact_path": "artifacts/qwen35-native-thinking/full/generations.jsonl",
+    "release_transport": {
+      "release_tag": "issue-92-counterfactual-parent-handoff",
+      "release_url": "https://github.com/murillo128/qwen-lean/releases/tag/issue-92-counterfactual-parent-handoff",
+      "asset_name": "qwen-lean-issue92-counterfactual-parent-handoff.tar.zst",
+      "asset_size_bytes": 539601,
+      "asset_sha256": "2418ed7694c95b970075c0c170e26e796638d0ec34749a5f420fdc39acb052ef",
+      "package_metadata_schema": "qwen-lean-issue92-counterfactual-parent-handoff-package-v1",
+      "package_metadata_sha256": "ee8145ca6adb40fd28cd704273618cb9f8cf0c7f50f0dd61d8aa760537d890c5",
+      "sha256sums_sha256": "7a5073bbbeccbd2c704ab1b2eb1f8ea9434e59ece8b0b553cf7134bec22c8cda",
+      "compact_generations_sha256": "e0383d34d4c59833c70582178dabcd28c7e90e6c7642cbf09a488189d79e4210",
+      "record_count": 120,
+      "extraction_order": "frozen handoff manifest candidate order"
+    }
+  },
+  "execution": {
+    "gpu_memory_utilization": 0.89
   },
   "parent_selection": {
     "candidate_index": 0,
