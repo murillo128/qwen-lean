@@ -35,6 +35,7 @@ from qwen_lean.generalist_v3_parity import (
     compact_lora_parity_evidence,
     run_vllm_parity_sentinel,
 )
+from qwen_lean.generalist_v3_reporting import compact_bounded_trajectory_evidence
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,6 +73,7 @@ def _parser() -> argparse.ArgumentParser:
     subparsers.add_parser("anchor-drift")
     subparsers.add_parser("checkpoint-canary")
     subparsers.add_parser("compact-checkpoint-canary")
+    subparsers.add_parser("compact-trajectory")
     return parser
 
 
@@ -358,6 +360,18 @@ def main() -> int:
                 configuration_id=configuration,
                 optimizer_step=step,
             )
+        print(json.dumps(value, indent=2, sort_keys=True))
+        return 0
+    if args.command == "compact-trajectory":
+        value = compact_bounded_trajectory_evidence(
+            config,
+            DEFAULT_EVIDENCE / "base-validation-canary.json",
+            DEFAULT_EVIDENCE / "validation",
+            artifact_root / "training",
+            DEFAULT_EVIDENCE / "bounded-trajectory.json",
+            DEFAULT_EVIDENCE / "bounded-validation-trajectory.svg",
+            DEFAULT_EVIDENCE / "bounded-training-trajectory.svg",
+        )
         print(json.dumps(value, indent=2, sort_keys=True))
         return 0
     raise AssertionError(args.command)

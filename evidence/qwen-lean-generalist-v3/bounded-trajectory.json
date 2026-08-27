@@ -1,0 +1,6494 @@
+{
+  "base": {
+    "anchor_drift": {
+      "all_finite": true,
+      "anchor_count": 512,
+      "maximum_anchor_kl": 0.0,
+      "mean_anchor_kl": 0.0,
+      "median_anchor_kl": 0.0,
+      "p95_anchor_kl": 0.0
+    },
+    "checkpoint_id": "Base",
+    "compact_evidence_sha256": "d1394bf45a37eff692f9417bb7177923cd6b555338feeafe36073e66586e1b18",
+    "optimizer_step": 0,
+    "validation": {
+      "combined": {
+        "candidate_count": 768,
+        "interface_task_count": 96,
+        "normalized_template_diversity": 0.9153645833333334,
+        "solved_at_8": 0,
+        "verified_candidates": 0,
+        "verified_density": 0.0
+      },
+      "incremental": {
+        "candidate_count": 384,
+        "dominant_template": {
+          "occurrences": 4,
+          "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+          "theorem_count": 1,
+          "verified_occurrences": 0
+        },
+        "eos_fraction": 0.34375,
+        "finish_reason_counts": {
+          "eos": 132,
+          "token_limit": 252
+        },
+        "first_construct_counts": {
+          "branch": 158,
+          "term": 226
+        },
+        "generated_tokens": {
+          "le_64_fraction": 0.07291666666666667,
+          "maximum": 1024,
+          "median": 1024.0,
+          "minimum": 12,
+          "p25": 251.5,
+          "p75": 1024.0,
+          "p95": 1024.0
+        },
+        "normalized_template_diversity": 0.9921875,
+        "pass_at_1": 0.0,
+        "pass_at_4": 0.0,
+        "pass_at_8": 0.0,
+        "solved_at_8": 0,
+        "task_count": 48,
+        "verified_candidates": 0,
+        "verified_density": 0.0
+      },
+      "whole": {
+        "candidate_count": 384,
+        "dominant_template": {
+          "occurrences": 20,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "theorem_count": 19,
+          "verified_occurrences": 0
+        },
+        "eos_fraction": 0.20833333333333334,
+        "finish_reason_counts": {
+          "eos": 80,
+          "token_limit": 304
+        },
+        "first_construct_counts": {
+          "branch": 10,
+          "empty": 21,
+          "induction": 1,
+          "intro": 4,
+          "intros": 1,
+          "let": 11,
+          "rw": 3,
+          "simp": 4,
+          "term": 323,
+          "unparseable": 6
+        },
+        "generated_tokens": {
+          "le_64_fraction": 0.1796875,
+          "maximum": 1024,
+          "median": 1024.0,
+          "minimum": 1,
+          "p25": 1024.0,
+          "p75": 1024.0,
+          "p95": 1024.0
+        },
+        "normalized_template_diversity": 0.8385416666666666,
+        "pass_at_1": 0.0,
+        "pass_at_4": 0.0,
+        "pass_at_8": 0.0,
+        "solved_at_8": 0,
+        "task_count": 48,
+        "verified_candidates": 0,
+        "verified_density": 0.0
+      }
+    }
+  },
+  "checkpoints": [
+    {
+      "adapter_model_sha256": "9f6b32e2257b0de4039ed39ed7a4c98f763ce19272f4fb2e1a54597298636995",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "9f6b32e2257b0de4039ed39ed7a4c98f763ce19272f4fb2e1a54597298636995",
+        "maximum_anchor_kl": 10.170804977416992,
+        "mean_anchor_kl": 3.8098923085216825,
+        "median_anchor_kl": 2.647390842437744,
+        "p95_anchor_kl": 9.024075508117676
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.01422859547859548,
+        "new_solved_interface_tasks": 6,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C0-100",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "b6d435d818dac6e4a81dd2ebce017a4d94d5571074f239b25fd65989139c7b65",
+      "configuration": {
+        "base_kl_lambda": 0.0,
+        "eligible": false,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C0",
+      "optimizer_step": 100,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 800,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.84765625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 89,
+              "token_limit": 39
+            },
+            "first_construct_counts": {
+              "branch": 26,
+              "term": 102
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.2734375,
+              "maximum": 1024,
+              "median": 250.5,
+              "minimum": 6,
+              "p25": 58.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9765625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 125,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 17,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 106,
+              "token_limit": 22
+            },
+            "first_construct_counts": {
+              "aesop": 17,
+              "constructor": 3,
+              "dsimp": 8,
+              "exact": 3,
+              "ext": 1,
+              "have": 4,
+              "induction": 7,
+              "let": 2,
+              "refine": 2,
+              "simp": 33,
+              "simp_all": 3,
+              "simp_rw": 15,
+              "simpa": 1,
+              "term": 29
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.75,
+              "maximum": 1024,
+              "median": 19.5,
+              "minimum": 2,
+              "p25": 6.0,
+              "p75": 64.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.71875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 92,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.765625,
+            "solved_at_8": 4,
+            "verified_candidates": 4,
+            "verified_density": 0.015625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 124,
+              "token_limit": 4
+            },
+            "first_construct_counts": {
+              "branch": 121,
+              "simp": 1,
+              "term": 6
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.625,
+              "maximum": 1024,
+              "median": 61.0,
+              "minimum": 6,
+              "p25": 47.0,
+              "p75": 74.0,
+              "p95": 153.49999999999991
+            },
+            "normalized_template_diversity": 0.9453125,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "04579f9d2f8f2ba8e39ebe4f5da972d2774d7e8c508afcfdb454f1d11c2d9193:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 121,
+            "verified_candidates": 1,
+            "verified_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 16,
+              "verified_occurrences": 3
+            },
+            "finish_reason_counts": {
+              "eos": 105,
+              "token_limit": 23
+            },
+            "first_construct_counts": {
+              "aesop": 16,
+              "branch": 1,
+              "dsimp": 2,
+              "exact": 2,
+              "have": 1,
+              "induction": 6,
+              "let": 1,
+              "rcases": 3,
+              "simp": 45,
+              "simp_all": 6,
+              "simp_rw": 12,
+              "term": 33
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.7578125,
+              "maximum": 1024,
+              "median": 10.0,
+              "minimum": 3,
+              "p25": 6.0,
+              "p75": 59.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5859375,
+            "pass_at_1": 0.0234375,
+            "pass_at_4": 0.09375,
+            "pass_at_8": 0.1875,
+            "solved_at_8": 3,
+            "solved_task_ids": [
+              "4c3b5fe688c8ab3c12de8f61d93c9b6874ee0f39a45d818c79e1d46120b75e71:whole",
+              "b2e9d6c54a0abd5918d86eda706c7d52f60be06ce75fdc06306cade2043ecfef:whole",
+              "b9c798ebb5ead3425486e1a7f08f4ec8d4db46847bd046e870e97fc3d881b814:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 75,
+            "verified_candidates": 3,
+            "verified_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0234375
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.87109375,
+            "solved_at_8": 2,
+            "verified_candidates": 2,
+            "verified_density": 0.0078125
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "67cfb40167b5d4b3aa64f75b7efad922ced76688a6c7e2e549dca60927e957be",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 94,
+              "token_limit": 34
+            },
+            "first_construct_counts": {
+              "branch": 9,
+              "term": 119
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1796875,
+              "maximum": 1024,
+              "median": 272.5,
+              "minimum": 10,
+              "p25": 99.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 15,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 15,
+              "verified_occurrences": 1
+            },
+            "finish_reason_counts": {
+              "eos": 117,
+              "token_limit": 11
+            },
+            "first_construct_counts": {
+              "aesop": 15,
+              "dsimp": 7,
+              "exact": 6,
+              "ext": 2,
+              "have": 9,
+              "induction": 8,
+              "intros": 1,
+              "let": 2,
+              "obtain": 2,
+              "rcases": 1,
+              "simp": 22,
+              "simp_all": 5,
+              "simp_rw": 5,
+              "simpa": 12,
+              "term": 31
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.7890625,
+              "maximum": 1024,
+              "median": 17.0,
+              "minimum": 2,
+              "p25": 6.0,
+              "p75": 41.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.7421875,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 95,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 6.155941009521484,
+        "gradient_norm_trailing_25_mean": 5.505474853515625,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 12.011452674865723,
+        "preservation_kl": 0.8533874154090881,
+        "preservation_kl_trailing_25_mean": 4.697042138651013,
+        "sft_loss": 2.04807435721159,
+        "sft_loss_trailing_25_mean": 1.78845944785513,
+        "weighted_preservation_kl": 0.0,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.796875,
+          "solved_at_8": 6,
+          "verified_candidates": 6,
+          "verified_density": 0.0078125
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 4,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.7994791666666666,
+          "finish_reason_counts": {
+            "eos": 307,
+            "token_limit": 77
+          },
+          "first_construct_counts": {
+            "branch": 156,
+            "simp": 1,
+            "term": 227
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.359375,
+            "maximum": 1024,
+            "median": 110.5,
+            "minimum": 6,
+            "p25": 55.0,
+            "p75": 605.5,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9739583333333334,
+          "pass_at_1": 0.005208333333333333,
+          "pass_at_4": 0.020833333333333332,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 2,
+          "verified_density": 0.005208333333333333
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 48,
+            "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+            "theorem_count": 47,
+            "verified_occurrences": 4
+          },
+          "eos_fraction": 0.8541666666666666,
+          "finish_reason_counts": {
+            "eos": 328,
+            "token_limit": 56
+          },
+          "first_construct_counts": {
+            "aesop": 48,
+            "branch": 1,
+            "constructor": 3,
+            "dsimp": 17,
+            "exact": 11,
+            "ext": 3,
+            "have": 14,
+            "induction": 21,
+            "intros": 1,
+            "let": 5,
+            "obtain": 2,
+            "rcases": 4,
+            "refine": 2,
+            "simp": 100,
+            "simp_all": 14,
+            "simp_rw": 32,
+            "simpa": 13,
+            "term": 93
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.765625,
+            "maximum": 1024,
+            "median": 16.0,
+            "minimum": 2,
+            "p25": 6.0,
+            "p75": 56.75,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.6197916666666666,
+          "pass_at_1": 0.010416666666666666,
+          "pass_at_4": 0.041666666666666664,
+          "pass_at_8": 0.08333333333333333,
+          "solved_at_8": 4,
+          "task_count": 48,
+          "verified_candidates": 4,
+          "verified_density": 0.010416666666666666
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "375d214d81385001d68565cf4c93c834ca3a2fe7f8491a20de1e565a9d122f3b",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "375d214d81385001d68565cf4c93c834ca3a2fe7f8491a20de1e565a9d122f3b",
+        "maximum_anchor_kl": 11.388702392578125,
+        "mean_anchor_kl": 4.552258402467714,
+        "median_anchor_kl": 4.00197696685791,
+        "p95_anchor_kl": 10.18809986114502
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.006204906204906205,
+        "new_solved_interface_tasks": 4,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C0-250",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "23441949f111980f623f54a6b470cf7a45b6a377475f9b6197ec4d1d187e0089",
+      "configuration": {
+        "base_kl_lambda": 0.0,
+        "eligible": false,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C0",
+      "optimizer_step": 250,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 2000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8515625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 98,
+              "token_limit": 30
+            },
+            "first_construct_counts": {
+              "branch": 42,
+              "term": 86
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.34375,
+              "maximum": 1024,
+              "median": 140.5,
+              "minimum": 6,
+              "p25": 45.75,
+              "p75": 902.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 12,
+              "sha256": "e4c28cd36a9f2624d552ef366424c888b971a8843807eca637ec8c20118e563e",
+              "theorem_count": 12,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 108,
+              "token_limit": 20
+            },
+            "first_construct_counts": {
+              "aesop": 10,
+              "dsimp": 2,
+              "grind": 12,
+              "induction": 2,
+              "refine": 1,
+              "simp": 63,
+              "simp_rw": 30,
+              "simpa": 1,
+              "term": 7
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.765625,
+              "maximum": 1024,
+              "median": 18.5,
+              "minimum": 3,
+              "p25": 10.0,
+              "p75": 60.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.7421875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 95,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.75,
+            "solved_at_8": 2,
+            "verified_candidates": 2,
+            "verified_density": 0.0078125
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 5,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 119,
+              "token_limit": 9
+            },
+            "first_construct_counts": {
+              "branch": 122,
+              "simp": 1,
+              "term": 5
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.546875,
+              "maximum": 1024,
+              "median": 61.0,
+              "minimum": 6,
+              "p25": 46.0,
+              "p75": 86.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "04579f9d2f8f2ba8e39ebe4f5da972d2774d7e8c508afcfdb454f1d11c2d9193:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 1,
+            "verified_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "e4c28cd36a9f2624d552ef366424c888b971a8843807eca637ec8c20118e563e",
+              "theorem_count": 15,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 106,
+              "token_limit": 22
+            },
+            "first_construct_counts": {
+              "aesop": 8,
+              "grind": 16,
+              "induction": 1,
+              "refine": 1,
+              "simp": 66,
+              "simp_rw": 27,
+              "term": 9
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.7890625,
+              "maximum": 1024,
+              "median": 14.0,
+              "minimum": 3,
+              "p25": 6.0,
+              "p75": 43.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5390625,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "4c3b5fe688c8ab3c12de8f61d93c9b6874ee0f39a45d818c79e1d46120b75e71:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 69,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.90625,
+            "solved_at_8": 2,
+            "verified_candidates": 3,
+            "verified_density": 0.01171875
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 2,
+              "sha256": "0b12a61aeb5464be12f911577e8bc184c0a912eabbc2544c76d7193becdc490b",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 106,
+              "token_limit": 22
+            },
+            "first_construct_counts": {
+              "branch": 25,
+              "term": 103
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.3046875,
+              "maximum": 1024,
+              "median": 187.5,
+              "minimum": 6,
+              "p25": 51.5,
+              "p75": 466.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.984375,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "bbcb7980988c6c050e6186aa48d5fe2939f1ea397e14ad8baa0f7547c089f7ca:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 126,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 11,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 11,
+              "verified_occurrences": 1
+            },
+            "finish_reason_counts": {
+              "eos": 122,
+              "token_limit": 6
+            },
+            "first_construct_counts": {
+              "aesop": 11,
+              "branch": 1,
+              "dsimp": 9,
+              "exact": 7,
+              "grind": 6,
+              "have": 2,
+              "induction": 3,
+              "intro": 1,
+              "let": 1,
+              "obtain": 5,
+              "rcases": 1,
+              "simp": 43,
+              "simp_all": 1,
+              "simp_rw": 12,
+              "simpa": 10,
+              "term": 15
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.8125,
+              "maximum": 1024,
+              "median": 21.0,
+              "minimum": 3,
+              "p25": 10.0,
+              "p75": 44.25,
+              "p95": 726.9499999999978
+            },
+            "normalized_template_diversity": 0.828125,
+            "pass_at_1": 0.015625,
+            "pass_at_4": 0.049107142857142856,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 106,
+            "verified_candidates": 2,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.015625
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 5.5856170654296875,
+        "gradient_norm_trailing_25_mean": 5.3578941345214846,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 12.011452674865723,
+        "preservation_kl": 10.229747772216797,
+        "preservation_kl_trailing_25_mean": 3.8932727571576833,
+        "sft_loss": 1.9210679456591606,
+        "sft_loss_trailing_25_mean": 1.711599250966683,
+        "weighted_preservation_kl": 0.0,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.8138020833333334,
+          "solved_at_8": 4,
+          "verified_candidates": 5,
+          "verified_density": 0.006510416666666667
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 5,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8411458333333334,
+          "finish_reason_counts": {
+            "eos": 323,
+            "token_limit": 61
+          },
+          "first_construct_counts": {
+            "branch": 189,
+            "simp": 1,
+            "term": 194
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.3984375,
+            "maximum": 1024,
+            "median": 87.0,
+            "minimum": 6,
+            "p25": 46.0,
+            "p75": 381.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.96875,
+          "pass_at_1": 0.005208333333333333,
+          "pass_at_4": 0.020833333333333332,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 2,
+          "verified_density": 0.005208333333333333
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 34,
+            "sha256": "e4c28cd36a9f2624d552ef366424c888b971a8843807eca637ec8c20118e563e",
+            "theorem_count": 33,
+            "verified_occurrences": 1
+          },
+          "eos_fraction": 0.875,
+          "finish_reason_counts": {
+            "eos": 336,
+            "token_limit": 48
+          },
+          "first_construct_counts": {
+            "aesop": 29,
+            "branch": 1,
+            "dsimp": 11,
+            "exact": 7,
+            "grind": 34,
+            "have": 2,
+            "induction": 6,
+            "intro": 1,
+            "let": 1,
+            "obtain": 5,
+            "rcases": 1,
+            "refine": 2,
+            "simp": 172,
+            "simp_all": 1,
+            "simp_rw": 69,
+            "simpa": 11,
+            "term": 31
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.7890625,
+            "maximum": 1024,
+            "median": 18.0,
+            "minimum": 3,
+            "p25": 9.0,
+            "p75": 46.75,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.6588541666666666,
+          "pass_at_1": 0.0078125,
+          "pass_at_4": 0.026785714285714284,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 3,
+          "verified_density": 0.0078125
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "81ae22d2d43b370fb7c757b07d3deca09171f5ceea6c2c270b0eadaab621d271",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "81ae22d2d43b370fb7c757b07d3deca09171f5ceea6c2c270b0eadaab621d271",
+        "maximum_anchor_kl": 12.750266075134277,
+        "mean_anchor_kl": 4.963920720317901,
+        "median_anchor_kl": 4.224806308746338,
+        "p95_anchor_kl": 11.109431266784668
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.0075092153217153216,
+        "new_solved_interface_tasks": 6,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C0-500",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "4ad258337d12432f4401d4a8c25c5a7d1e4bd3bb0f0357d38503011cf3fc6873",
+      "configuration": {
+        "base_kl_lambda": 0.0,
+        "eligible": false,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C0",
+      "optimizer_step": 500,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 4000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8515625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "fb4a9045378cd951b0badea54e8d39cee1727ac8c12e1cb4faac76a575303826",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 108,
+              "token_limit": 20
+            },
+            "first_construct_counts": {
+              "branch": 77,
+              "term": 51
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.59375,
+              "maximum": 1024,
+              "median": 45.5,
+              "minimum": 6,
+              "p25": 20.0,
+              "p75": 383.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9453125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 121,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 110,
+              "token_limit": 18
+            },
+            "first_construct_counts": {
+              "aesop": 16,
+              "branch": 12,
+              "constructor": 3,
+              "dsimp": 10,
+              "exact": 7,
+              "ext": 1,
+              "induction": 3,
+              "refine": 1,
+              "simp": 37,
+              "simp_all": 3,
+              "simp_rw": 2,
+              "simpa": 2,
+              "term": 31
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.6640625,
+              "maximum": 1024,
+              "median": 20.5,
+              "minimum": 2,
+              "p25": 6.0,
+              "p75": 107.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.7578125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 97,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.78125,
+            "solved_at_8": 3,
+            "verified_candidates": 3,
+            "verified_density": 0.01171875
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 5,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 125,
+              "token_limit": 3
+            },
+            "first_construct_counts": {
+              "branch": 126,
+              "term": 2
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5703125,
+              "maximum": 1024,
+              "median": 62.0,
+              "minimum": 17,
+              "p25": 51.0,
+              "p75": 77.0,
+              "p95": 277.0999999999999
+            },
+            "normalized_template_diversity": 0.9140625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 117,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 16,
+              "verified_occurrences": 3
+            },
+            "finish_reason_counts": {
+              "eos": 104,
+              "token_limit": 24
+            },
+            "first_construct_counts": {
+              "aesop": 16,
+              "branch": 12,
+              "constructor": 4,
+              "dsimp": 9,
+              "exact": 1,
+              "ext": 1,
+              "induction": 2,
+              "let": 1,
+              "simp": 46,
+              "simp_all": 6,
+              "term": 30
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.703125,
+              "maximum": 1024,
+              "median": 15.0,
+              "minimum": 2,
+              "p25": 6.0,
+              "p75": 81.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6484375,
+            "pass_at_1": 0.0234375,
+            "pass_at_4": 0.09375,
+            "pass_at_8": 0.1875,
+            "solved_at_8": 3,
+            "solved_task_ids": [
+              "4c3b5fe688c8ab3c12de8f61d93c9b6874ee0f39a45d818c79e1d46120b75e71:whole",
+              "b2e9d6c54a0abd5918d86eda706c7d52f60be06ce75fdc06306cade2043ecfef:whole",
+              "b9c798ebb5ead3425486e1a7f08f4ec8d4db46847bd046e870e97fc3d881b814:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 83,
+            "verified_candidates": 3,
+            "verified_counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0234375
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.88671875,
+            "solved_at_8": 3,
+            "verified_candidates": 5,
+            "verified_density": 0.01953125
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "d238cbbe75b6ebca987f71462ffe0bbc1af46253aa337b670dda8c30e36db0d1",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 108,
+              "token_limit": 20
+            },
+            "first_construct_counts": {
+              "branch": 72,
+              "term": 56
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.546875,
+              "maximum": 1024,
+              "median": 44.5,
+              "minimum": 6,
+              "p25": 18.0,
+              "p75": 260.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.953125,
+            "pass_at_1": 0.03125,
+            "pass_at_4": 0.09821428571428571,
+            "pass_at_8": 0.125,
+            "solved_at_8": 2,
+            "solved_task_ids": [
+              "2d0935596648c342b95c8bf2bcb8dbfaea1a085252425f77c6f606f2cd864366:incremental",
+              "bbcb7980988c6c050e6186aa48d5fe2939f1ea397e14ad8baa0f7547c089f7ca:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 122,
+            "verified_candidates": 4,
+            "verified_counts": [
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.03125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 15,
+              "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+              "theorem_count": 15,
+              "verified_occurrences": 1
+            },
+            "finish_reason_counts": {
+              "eos": 112,
+              "token_limit": 16
+            },
+            "first_construct_counts": {
+              "aesop": 15,
+              "branch": 9,
+              "dsimp": 3,
+              "exact": 16,
+              "ext": 5,
+              "induction": 1,
+              "intro": 1,
+              "let": 2,
+              "obtain": 3,
+              "simp": 19,
+              "simpa": 8,
+              "term": 46
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.78125,
+              "maximum": 1024,
+              "median": 21.0,
+              "minimum": 2,
+              "p25": 9.0,
+              "p75": 49.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.8203125,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 105,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 5.790404796600342,
+        "gradient_norm_trailing_25_mean": 5.374786014556885,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 12.011452674865723,
+        "preservation_kl": 11.253852844238281,
+        "preservation_kl_trailing_25_mean": 5.912547599356621,
+        "sft_loss": 1.9633869677782059,
+        "sft_loss_trailing_25_mean": 1.549405452327337,
+        "weighted_preservation_kl": 0.0,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.8151041666666666,
+          "solved_at_8": 6,
+          "verified_candidates": 8,
+          "verified_density": 0.010416666666666666
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 5,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8880208333333334,
+          "finish_reason_counts": {
+            "eos": 341,
+            "token_limit": 43
+          },
+          "first_construct_counts": {
+            "branch": 275,
+            "term": 109
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.5703125,
+            "maximum": 1024,
+            "median": 58.0,
+            "minimum": 6,
+            "p25": 24.0,
+            "p75": 147.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9375,
+          "pass_at_1": 0.010416666666666666,
+          "pass_at_4": 0.03273809523809524,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 4,
+          "verified_density": 0.010416666666666666
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 47,
+            "sha256": "867d1ac63ad2e739525f4b9b83604f8c8c4fa4531959e77bf53bb64c7e61bed7",
+            "theorem_count": 47,
+            "verified_occurrences": 4
+          },
+          "eos_fraction": 0.8489583333333334,
+          "finish_reason_counts": {
+            "eos": 326,
+            "token_limit": 58
+          },
+          "first_construct_counts": {
+            "aesop": 47,
+            "branch": 33,
+            "constructor": 7,
+            "dsimp": 22,
+            "exact": 24,
+            "ext": 7,
+            "induction": 6,
+            "intro": 1,
+            "let": 3,
+            "obtain": 3,
+            "refine": 1,
+            "simp": 102,
+            "simp_all": 9,
+            "simp_rw": 2,
+            "simpa": 10,
+            "term": 107
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.7161458333333334,
+            "maximum": 1024,
+            "median": 18.0,
+            "minimum": 2,
+            "p25": 6.0,
+            "p75": 81.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.6927083333333334,
+          "pass_at_1": 0.010416666666666666,
+          "pass_at_4": 0.041666666666666664,
+          "pass_at_8": 0.08333333333333333,
+          "solved_at_8": 4,
+          "task_count": 48,
+          "verified_candidates": 4,
+          "verified_density": 0.010416666666666666
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "5b4028e10ba948dc3ffe5ad379db7652a9b87b42a4c64911ae3e4ecfa41dd96f",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "5b4028e10ba948dc3ffe5ad379db7652a9b87b42a4c64911ae3e4ecfa41dd96f",
+        "maximum_anchor_kl": 3.4703588485717773,
+        "mean_anchor_kl": 0.7936811435927495,
+        "median_anchor_kl": 0.4358038008213043,
+        "p95_anchor_kl": 2.583928108215332
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.037306530275280275,
+        "new_solved_interface_tasks": 2,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C1-100",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "fe8cc14c83233ee71606602806f4ef803b4bdf5908899f73a2bfbe351f6010cf",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C1",
+      "optimizer_step": 100,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 800,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.73828125,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 96,
+              "token_limit": 32
+            },
+            "first_construct_counts": {
+              "branch": 27,
+              "term": 101
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.203125,
+              "maximum": 1024,
+              "median": 237.5,
+              "minimum": 6,
+              "p25": 83.0,
+              "p75": 985.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9765625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 125,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 30,
+              "sha256": "0eda5271a3f08cf11d528bfdbc4aca18280ff02e07d2cc09b6358d704e88fceb",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 106,
+              "token_limit": 22
+            },
+            "first_construct_counts": {
+              "aesop": 5,
+              "branch": 5,
+              "dsimp": 4,
+              "empty": 3,
+              "exact": 4,
+              "have": 1,
+              "induction": 8,
+              "intro": 1,
+              "let": 3,
+              "simp": 3,
+              "simp_all": 1,
+              "simp_rw": 7,
+              "term": 83
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.7578125,
+              "maximum": 1024,
+              "median": 6.0,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 50.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 64,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.71875,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 123,
+              "token_limit": 5
+            },
+            "first_construct_counts": {
+              "branch": 124,
+              "term": 4
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.625,
+              "maximum": 1024,
+              "median": 59.5,
+              "minimum": 6,
+              "p25": 45.5,
+              "p75": 77.0,
+              "p95": 336.14999999999924
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 30,
+              "sha256": "0eda5271a3f08cf11d528bfdbc4aca18280ff02e07d2cc09b6358d704e88fceb",
+              "theorem_count": 12,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 102,
+              "token_limit": 26
+            },
+            "first_construct_counts": {
+              "aesop": 7,
+              "branch": 1,
+              "constructor": 3,
+              "dsimp": 2,
+              "induction": 4,
+              "let": 3,
+              "rcases": 2,
+              "rfl": 1,
+              "simp": 6,
+              "simp_rw": 10,
+              "term": 89
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.75,
+              "maximum": 1024,
+              "median": 7.0,
+              "minimum": 2,
+              "p25": 2.0,
+              "p75": 65.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.4765625,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "b9c798ebb5ead3425486e1a7f08f4ec8d4db46847bd046e870e97fc3d881b814:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 61,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.79296875,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 2,
+              "sha256": "91a8094dee09e7034f2febd8e94d905a035d12476c8f9d7135b4463d3411257e",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 98,
+              "token_limit": 30
+            },
+            "first_construct_counts": {
+              "branch": 11,
+              "term": 117
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1640625,
+              "maximum": 1024,
+              "median": 252.5,
+              "minimum": 6,
+              "p25": 107.75,
+              "p75": 817.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9921875,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 127,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 24,
+              "sha256": "0eda5271a3f08cf11d528bfdbc4aca18280ff02e07d2cc09b6358d704e88fceb",
+              "theorem_count": 9,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 104,
+              "token_limit": 24
+            },
+            "first_construct_counts": {
+              "aesop": 7,
+              "branch": 2,
+              "dsimp": 1,
+              "empty": 2,
+              "exact": 3,
+              "have": 4,
+              "induction": 6,
+              "intros": 1,
+              "let": 7,
+              "obtain": 1,
+              "simp": 5,
+              "simp_all": 2,
+              "simp_rw": 5,
+              "simpa": 2,
+              "term": 80
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.703125,
+              "maximum": 1024,
+              "median": 8.5,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 213.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.59375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 76,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 6.228005409240723,
+        "gradient_norm_trailing_25_mean": 6.220923881530762,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 24.0422306060791,
+        "preservation_kl": 0.41762077808380127,
+        "preservation_kl_trailing_25_mean": 1.1078345178812743,
+        "sft_loss": 2.141799997538328,
+        "sft_loss_trailing_25_mean": 1.8454929729085416,
+        "weighted_preservation_kl": 0.04176207780838013,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.72265625,
+          "solved_at_8": 2,
+          "verified_candidates": 2,
+          "verified_density": 0.0026041666666666665
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 3,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8255208333333334,
+          "finish_reason_counts": {
+            "eos": 317,
+            "token_limit": 67
+          },
+          "first_construct_counts": {
+            "branch": 162,
+            "term": 222
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.3307291666666667,
+            "maximum": 1024,
+            "median": 128.0,
+            "minimum": 6,
+            "p25": 55.0,
+            "p75": 462.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9765625,
+          "pass_at_1": 0.0026041666666666665,
+          "pass_at_4": 0.010416666666666666,
+          "pass_at_8": 0.020833333333333332,
+          "solved_at_8": 1,
+          "task_count": 48,
+          "verified_candidates": 1,
+          "verified_density": 0.0026041666666666665
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 84,
+            "sha256": "0eda5271a3f08cf11d528bfdbc4aca18280ff02e07d2cc09b6358d704e88fceb",
+            "theorem_count": 34,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8125,
+          "finish_reason_counts": {
+            "eos": 312,
+            "token_limit": 72
+          },
+          "first_construct_counts": {
+            "aesop": 19,
+            "branch": 8,
+            "constructor": 3,
+            "dsimp": 7,
+            "empty": 5,
+            "exact": 7,
+            "have": 5,
+            "induction": 18,
+            "intro": 1,
+            "intros": 1,
+            "let": 13,
+            "obtain": 1,
+            "rcases": 2,
+            "rfl": 1,
+            "simp": 14,
+            "simp_all": 3,
+            "simp_rw": 22,
+            "simpa": 2,
+            "term": 252
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.7369791666666666,
+            "maximum": 1024,
+            "median": 6.0,
+            "minimum": 1,
+            "p25": 2.0,
+            "p75": 82.75,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.46875,
+          "pass_at_1": 0.0026041666666666665,
+          "pass_at_4": 0.010416666666666666,
+          "pass_at_8": 0.020833333333333332,
+          "solved_at_8": 1,
+          "task_count": 48,
+          "verified_candidates": 1,
+          "verified_density": 0.0026041666666666665
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "450848a986892baf711681572309231359972251205b190cc272b642f0c58afc",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "450848a986892baf711681572309231359972251205b190cc272b642f0c58afc",
+        "maximum_anchor_kl": 4.527119159698486,
+        "mean_anchor_kl": 0.5630973521826235,
+        "median_anchor_kl": 0.25311195850372314,
+        "p95_anchor_kl": 2.3167543411254883
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.038411414973914974,
+        "new_solved_interface_tasks": 1,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C1-250",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "b6df949dd46f0ccb66434d1bb1998342614204aad1b4dca16dad94af60fcbd98",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C1",
+      "optimizer_step": 250,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 2000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.82421875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 108,
+              "token_limit": 20
+            },
+            "first_construct_counts": {
+              "branch": 43,
+              "term": 85
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.3671875,
+              "maximum": 1024,
+              "median": 152.5,
+              "minimum": 6,
+              "p25": 42.75,
+              "p75": 606.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.96875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 124,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 57,
+              "token_limit": 71
+            },
+            "first_construct_counts": {
+              "branch": 5,
+              "empty": 1,
+              "grind": 2,
+              "induction": 4,
+              "let": 3,
+              "term": 112,
+              "unparseable": 1
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.3984375,
+              "maximum": 1024,
+              "median": 1024.0,
+              "minimum": 1,
+              "p25": 5.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6796875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 87,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.79296875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 118,
+              "token_limit": 10
+            },
+            "first_construct_counts": {
+              "branch": 123,
+              "simp": 1,
+              "term": 4
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.546875,
+              "maximum": 1024,
+              "median": 61.5,
+              "minimum": 6,
+              "p25": 47.0,
+              "p75": 90.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "8831223cda2028f442d5b06998e47bc748b11574bba849699d32244fd77d7329",
+              "theorem_count": 12,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 72,
+              "token_limit": 56
+            },
+            "first_construct_counts": {
+              "branch": 1,
+              "empty": 1,
+              "grind": 7,
+              "induction": 1,
+              "let": 2,
+              "rcases": 2,
+              "term": 114
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5,
+              "maximum": 1024,
+              "median": 62.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 80,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.84375,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 2,
+              "sha256": "2e25426f5c4cd144529fba96a60f6e9c21ba7c1e61af73a183734e8b11a5c276",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 110,
+              "token_limit": 18
+            },
+            "first_construct_counts": {
+              "branch": 25,
+              "term": 103
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.3125,
+              "maximum": 1024,
+              "median": 158.0,
+              "minimum": 6,
+              "p25": 49.25,
+              "p75": 387.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9921875,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "bbcb7980988c6c050e6186aa48d5fe2939f1ea397e14ad8baa0f7547c089f7ca:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 127,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 74,
+              "token_limit": 54
+            },
+            "first_construct_counts": {
+              "branch": 2,
+              "empty": 1,
+              "grind": 2,
+              "induction": 5,
+              "rcases": 2,
+              "term": 116
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4921875,
+              "maximum": 1024,
+              "median": 79.0,
+              "minimum": 1,
+              "p25": 3.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6953125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 89,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 6.052523136138916,
+        "gradient_norm_trailing_25_mean": 6.1747867870330815,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 24.0422306060791,
+        "preservation_kl": 2.888353109359741,
+        "preservation_kl_trailing_25_mean": 0.604002206902951,
+        "sft_loss": 1.899470955133438,
+        "sft_loss_trailing_25_mean": 1.7544815172068775,
+        "weighted_preservation_kl": 0.28883531093597414,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.7955729166666666,
+          "solved_at_8": 1,
+          "verified_candidates": 1,
+          "verified_density": 0.0013020833333333333
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 4,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.875,
+          "finish_reason_counts": {
+            "eos": 336,
+            "token_limit": 48
+          },
+          "first_construct_counts": {
+            "branch": 191,
+            "simp": 1,
+            "term": 192
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.4088541666666667,
+            "maximum": 1024,
+            "median": 82.5,
+            "minimum": 6,
+            "p25": 46.75,
+            "p75": 307.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9739583333333334,
+          "pass_at_1": 0.0026041666666666665,
+          "pass_at_4": 0.010416666666666666,
+          "pass_at_8": 0.020833333333333332,
+          "solved_at_8": 1,
+          "task_count": 48,
+          "verified_candidates": 1,
+          "verified_density": 0.0026041666666666665
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 42,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 42,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.5286458333333334,
+          "finish_reason_counts": {
+            "eos": 203,
+            "token_limit": 181
+          },
+          "first_construct_counts": {
+            "branch": 8,
+            "empty": 3,
+            "grind": 11,
+            "induction": 10,
+            "let": 5,
+            "rcases": 4,
+            "term": 342,
+            "unparseable": 1
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.4635416666666667,
+            "maximum": 1024,
+            "median": 305.0,
+            "minimum": 1,
+            "p25": 3.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.6171875,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "f7b788ba4f3e120969cd5a2088b0eca1d68ae772c81bbfcf6297d498d6cbae94",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "f7b788ba4f3e120969cd5a2088b0eca1d68ae772c81bbfcf6297d498d6cbae94",
+        "maximum_anchor_kl": 5.422877311706543,
+        "mean_anchor_kl": 0.45609105867222866,
+        "median_anchor_kl": 0.1900632679462433,
+        "p95_anchor_kl": 2.026658535003662
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.039562723156473155,
+        "new_solved_interface_tasks": 0,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C1-500",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "4bef438f166a694b2ea1a9c7f9d82dfa4370c8a493488f1791295516f064d162",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 3e-05
+      },
+      "configuration_id": "C1",
+      "optimizer_step": 500,
+      "positive_500_step_gate": false,
+      "stream_rows_consumed": 4000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.7265625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 5,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 75,
+              "token_limit": 53
+            },
+            "first_construct_counts": {
+              "branch": 8,
+              "term": 120
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1015625,
+              "maximum": 1024,
+              "median": 579.0,
+              "minimum": 14,
+              "p25": 139.5,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.96875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 124,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 77,
+              "token_limit": 51
+            },
+            "first_construct_counts": {
+              "branch": 4,
+              "empty": 1,
+              "let": 1,
+              "term": 122
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5234375,
+              "maximum": 1024,
+              "median": 30.0,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.484375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 62,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.765625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 5,
+              "sha256": "0bdb18ecb654fc5c99c9f4a3cde3293a7901dbbc0d2de24baf1414470351b1a0",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 124,
+              "token_limit": 4
+            },
+            "first_construct_counts": {
+              "branch": 120,
+              "term": 8
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.421875,
+              "maximum": 1024,
+              "median": 68.0,
+              "minimum": 20,
+              "p25": 53.0,
+              "p75": 106.0,
+              "p95": 316.95
+            },
+            "normalized_template_diversity": 0.8984375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 115,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 11,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 11,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 70,
+              "token_limit": 58
+            },
+            "first_construct_counts": {
+              "branch": 6,
+              "let": 2,
+              "term": 120
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5,
+              "maximum": 1024,
+              "median": 65.5,
+              "minimum": 2,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6328125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 81,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80078125,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "f5235224817603f406a5026fb528a61ce10422666c7436d21e5341a85c8781bb",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 98,
+              "token_limit": 30
+            },
+            "first_construct_counts": {
+              "branch": 5,
+              "term": 123
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.109375,
+              "maximum": 1024,
+              "median": 340.5,
+              "minimum": 12,
+              "p25": 122.25,
+              "p75": 893.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 15,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 15,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 80,
+              "token_limit": 48
+            },
+            "first_construct_counts": {
+              "branch": 6,
+              "empty": 1,
+              "induction": 1,
+              "let": 1,
+              "term": 119
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5390625,
+              "maximum": 1024,
+              "median": 22.5,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6015625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 77,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 7.145048141479492,
+        "gradient_norm_trailing_25_mean": 5.885419807434082,
+        "learning_rate": 3e-05,
+        "maximum_gradient_norm_through_checkpoint": 24.0422306060791,
+        "preservation_kl": 2.0381641387939453,
+        "preservation_kl_trailing_25_mean": 0.5825331705436111,
+        "sft_loss": 2.0112538039684296,
+        "sft_loss_trailing_25_mean": 1.5897631424188148,
+        "weighted_preservation_kl": 0.20381641387939453,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.73828125,
+          "solved_at_8": 0,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 5,
+            "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.7734375,
+          "finish_reason_counts": {
+            "eos": 297,
+            "token_limit": 87
+          },
+          "first_construct_counts": {
+            "branch": 133,
+            "term": 251
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.2109375,
+            "maximum": 1024,
+            "median": 170.5,
+            "minimum": 12,
+            "p25": 69.75,
+            "p75": 779.5,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9557291666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 42,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 42,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.5911458333333334,
+          "finish_reason_counts": {
+            "eos": 227,
+            "token_limit": 157
+          },
+          "first_construct_counts": {
+            "branch": 16,
+            "empty": 2,
+            "induction": 1,
+            "let": 4,
+            "term": 361
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.5208333333333334,
+            "maximum": 1024,
+            "median": 40.0,
+            "minimum": 1,
+            "p25": 2.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.5208333333333334,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "3395d36ae747533e231dd70f05132057268a1e65e1bacdd7b07306c1e4adc360",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "3395d36ae747533e231dd70f05132057268a1e65e1bacdd7b07306c1e4adc360",
+        "maximum_anchor_kl": 4.484122276306152,
+        "mean_anchor_kl": 1.111762420498394,
+        "median_anchor_kl": 0.601685643196106,
+        "p95_anchor_kl": 3.4708945751190186
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.05846323815073815,
+        "new_solved_interface_tasks": 2,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C2-100",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "eaa0dbc18eb49ccb278e541bcdee085fd7e41f1b2a235019a0296ea19eb06a56",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 1e-05
+      },
+      "configuration_id": "C2",
+      "optimizer_step": 100,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 800,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80859375,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 86,
+              "token_limit": 42
+            },
+            "first_construct_counts": {
+              "branch": 22,
+              "term": 106
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.140625,
+              "maximum": 1024,
+              "median": 423.5,
+              "minimum": 15,
+              "p25": 126.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.96875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 124,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 13,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 98,
+              "token_limit": 30
+            },
+            "first_construct_counts": {
+              "aesop": 7,
+              "branch": 3,
+              "constructor": 5,
+              "dsimp": 4,
+              "empty": 7,
+              "have": 2,
+              "induction": 5,
+              "intro": 10,
+              "let": 3,
+              "rfl": 10,
+              "simp": 4,
+              "simp_rw": 4,
+              "term": 64
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.6484375,
+              "maximum": 1024,
+              "median": 18.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 367.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6484375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 83,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.74609375,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 115,
+              "token_limit": 13
+            },
+            "first_construct_counts": {
+              "branch": 123,
+              "term": 5
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4765625,
+              "maximum": 1024,
+              "median": 66.5,
+              "minimum": 6,
+              "p25": 51.75,
+              "p75": 101.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 120,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 13,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 101,
+              "token_limit": 27
+            },
+            "first_construct_counts": {
+              "aesop": 3,
+              "apply": 1,
+              "constructor": 11,
+              "dsimp": 2,
+              "empty": 13,
+              "exact": 1,
+              "have": 2,
+              "let": 4,
+              "rcases": 4,
+              "rfl": 8,
+              "simp": 4,
+              "simp_rw": 1,
+              "term": 74
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.6875,
+              "maximum": 1024,
+              "median": 9.5,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 205.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5546875,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "b2e9d6c54a0abd5918d86eda706c7d52f60be06ce75fdc06306cade2043ecfef:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 71,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80859375,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "3ccae90aa02f520bb61caed465188b41e4573954d4675bd8e0fe3d9227aba385",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 96,
+              "token_limit": 32
+            },
+            "first_construct_counts": {
+              "branch": 7,
+              "term": 121
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.140625,
+              "maximum": 1024,
+              "median": 296.5,
+              "minimum": 12,
+              "p25": 117.75,
+              "p75": 1021.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 12,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 12,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 95,
+              "token_limit": 33
+            },
+            "first_construct_counts": {
+              "aesop": 4,
+              "branch": 3,
+              "constructor": 2,
+              "dsimp": 1,
+              "empty": 12,
+              "exact": 1,
+              "have": 1,
+              "induction": 2,
+              "intro": 8,
+              "let": 9,
+              "obtain": 1,
+              "rfl": 10,
+              "term": 74
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.640625,
+              "maximum": 1024,
+              "median": 13.5,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6171875,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "9b8e8c6835c364a69e186ced0aeef33a7f1efaafe1f8a33e6b96d559cfcb652b:whole"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 79,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 7.125198841094971,
+        "gradient_norm_trailing_25_mean": 8.734134750366211,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 18.37254524230957,
+        "preservation_kl": 0.26262521743774414,
+        "preservation_kl_trailing_25_mean": 1.1977187391743065,
+        "sft_loss": 2.2357864901423454,
+        "sft_loss_trailing_25_mean": 2.0146731222234666,
+        "weighted_preservation_kl": 0.026262521743774414,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.7591145833333334,
+          "solved_at_8": 2,
+          "verified_candidates": 2,
+          "verified_density": 0.0026041666666666665
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 4,
+            "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.7734375,
+          "finish_reason_counts": {
+            "eos": 297,
+            "token_limit": 87
+          },
+          "first_construct_counts": {
+            "branch": 152,
+            "term": 232
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.2526041666666667,
+            "maximum": 1024,
+            "median": 157.5,
+            "minimum": 6,
+            "p25": 64.0,
+            "p75": 854.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.96875,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 38,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 38,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.765625,
+          "finish_reason_counts": {
+            "eos": 294,
+            "token_limit": 90
+          },
+          "first_construct_counts": {
+            "aesop": 14,
+            "apply": 1,
+            "branch": 6,
+            "constructor": 18,
+            "dsimp": 7,
+            "empty": 32,
+            "exact": 2,
+            "have": 5,
+            "induction": 7,
+            "intro": 18,
+            "let": 16,
+            "obtain": 1,
+            "rcases": 4,
+            "rfl": 28,
+            "simp": 8,
+            "simp_rw": 5,
+            "term": 212
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.6588541666666666,
+            "maximum": 1024,
+            "median": 15.5,
+            "minimum": 1,
+            "p25": 3.0,
+            "p75": 331.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.5494791666666666,
+          "pass_at_1": 0.005208333333333333,
+          "pass_at_4": 0.020833333333333332,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 2,
+          "verified_density": 0.005208333333333333
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "b4485536a12a8961b53c600cc2a8aa8c3434a184d7ea3f239f2f58072902da47",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "b4485536a12a8961b53c600cc2a8aa8c3434a184d7ea3f239f2f58072902da47",
+        "maximum_anchor_kl": 4.128037452697754,
+        "mean_anchor_kl": 0.5960914793725465,
+        "median_anchor_kl": 0.2670300304889679,
+        "p95_anchor_kl": 2.225281238555908
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.04356780372405372,
+        "new_solved_interface_tasks": 0,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C2-250",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "9159d89c83fa33106e5175e1d0791bd52b20f819834e218f29072a3d4ac88956",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 1e-05
+      },
+      "configuration_id": "C2",
+      "optimizer_step": 250,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 2000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8359375,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 95,
+              "token_limit": 33
+            },
+            "first_construct_counts": {
+              "branch": 33,
+              "term": 95
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1875,
+              "maximum": 1024,
+              "median": 232.5,
+              "minimum": 6,
+              "p25": 77.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.984375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 126,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 70,
+              "token_limit": 58
+            },
+            "first_construct_counts": {
+              "branch": 9,
+              "empty": 1,
+              "induction": 2,
+              "let": 3,
+              "rcases": 2,
+              "simp": 1,
+              "term": 110
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.421875,
+              "maximum": 1024,
+              "median": 402.0,
+              "minimum": 1,
+              "p25": 4.5,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 88,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8046875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 121,
+              "token_limit": 7
+            },
+            "first_construct_counts": {
+              "branch": 124,
+              "term": 4
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4296875,
+              "maximum": 1024,
+              "median": 67.0,
+              "minimum": 11,
+              "p25": 53.0,
+              "p75": 97.0,
+              "p95": 840.9499999999955
+            },
+            "normalized_template_diversity": 0.9765625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 125,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 69,
+              "token_limit": 59
+            },
+            "first_construct_counts": {
+              "aesop": 1,
+              "branch": 2,
+              "constructor": 4,
+              "let": 2,
+              "rcases": 8,
+              "simp_rw": 1,
+              "term": 110
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4765625,
+              "maximum": 1024,
+              "median": 76.0,
+              "minimum": 2,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6328125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 81,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.87109375,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "f2ccdea072e3a82eada2a6cae397df96a8bc9275425f4580e73953f4092cdc2e",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 103,
+              "token_limit": 25
+            },
+            "first_construct_counts": {
+              "branch": 12,
+              "term": 116
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.203125,
+              "maximum": 1024,
+              "median": 241.5,
+              "minimum": 6,
+              "p25": 84.25,
+              "p75": 624.25,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 59,
+              "token_limit": 69
+            },
+            "first_construct_counts": {
+              "branch": 5,
+              "empty": 1,
+              "have": 1,
+              "let": 6,
+              "rcases": 4,
+              "term": 111
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4140625,
+              "maximum": 1024,
+              "median": 1024.0,
+              "minimum": 1,
+              "p25": 6.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.7421875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 95,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 7.8715033531188965,
+        "gradient_norm_trailing_25_mean": 7.742430725097656,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 23.239171981811523,
+        "preservation_kl": 2.6812472343444824,
+        "preservation_kl_trailing_25_mean": 0.5273506559431553,
+        "sft_loss": 1.9431993290781975,
+        "sft_loss_trailing_25_mean": 1.8505697582475842,
+        "weighted_preservation_kl": 0.26812472343444826,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.8138020833333334,
+          "solved_at_8": 0,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 3,
+            "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8307291666666666,
+          "finish_reason_counts": {
+            "eos": 319,
+            "token_limit": 65
+          },
+          "first_construct_counts": {
+            "branch": 169,
+            "term": 215
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.2734375,
+            "maximum": 1024,
+            "median": 129.0,
+            "minimum": 6,
+            "p25": 62.0,
+            "p75": 434.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9869791666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 44,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 44,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.515625,
+          "finish_reason_counts": {
+            "eos": 198,
+            "token_limit": 186
+          },
+          "first_construct_counts": {
+            "aesop": 1,
+            "branch": 16,
+            "constructor": 4,
+            "empty": 2,
+            "have": 1,
+            "induction": 2,
+            "let": 11,
+            "rcases": 14,
+            "simp": 1,
+            "simp_rw": 1,
+            "term": 331
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.4375,
+            "maximum": 1024,
+            "median": 592.5,
+            "minimum": 1,
+            "p25": 5.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.640625,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "74f8aedfefe50b731f4ae7462d76fef3fd65b60566e06fb18f934f7971654a05",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "74f8aedfefe50b731f4ae7462d76fef3fd65b60566e06fb18f934f7971654a05",
+        "maximum_anchor_kl": 5.941173553466797,
+        "mean_anchor_kl": 0.48705969966960083,
+        "median_anchor_kl": 0.183079332113266,
+        "p95_anchor_kl": 2.1342039108276367
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.04849525474525474,
+        "new_solved_interface_tasks": 0,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C2-500",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "ac2bd894909e5f5eebf03572c1b0e0b84ea4ec1c73cc846640782ab02c6a5cd5",
+      "configuration": {
+        "base_kl_lambda": 0.1,
+        "eligible": true,
+        "learning_rate": 1e-05
+      },
+      "configuration_id": "C2",
+      "optimizer_step": 500,
+      "positive_500_step_gate": false,
+      "stream_rows_consumed": 4000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.7890625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 98,
+              "token_limit": 30
+            },
+            "first_construct_counts": {
+              "branch": 30,
+              "term": 98
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.2578125,
+              "maximum": 1024,
+              "median": 254.0,
+              "minimum": 10,
+              "p25": 58.0,
+              "p75": 859.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.953125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 122,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 16,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 16,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 76,
+              "token_limit": 52
+            },
+            "first_construct_counts": {
+              "branch": 7,
+              "empty": 1,
+              "grind": 2,
+              "induction": 2,
+              "let": 4,
+              "term": 112
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5,
+              "maximum": 1024,
+              "median": 66.0,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 80,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.76953125,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 5,
+              "sha256": "0bdb18ecb654fc5c99c9f4a3cde3293a7901dbbc0d2de24baf1414470351b1a0",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 122,
+              "token_limit": 6
+            },
+            "first_construct_counts": {
+              "branch": 122,
+              "term": 6
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5,
+              "maximum": 1024,
+              "median": 65.0,
+              "minimum": 16,
+              "p25": 51.75,
+              "p75": 102.75,
+              "p95": 679.6499999999958
+            },
+            "normalized_template_diversity": 0.9375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 120,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 11,
+              "sha256": "6c91f8ffa6ba28e65b81c829a792a947b6a3afb861b153c3ac3f0a3d96b2ccf5",
+              "theorem_count": 11,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 76,
+              "token_limit": 52
+            },
+            "first_construct_counts": {
+              "aesop": 1,
+              "branch": 5,
+              "grind": 5,
+              "let": 4,
+              "term": 113
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.515625,
+              "maximum": 1024,
+              "median": 23.5,
+              "minimum": 2,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6015625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 77,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8046875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "014054402c56834a5a7acb4c50aa07443226db73e34127927d2060a2de6caa4d",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 103,
+              "token_limit": 25
+            },
+            "first_construct_counts": {
+              "branch": 11,
+              "term": 117
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.2109375,
+              "maximum": 1024,
+              "median": 217.5,
+              "minimum": 12,
+              "p25": 93.75,
+              "p75": 614.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 15,
+              "sha256": "8831223cda2028f442d5b06998e47bc748b11574bba849699d32244fd77d7329",
+              "theorem_count": 9,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 84,
+              "token_limit": 44
+            },
+            "first_construct_counts": {
+              "branch": 6,
+              "empty": 1,
+              "grind": 1,
+              "induction": 1,
+              "let": 4,
+              "term": 115
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5625,
+              "maximum": 1024,
+              "median": 22.5,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.609375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 78,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 9.867729187011719,
+        "gradient_norm_trailing_25_mean": 8.220123901367188,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 23.239171981811523,
+        "preservation_kl": 2.011281967163086,
+        "preservation_kl_trailing_25_mean": 0.5762336883507669,
+        "sft_loss": 2.185709625482559,
+        "sft_loss_trailing_25_mean": 1.6709390460839495,
+        "weighted_preservation_kl": 0.2011281967163086,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.7591145833333334,
+          "solved_at_8": 0,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 5,
+            "sha256": "0bdb18ecb654fc5c99c9f4a3cde3293a7901dbbc0d2de24baf1414470351b1a0",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8411458333333334,
+          "finish_reason_counts": {
+            "eos": 323,
+            "token_limit": 61
+          },
+          "first_construct_counts": {
+            "branch": 163,
+            "term": 221
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.3229166666666667,
+            "maximum": 1024,
+            "median": 118.5,
+            "minimum": 10,
+            "p25": 56.75,
+            "p75": 409.5,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9635416666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 41,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 41,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.6145833333333334,
+          "finish_reason_counts": {
+            "eos": 236,
+            "token_limit": 148
+          },
+          "first_construct_counts": {
+            "aesop": 1,
+            "branch": 18,
+            "empty": 2,
+            "grind": 8,
+            "induction": 3,
+            "let": 12,
+            "term": 340
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.5260416666666666,
+            "maximum": 1024,
+            "median": 35.5,
+            "minimum": 1,
+            "p25": 2.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.5546875,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "77a066c5beaf1451ac4167b8dde215e4c0a1eced36ca3b9bd5f0908d5c81b068",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "77a066c5beaf1451ac4167b8dde215e4c0a1eced36ca3b9bd5f0908d5c81b068",
+        "maximum_anchor_kl": 4.022272109985352,
+        "mean_anchor_kl": 0.7761074921879185,
+        "median_anchor_kl": 0.39086925983428955,
+        "p95_anchor_kl": 2.7661890983581543
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.07722520535020534,
+        "new_solved_interface_tasks": 0,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C3-100",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "0890efa3c9c4016dbb8072017d9b6a28301e4e61a1bd7d097b84c2f15506dd9d",
+      "configuration": {
+        "base_kl_lambda": 0.3,
+        "eligible": true,
+        "learning_rate": 1e-05,
+        "rescue_only": true
+      },
+      "configuration_id": "C3",
+      "optimizer_step": 100,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 800,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80859375,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 89,
+              "token_limit": 39
+            },
+            "first_construct_counts": {
+              "branch": 22,
+              "term": 106
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.109375,
+              "maximum": 1024,
+              "median": 383.5,
+              "minimum": 15,
+              "p25": 136.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.96875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 124,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 13,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 86,
+              "token_limit": 42
+            },
+            "first_construct_counts": {
+              "aesop": 3,
+              "branch": 4,
+              "constructor": 3,
+              "dsimp": 1,
+              "empty": 2,
+              "have": 1,
+              "induction": 5,
+              "intro": 5,
+              "let": 3,
+              "rfl": 13,
+              "simp": 2,
+              "term": 86
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5859375,
+              "maximum": 1024,
+              "median": 25.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6484375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 83,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.73046875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "860c33cc5a0cc6fde8ee107a22ffe92e3da0f6696bdc280cf1e119ca90094ab8",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 116,
+              "token_limit": 12
+            },
+            "first_construct_counts": {
+              "branch": 124,
+              "term": 4
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.46875,
+              "maximum": 1024,
+              "median": 67.0,
+              "minimum": 12,
+              "p25": 53.0,
+              "p75": 112.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9453125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 121,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 13,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 81,
+              "token_limit": 47
+            },
+            "first_construct_counts": {
+              "branch": 1,
+              "constructor": 6,
+              "empty": 8,
+              "intro": 1,
+              "let": 3,
+              "rcases": 4,
+              "rfl": 11,
+              "simp": 3,
+              "term": 91
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.609375,
+              "maximum": 1024,
+              "median": 17.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.515625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 66,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80078125,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "d8f9403692ea3c3db1aff40c424a074376b0d777b14120bd52de7d324d4b4dd5",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 92,
+              "token_limit": 36
+            },
+            "first_construct_counts": {
+              "branch": 7,
+              "term": 121
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1171875,
+              "maximum": 1024,
+              "median": 294.5,
+              "minimum": 12,
+              "p25": 137.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 89,
+              "token_limit": 39
+            },
+            "first_construct_counts": {
+              "aesop": 2,
+              "branch": 2,
+              "constructor": 1,
+              "empty": 6,
+              "induction": 1,
+              "intro": 4,
+              "let": 7,
+              "rfl": 13,
+              "term": 92
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.625,
+              "maximum": 1024,
+              "median": 17.0,
+              "minimum": 1,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6015625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 77,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 8.060914993286133,
+        "gradient_norm_trailing_25_mean": 11.78958553314209,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 24.388935089111328,
+        "preservation_kl": 0.18024347722530365,
+        "preservation_kl_trailing_25_mean": 0.698192538432777,
+        "sft_loss": 2.292066842317581,
+        "sft_loss_trailing_25_mean": 2.1187384117208423,
+        "weighted_preservation_kl": 0.054073043167591095,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.7486979166666666,
+          "solved_at_8": 0,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 4,
+            "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.7734375,
+          "finish_reason_counts": {
+            "eos": 297,
+            "token_limit": 87
+          },
+          "first_construct_counts": {
+            "branch": 153,
+            "term": 231
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.23177083333333334,
+            "maximum": 1024,
+            "median": 181.0,
+            "minimum": 12,
+            "p25": 67.0,
+            "p75": 766.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9713541666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 40,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 40,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.6666666666666666,
+          "finish_reason_counts": {
+            "eos": 256,
+            "token_limit": 128
+          },
+          "first_construct_counts": {
+            "aesop": 5,
+            "branch": 7,
+            "constructor": 10,
+            "dsimp": 1,
+            "empty": 16,
+            "have": 1,
+            "induction": 6,
+            "intro": 10,
+            "let": 13,
+            "rcases": 4,
+            "rfl": 37,
+            "simp": 5,
+            "term": 269
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.6067708333333334,
+            "maximum": 1024,
+            "median": 18.0,
+            "minimum": 1,
+            "p25": 3.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.5260416666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "0162b568e9f8047e79bede1354a9d4db38530b5274ae3f4f065e8abfdf6f46e1",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "0162b568e9f8047e79bede1354a9d4db38530b5274ae3f4f065e8abfdf6f46e1",
+        "maximum_anchor_kl": 3.346270799636841,
+        "mean_anchor_kl": 0.3896611186122243,
+        "median_anchor_kl": 0.13951760530471802,
+        "p95_anchor_kl": 1.743833303451538
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.05431643009768009,
+        "new_solved_interface_tasks": 2,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C3-250",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "5063be95097bc42c528e7e513504f3174a2caad6e5c0ce9656e7a35b1c7a5816",
+      "configuration": {
+        "base_kl_lambda": 0.3,
+        "eligible": true,
+        "learning_rate": 1e-05,
+        "rescue_only": true
+      },
+      "configuration_id": "C3",
+      "optimizer_step": 250,
+      "positive_500_step_gate": null,
+      "stream_rows_consumed": 2000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.828125,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 88,
+              "token_limit": 40
+            },
+            "first_construct_counts": {
+              "branch": 33,
+              "term": 95
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.21875,
+              "maximum": 1024,
+              "median": 276.5,
+              "minimum": 6,
+              "p25": 73.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9765625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 125,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 67,
+              "token_limit": 61
+            },
+            "first_construct_counts": {
+              "branch": 9,
+              "empty": 1,
+              "induction": 1,
+              "let": 4,
+              "rcases": 2,
+              "term": 111
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4296875,
+              "maximum": 1024,
+              "median": 307.5,
+              "minimum": 1,
+              "p25": 17.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6796875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 87,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.78125,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 3,
+              "sha256": "729dc03cecba691b381f24c0086a7cb0653d56e055287b07122f8cade1a3c11a",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 118,
+              "token_limit": 10
+            },
+            "first_construct_counts": {
+              "branch": 126,
+              "term": 2
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5078125,
+              "maximum": 1024,
+              "median": 64.0,
+              "minimum": 12,
+              "p25": 51.0,
+              "p75": 89.5,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "04579f9d2f8f2ba8e39ebe4f5da972d2774d7e8c508afcfdb454f1d11c2d9193:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 1,
+            "verified_counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "efbc62f7e41240e89afda6be67c3dfa3cc11b6ed7a61eb40b05fe8f5bda7ecc1",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 66,
+              "token_limit": 62
+            },
+            "first_construct_counts": {
+              "branch": 3,
+              "constructor": 2,
+              "empty": 2,
+              "let": 4,
+              "rcases": 5,
+              "term": 112
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.484375,
+              "maximum": 1024,
+              "median": 145.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6015625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 77,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.8515625,
+            "solved_at_8": 1,
+            "verified_candidates": 1,
+            "verified_density": 0.00390625
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "f312147dc545b96020087c9f01f73a10e04b1759899626ae4848450916faa8cb",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 105,
+              "token_limit": 23
+            },
+            "first_construct_counts": {
+              "branch": 15,
+              "term": 113
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.2109375,
+              "maximum": 1024,
+              "median": 242.5,
+              "minimum": 6,
+              "p25": 98.0,
+              "p75": 613.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0078125,
+            "pass_at_4": 0.03125,
+            "pass_at_8": 0.0625,
+            "solved_at_8": 1,
+            "solved_task_ids": [
+              "bbcb7980988c6c050e6186aa48d5fe2939f1ea397e14ad8baa0f7547c089f7ca:incremental"
+            ],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 1,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0078125
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 14,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 14,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 75,
+              "token_limit": 53
+            },
+            "first_construct_counts": {
+              "branch": 2,
+              "empty": 2,
+              "induction": 1,
+              "let": 7,
+              "rcases": 3,
+              "term": 113
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4453125,
+              "maximum": 1024,
+              "median": 128.0,
+              "minimum": 1,
+              "p25": 6.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.703125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 90,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 18.283489227294922,
+        "gradient_norm_trailing_25_mean": 10.165319499969483,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 42.616249084472656,
+        "preservation_kl": 2.209707260131836,
+        "preservation_kl_trailing_25_mean": 0.34037371575832365,
+        "sft_loss": 1.9498054012656212,
+        "sft_loss_trailing_25_mean": 1.9034813868626952,
+        "weighted_preservation_kl": 0.6629121780395507,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.79296875,
+          "solved_at_8": 2,
+          "verified_candidates": 2,
+          "verified_density": 0.0026041666666666665
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 3,
+            "sha256": "729dc03cecba691b381f24c0086a7cb0653d56e055287b07122f8cade1a3c11a",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8098958333333334,
+          "finish_reason_counts": {
+            "eos": 311,
+            "token_limit": 73
+          },
+          "first_construct_counts": {
+            "branch": 174,
+            "term": 210
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.3125,
+            "maximum": 1024,
+            "median": 133.5,
+            "minimum": 6,
+            "p25": 57.75,
+            "p75": 575.25,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9791666666666666,
+          "pass_at_1": 0.005208333333333333,
+          "pass_at_4": 0.020833333333333332,
+          "pass_at_8": 0.041666666666666664,
+          "solved_at_8": 2,
+          "task_count": 48,
+          "verified_candidates": 2,
+          "verified_density": 0.005208333333333333
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 39,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 39,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.5416666666666666,
+          "finish_reason_counts": {
+            "eos": 208,
+            "token_limit": 176
+          },
+          "first_construct_counts": {
+            "branch": 14,
+            "constructor": 2,
+            "empty": 5,
+            "induction": 2,
+            "let": 15,
+            "rcases": 10,
+            "term": 336
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.453125,
+            "maximum": 1024,
+            "median": 177.5,
+            "minimum": 1,
+            "p25": 6.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.6067708333333334,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    },
+    {
+      "adapter_model_sha256": "7885d3ee9b182ba0cc301906fe2b70d9524f5189e6136a026da093a84077ea9f",
+      "anchor_drift": {
+        "all_finite": true,
+        "anchor_count": 512,
+        "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+        "checkpoint_adapter_model_sha256": "7885d3ee9b182ba0cc301906fe2b70d9524f5189e6136a026da093a84077ea9f",
+        "maximum_anchor_kl": 6.032260894775391,
+        "mean_anchor_kl": 0.3779636237613886,
+        "median_anchor_kl": 0.12522681057453156,
+        "p95_anchor_kl": 1.7512787580490112
+      },
+      "base_comparison": {
+        "base_solved_interface_tasks": 0,
+        "lost_base_solved_task_ids": [],
+        "mean_task_template_jaccard": 0.050594081844081845,
+        "new_solved_interface_tasks": 0,
+        "retained_base_solved_interface_tasks": 0
+      },
+      "checkpoint_id": "C3-500",
+      "collapse_gates": {
+        "catastrophic_base_coverage_loss": false,
+        "eligible": false,
+        "repeated_template_collapse": true,
+        "repeated_template_interfaces": [
+          "whole"
+        ],
+        "short_eos_collapse": false
+      },
+      "compact_evidence_sha256": "08b6d8939cdbe52745bf7468196ea8c71ee3674c6c7c341157ecc07f960197aa",
+      "configuration": {
+        "base_kl_lambda": 0.3,
+        "eligible": true,
+        "learning_rate": 1e-05,
+        "rescue_only": true
+      },
+      "configuration_id": "C3",
+      "optimizer_step": 500,
+      "positive_500_step_gate": false,
+      "stream_rows_consumed": 4000,
+      "structural_summary": {
+        "branching": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.76171875,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 92,
+              "token_limit": 36
+            },
+            "first_construct_counts": {
+              "branch": 24,
+              "term": 104
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.2109375,
+              "maximum": 1024,
+              "median": 314.5,
+              "minimum": 10,
+              "p25": 92.75,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.9609375,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 123,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 12,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 12,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 78,
+              "token_limit": 50
+            },
+            "first_construct_counts": {
+              "branch": 5,
+              "empty": 1,
+              "grind": 3,
+              "induction": 3,
+              "let": 3,
+              "term": 113
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.4921875,
+              "maximum": 1024,
+              "median": 66.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5625,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 72,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "deep": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.7265625,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 4,
+              "sha256": "0bdb18ecb654fc5c99c9f4a3cde3293a7901dbbc0d2de24baf1414470351b1a0",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 121,
+              "token_limit": 7
+            },
+            "first_construct_counts": {
+              "branch": 122,
+              "term": 6
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.484375,
+              "maximum": 1024,
+              "median": 66.0,
+              "minimum": 16,
+              "p25": 51.0,
+              "p75": 106.25,
+              "p95": 1022.95
+            },
+            "normalized_template_diversity": 0.953125,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 122,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 15,
+              "sha256": "6c91f8ffa6ba28e65b81c829a792a947b6a3afb861b153c3ac3f0a3d96b2ccf5",
+              "theorem_count": 15,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 77,
+              "token_limit": 51
+            },
+            "first_construct_counts": {
+              "empty": 1,
+              "grind": 7,
+              "let": 2,
+              "term": 118
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5859375,
+              "maximum": 1024,
+              "median": 17.0,
+              "minimum": 1,
+              "p25": 3.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.5,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 64,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        },
+        "direct": {
+          "combined": {
+            "candidate_count": 256,
+            "interface_task_count": 32,
+            "normalized_template_diversity": 0.80859375,
+            "solved_at_8": 0,
+            "verified_candidates": 0,
+            "verified_density": 0.0
+          },
+          "incremental": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 1,
+              "sha256": "30a2126f5bba5cbd7abf94cd00803640cc919623d07bcd486d3faa54c3275755",
+              "theorem_count": 1,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 106,
+              "token_limit": 22
+            },
+            "first_construct_counts": {
+              "branch": 8,
+              "term": 120
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.1953125,
+              "maximum": 1024,
+              "median": 250.0,
+              "minimum": 12,
+              "p25": 96.0,
+              "p75": 535.75,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 1.0,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 128,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          },
+          "whole": {
+            "candidate_count": 128,
+            "dominant_template": {
+              "occurrences": 13,
+              "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+              "theorem_count": 13,
+              "verified_occurrences": 0
+            },
+            "finish_reason_counts": {
+              "eos": 83,
+              "token_limit": 45
+            },
+            "first_construct_counts": {
+              "branch": 2,
+              "grind": 3,
+              "induction": 1,
+              "let": 4,
+              "term": 118
+            },
+            "generated_tokens": {
+              "le_64_fraction": 0.5390625,
+              "maximum": 1024,
+              "median": 35.0,
+              "minimum": 2,
+              "p25": 2.0,
+              "p75": 1024.0,
+              "p95": 1024.0
+            },
+            "normalized_template_diversity": 0.6171875,
+            "pass_at_1": 0.0,
+            "pass_at_4": 0.0,
+            "pass_at_8": 0.0,
+            "solved_at_8": 0,
+            "solved_task_ids": [],
+            "task_count": 16,
+            "unique_normalized_templates": 79,
+            "verified_candidates": 0,
+            "verified_counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "verified_density": 0.0
+          }
+        }
+      },
+      "training": {
+        "all_logged_objective_and_gradient_values_finite": true,
+        "gradient_norm_before_clipping": 21.30136489868164,
+        "gradient_norm_trailing_25_mean": 9.931699142456054,
+        "learning_rate": 1e-05,
+        "maximum_gradient_norm_through_checkpoint": 42.616249084472656,
+        "preservation_kl": 1.629847764968872,
+        "preservation_kl_trailing_25_mean": 0.3756924531236291,
+        "sft_loss": 2.2429246604442596,
+        "sft_loss_trailing_25_mean": 1.7133466328168288,
+        "weighted_preservation_kl": 0.4889543294906616,
+        "window_optimizer_steps": 25
+      },
+      "validation": {
+        "combined": {
+          "candidate_count": 768,
+          "interface_task_count": 96,
+          "normalized_template_diversity": 0.7369791666666666,
+          "solved_at_8": 0,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "incremental": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 4,
+            "sha256": "5ccd15e493df13789b9b79a3ddaf254ae919bc2e6ec289fd465b361f0ffcd934",
+            "theorem_count": 1,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.8307291666666666,
+          "finish_reason_counts": {
+            "eos": 319,
+            "token_limit": 65
+          },
+          "first_construct_counts": {
+            "branch": 154,
+            "term": 230
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.296875,
+            "maximum": 1024,
+            "median": 154.5,
+            "minimum": 10,
+            "p25": 59.0,
+            "p75": 524.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.9713541666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        },
+        "whole": {
+          "candidate_count": 384,
+          "dominant_template": {
+            "occurrences": 34,
+            "sha256": "6845427f830f56d3687d9ab7327c2f4a6b381e237c2d3cdab92f5d57d34ebe8c",
+            "theorem_count": 34,
+            "verified_occurrences": 0
+          },
+          "eos_fraction": 0.6197916666666666,
+          "finish_reason_counts": {
+            "eos": 238,
+            "token_limit": 146
+          },
+          "first_construct_counts": {
+            "branch": 7,
+            "empty": 2,
+            "grind": 13,
+            "induction": 4,
+            "let": 9,
+            "term": 349
+          },
+          "generated_tokens": {
+            "le_64_fraction": 0.5390625,
+            "maximum": 1024,
+            "median": 22.0,
+            "minimum": 1,
+            "p25": 3.0,
+            "p75": 1024.0,
+            "p95": 1024.0
+          },
+          "normalized_template_diversity": 0.5026041666666666,
+          "pass_at_1": 0.0,
+          "pass_at_4": 0.0,
+          "pass_at_8": 0.0,
+          "solved_at_8": 0,
+          "task_count": 48,
+          "verified_candidates": 0,
+          "verified_density": 0.0
+        }
+      }
+    }
+  ],
+  "marker": "OBSERVED",
+  "outcome": {
+    "checkpoint_frozen": false,
+    "continuation_optimizer_updates_authorized": false,
+    "reason": "C1 and C2 failed the positive 500-step gate; the single authorized C3 rescue also failed",
+    "sealed_test_evaluation_authorized": false,
+    "selected_checkpoint": null,
+    "sft_status": "stopped"
+  },
+  "plots": {
+    "training": {
+      "path": "bounded-training-trajectory.svg",
+      "sha256": "d5af8d05e8886049cfdddce26654f4d08394e13246fe6d89f561bd7fcde58bf9"
+    },
+    "validation": {
+      "path": "bounded-validation-trajectory.svg",
+      "sha256": "f97f8900d85817d79b132154082d6f4677bac18a3a7a815cb76f9b4a1d39488e"
+    }
+  },
+  "protocol": {
+    "all_validation_compositions_evaluated": true,
+    "base_and_all_retained_checkpoints_included": true,
+    "configurations": [
+      "C0",
+      "C1",
+      "C2",
+      "C3"
+    ],
+    "maximum_optimizer_updates": 500,
+    "optimizer_updates_beyond_500": 0,
+    "retained_optimizer_steps": [
+      100,
+      250,
+      500
+    ],
+    "sealed_test_accessed": false,
+    "silent_exclusions": 0,
+    "truncation": false
+  },
+  "schema_version": "generalist-v3-bounded-trajectory-evidence-v1",
+  "shared_training_stream": {
+    "all_configurations_matched": true,
+    "training_stream_manifest_sha256": "f2fdbdc991f1a552fe5dd4d1536da8fee640d9907ad273c5d901e8a7077dbb03",
+    "training_stream_sha256": "c5c939a23d8e0c5aee4eef9c658b969c4677732a72e0db41a415241d34861010"
+  },
+  "status": "passed",
+  "training_bindings": {
+    "C0": {
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "execution": "project-controlled-local-cuda",
+        "lane": "nf4-qlora",
+        "optimizer": "bitsandbytes.PagedAdamW8bit",
+        "peak_cuda_allocated_bytes": 16905875456,
+        "peak_cuda_reserved_bytes": 18368954368,
+        "trainable_parameter_count": 32464896,
+        "wall_time_seconds": 1580.0365825790213
+      },
+      "training_log_sha256": "526e405708be21d2a6c0a967ed702360da4272a2e4089173e9d25f73e09dfd25",
+      "training_sha256": "4c3e73c39768c5686f00ff9570f43c8da98811977f233466b2ed49f99e610636"
+    },
+    "C1": {
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "execution": "project-controlled-local-cuda",
+        "lane": "nf4-qlora",
+        "optimizer": "bitsandbytes.PagedAdamW8bit",
+        "peak_cuda_allocated_bytes": 16905875456,
+        "peak_cuda_reserved_bytes": 18368954368,
+        "trainable_parameter_count": 32464896,
+        "wall_time_seconds": 1581.5333893349161
+      },
+      "training_log_sha256": "07f3a34938deef03898434a30b807f9c1985813520fc952cc48acbee0160e46e",
+      "training_sha256": "6284a14cbac92e5cdb14c6b815b9357887c2298933357f0687e8f5a6e59089a3"
+    },
+    "C2": {
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "execution": "project-controlled-local-cuda",
+        "lane": "nf4-qlora",
+        "optimizer": "bitsandbytes.PagedAdamW8bit",
+        "peak_cuda_allocated_bytes": 16905875456,
+        "peak_cuda_reserved_bytes": 18368954368,
+        "trainable_parameter_count": 32464896,
+        "wall_time_seconds": 1582.3800011620624
+      },
+      "training_log_sha256": "d43a1470bdd8c5bcbbc1a8cafba51d7189bcb75ce7314160d88d4f55baa1e93d",
+      "training_sha256": "ff7e2b0983e09ede1d86f231372275a0378aa4d2f4e7da245f3200d620cf5396"
+    },
+    "C3": {
+      "runtime": {
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "execution": "project-controlled-local-cuda",
+        "lane": "nf4-qlora",
+        "optimizer": "bitsandbytes.PagedAdamW8bit",
+        "peak_cuda_allocated_bytes": 16905875456,
+        "peak_cuda_reserved_bytes": 18368954368,
+        "trainable_parameter_count": 32464896,
+        "wall_time_seconds": 1585.7849830939667
+      },
+      "training_log_sha256": "d829cae078dab55d4a761d5fa074272d301839e0b18e872a8d22a189bf50b26e",
+      "training_sha256": "cbd2a32c1e1181250fac7b0f7b5fd51f0265fd8e2b11fa1fbb7986a3682f7a78"
+    }
+  }
+}

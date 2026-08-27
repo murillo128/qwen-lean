@@ -45,6 +45,45 @@ missing or unexpected module. The adapter changed generated text on two probes;
 all four probes changed either text or first-token probability. This sentinel
 establishes transport activity and completeness only, not model quality.
 
+## Bounded SFT trajectory and stop decision
+
+`OBSERVED`: all four issue-authorized bounded configurations completed exactly
+500 optimizer updates on the same frozen stream, with retained evaluations at
+steps 100, 250, and 500. No optimizer update beyond step 500 occurred. The
+machine-readable Base-plus-12 trajectory is in `bounded-trajectory.json`; the
+validation and optimizer trajectories are plotted in
+`bounded-validation-trajectory.svg` and `bounded-training-trajectory.svg`.
+
+| Configuration | LR | Base KL weight | Step 100 solved / verified | Step 250 solved / verified | Step 500 solved / verified | Step 500 mean anchor KL |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| C0 diagnostic | 3e-5 | 0.0 | 6 / 6 | 4 / 5 | 6 / 8 | 4.9639 |
+| C1 | 3e-5 | 0.1 | 2 / 2 | 1 / 1 | 0 / 0 | 0.4561 |
+| C2 | 1e-5 | 0.1 | 2 / 2 | 0 / 0 | 0 / 0 | 0.4871 |
+| C3 rescue | 1e-5 | 0.3 | 0 / 0 | 2 / 2 | 0 / 0 | 0.3780 |
+
+Every solved and verified count is measured over the same complete 96-task,
+768-candidate validation canary. Every retained checkpoint failed the hard
+repeated-template gate in the whole-proof lane and is therefore ineligible,
+including the early checkpoints with nonzero Lean verification. C0 was always a
+diagnostic-only arm; its verified candidates coincided with much larger direct
+Base drift. C1, C2, and C3 show that the cached-logit preservation term
+substantially constrained mean anchor KL, but lower direct drift did not
+preserve healthy search behavior or produce an eligible checkpoint.
+
+`OBSERVED`: the frozen positive step-500 gate failed for C1 and C2. The single
+authorized C3 rescue also failed. The issue stop rule is therefore active:
+SFT is stopped, no checkpoint is frozen, no 1k/2k/4k/8k continuation or broader
+rescue sweep is authorized, and the sealed Dataset-v3 test remains untouched.
+The negative result is not evidence that the preservation mechanism was
+inactive; it is evidence that these bounded SFT configurations did not combine
+verified Lean learning with non-collapsed generation.
+
+The next experiment belongs in a separate design scope. The controlling issue
+calls for verifier-driven training rather than a larger imitation-only retry;
+its latest evidence note also identifies a bounded broad-data replay comparison
+as a preservation control worth testing. Neither follow-up is part of this run,
+and no replay percentage or RL objective is accepted here.
+
 ## Historical feasibility returns
 
 `OBSERVED`: the exact merged Dataset-v3 package binds successfully and contains
