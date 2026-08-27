@@ -160,6 +160,13 @@ from .native_thinking_assessment import (
     run_verification as run_native_thinking_verification,
     write_final_evidence as write_native_thinking_evidence,
 )
+from .counterfactual_forking_assessment import (
+    CounterfactualForkingConfig,
+    run_counterfactual_preflight,
+    run_fork_generation as run_counterfactual_generation,
+    run_fork_verification as run_counterfactual_verification,
+    write_final_evidence as write_counterfactual_evidence,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -686,6 +693,101 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/qwen35-native-thinking",
+    )
+
+    counterfactual_preflight = subparsers.add_parser(
+        "qwen35-counterfactual-preflight",
+        help="run exact-token parent parity and two bounded real fork probes",
+    )
+    counterfactual_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-counterfactual-forking.json",
+    )
+    counterfactual_preflight.add_argument("--mathia-root", type=Path, required=True)
+    counterfactual_preflight.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    counterfactual_preflight.add_argument(
+        "--minif2f-root", type=Path, required=True
+    )
+    counterfactual_preflight.add_argument(
+        "--mathlib-root", type=Path, default=root
+    )
+    counterfactual_preflight.add_argument("--artifact-dir", type=Path, required=True)
+    counterfactual_preflight.add_argument(
+        "--output",
+        type=Path,
+        default=root / "evidence/qwen35-counterfactual-forking/pre-inference.json",
+    )
+    counterfactual_preflight.add_argument("--workers", type=int)
+
+    counterfactual_generate = subparsers.add_parser(
+        "qwen35-counterfactual-generate",
+        help="run or resume discovery or matched-budget confirmation forks",
+    )
+    counterfactual_generate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-counterfactual-forking.json",
+    )
+    counterfactual_generate.add_argument("--mathia-root", type=Path, required=True)
+    counterfactual_generate.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    counterfactual_generate.add_argument("--artifact-dir", type=Path, required=True)
+    counterfactual_generate.add_argument(
+        "--phase", choices=("discovery", "confirmation"), required=True
+    )
+
+    counterfactual_verify = subparsers.add_parser(
+        "qwen35-counterfactual-verify",
+        help="run or resume exact-final-channel Lean verification for fork branches",
+    )
+    counterfactual_verify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-counterfactual-forking.json",
+    )
+    counterfactual_verify.add_argument("--mathia-root", type=Path, required=True)
+    counterfactual_verify.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    counterfactual_verify.add_argument(
+        "--minif2f-root", type=Path, required=True
+    )
+    counterfactual_verify.add_argument(
+        "--mathlib-root", type=Path, default=root
+    )
+    counterfactual_verify.add_argument("--artifact-dir", type=Path, required=True)
+    counterfactual_verify.add_argument(
+        "--phase", choices=("discovery", "confirmation"), required=True
+    )
+    counterfactual_verify.add_argument("--workers", type=int)
+
+    counterfactual_evidence = subparsers.add_parser(
+        "qwen35-counterfactual-evidence",
+        help="write compact discovery and matched-budget confirmation evidence",
+    )
+    counterfactual_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-counterfactual-forking.json",
+    )
+    counterfactual_evidence.add_argument("--mathia-root", type=Path, required=True)
+    counterfactual_evidence.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    counterfactual_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    counterfactual_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "evidence/qwen35-counterfactual-forking/pre-inference.json",
+    )
+    counterfactual_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-counterfactual-forking",
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2220,6 +2322,67 @@ def main(argv: list[str] | None = None) -> int:
         evidence = write_native_thinking_evidence(
             NativeThinkingConfig.load(args.config),
             args.mathia_root,
+            args.artifact_dir,
+            args.preflight,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-counterfactual-preflight":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_counterfactual_preflight(
+            CounterfactualForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.output,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-counterfactual-generate":
+        summary = run_counterfactual_generation(
+            CounterfactualForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            phase=args.phase,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-counterfactual-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_counterfactual_verification(
+            CounterfactualForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            phase=args.phase,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-counterfactual-evidence":
+        evidence = write_counterfactual_evidence(
+            CounterfactualForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
             args.artifact_dir,
             args.preflight,
             args.evidence_dir,
