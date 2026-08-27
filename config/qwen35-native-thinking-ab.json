@@ -1,0 +1,97 @@
+{
+  "schema_version": "qwen35-native-thinking-ab-config-v1",
+  "experiment_id": "qwen35-4b-native-thinking-mathia-v1",
+  "model": {
+    "model_id": "Qwen/Qwen3.5-4B",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "tokenizer_id": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "license": "Apache-2.0"
+  },
+  "mathia": {
+    "repository": "murillo128/mathia",
+    "integration_commit": "8baa43ad85fef2c7ecb86a0c84d602f2be2f0802",
+    "artifact_subdirectory": "experiments/frontier_assisted_intuition_corpus_v1",
+    "freeze_id": "frontier_assisted_intuition_corpus_26b3030e14ab4df8694b9c14ab30a297214f33f7a7ebdb8686ccd2ffae37849f",
+    "freeze_sha256": "40e9492bf31eef774cd1f8ac4fb70b6760f762191c6af381b7bfa54e3c5c4349",
+    "accepted_intuitions_sha256": "67bcb9278445f06c6fb21081eb7ff9fb6fe2aa73b42c63d9225422f5a7d25b5d",
+    "source_tasks_sha256": "300ecea0061590e36cde03c53bcc39b5699ed0615f8e05573ebfbc89f657f861",
+    "expected_counts": {
+      "minif2f-valid-clean-v2": 223,
+      "fresh-composition-valid-v2": 388
+    }
+  },
+  "prompt": {
+    "format_id": "mathia-native-chat-proof-body-v1",
+    "roles": [
+      "user"
+    ],
+    "user_template": "Complete the Lean proof below.\nUse the mathematical intuition as high-level guidance for the proof.\nIn the final answer, output only the Lean proof body that continues after the existing `:= by`.\nDo not repeat the theorem declaration or `by`.\nDo not include Markdown, explanations, comments, or any natural language in the final answer.\nDo not use `sorry` or `admit`.\n\nMathematical intuition:\n<FROZEN_INTUITION_BYTES>\n\nLean theorem:\n<UNCHANGED_DECLARATION> := by\n"
+  },
+  "arms": {
+    "t0": {
+      "enable_thinking": false
+    },
+    "t1": {
+      "enable_thinking": true
+    }
+  },
+  "sampling": {
+    "candidates_per_task": 4,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "presence_penalty": 0.0,
+    "repetition_penalty": 1.0,
+    "max_new_tokens": 4096,
+    "seed": 0,
+    "candidate_seed_mapping": "seed_plus_candidate_index",
+    "stop": "tokenizer_eos_or_token_limit"
+  },
+  "engine": {
+    "name": "vllm",
+    "version": "0.27.2rc1.dev203+g41f179b57",
+    "reasoning_parser": "qwen3",
+    "dtype": "bfloat16",
+    "tensor_parallel_size": 1,
+    "gpu_memory_utilization": 0.9,
+    "max_model_len": 24576,
+    "max_num_seqs": 8,
+    "max_in_flight_requests": 16,
+    "enforce_eager": true,
+    "quantization": null,
+    "language_model_only": true,
+    "resolve_pinned_snapshot": true,
+    "use_flashinfer_sampler": false,
+    "expected_cuda_device_name_fragment": "Ada"
+  },
+  "verifier": {
+    "timeout_seconds": 30.0,
+    "environment_probe_timeout_seconds": 180.0,
+    "workers": 8,
+    "workloads": {
+      "minif2f-valid-clean-v2": {
+        "repository": "google-deepmind/miniF2F",
+        "revision": "f0a20e14c1eeccd859d51bb4c2b3ee487889c303",
+        "lean_toolchain": "leanprover/lean4:v4.27.0",
+        "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900"
+      },
+      "fresh-composition-valid-v2": {
+        "repository": "murillo128/qwen-lean",
+        "revision": "67d0cdc13ce38c3847633fe9982d0c6e1473e8ed",
+        "lean_toolchain": "leanprover/lean4:v4.32.0",
+        "mathlib_revision": "81a5d257c8e410db227a6665ed08f64fea08e997"
+      }
+    }
+  },
+  "analysis": {
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 0,
+    "bootstrap_percentiles": [
+      2.5,
+      97.5
+    ],
+    "natural_language_heuristic_id": "final-line-four-words-v1"
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "candidate_identity": {
+    "candidate_seed_mapping": "seed_plus_candidate_index",
+    "candidate_seeds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "generation_config_sha256": "b30d52a83b5c179ceb53a012351271f71f245d5a52b6b77013c42d226d1e8820",
+    "prospective_candidate_count": 4888
+  },
+  "experiment_id": "qwen35-4b-native-thinking-mathia-v1",
+  "lean_environments": {
+    "fresh-composition-valid-v2": {
+      "known_valid_control": "verified",
+      "lean_toolchain": "leanprover/lean4:v4.32.0",
+      "mathlib_revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+      "placeholder_control": "lean_rejected"
+    },
+    "minif2f-valid-clean-v2": {
+      "known_valid_control": "verified",
+      "lean_toolchain": "leanprover/lean4:v4.27.0",
+      "mathlib_revision": "a3a10db0e9d66acbebf76c5e6a135066525ac900",
+      "placeholder_control": "lean_rejected"
+    }
+  },
+  "mathia_binding": {
+    "counts": {
+      "fresh-composition-valid-v2": 388,
+      "minif2f-valid-clean-v2": 223
+    },
+    "file_sha256": {
+      "accepted_intuitions.jsonl": "67bcb9278445f06c6fb21081eb7ff9fb6fe2aa73b42c63d9225422f5a7d25b5d",
+      "freeze.json": "40e9492bf31eef774cd1f8ac4fb70b6760f762191c6af381b7bfa54e3c5c4349",
+      "source_tasks.jsonl": "300ecea0061590e36cde03c53bcc39b5699ed0615f8e05573ebfbc89f657f861"
+    },
+    "freeze_id": "frontier_assisted_intuition_corpus_26b3030e14ab4df8694b9c14ab30a297214f33f7a7ebdb8686ccd2ffae37849f",
+    "ordered_task_ids_sha256": {
+      "fresh-composition-valid-v2": "2d7b298fbb5ac6ff8927c09181b1fdae5897875441639894b60c4839a9783674",
+      "minif2f-valid-clean-v2": "25f2c121dad941b5c70788030f0c78ec85696ce5baa4fb8bac99ee8c86eca1e0"
+    }
+  },
+  "model": {
+    "license": "Apache-2.0",
+    "model_id": "Qwen/Qwen3.5-4B",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "tokenizer_id": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "parser_integrity": {
+    "checks": {
+      "parser_registered_as_qwen3": true,
+      "raw_evidence_retained": true,
+      "t0_final_exact": true,
+      "t0_reasoning_absent": true,
+      "t1_final_exact": true,
+      "t1_reasoning_separated": true
+    },
+    "parser": "qwen3",
+    "status": "passed",
+    "t0_raw_sha256": "f76f784df988ade57466ca0dd2846af8920c281680e66fa34c0968255184f902",
+    "t1_final_sha256": "f76f784df988ade57466ca0dd2846af8920c281680e66fa34c0968255184f902",
+    "t1_raw_sha256": "cd2d632beb114a331b8c4ca157dc4235fb8f336e9b666130c53ab53195e542bf",
+    "t1_reasoning_sha256": "c6abc64730b08a1ba3adb2bdca9252cc54b0a087ac2bf7eaeba144b04c39f106"
+  },
+  "prompt_audit": {
+    "all_prompts_fit_frozen_budget": true,
+    "native_template_call_difference": "chat_template_kwargs.enable_thinking only",
+    "native_template_common_prefix_bytes": {
+      "count": 611,
+      "max": 50419.0,
+      "mean": 5433.2585924713585,
+      "median": 2470.0,
+      "min": 667.0,
+      "p90": 13670.0,
+      "p95": 21205.0
+    },
+    "native_template_suffix_difference_classes": 1,
+    "native_template_suffix_difference_counts": {
+      "4dc11f74ee048dc5d24ab338b2c0b7290e7017715e74566d654126d7ad06d257": 611
+    },
+    "ordered_native_chat_hashes_sha256": "751607e8d7ce45e7315fb0e2bba1af280058f209215de88ae2e826669c7abbcd",
+    "ordered_user_message_hashes_sha256": "5ee1725a6212d37b0527384eb56bcf3b966131e734bb505d044d5ea9113ceecf",
+    "prompt_token_counts": {
+      "t0": {
+        "count": 611,
+        "max": 16489.0,
+        "mean": 1700.7823240589198,
+        "median": 806.0,
+        "min": 156.0,
+        "p90": 4321.0,
+        "p95": 6438.0
+      },
+      "t1": {
+        "count": 611,
+        "max": 16487.0,
+        "mean": 1698.7823240589198,
+        "median": 804.0,
+        "min": 154.0,
+        "p90": 4319.0,
+        "p95": 6436.0
+      }
+    },
+    "single_user_message_only": true,
+    "task_count": 611,
+    "user_message_identical_between_arms": true
+  },
+  "runtime": {
+    "engine": {
+      "dtype": "bfloat16",
+      "enforce_eager": true,
+      "expected_cuda_device_name_fragment": "Ada",
+      "gpu_memory_utilization": 0.9,
+      "language_model_only": true,
+      "max_in_flight_requests": 16,
+      "max_model_len": 24576,
+      "max_num_seqs": 8,
+      "name": "vllm",
+      "quantization": null,
+      "reasoning_parser": "qwen3",
+      "resolve_pinned_snapshot": true,
+      "tensor_parallel_size": 1,
+      "use_flashinfer_sampler": false,
+      "version": "0.27.2rc1.dev203+g41f179b57"
+    },
+    "generation_segments": [
+      {
+        "arm": "t0",
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "gpu_memory_before_bytes": 483917824,
+        "gpu_memory_monitoring": "nvml_device_used_bytes",
+        "gpu_memory_peak_bytes": 19413991424,
+        "gpu_memory_peak_delta_bytes": 18930073600,
+        "inference_execution": "local_cuda",
+        "model_snapshot_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "package_versions": {
+          "nvidia-ml-py": "13.610.43",
+          "torch": "2.13.0+cu132",
+          "transformers": "5.15.0",
+          "vllm": "0.27.2rc1.dev203+g41f179b57"
+        },
+        "persisted_candidate_count": 1,
+        "segment_wall_time_seconds": 84.76502257795073,
+        "torch_cuda_version": "13.2"
+      },
+      {
+        "arm": "t1",
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "cuda_device_capability": [
+          8,
+          9
+        ],
+        "cuda_device_index": 0,
+        "cuda_device_total_memory_bytes": 20989804544,
+        "gpu_memory_before_bytes": 483917824,
+        "gpu_memory_monitoring": "nvml_device_used_bytes",
+        "gpu_memory_peak_bytes": 19413991424,
+        "gpu_memory_peak_delta_bytes": 18930073600,
+        "inference_execution": "local_cuda",
+        "model_snapshot_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "package_versions": {
+          "nvidia-ml-py": "13.610.43",
+          "torch": "2.13.0+cu132",
+          "transformers": "5.15.0",
+          "vllm": "0.27.2rc1.dev203+g41f179b57"
+        },
+        "persisted_candidate_count": 1,
+        "segment_wall_time_seconds": 148.61536315991543,
+        "torch_cuda_version": "13.2"
+      }
+    ],
+    "gpu_memory_peak_bytes": 19413991424,
+    "gpu_memory_total_bytes": 20989804544,
+    "package_versions": {
+      "nvidia-ml-py": "13.610.43",
+      "torch": "2.13.0+cu132",
+      "transformers": "5.15.0",
+      "vllm": "0.27.2rc1.dev203+g41f179b57"
+    }
+  },
+  "schema_version": "qwen35-native-thinking-pre-inference-v1",
+  "smoke": {
+    "execution_status": "completed_persisted",
+    "generation": {
+      "t0": {
+        "candidate_id": "native-thinking-b45133b1d4c2111747ad7c9e313ea242",
+        "final_content_sha256": "937d416796d429146fc3d86fd5ecafe1fc89ecd44a6dc5ef90e4d40ddd7aa109",
+        "final_token_count": 1677,
+        "finish_reason": "eos",
+        "raw_response_sha256": "937d416796d429146fc3d86fd5ecafe1fc89ecd44a6dc5ef90e4d40ddd7aa109",
+        "reasoning_present": false,
+        "reasoning_token_count": 0
+      },
+      "t1": {
+        "candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+        "final_content_sha256": null,
+        "final_token_count": 0,
+        "finish_reason": "token_limit",
+        "raw_response_sha256": "c11c0b9b0f6dee50bc55e81ee46d608148dc5a028c72ea7a56abe63ff2b9a8c7",
+        "reasoning_present": true,
+        "reasoning_token_count": 4096
+      }
+    },
+    "operational_only": true,
+    "quality_not_used_for_contract_changes": true,
+    "task_id": "amc12a_2019_p21",
+    "verification": {
+      "t0": "lean_rejected",
+      "t1": "empty_candidate"
+    },
+    "verification_status": "completed_persisted"
+  },
+  "status": "passed"
+}

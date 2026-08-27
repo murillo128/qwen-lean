@@ -153,6 +153,13 @@ from .qwen35_4b_base_assessment import (
 from .qwen35_4b_base_assessment import (
     write_compact_evidence as write_qwen35_4b_base_evidence,
 )
+from .native_thinking_assessment import (
+    NativeThinkingConfig,
+    run_generation as run_native_thinking_generation,
+    run_preflight as run_native_thinking_preflight,
+    run_verification as run_native_thinking_verification,
+    write_final_evidence as write_native_thinking_evidence,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -606,6 +613,79 @@ def _parser() -> argparse.ArgumentParser:
     )
     qwen35_evidence.add_argument(
         "--evidence-dir", type=Path, default=root / "evidence/qwen35-4b"
+    )
+
+    native_thinking_preflight = subparsers.add_parser(
+        "qwen35-native-thinking-preflight",
+        help="run the frozen native-thinking pre-inference gate",
+    )
+    native_thinking_preflight.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    native_thinking_preflight.add_argument("--mathia-root", type=Path, required=True)
+    native_thinking_preflight.add_argument(
+        "--minif2f-root", type=Path, required=True
+    )
+    native_thinking_preflight.add_argument(
+        "--mathlib-root", type=Path, default=root
+    )
+    native_thinking_preflight.add_argument("--artifact-dir", type=Path, required=True)
+    native_thinking_preflight.add_argument(
+        "--output",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/pre-inference.json",
+    )
+
+    native_thinking_generate = subparsers.add_parser(
+        "qwen35-native-thinking-generate",
+        help="run or resume one frozen native-thinking generation arm",
+    )
+    native_thinking_generate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    native_thinking_generate.add_argument("--mathia-root", type=Path, required=True)
+    native_thinking_generate.add_argument("--arm", choices=("t0", "t1"), required=True)
+    native_thinking_generate.add_argument("--artifact-dir", type=Path, required=True)
+
+    native_thinking_verify = subparsers.add_parser(
+        "qwen35-native-thinking-verify",
+        help="run or resume final-channel-only Lean verification",
+    )
+    native_thinking_verify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    native_thinking_verify.add_argument("--mathia-root", type=Path, required=True)
+    native_thinking_verify.add_argument("--minif2f-root", type=Path, required=True)
+    native_thinking_verify.add_argument("--mathlib-root", type=Path, default=root)
+    native_thinking_verify.add_argument("--artifact-dir", type=Path, required=True)
+    native_thinking_verify.add_argument("--workers", type=int)
+
+    native_thinking_evidence = subparsers.add_parser(
+        "qwen35-native-thinking-evidence",
+        help="write compact paired quality, interface, diversity, and cost evidence",
+    )
+    native_thinking_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    native_thinking_evidence.add_argument("--mathia-root", type=Path, required=True)
+    native_thinking_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    native_thinking_evidence.add_argument(
+        "--preflight",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/pre-inference.json",
+    )
+    native_thinking_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking",
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2093,6 +2173,58 @@ def main(argv: list[str] | None = None) -> int:
             evidence_dir=args.evidence_dir,
         )
         print(json.dumps(comparison, indent=2))
+        return 0
+
+    if args.command == "qwen35-native-thinking-preflight":
+        evidence = run_native_thinking_preflight(
+            NativeThinkingConfig.load(args.config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.output,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-native-thinking-generate":
+        summary = run_native_thinking_generation(
+            NativeThinkingConfig.load(args.config),
+            args.mathia_root,
+            args.arm,
+            args.artifact_dir,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-native-thinking-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_native_thinking_verification(
+            NativeThinkingConfig.load(args.config),
+            args.mathia_root,
+            args.artifact_dir,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-native-thinking-evidence":
+        evidence = write_native_thinking_evidence(
+            NativeThinkingConfig.load(args.config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.preflight,
+            args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
         return 0
 
     if args.command == "qwen35-4b-base-assess":
