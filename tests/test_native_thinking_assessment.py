@@ -13,6 +13,7 @@ from qwen_lean.native_thinking_assessment import (
     _apparent_natural_language,
     _finish_reason,
     _mcnemar_exact,
+    _render_final_readme,
     _verify_generation_record,
     analyze_results,
     candidate_identity,
@@ -183,6 +184,18 @@ def test_paired_analysis_reports_quality_interface_and_overlap() -> None:
         combined["arms"]["t1"]["interface_diagnostics"]["reasoning_present"]["count"]
         == 8
     )
+    combined["arms"]["t1"]["interface_diagnostics"][
+        "token_limit_before_usable_final"
+    ] = {"count": 7, "fraction": 0.875}
+    readme = _render_final_readme(
+        {
+            "analysis": analysis,
+            "interpretation": {"category": "t1_hurts_with_token_or_format_behavior"},
+        }
+    )
+    assert "usable final content on 7/8 candidates" in readme
+    assert "(87.50%)" in readme
+    assert "reasoning-budget exhaustion" in readme
 
 
 def test_diagnostic_helpers_are_deterministic_and_nonrepairing() -> None:

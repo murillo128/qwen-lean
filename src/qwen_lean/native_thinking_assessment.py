@@ -1527,6 +1527,7 @@ def _render_final_readme(result: dict[str, Any]) -> str:
     t0 = combined["arms"]["t0"]
     t1 = combined["arms"]["t1"]
     paired = combined["paired"]
+    t1_budget_exhausted = t1["interface_diagnostics"]["token_limit_before_usable_final"]
     return f"""# Qwen3.5-4B native thinking A/B
 
 **OBSERVED:** both frozen native-chat arms completed all 611 Mathia-guided tasks
@@ -1548,9 +1549,13 @@ bytes were submitted to Lean, without extraction, sanitization, repair, or
 verifier-driven retry.
 
 **OBSERVED:** the deterministic interpretation category is
-`{result["interpretation"]["category"]}`. Thinking is not compute matched: cost
-and token totals for each arm are retained in `results.json`. This result does
-not change the external-planner design or authorize a training architecture.
+`{result["interpretation"]["category"]}`. T1 hit the shared token limit before
+usable final content on {t1_budget_exhausted["count"]}/{t1["candidate_count"]} candidates
+({t1_budget_exhausted["fraction"]:.2%});
+reasoning-budget exhaustion, rather than final-channel contamination, was the
+dominant observed interface failure. Thinking is not compute matched: cost and
+token totals for each arm are retained in `results.json`. This result does not
+change the external-planner design or authorize a training architecture.
 """
 
 
