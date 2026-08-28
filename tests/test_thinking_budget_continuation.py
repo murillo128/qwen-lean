@@ -7,7 +7,10 @@ import pytest
 from qwen_lean.native_thinking_assessment import MathiaTask, NativeThinkingConfig
 from qwen_lean.thinking_budget_continuation import (
     CONTINUATION_CONFIG_SCHEMA,
+    EXPECTED_PARSER_RUNTIME_IDENTITY,
     ThinkingBudgetContinuationConfig,
+    _canonical_output_contract_from_identity,
+    _matched_task_table,
     _verify_dual_record,
     continuation_candidate_identity,
     load_continuation_generation_records,
@@ -50,6 +53,20 @@ def test_config_rejects_changed_normalization(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="canonical parsed-output contract"):
         ThinkingBudgetContinuationConfig.load(changed)
+
+
+def test_canonical_contract_corrects_legacy_parser_source_label() -> None:
+    continuation = ThinkingBudgetContinuationConfig.load(CONTINUATION_CONFIG_PATH)
+    identity = {**EXPECTED_PARSER_RUNTIME_IDENTITY, "validated": True}
+
+    contract = _canonical_output_contract_from_identity(continuation, identity)
+
+    assert contract["parser_runtime_identity"] == identity
+    assert "parser_source_sha256" not in contract
+    legacy = contract["legacy_generation_contract_field"]
+    assert legacy["actual_role"] == "thinking_budget_control_source_sha256"
+    assert legacy["authoritative_for_parser_identity"] is False
+    assert legacy["preserved_for_immutable_candidate_binding"] is True
 
 
 @pytest.mark.parametrize(
@@ -97,6 +114,62 @@ def test_candidate_identity_binds_arm_budgets_and_continuation_contract() -> Non
         16384,
         20480,
     )
+
+
+def test_matched_table_requires_and_reports_replay_audited_counts() -> None:
+    continuation = ThinkingBudgetContinuationConfig.load(CONTINUATION_CONFIG_PATH)
+    scaling = ThinkingBudgetScalingConfig.load(SCALING_CONFIG_PATH)
+    stage1 = NativeThinkingConfig.load(STAGE1_CONFIG_PATH)
+    selected = _selected(_task("mini-0", "minif2f-valid-clean-v2"))
+    generations: dict[str, dict[str, object]] = {}
+    verifications: dict[str, dict[str, object]] = {}
+    for arm in ("B4", "B8", "B16"):
+        candidate_id, identity = continuation_candidate_identity(
+            continuation, scaling, stage1, selected, arm
+        )
+        generations[candidate_id] = {
+            "candidate_id": candidate_id,
+            **identity,
+            "reasoning_token_count": identity["max_reasoning_tokens"] - 1,
+            "reasoning_exit": "forced_at_budget",
+            "parsed_final_exact": "exact True.intro",
+            "parsed_final_token_count": 4094,
+            "normalized_final_token_count": 4094,
+            "parsed_final_token_count_stored": 933,
+            "normalized_final_token_count_stored": 933,
+            "normalization_applied": False,
+            "finish_reason": "eos",
+            "raw_response_token_count": 8191,
+            "generation_latency_seconds": 1.0,
+        }
+        interface = {"category": "lean_rejected"}
+        verifications[candidate_id] = {
+            "strict_parsed_interface": interface,
+            "deployed_normalized_interface": interface,
+        }
+
+    table = _matched_task_table(
+        continuation,
+        scaling,
+        stage1,
+        [selected],
+        generations,  # type: ignore[arg-type]
+        verifications,  # type: ignore[arg-type]
+    )
+
+    assert table[0]["arms"]["B4"]["parsed_final_tokens"] == 4094
+    assert table[0]["arms"]["B4"]["parsed_final_tokens_stored_legacy"] == 933
+
+    generations[next(iter(generations))].pop("parsed_final_token_count_stored")
+    with pytest.raises(ValueError, match="replay-audited canonical token counts"):
+        _matched_task_table(
+            continuation,
+            scaling,
+            stage1,
+            [selected],
+            generations,  # type: ignore[arg-type]
+            verifications,  # type: ignore[arg-type]
+        )
 
 
 def test_continuation_loader_fails_closed_on_normalized_mutation(

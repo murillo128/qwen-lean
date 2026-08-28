@@ -2,9 +2,30 @@
   "base_scaling_config_sha256": "cf9222dbdfb334aa6c439c8b59b8fbd369259f2319678cbea97add9e0d89b8b6",
   "canonical_output_contract": {
     "canonical_answer": "parsed_final_exact",
+    "legacy_generation_contract_field": {
+      "actual_module_path": "vllm/v1/sample/thinking_budget_state.py",
+      "actual_role": "thinking_budget_control_source_sha256",
+      "authoritative_for_parser_identity": false,
+      "field": "canonical_output.parser_source_sha256",
+      "preserved_for_immutable_candidate_binding": true,
+      "value": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e"
+    },
     "normalization": "lean-wrapper-normalization-v1",
     "parser": "qwen3",
-    "parser_source_sha256": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e",
+    "parser_runtime_identity": {
+      "implementation_class": "vllm.parser.qwen3.Qwen3Parser",
+      "implementation_source": {
+        "module_path": "vllm/parser/qwen3.py",
+        "sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb"
+      },
+      "registered_adapter_source": {
+        "module_path": "vllm/parser/engine/adapters.py",
+        "sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d"
+      },
+      "registered_class": "vllm.parser.engine.adapters.Qwen3ParserReasoningAdapter",
+      "registered_name": "qwen3",
+      "validated": true
+    },
     "raw_suffix_identity_is_diagnostic": true
   },
   "checks": {
@@ -15,6 +36,7 @@
     "normalization_idempotent": true,
     "normalization_replay_deterministic": true,
     "pinned_parser_replay_deterministic": true,
+    "pinned_parser_runtime_source_identity": true,
     "raw_token_ids_retained": true,
     "reasoning_bounded": true,
     "reasoning_markers_absent_from_parsed_final": true
@@ -189,6 +211,20 @@
       "torch": "2.13.0+cu132",
       "transformers": "5.15.0",
       "vllm": "0.27.2rc1.dev203+g41f179b57"
+    },
+    "parser_runtime_identity": {
+      "implementation_class": "vllm.parser.qwen3.Qwen3Parser",
+      "implementation_source": {
+        "module_path": "vllm/parser/qwen3.py",
+        "sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb"
+      },
+      "registered_adapter_source": {
+        "module_path": "vllm/parser/engine/adapters.py",
+        "sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d"
+      },
+      "registered_class": "vllm.parser.engine.adapters.Qwen3ParserReasoningAdapter",
+      "registered_name": "qwen3",
+      "validated": true
     },
     "passed": true,
     "thinking_budget_state_module": "vllm/v1/sample/thinking_budget_state.py",

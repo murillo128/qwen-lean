@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import time
@@ -57,6 +58,22 @@ EXPECTED_HISTORICAL_GATE_TARGET = "034c96fb54761e843ff68fb21d688b22a2a645ef"
 EXPECTED_HISTORICAL_GATE_SHA256 = (
     "302cfeb1a348d61387e83764a5a142975069fcec84708fb146bb7a3fab871f0e"
 )
+EXPECTED_THINKING_BUDGET_SOURCE_SHA256 = (
+    "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e"
+)
+EXPECTED_PARSER_RUNTIME_IDENTITY = {
+    "registered_name": "qwen3",
+    "registered_class": "vllm.parser.engine.adapters.Qwen3ParserReasoningAdapter",
+    "registered_adapter_source": {
+        "module_path": "vllm/parser/engine/adapters.py",
+        "sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d",
+    },
+    "implementation_class": "vllm.parser.qwen3.Qwen3Parser",
+    "implementation_source": {
+        "module_path": "vllm/parser/qwen3.py",
+        "sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb",
+    },
+}
 CONTINUATION_ARMS = ("B4", "B8", "B16")
 
 
@@ -112,9 +129,7 @@ def validate_continuation_config(config: ThinkingBudgetContinuationConfig) -> No
         raise ValueError("historical runtime-gate binding changed")
     if config.canonical_output != {
         "parser": "qwen3",
-        "parser_source_sha256": (
-            "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e"
-        ),
+        "parser_source_sha256": EXPECTED_THINKING_BUDGET_SOURCE_SHA256,
         "canonical_answer": "parsed_final_exact",
         "normalization": LEAN_WRAPPER_NORMALIZATION,
         "raw_suffix_identity_is_diagnostic": True,
@@ -150,6 +165,91 @@ def validate_continuation_binding(
     ):
         raise ValueError("historical runtime-gate evidence changed")
     validate_stage1_binding(scaling, stage1, stage1_results_path=stage1_results_path)
+
+
+def canonical_parser_runtime_identity(
+    stage1: NativeThinkingConfig,
+) -> dict[str, Any]:
+    """Fail closed unless the live registered qwen3 parser matches its source pin."""
+
+    from vllm.reasoning import ReasoningParserManager
+
+    registered_name = str(stage1.engine["reasoning_parser"])
+    parser_class = ReasoningParserManager.get_reasoning_parser(registered_name)
+    implementation_class = getattr(parser_class, "_parser_engine_cls", None)
+    if implementation_class is None:
+        raise RuntimeError(
+            "registered qwen3 parser has no parser-engine implementation"
+        )
+    adapter_source = _runtime_source_identity(parser_class)
+    implementation_source = _runtime_source_identity(implementation_class)
+    observed = {
+        "registered_name": registered_name,
+        "registered_class": (f"{parser_class.__module__}.{parser_class.__qualname__}"),
+        "registered_adapter_source": adapter_source,
+        "implementation_class": (
+            f"{implementation_class.__module__}.{implementation_class.__qualname__}"
+        ),
+        "implementation_source": implementation_source,
+    }
+    if observed != EXPECTED_PARSER_RUNTIME_IDENTITY:
+        raise RuntimeError("live qwen3 parser runtime/source identity changed")
+    return {**observed, "validated": True}
+
+
+def _runtime_source_identity(value: type[Any]) -> dict[str, str]:
+    source_value = inspect.getsourcefile(value)
+    if source_value is None:
+        raise RuntimeError(f"cannot resolve parser source for {value!r}")
+    source_path = Path(source_value).resolve()
+    try:
+        vllm_index = source_path.parts.index("vllm")
+    except ValueError as error:
+        raise RuntimeError(
+            f"parser source is outside the vllm package: {source_path}"
+        ) from error
+    return {
+        "module_path": "/".join(source_path.parts[vllm_index:]),
+        "sha256": _file_sha256(source_path),
+    }
+
+
+def _canonical_output_contract(
+    continuation: ThinkingBudgetContinuationConfig,
+    stage1: NativeThinkingConfig,
+) -> dict[str, Any]:
+    return _canonical_output_contract_from_identity(
+        continuation, canonical_parser_runtime_identity(stage1)
+    )
+
+
+def _canonical_output_contract_from_identity(
+    continuation: ThinkingBudgetContinuationConfig,
+    parser_runtime_identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Correct a legacy field label without changing frozen candidate identities."""
+
+    frozen = continuation.canonical_output
+    legacy_source_sha256 = str(frozen["parser_source_sha256"])
+    if legacy_source_sha256 != EXPECTED_THINKING_BUDGET_SOURCE_SHA256:
+        raise ValueError("legacy budget-control source binding changed")
+    return {
+        "parser": frozen["parser"],
+        "canonical_answer": frozen["canonical_answer"],
+        "normalization": frozen["normalization"],
+        "raw_suffix_identity_is_diagnostic": frozen[
+            "raw_suffix_identity_is_diagnostic"
+        ],
+        "parser_runtime_identity": dict(parser_runtime_identity),
+        "legacy_generation_contract_field": {
+            "field": "canonical_output.parser_source_sha256",
+            "value": legacy_source_sha256,
+            "actual_role": "thinking_budget_control_source_sha256",
+            "actual_module_path": "vllm/v1/sample/thinking_budget_state.py",
+            "authoritative_for_parser_identity": False,
+            "preserved_for_immutable_candidate_binding": True,
+        },
+    }
 
 
 def continuation_generation_config_sha256(
@@ -267,6 +367,18 @@ def run_continuation_gate(
         stage1_results_path=stage1_results_path,
     )
     runtime = runtime_support_audit(scaling, stage1)
+    try:
+        parser_runtime_identity = canonical_parser_runtime_identity(stage1)
+    except RuntimeError as error:
+        runtime["parser_runtime_identity"] = {
+            "validated": False,
+            "error": str(error),
+        }
+        runtime["passed"] = False
+        evidence = _failed_gate_evidence(continuation, runtime)
+        _write_continuation_gate_evidence(output_path, evidence)
+        return evidence
+    runtime["parser_runtime_identity"] = parser_runtime_identity
     if not runtime["passed"]:
         evidence = _failed_gate_evidence(continuation, runtime)
         _write_continuation_gate_evidence(output_path, evidence)
@@ -331,6 +443,9 @@ def run_continuation_gate(
         "pinned_parser_replay_deterministic": all(
             row["parser_replay_matches_stored"] for row in audits
         ),
+        "pinned_parser_runtime_source_identity": bool(
+            parser_runtime_identity["validated"]
+        ),
         "reasoning_markers_absent_from_parsed_final": all(
             not row["final_has_reasoning_marker"] for row in probe_records
         ),
@@ -367,7 +482,9 @@ def run_continuation_gate(
         "base_scaling_config_sha256": _file_sha256(scaling.path),
         "stage1_config_sha256": _file_sha256(stage1.path),
         "runtime_support": runtime,
-        "canonical_output_contract": continuation.canonical_output,
+        "canonical_output_contract": _canonical_output_contract_from_identity(
+            continuation, parser_runtime_identity
+        ),
         "mathia_binding": {
             key: value for key, value in mathia_binding.items() if key != "corpus_root"
         },
@@ -891,6 +1008,7 @@ def write_continuation_evidence(
         }
         for generation in generations
     ]
+    replay_audited_generation_by_id = {str(row["candidate_id"]): row for row in joined}
     generation_segments = _read_jsonl(artifact_dir / "generation-segments.jsonl")
     verification_segments = _read_jsonl(artifact_dir / "verification-segments.jsonl")
     summaries = {
@@ -920,7 +1038,12 @@ def write_continuation_evidence(
             include_segment_cost=True,
         )
     matched_table = _matched_task_table(
-        continuation, scaling, stage1, selected, generation_by_id, verification_by_id
+        continuation,
+        scaling,
+        stage1,
+        selected,
+        replay_audited_generation_by_id,
+        verification_by_id,
     )
     conclusion = _continuation_conclusion(summaries, matched_table)
     result = {
@@ -942,7 +1065,7 @@ def write_continuation_evidence(
         "engine": stage1.engine,
         "sampling": scaling.sampling,
         "arms": FROZEN_SCALING_ARMS,
-        "canonical_output_contract": continuation.canonical_output,
+        "canonical_output_contract": _canonical_output_contract(continuation, stage1),
         "continuation_gate": {
             "status": gate["status"],
             "checks": gate["checks"],
@@ -1141,6 +1264,13 @@ def _matched_task_table(
             )
             generation = generation_by_id[candidate_id]
             verification = verification_by_id[candidate_id]
+            if not {
+                "parsed_final_token_count_stored",
+                "normalized_final_token_count_stored",
+            }.issubset(generation):
+                raise ValueError(
+                    "matched table requires replay-audited canonical token counts"
+                )
             arms[arm] = {
                 "candidate_id": candidate_id,
                 "configured_reasoning_tokens": generation["max_reasoning_tokens"],
@@ -1149,6 +1279,12 @@ def _matched_task_table(
                 "parsed_final_nonempty": bool(generation["parsed_final_exact"]),
                 "parsed_final_tokens": generation["parsed_final_token_count"],
                 "normalized_final_tokens": generation["normalized_final_token_count"],
+                "parsed_final_tokens_stored_legacy": generation[
+                    "parsed_final_token_count_stored"
+                ],
+                "normalized_final_tokens_stored_legacy": generation[
+                    "normalized_final_token_count_stored"
+                ],
                 "normalization_applied": generation["normalization_applied"],
                 "strict_lean_category": verification["strict_parsed_interface"][
                     "category"
