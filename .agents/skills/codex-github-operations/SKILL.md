@@ -100,6 +100,14 @@ A new implementation, test, technical-evidence, dependency, configuration, or te
 
 A final-capable checkpoint may serve as the final technical PR review when the issue and reviewer confirm that it covers the complete final diff and immutable technical evidence. It still does not authorize merge without the explicit user-facing decision above.
 
+## Active executor ownership
+
+Once a Codex executor creates or adopts a pull request for a controlling issue, that executor owns the PR head branch and execution control plane until handoff, closure, merge, or explicit ownership transfer.
+
+Other actors may inspect the target read-only, but should not silently push to, rebase, reset, or otherwise modify the active executor's branch. Material corrections should flow through the controlling issue unless ownership has explicitly transferred.
+
+If branch ownership is ambiguous, stop and resolve ownership before mutating shared state.
+
 ## Technical evidence and workflow metadata
 
 Technical manifests should contain technical and reproducibility data, not GitHub bookkeeping, unless specific workflow metadata is itself a technical input to the tested system.
