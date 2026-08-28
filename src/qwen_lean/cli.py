@@ -160,6 +160,10 @@ from .native_thinking_assessment import (
     run_verification as run_native_thinking_verification,
     write_final_evidence as write_native_thinking_evidence,
 )
+from .thinking_budget_scaling import (
+    ThinkingBudgetScalingConfig,
+    run_runtime_gate as run_thinking_budget_gate,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -686,6 +690,35 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/qwen35-native-thinking",
+    )
+
+    thinking_budget_gate = subparsers.add_parser(
+        "qwen35-thinking-budget-gate",
+        help="run the Stage 2 native thinking-token-budget runtime gate",
+    )
+    thinking_budget_gate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    thinking_budget_gate.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    thinking_budget_gate.add_argument(
+        "--stage1-results",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/results.json",
+    )
+    thinking_budget_gate.add_argument("--mathia-root", type=Path, required=True)
+    thinking_budget_gate.add_argument("--artifact-dir", type=Path, required=True)
+    thinking_budget_gate.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root / "evidence/qwen35-thinking-budget-scaling/runtime-gate.json"
+        ),
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2226,6 +2259,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(evidence, indent=2))
         return 0
+
+    if args.command == "qwen35-thinking-budget-gate":
+        evidence = run_thinking_budget_gate(
+            ThinkingBudgetScalingConfig.load(args.config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.output,
+            stage1_results_path=args.stage1_results,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
 
     if args.command == "qwen35-4b-base-assess":
         if args.verification_workers < 1:
