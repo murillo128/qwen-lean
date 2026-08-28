@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import gc
+import hashlib
 import json
 import math
 import os
@@ -83,6 +84,8 @@ RELEASE_TRANSPORT = {
 }
 TOTAL_GENERATION_BUDGET = 4096
 LOCAL_GPU_MEMORY_UTILIZATION = 0.89
+QWEN35_EOS_TOKEN_ID = 248046
+QWEN35_EOS_TOKEN_TEXT = "<|im_end|>"
 FORK_FRACTIONS = (0.15, 0.30, 0.45, 0.60, 0.75, 0.90)
 DISCOVERY_SEEDS = tuple(range(100, 106))
 CONFIRMATION_SEEDS = tuple(range(1000, 1012))
@@ -361,9 +364,8 @@ def _validate_handoff_records_with_transport(
             expected = expected_by_line.get(line_number)
             if expected is not None:
                 source_lines.append((expected, raw_line))
-            if (
-                line_number >= maximum_source_line
-                and len(source_lines) == len(expected_by_line)
+            if line_number >= maximum_source_line and len(source_lines) == len(
+                expected_by_line
             ):
                 source_detected = True
                 break
@@ -492,8 +494,7 @@ def _validate_release_package(
         raise ValueError("#89 Release transport record count changed")
     task_ids = {str(candidate["task_id"]) for candidate in candidates}
     line_numbers = [
-        int(candidate["raw_generation_jsonl_line_number"])
-        for candidate in candidates
+        int(candidate["raw_generation_jsonl_line_number"]) for candidate in candidates
     ]
     required_metadata = {
         "schema_version": release_transport["package_metadata_schema"],
@@ -562,9 +563,7 @@ def _validate_release_package(
         "asset_sha256": release_transport["asset_sha256"],
         "package_metadata_schema": metadata["schema_version"],
         "package_metadata_sha256": release_transport["package_metadata_sha256"],
-        "compact_generations_sha256": release_transport[
-            "compact_generations_sha256"
-        ],
+        "compact_generations_sha256": release_transport["compact_generations_sha256"],
         "extraction_order": release_transport["extraction_order"],
     }
 
@@ -700,18 +699,57 @@ def _parse_combined_response(
     )
     reasoning, final_content = parser.extract_reasoning(raw_text, request)
     reasoning_count = int(parser.count_reasoning_tokens(list(token_ids)))
-    final_count = (
-        0 if final_content is None else len(parser.extract_content_ids(list(token_ids)))
+    content_ids = (
+        [] if final_content is None else parser.extract_content_ids(list(token_ids))
     )
+    final_count = len(content_ids)
+    final_content_is_exact_raw_suffix = final_content is None or raw_text.endswith(
+        final_content
+    )
+    parser_terminal_token_ids: list[int] = []
+    parser_terminal_text = ""
+    if final_content is None:
+        final_content_parity = "no_final_content"
+    elif final_content_is_exact_raw_suffix:
+        final_content_parity = "exact_raw_suffix"
+    else:
+        eos_token_id = getattr(tokenizer, "eos_token_id", None)
+        eos_token_text = (
+            tokenizer.decode([int(eos_token_id)], skip_special_tokens=False)
+            if eos_token_id is not None
+            else ""
+        )
+        content_without_eos = content_ids[:-1]
+        decoded_content_without_eos = tokenizer.decode(
+            content_without_eos, skip_special_tokens=False
+        )
+        decoded_content_with_eos = tokenizer.decode(
+            content_ids, skip_special_tokens=False
+        )
+        if (
+            eos_token_id == QWEN35_EOS_TOKEN_ID
+            and eos_token_text == QWEN35_EOS_TOKEN_TEXT
+            and content_ids
+            and content_ids[-1] == QWEN35_EOS_TOKEN_ID
+            and decoded_content_without_eos == final_content
+            and decoded_content_with_eos == final_content + QWEN35_EOS_TOKEN_TEXT
+            and raw_text.endswith(decoded_content_with_eos)
+        ):
+            final_content_parity = "exact_before_terminal_eos"
+            parser_terminal_token_ids = [QWEN35_EOS_TOKEN_ID]
+            parser_terminal_text = QWEN35_EOS_TOKEN_TEXT
+        else:
+            final_content_parity = "mismatch"
     return {
         "raw_text": raw_text,
         "reasoning_content": reasoning,
         "reasoning_token_count": reasoning_count,
         "final_content": final_content,
         "final_token_count": final_count,
-        "final_content_is_exact_raw_suffix": (
-            final_content is None or raw_text.endswith(final_content)
-        ),
+        "final_content_is_exact_raw_suffix": final_content_is_exact_raw_suffix,
+        "final_content_parity": final_content_parity,
+        "terminal_token_ids": parser_terminal_token_ids,
+        "terminal_text": parser_terminal_text,
     }
 
 
@@ -970,6 +1008,34 @@ def _phase_verification_path(artifact_dir: Path, phase: str) -> Path:
     return artifact_dir / f"{phase}-verifications.jsonl"
 
 
+def _restart_safe_jsonl_lines(path: Path) -> list[str]:
+    """Read an append-only journal, preserving and dropping only a torn tail."""
+    payload = path.read_bytes()
+    if payload and not payload.endswith(b"\n"):
+        complete_end = payload.rfind(b"\n") + 1
+        interrupted_tail = payload[complete_end:]
+        tail_sha256 = hashlib.sha256(interrupted_tail).hexdigest()
+        recovery_path = path.with_name(
+            f"{path.name}.interrupted-tail-{tail_sha256[:16]}.bin"
+        )
+        if recovery_path.exists():
+            if recovery_path.read_bytes() != interrupted_tail:
+                raise RuntimeError(
+                    f"restart recovery sidecar changed unexpectedly: {recovery_path}"
+                )
+        else:
+            with recovery_path.open("xb") as recovery:
+                recovery.write(interrupted_tail)
+                recovery.flush()
+                os.fsync(recovery.fileno())
+        with path.open("r+b") as journal:
+            journal.truncate(complete_end)
+            journal.flush()
+            os.fsync(journal.fileno())
+        payload = payload[:complete_end]
+    return [line.decode("utf-8") for line in payload.splitlines() if line]
+
+
 def load_fork_generation_records(
     path: Path, expected_requests: Sequence[ForkRequest]
 ) -> list[dict[str, Any]]:
@@ -980,7 +1046,7 @@ def load_fork_generation_records(
         raise AssertionError("expected counterfactual branch identities are not unique")
     records_by_id: dict[str, dict[str, Any]] = {}
     seen: set[str] = set()
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in _restart_safe_jsonl_lines(path):
         if not line:
             continue
         record = json.loads(line)
@@ -1053,6 +1119,48 @@ def _validate_fork_generation_record(
         "suffix_response_sha256"
     ):
         raise ValueError(f"persisted suffix response changed: {request.branch_id}")
+    text_parity = record.get("suffix_text_vllm_parity")
+    if text_parity is not None:
+        emitted_length = int(record.get("vllm_emitted_text_length", -1))
+        emitted_sha256 = record.get("vllm_emitted_text_sha256")
+        if text_parity == "exact":
+            expected_emitted_text = suffix_text
+        elif text_parity == "token_limit_trailing_incomplete_unicode":
+            if record.get("raw_finish_reason") != "length" or not suffix_text.endswith(
+                "\ufffd"
+            ):
+                raise ValueError(
+                    f"invalid token-limit text parity: {request.branch_id}"
+                )
+            expected_emitted_text = suffix_text[:-1]
+        elif text_parity == "diagnostic_mismatch_token_ids_authoritative":
+            expected_emitted_text = record.get("vllm_emitted_text")
+            if not isinstance(expected_emitted_text, str) or (
+                expected_emitted_text == suffix_text
+            ):
+                raise ValueError(
+                    f"invalid diagnostic vLLM text mismatch: {request.branch_id}"
+                )
+            expected_mismatch_at = next(
+                (
+                    index
+                    for index, (decoded, emitted) in enumerate(
+                        zip(suffix_text, expected_emitted_text, strict=False)
+                    )
+                    if decoded != emitted
+                ),
+                min(len(suffix_text), len(expected_emitted_text)),
+            )
+            if record.get("vllm_text_first_mismatch_index") != (expected_mismatch_at):
+                raise ValueError(
+                    f"vLLM text mismatch position changed: {request.branch_id}"
+                )
+        else:
+            raise ValueError(f"unknown vLLM text parity: {request.branch_id}")
+        if emitted_length != len(expected_emitted_text) or emitted_sha256 != (
+            _sha256_text(expected_emitted_text)
+        ):
+            raise ValueError(f"vLLM emitted text binding changed: {request.branch_id}")
     combined_text = record.get("combined_response_text")
     if not isinstance(combined_text, str) or _sha256_text(combined_text) != record.get(
         "combined_response_sha256"
@@ -1068,8 +1176,44 @@ def _validate_fork_generation_record(
         "final_content_sha256"
     ):
         raise ValueError(f"persisted final content changed: {request.branch_id}")
-    if not record.get("parser_final_content_is_exact_raw_suffix"):
-        raise ValueError(f"parser changed final bytes: {request.branch_id}")
+    parser_parity = record.get("parser_final_content_parity")
+    if parser_parity is None:
+        # Records written before the terminal-EOS distinction are valid only
+        # under the original, stricter raw-suffix invariant.
+        if not record.get("parser_final_content_is_exact_raw_suffix"):
+            raise ValueError(f"parser changed final bytes: {request.branch_id}")
+    else:
+        parser_terminal_token_ids = record.get("parser_terminal_token_ids")
+        parser_terminal_text = record.get("parser_terminal_text")
+        parser_exact_raw_suffix = record.get("parser_final_content_is_exact_raw_suffix")
+        if parser_parity == "no_final_content":
+            valid_parser_parity = (
+                final is None
+                and parser_exact_raw_suffix is True
+                and parser_terminal_token_ids == []
+                and parser_terminal_text == ""
+            )
+        elif parser_parity == "exact_raw_suffix":
+            valid_parser_parity = (
+                isinstance(final, str)
+                and parser_exact_raw_suffix is True
+                and parser_terminal_token_ids == []
+                and parser_terminal_text == ""
+                and combined_text.endswith(final)
+            )
+        elif parser_parity == "exact_before_terminal_eos":
+            valid_parser_parity = (
+                isinstance(final, str)
+                and parser_exact_raw_suffix is False
+                and parser_terminal_token_ids == [QWEN35_EOS_TOKEN_ID]
+                and parser_terminal_text == QWEN35_EOS_TOKEN_TEXT
+                and suffix_ids[-1:] == [QWEN35_EOS_TOKEN_ID]
+                and combined_text.endswith(final + QWEN35_EOS_TOKEN_TEXT)
+            )
+        else:
+            valid_parser_parity = False
+        if not valid_parser_parity:
+            raise ValueError(f"parser changed final bytes: {request.branch_id}")
     if record.get("inference_input_kind") != "prompt_token_ids":
         raise ValueError(
             f"branch did not use direct token-ID input: {request.branch_id}"
@@ -1281,8 +1425,31 @@ def _fork_generation_record(
 ) -> dict[str, Any]:
     suffix_ids = [int(value) for value in completion.token_ids]
     suffix_text = tokenizer.decode(suffix_ids, skip_special_tokens=False)
-    if suffix_text != str(completion.text):
-        raise RuntimeError(f"vLLM suffix token decode mismatch: {request.branch_id}")
+    completion_text = str(completion.text)
+    raw_finish_reason = (
+        None if completion.finish_reason is None else str(completion.finish_reason)
+    )
+    if suffix_text == completion_text:
+        suffix_text_vllm_parity = "exact"
+        vllm_text_first_mismatch_index = None
+        vllm_emitted_text = None
+    elif raw_finish_reason == "length" and suffix_text == completion_text + "\ufffd":
+        suffix_text_vllm_parity = "token_limit_trailing_incomplete_unicode"
+        vllm_text_first_mismatch_index = len(completion_text)
+        vllm_emitted_text = None
+    else:
+        suffix_text_vllm_parity = "diagnostic_mismatch_token_ids_authoritative"
+        vllm_text_first_mismatch_index = next(
+            (
+                index
+                for index, (decoded, emitted) in enumerate(
+                    zip(suffix_text, completion_text, strict=False)
+                )
+                if decoded != emitted
+            ),
+            min(len(suffix_text), len(completion_text)),
+        )
+        vllm_emitted_text = completion_text
     parent_prefix = list(
         request.parent.raw_response_token_ids[: request.state.prefix_len]
     )
@@ -1293,9 +1460,6 @@ def _fork_generation_record(
         render_user_message(request.parent.task),
         combined_ids,
         max_tokens=request.max_tokens,
-    )
-    raw_finish_reason = (
-        None if completion.finish_reason is None else str(completion.finish_reason)
     )
     final_content = parsed["final_content"]
     record = {
@@ -1320,6 +1484,11 @@ def _fork_generation_record(
         "suffix_response_token_ids": suffix_ids,
         "suffix_response_token_ids_sha256": _sha256_json(suffix_ids),
         "suffix_response_token_count": len(suffix_ids),
+        "suffix_text_vllm_parity": suffix_text_vllm_parity,
+        "vllm_emitted_text_sha256": _sha256_text(completion_text),
+        "vllm_emitted_text_length": len(completion_text),
+        "vllm_emitted_text": vllm_emitted_text,
+        "vllm_text_first_mismatch_index": vllm_text_first_mismatch_index,
         "combined_response_text": parsed["raw_text"],
         "combined_response_sha256": _sha256_text(parsed["raw_text"]),
         "combined_response_token_count": len(combined_ids),
@@ -1341,6 +1510,9 @@ def _fork_generation_record(
         "parser_final_content_is_exact_raw_suffix": parsed[
             "final_content_is_exact_raw_suffix"
         ],
+        "parser_final_content_parity": parsed["final_content_parity"],
+        "parser_terminal_token_ids": parsed["terminal_token_ids"],
+        "parser_terminal_text": parsed["terminal_text"],
         "finish_reason": _finish_reason(raw_finish_reason),
         "raw_finish_reason": raw_finish_reason,
         "generation_latency_seconds": latency_seconds,
@@ -1395,9 +1567,7 @@ def run_fork_generation(
     runtime = _fork_local_runtime(config)
     runtime.update(
         {
-            "engine_gpu_memory_utilization": config.execution[
-                "gpu_memory_utilization"
-            ],
+            "engine_gpu_memory_utilization": config.execution["gpu_memory_utilization"],
             "parent_engine_gpu_memory_utilization": config.native.engine[
                 "gpu_memory_utilization"
             ],
@@ -1459,7 +1629,7 @@ def load_fork_verification_records(
     expected = {request.branch_id: request for request in expected_requests}
     attempts: dict[str, int] = defaultdict(int)
     records: list[dict[str, Any]] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in _restart_safe_jsonl_lines(path):
         if not line:
             continue
         record = json.loads(line)
@@ -2150,9 +2320,7 @@ def write_preinference_evidence(
             "reasoning_parser": config.native.engine["reasoning_parser"],
             "dtype": config.native.engine["dtype"],
             "vllm_version": VLLM_VERSION,
-            "engine_gpu_memory_utilization": config.execution[
-                "gpu_memory_utilization"
-            ],
+            "engine_gpu_memory_utilization": config.execution["gpu_memory_utilization"],
             "parent_engine_gpu_memory_utilization": config.native.engine[
                 "gpu_memory_utilization"
             ],
@@ -2405,6 +2573,28 @@ def analyze_counterfactual_results(
         for segment in generation_segments
         if segment.get("gpu_memory_peak_bytes") is not None
     ]
+    generation_segment_status_counts = Counter(
+        str(segment.get("status", "unknown")) for segment in generation_segments
+    )
+    suffix_text_parity_counts = Counter(
+        str(row.get("suffix_text_vllm_parity") or "legacy_unrecorded")
+        for row in all_rows
+    )
+    parser_final_parity_counts = Counter(
+        str(row.get("parser_final_content_parity") or "legacy_strict_raw_suffix")
+        for row in all_rows
+    )
+    completed_rows = {str(row["branch_id"]): row for row in all_rows}
+    retry_outcome_variation_branch_ids: list[str] = []
+    parser_error_marker = "parser changed final bytes: "
+    for segment in generation_segments:
+        error = str(segment.get("error") or "")
+        if parser_error_marker not in error:
+            continue
+        branch_id = error.rsplit(parser_error_marker, 1)[-1].strip()
+        completed = completed_rows.get(branch_id)
+        if completed is not None and completed["final_production_status"] == "empty":
+            retry_outcome_variation_branch_ids.append(branch_id)
     runtime = {
         "total_generated_tokens": sum(
             int(row["suffix_response_token_count"]) for row in all_rows
@@ -2418,6 +2608,26 @@ def analyze_counterfactual_results(
             for segment in verification_segments
         ),
         "peak_gpu_memory_bytes": max(peak_values) if peak_values else None,
+        "generation_segment_count": len(generation_segments),
+        "generation_segment_status_counts": dict(
+            sorted(generation_segment_status_counts.items())
+        ),
+        "suffix_text_vllm_parity_counts": dict(
+            sorted(suffix_text_parity_counts.items())
+        ),
+        "parser_final_content_parity_counts": dict(
+            sorted(parser_final_parity_counts.items())
+        ),
+        "retry_outcome_variation": {
+            "observed": bool(retry_outcome_variation_branch_ids),
+            "branch_ids": sorted(set(retry_outcome_variation_branch_ids)),
+            "interpretation": (
+                "fixed per-request seeds did not make interrupted asynchronous "
+                "vLLM requests deterministic across process restarts"
+                if retry_outcome_variation_branch_ids
+                else None
+            ),
+        },
         "verifier_workload_count": len(all_rows),
         "verifier_category_counts": dict(sorted(category_counts.items())),
     }
@@ -2590,6 +2800,39 @@ def write_final_evidence(
         generation_segments=generation_segments,
         verification_segments=verification_segments,
     )
+    runtime = analysis["runtime"]
+    limitations = [
+        "bounded 30-task candidate-index-0 Mathia-guided T1 sample",
+        "token-quantile checkpoints are not semantic decision boundaries",
+        "operational discovery deltas mix state with consumed token budget",
+        "matched-budget confirmation uses 12 Bernoulli branches per side",
+        "go/no-go thresholds are heuristics rather than statistical theorems",
+        "negative or weak signal is retained without selecting a training method",
+    ]
+    failed_segments = int(runtime["generation_segment_status_counts"].get("failed", 0))
+    if failed_segments:
+        limitations.append(
+            f"execution required restart after {failed_segments} failed or "
+            "interrupted discovery generation segments; the completed "
+            "restart-safe JSONL is the authoritative sample"
+        )
+    diagnostic_mismatches = int(
+        runtime["suffix_text_vllm_parity_counts"].get(
+            "diagnostic_mismatch_token_ids_authoritative", 0
+        )
+    )
+    if diagnostic_mismatches:
+        limitations.append(
+            f"vLLM emitted-text diagnostics differed from tokenizer-decoded "
+            f"authoritative token IDs in {diagnostic_mismatches} persisted "
+            "branches; parsing and verification used the token-ID reconstruction"
+        )
+    if runtime["retry_outcome_variation"]["observed"]:
+        limitations.append(
+            "OBSERVED: fixed per-request seeds did not reproduce identical "
+            "outcomes for at least one interrupted asynchronous vLLM request "
+            "after process restart"
+        )
     result = {
         "schema_version": FINAL_EVIDENCE_SCHEMA,
         "experiment_id": "qwen35-4b-mathia-counterfactual-forking-v1",
@@ -2606,9 +2849,7 @@ def write_final_evidence(
             "confirmation_seeds": list(CONFIRMATION_SEEDS),
             "total_generation_budget": TOTAL_GENERATION_BUDGET,
             "fork_fractions": list(FORK_FRACTIONS),
-            "engine_gpu_memory_utilization": config.execution[
-                "gpu_memory_utilization"
-            ],
+            "engine_gpu_memory_utilization": config.execution["gpu_memory_utilization"],
             "parent_engine_gpu_memory_utilization": config.native.engine[
                 "gpu_memory_utilization"
             ],
@@ -2653,14 +2894,7 @@ def write_final_evidence(
         },
         "confirmation_plan": plan,
         "analysis": analysis,
-        "limitations": [
-            "bounded 30-task candidate-index-0 Mathia-guided T1 sample",
-            "token-quantile checkpoints are not semantic decision boundaries",
-            "operational discovery deltas mix state with consumed token budget",
-            "matched-budget confirmation uses 12 Bernoulli branches per side",
-            "go/no-go thresholds are heuristics rather than statistical theorems",
-            "negative or weak signal is retained without selecting a training method",
-        ],
+        "limitations": limitations,
     }
     evidence_dir.mkdir(parents=True, exist_ok=True)
     _atomic_write_json(evidence_dir / "results.json", result)
@@ -2674,6 +2908,7 @@ def _render_final_readme(result: dict[str, Any]) -> str:
     analysis = result["analysis"]
     discovery = analysis["discovery"]
     confirmation = analysis["confirmation"]
+    limitations = "\n".join(f"- {limitation}" for limitation in result["limitations"])
     return f"""# Counterfactual forking signal
 
 This directory contains compact evidence for issue #92. Raw suffix token arrays,
@@ -2694,4 +2929,8 @@ Discovery `Delta_op` is descriptive, not causal: adjacent states have different
 remaining token budgets. Confirmation compares both sides with the later
 prefix's remaining budget and independent seeds. This measurement does not
 authorize or select DPO, RLVR, value learning, replay, or planner changes.
+
+## Material limitations
+
+{limitations}
 """

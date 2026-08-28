@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
+import sys
+import types
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
+import qwen_lean.counterfactual_forking_assessment as counterfactual
 from qwen_lean.counterfactual_forking_assessment import (
     CONFIRMATION_SEEDS,
     DISCOVERY_SEEDS,
@@ -17,7 +22,9 @@ from qwen_lean.counterfactual_forking_assessment import (
     ForkRequest,
     ParentTrajectory,
     _confirmation_results,
+    _fork_generation_record,
     _request,
+    _run_async_fork_generation,
     _validate_fork_generation_record,
     _verify_fork_generation_record,
     confirmation_requests,
@@ -25,6 +32,7 @@ from qwen_lean.counterfactual_forking_assessment import (
     discovery_requests,
     fork_generation_config_sha256,
     fork_states,
+    load_fork_generation_records,
     load_fork_verification_records,
     select_confirmation_intervals,
     validate_handoff_records,
@@ -70,6 +78,243 @@ def test_config_freezes_parent_forks_budgets_and_independent_seeds() -> None:
     assert config.execution["gpu_memory_utilization"] == 0.89
     assert config.native.engine["gpu_memory_utilization"] == 0.9
     assert len(fork_generation_config_sha256(config)) == 64
+
+
+def test_async_generation_returns_every_persisted_record(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class FakeSamplingParams:
+        def __init__(self, **_kwargs: object) -> None:
+            pass
+
+    class FakeTokensPrompt:
+        def __init__(self, *, prompt_token_ids: list[int]) -> None:
+            self.prompt_token_ids = prompt_token_ids
+
+    class FakeAsyncLLM:
+        @classmethod
+        def from_engine_args(cls, _args: object) -> FakeAsyncLLM:
+            return cls()
+
+        async def generate(self, *_args: object, **_kwargs: object):
+            yield SimpleNamespace(finished=True, outputs=[object()])
+
+        def shutdown(self) -> None:
+            pass
+
+    fake_vllm = types.ModuleType("vllm")
+    fake_vllm.SamplingParams = FakeSamplingParams
+    fake_inputs = types.ModuleType("vllm.inputs")
+    fake_inputs.TokensPrompt = FakeTokensPrompt
+    fake_v1 = types.ModuleType("vllm.v1")
+    fake_engine = types.ModuleType("vllm.v1.engine")
+    fake_async_llm = types.ModuleType("vllm.v1.engine.async_llm")
+    fake_async_llm.AsyncLLM = FakeAsyncLLM
+    for name, module in (
+        ("vllm", fake_vllm),
+        ("vllm.inputs", fake_inputs),
+        ("vllm.v1", fake_v1),
+        ("vllm.v1.engine", fake_engine),
+        ("vllm.v1.engine.async_llm", fake_async_llm),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+    config = CounterfactualForkingConfig.load(CONFIG_PATH)
+    parent = _parent()
+    state = parent.states[-1]
+    requests = [
+        _request(
+            config,
+            phase="discovery",
+            parent=parent,
+            state=state,
+            seed=seed,
+            max_tokens=4096 - state.prefix_len,
+        )
+        for seed in (100, 101)
+    ]
+    monkeypatch.setattr(counterfactual, "_engine_args", lambda *_args: object())
+    monkeypatch.setattr(
+        counterfactual,
+        "_fork_generation_record",
+        lambda _config, _tokenizer, request, _output, **_kwargs: {
+            "branch_id": request.branch_id
+        },
+    )
+
+    records = asyncio.run(
+        _run_async_fork_generation(
+            config,
+            tokenizer=None,
+            requests=requests,
+            generation_path=tmp_path / "generations.jsonl",
+            snapshot_path=tmp_path,
+        )
+    )
+
+    assert [record["branch_id"] for record in records] == [
+        request.branch_id for request in requests
+    ]
+    assert len((tmp_path / "generations.jsonl").read_text().splitlines()) == 2
+
+
+def test_generation_record_builder_returns_the_validated_record(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeTokenizer:
+        def decode(self, _token_ids: list[int], *, skip_special_tokens: bool) -> str:
+            assert not skip_special_tokens
+            return "suffix"
+
+    config = CounterfactualForkingConfig.load(CONFIG_PATH)
+    parent = _parent()
+    state = parent.states[-1]
+    request = _request(
+        config,
+        phase="discovery",
+        parent=parent,
+        state=state,
+        seed=100,
+        max_tokens=4096 - state.prefix_len,
+    )
+    monkeypatch.setattr(
+        counterfactual,
+        "_parse_combined_response",
+        lambda *_args, **_kwargs: {
+            "raw_text": "combined",
+            "reasoning_content": "combined",
+            "reasoning_token_count": state.prefix_len + 2,
+            "final_content": None,
+            "final_token_count": 0,
+            "final_content_is_exact_raw_suffix": True,
+            "final_content_parity": "no_final_content",
+            "terminal_token_ids": [],
+            "terminal_text": "",
+        },
+    )
+
+    record = _fork_generation_record(
+        config,
+        FakeTokenizer(),
+        request,
+        SimpleNamespace(token_ids=[1, 2], text="suffix", finish_reason="length"),
+        latency_seconds=1.0,
+    )
+
+    assert record["branch_id"] == request.branch_id
+    assert record["schema_version"] == FORK_GENERATION_SCHEMA
+    assert record["suffix_text_vllm_parity"] == "exact"
+
+
+def test_generation_record_allows_only_token_limit_incomplete_unicode_tail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class IncompleteTokenizer:
+        def decode(self, _token_ids: list[int], *, skip_special_tokens: bool) -> str:
+            assert not skip_special_tokens
+            return "suffix\ufffd"
+
+    config = CounterfactualForkingConfig.load(CONFIG_PATH)
+    parent = _parent()
+    state = parent.states[-1]
+    request = _request(
+        config,
+        phase="discovery",
+        parent=parent,
+        state=state,
+        seed=100,
+        max_tokens=4096 - state.prefix_len,
+    )
+    monkeypatch.setattr(
+        counterfactual,
+        "_parse_combined_response",
+        lambda *_args, **_kwargs: {
+            "raw_text": "combined\ufffd",
+            "reasoning_content": "combined\ufffd",
+            "reasoning_token_count": state.prefix_len + 1,
+            "final_content": None,
+            "final_token_count": 0,
+            "final_content_is_exact_raw_suffix": True,
+            "final_content_parity": "no_final_content",
+            "terminal_token_ids": [],
+            "terminal_text": "",
+        },
+    )
+
+    record = _fork_generation_record(
+        config,
+        IncompleteTokenizer(),
+        request,
+        SimpleNamespace(token_ids=[1], text="suffix", finish_reason="length"),
+        latency_seconds=1.0,
+    )
+
+    assert record["suffix_response_text"] == "suffix\ufffd"
+    assert record["suffix_text_vllm_parity"] == (
+        "token_limit_trailing_incomplete_unicode"
+    )
+    assert record["vllm_emitted_text_length"] == len("suffix")
+
+    mismatch = _fork_generation_record(
+        config,
+        IncompleteTokenizer(),
+        request,
+        SimpleNamespace(token_ids=[1], text="sufXix", finish_reason="length"),
+        latency_seconds=1.0,
+    )
+    assert mismatch["suffix_text_vllm_parity"] == (
+        "diagnostic_mismatch_token_ids_authoritative"
+    )
+    assert mismatch["vllm_emitted_text"] == "sufXix"
+    assert mismatch["vllm_text_first_mismatch_index"] == 3
+
+    non_length = _fork_generation_record(
+        config,
+        IncompleteTokenizer(),
+        request,
+        SimpleNamespace(token_ids=[1], text="suffix", finish_reason="stop"),
+        latency_seconds=1.0,
+    )
+    assert non_length["suffix_text_vllm_parity"] == (
+        "diagnostic_mismatch_token_ids_authoritative"
+    )
+    tampered = dict(mismatch)
+    tampered["vllm_text_first_mismatch_index"] = 0
+    with pytest.raises(ValueError, match="mismatch position changed"):
+        _validate_fork_generation_record(tampered, request)
+
+
+def test_generation_restart_preserves_and_drops_only_a_torn_tail(
+    tmp_path: Path,
+) -> None:
+    config = CounterfactualForkingConfig.load(CONFIG_PATH)
+    parent = _parent()
+    state = parent.states[-1]
+    requests = [
+        _request(
+            config,
+            phase="discovery",
+            parent=parent,
+            state=state,
+            seed=seed,
+            max_tokens=4096 - state.prefix_len,
+        )
+        for seed in (100, 101)
+    ]
+    complete_payload = json.dumps(
+        _fork_record(requests[0]), sort_keys=True, separators=(",", ":")
+    ).encode()
+    interrupted_tail = b'{"branch_id":"interrupted'
+    path = tmp_path / "generations.jsonl"
+    path.write_bytes(complete_payload + b"\n" + interrupted_tail)
+
+    records = load_fork_generation_records(path, requests)
+
+    assert [record["branch_id"] for record in records] == [requests[0].branch_id]
+    assert path.read_bytes() == complete_payload + b"\n"
+    sidecars = list(tmp_path.glob("generations.jsonl.interrupted-tail-*.bin"))
+    assert len(sidecars) == 1
+    assert sidecars[0].read_bytes() == interrupted_tail
 
 
 def test_handoff_integrity_uses_exact_line_and_allows_later_appends(
@@ -166,8 +411,9 @@ def test_compact_release_transport_validates_package_and_frozen_record_order(
     generations.write_text(raw_line + "\n", encoding="utf-8")
     packaged_manifest = package_dir / "counterfactual-forking-handoff.json"
     packaged_manifest.write_bytes(
-        (ROOT / "evidence/qwen35-native-thinking/counterfactual-forking-handoff.json")
-        .read_bytes()
+        (
+            ROOT / "evidence/qwen35-native-thinking/counterfactual-forking-handoff.json"
+        ).read_bytes()
     )
     generations_sha256 = _file_hash(generations)
     metadata = {
@@ -290,6 +536,48 @@ def test_discovery_requests_use_exact_prefix_tokens_and_restart_binding() -> Non
     tampered["fork_generation_config_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="identity field changed"):
         _validate_fork_generation_record(tampered, p45)
+
+
+def test_parser_final_bytes_allow_only_the_pinned_terminal_eos() -> None:
+    config = CounterfactualForkingConfig.load(CONFIG_PATH)
+    request = discovery_requests(config, [_parent()])[0]
+    record = _fork_record(request)
+    final = "by exact trivial"
+    terminal = counterfactual.QWEN35_EOS_TOKEN_TEXT
+    suffix_ids = [1, counterfactual.QWEN35_EOS_TOKEN_ID]
+    suffix_text = final + terminal
+    combined_text = "reasoning</think>" + suffix_text
+    record.update(
+        {
+            "suffix_response_text": suffix_text,
+            "suffix_response_sha256": hashlib.sha256(suffix_text.encode()).hexdigest(),
+            "suffix_response_token_ids": suffix_ids,
+            "suffix_response_token_ids_sha256": _json_hash(suffix_ids),
+            "suffix_response_token_count": len(suffix_ids),
+            "combined_response_text": combined_text,
+            "combined_response_sha256": hashlib.sha256(
+                combined_text.encode()
+            ).hexdigest(),
+            "combined_response_token_count": (
+                request.state.prefix_len + len(suffix_ids)
+            ),
+            "final_content": final,
+            "final_content_sha256": hashlib.sha256(final.encode()).hexdigest(),
+            "final_token_count": len(suffix_ids),
+            "final_production_status": "nonempty",
+            "parser_final_content_is_exact_raw_suffix": False,
+            "parser_final_content_parity": "exact_before_terminal_eos",
+            "parser_terminal_token_ids": [counterfactual.QWEN35_EOS_TOKEN_ID],
+            "parser_terminal_text": terminal,
+        }
+    )
+
+    _validate_fork_generation_record(record, request)
+
+    tampered = dict(record)
+    tampered["parser_terminal_text"] = "<|endoftext|>"
+    with pytest.raises(ValueError, match="parser changed final bytes"):
+        _validate_fork_generation_record(tampered, request)
 
 
 def test_confirmation_selection_threshold_and_matched_budget() -> None:
