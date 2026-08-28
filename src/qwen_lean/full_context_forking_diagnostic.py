@@ -896,11 +896,14 @@ def _full_context_engine_args(
 def _reasoning_transition_index(
     tokenizer: Any, combined_ids: Sequence[int]
 ) -> int | None:
-    from vllm.reasoning import ReasoningParserManager
-
-    parser_class = ReasoningParserManager.get_reasoning_parser("qwen3")
-    parser = parser_class(tokenizer, chat_template_kwargs={"enable_thinking": True})
-    end_token_id = int(parser.end_token_id)
+    # The exact qwen3 contract uses the single vocabulary token ``</think>``
+    # as its reasoning-to-final boundary. New engine-parser adapters do not
+    # expose the legacy ``end_token_id`` attribute, so bind the same immutable
+    # tokenizer vocabulary directly instead of reaching through adapter
+    # internals or re-tokenizing the generated text.
+    end_token_id = tokenizer.get_vocab().get("</think>")
+    if not isinstance(end_token_id, int) or isinstance(end_token_id, bool):
+        raise RuntimeError("pinned tokenizer lacks the qwen3 </think> token")
     try:
         return list(combined_ids).index(end_token_id) + 1
     except ValueError:

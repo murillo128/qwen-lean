@@ -15,6 +15,7 @@ from qwen_lean.full_context_forking_diagnostic import (
     FullContextForkingConfig,
     _classify_outcome,
     _next_calibration_action,
+    _reasoning_transition_index,
     _validate_checkpoint_review,
     full_context_requests,
 )
@@ -170,6 +171,17 @@ def test_generation_requires_published_pass_review_of_exact_calibration(
     review.write_text(json.dumps(value), encoding="utf-8")
     with pytest.raises(RuntimeError, match="not PASS"):
         _validate_checkpoint_review(calibration, review)
+
+
+def test_transition_index_uses_exact_qwen3_vocab_without_parser_internals() -> None:
+    class Tokenizer:
+        def get_vocab(self) -> dict[str, int]:
+            return {"</think>": 42}
+
+    tokenizer = Tokenizer()
+    assert _reasoning_transition_index(tokenizer, [1, 2, 42, 3, 4]) == 3
+    assert _reasoning_transition_index(tokenizer, [1, 2, 3]) is None
+    assert _reasoning_transition_index(tokenizer, [1, 2, 42]) == 3
 
 
 def test_classification_rules_are_deterministic() -> None:
