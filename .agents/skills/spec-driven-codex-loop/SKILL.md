@@ -23,6 +23,8 @@ Load once:
 
 Do not weaken the issue, reconstruct its intent from history, or choose between materially different implementations when the issue is silent. Return to design instead.
 
+Do not silently promote exploratory notes, hypotheses, brainstorming, or provisional chat conclusions into requirements. Use them only when the controlling issue or an authoritative repository source explicitly adopts them.
+
 On resume, verify branch, `HEAD`, worktree, the controlling issue's single authoritative state label, and new material comments. Reuse unchanged inspected context.
 
 ## Entry gate and workflow state
