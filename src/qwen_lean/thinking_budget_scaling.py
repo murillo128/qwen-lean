@@ -4,6 +4,7 @@ import asyncio
 import gc
 import inspect
 import json
+import re
 import time
 from collections import Counter
 from collections.abc import Mapping, Sequence
@@ -38,6 +39,7 @@ from .native_thinking_assessment import (
 SCALING_CONFIG_SCHEMA = "qwen35-thinking-budget-scaling-config-v1"
 GENERATION_SCHEMA = "qwen35-thinking-budget-scaling-generation-v1"
 GATE_SCHEMA = "qwen35-thinking-budget-runtime-gate-v1"
+LEAN_WRAPPER_NORMALIZATION = "lean-wrapper-normalization-v1"
 EXPECTED_STAGE1_TARGET = "cbd93de8a96bba9c93fac8afb95e8a8d12205715"
 EXPECTED_STAGE1_RESULTS_SHA256 = (
     "5733df8939418fd4c841124e993832169cd05bab546c060972398f7250a163fe"
@@ -70,6 +72,19 @@ FROZEN_SCALING_ARMS = {
         "nominal_final_allowance": 4096,
     },
 }
+
+
+def lean_wrapper_normalization_v1(
+    parsed_final: str | None,
+) -> tuple[str | None, bool]:
+    """Remove one exact leading Lean `by` wrapper, and nothing else."""
+
+    if parsed_final is None:
+        return None, False
+    match = re.match(r"\A\s*by(?![\w'])", parsed_final)
+    if match is None:
+        return parsed_final, False
+    return parsed_final[match.end() :], True
 
 
 @dataclass(frozen=True)
@@ -714,9 +729,23 @@ def _generation_record(
         include_reasoning=True,
     )
     reasoning, final_content = parser.extract_reasoning(raw_text, parser_request)
+    normalized_final, normalization_applied = lean_wrapper_normalization_v1(
+        final_content
+    )
+    normalized_replay, _ = lean_wrapper_normalization_v1(normalized_final)
     reasoning_token_count = int(parser.count_reasoning_tokens(token_ids))
     final_token_count = (
         0 if final_content is None else len(parser.extract_content_ids(token_ids))
+    )
+    parsed_final_token_count = (
+        0
+        if final_content is None
+        else len(tokenizer.encode(final_content, add_special_tokens=False))
+    )
+    normalized_final_token_count = (
+        0
+        if normalized_final is None
+        else len(tokenizer.encode(normalized_final, add_special_tokens=False))
     )
     if reasoning_token_count > request.max_reasoning_tokens:
         raise RuntimeError(
@@ -794,6 +823,20 @@ def _generation_record(
             None if final_content is None else _sha256_text(final_content)
         ),
         "final_token_count": final_token_count,
+        "parsed_final_exact": final_content,
+        "parsed_final_sha256": (
+            None if final_content is None else _sha256_text(final_content)
+        ),
+        "parsed_final_token_count": parsed_final_token_count,
+        "normalized_final_exact": normalized_final,
+        "normalized_final_sha256": (
+            None if normalized_final is None else _sha256_text(normalized_final)
+        ),
+        "normalized_final_token_count": normalized_final_token_count,
+        "normalization_id": LEAN_WRAPPER_NORMALIZATION,
+        "normalization_applied": normalization_applied,
+        "normalization_pass_count": 1,
+        "normalization_idempotent": normalized_replay == normalized_final,
         "parser_final_content_is_exact_raw_suffix": (
             final_content is None or raw_text.endswith(final_content)
         ),
