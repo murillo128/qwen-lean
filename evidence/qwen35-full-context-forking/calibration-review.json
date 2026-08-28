@@ -1,12 +1,12 @@
 {
   "schema_version": "qwen35-full-context-calibration-review-v1",
   "verdict": "PASS",
-  "reviewed_commit": "7a1c50ac783317fefeeb9849332a7944b0f4d563",
+  "reviewed_commit": "b100c4b7da4a180298afd139f1a568135c45e266",
   "reviewed_base_commit": "6f6838041ef517518d3fcfa68889ea2988074c83",
   "calibration_evidence_sha256": "3536cbb87a98a1b946f210c3c8b09e9ee8e85fa329ca6e62266836982f775197",
   "selected_max_context_length": 64512,
   "material_findings": [],
   "safe_to_progress_to_scientific_branches": true,
   "serves_as_final_technical_review": false,
-  "published_review_url": "https://github.com/murillo128/qwen-lean/pull/99#issuecomment-5453768804"
+  "published_review_url": "https://github.com/murillo128/qwen-lean/pull/99#issuecomment-5454413666"
 }
