@@ -48,6 +48,17 @@ For that user-facing explanation:
 
 The issue itself may still describe technical data flow, semantics, or component interaction when Codex needs that information to implement correctly. Keep such text contractual and implementation-oriented, not pedagogical.
 
+## Design-session traceability
+
+When a ChatGPT design session publishes a new issue:
+
+- if the current private conversation URL is available, add `Design session: [ChatGPT](<private-conversation-url>)` to the initial issue body;
+- never create or use a public/shared ChatGPT link for this provenance; if the private conversation URL is unavailable, omit the link rather than blocking issue publication;
+- after GitHub assigns the issue number, if the environment exposes a supported conversation-title action, rename the current ChatGPT conversation to `#<issue-number> — <issue-title>`;
+- do not add a repository prefix to the conversation title, and do not fail or block the workflow when conversation renaming is unavailable.
+
+This traceability applies only to the design session. Do not add Codex implementation-session identifiers or general session bookkeeping to the issue.
+
 ## Load material design context
 
 Start with:
