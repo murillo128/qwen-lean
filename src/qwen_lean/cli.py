@@ -167,6 +167,14 @@ from .counterfactual_forking_assessment import (
     run_fork_verification as run_counterfactual_verification,
     write_final_evidence as write_counterfactual_evidence,
 )
+from .full_context_forking_diagnostic import (
+    FullContextForkingConfig,
+    run_calibration_probe as run_full_context_calibration_probe,
+    run_context_calibration as run_full_context_calibration,
+    run_full_context_generation,
+    run_full_context_verification,
+    write_full_context_evidence,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -808,6 +816,118 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/qwen35-counterfactual-forking",
+    )
+
+    full_context_probe = subparsers.add_parser(
+        "qwen35-full-context-calibration-probe",
+        help=argparse.SUPPRESS,
+    )
+    full_context_probe.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    full_context_probe.add_argument("--mathia-root", type=Path, required=True)
+    full_context_probe.add_argument("--parent-generations", type=Path, required=True)
+    full_context_probe.add_argument("--parent-package", type=Path)
+    full_context_probe.add_argument("--context-length", type=int, required=True)
+    full_context_probe.add_argument("--seed", type=int, required=True)
+    full_context_probe.add_argument("--output", type=Path, required=True)
+
+    full_context_calibrate = subparsers.add_parser(
+        "qwen35-full-context-calibrate",
+        help="calibrate and repeat-confirm the real sustainable local-GPU context",
+    )
+    full_context_calibrate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    full_context_calibrate.add_argument("--mathia-root", type=Path, required=True)
+    full_context_calibrate.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    full_context_calibrate.add_argument("--parent-package", type=Path)
+    full_context_calibrate.add_argument("--artifact-dir", type=Path, required=True)
+    full_context_calibrate.add_argument(
+        "--output",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+    )
+
+    full_context_generate = subparsers.add_parser(
+        "qwen35-full-context-generate",
+        help="run or resume the 42 frozen full-context branches",
+    )
+    full_context_generate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    full_context_generate.add_argument("--mathia-root", type=Path, required=True)
+    full_context_generate.add_argument("--parent-generations", type=Path, required=True)
+    full_context_generate.add_argument("--parent-package", type=Path)
+    full_context_generate.add_argument("--artifact-dir", type=Path, required=True)
+    full_context_generate.add_argument(
+        "--calibration",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+    )
+    full_context_generate.add_argument(
+        "--checkpoint-review",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
+    )
+
+    full_context_verify = subparsers.add_parser(
+        "qwen35-full-context-verify",
+        help="run or resume exact-final-channel Lean checks for all 42 branches",
+    )
+    full_context_verify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    full_context_verify.add_argument("--mathia-root", type=Path, required=True)
+    full_context_verify.add_argument("--parent-generations", type=Path, required=True)
+    full_context_verify.add_argument("--parent-package", type=Path)
+    full_context_verify.add_argument("--artifact-dir", type=Path, required=True)
+    full_context_verify.add_argument(
+        "--calibration",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+    )
+    full_context_verify.add_argument("--minif2f-root", type=Path, required=True)
+    full_context_verify.add_argument("--mathlib-root", type=Path, default=root)
+    full_context_verify.add_argument("--workers", type=int)
+
+    full_context_evidence = subparsers.add_parser(
+        "qwen35-full-context-evidence",
+        help="write compact scoring-excluded full-context diagnostic evidence",
+    )
+    full_context_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    full_context_evidence.add_argument("--mathia-root", type=Path, required=True)
+    full_context_evidence.add_argument("--parent-generations", type=Path, required=True)
+    full_context_evidence.add_argument("--parent-package", type=Path)
+    full_context_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    full_context_evidence.add_argument(
+        "--calibration",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+    )
+    full_context_evidence.add_argument(
+        "--checkpoint-review",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
+    )
+    full_context_evidence.add_argument(
+        "--output",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/results.json",
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2409,6 +2529,78 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.preflight,
             args.evidence_dir,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-calibration-probe":
+        result = run_full_context_calibration_probe(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.output,
+            context_length=args.context_length,
+            seed=args.seed,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(result, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-calibrate":
+        evidence = run_full_context_calibration(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.output,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-generate":
+        summary = run_full_context_generation(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            args.checkpoint_review,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_full_context_verification(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-evidence":
+        evidence = write_full_context_evidence(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            args.checkpoint_review,
+            args.output,
             parent_release_package_path=args.parent_package,
         )
         print(json.dumps(evidence, indent=2))
