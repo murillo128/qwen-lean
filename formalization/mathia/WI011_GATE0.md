@@ -1,10 +1,33 @@
 # WI-011 Gate 0: finite trace--energy and four-point assembly audit
 
-Issue: [qwen-lean #101](https://github.com/murillo128/qwen-lean/issues/101)
+Controlling issue: [Mathia #74](https://github.com/murillo128/mathia/issues/74)
+
+Original execution record: [qwen-lean #101](https://github.com/murillo128/qwen-lean/issues/101)
+(closed and superseded by the Mathia issue)
 
 Status: `OBSERVED` Gate-0 evidence. The executor proposes `PASS_TO_PROOF`, subject to the
 blocking independent review required by the issue. This document freezes the proof surfaces and
 records the repairs and exclusions found before any Lean proof work.
+
+## 0. Scientific-ownership migration and current-source reconciliation
+
+Gate 0 was published and independently passed at
+`a064eecdaf7ca8bd5ef5f9efe43dc8d79ac3249b` while qwen-lean #101 still hosted the execution
+contract. Mathia #74 now owns the scientific question, and this qwen-lean branch remains only its
+child formalization artifact.
+
+The complete proof target was reconciled against Mathia `main` at
+`391e3b7a1f32c925cfb6bb8c8d9d7f8ace097b50`. The current WI-011 incorporates the exact
+large-coordinate compression repair persisted by Mathia commit
+`24226ee6142f604e21cfcb7c75f1b4a86b3b71fd`: preserve trace and defect, concentrate excess above
+the affine threshold, increase comparison energy, and reduce to the one-large-coordinate case.
+That is already the route proved below, so the migration introduces no theorem-surface or Lean
+proof change. WI-020 resolves the separate extremizer/generalization clue and does not enlarge
+this issue's finite-splice target.
+
+WI-009 remains the provenance source for the exact four-point coefficients and the externally
+Lean-checked local certificate. As frozen below, this repository keeps that certificate as an
+explicit hypothesis rather than converting it into an assumption-free local theorem.
 
 ## 1. Bounded outcome and dependency decision
 
@@ -317,7 +340,7 @@ The sources were inspected at these public revisions:
 
 | source | inspected revision | classification |
 |---|---|---|
-| `murillo128/mathia` WI-009/WI-011 | `ccf26f8956083aba8be9c3dbfff0b9c3dd2722da` | WI-011 is the candidate splice under test; it explicitly disclaims novelty for the envelope and window accounting. |
+| `murillo128/mathia` WI-009/WI-011 | historical Gate input `ccf26f8956083aba8be9c3dbfff0b9c3dd2722da`; reconciled current `main` `391e3b7a1f32c925cfb6bb8c8d9d7f8ace097b50` | WI-011 is the candidate splice under test and now contains the Gate-0 compression repair; it explicitly disclaims novelty for the envelope and window accounting. WI-009 supplies the external-certificate provenance and exact coefficient contract. |
 | `tawanerguo-cn/zeta-simple-zeros` | `45149f6d403059a71be73c5e3f884cee7cd62b20` | MIT prior art for the fixed-`A` trace--energy implication and shifted pressure assembly; no Lean source is present. Its current paper explicitly says no global minimizer claim is needed. |
 | `trmdy/zeta-simple-zeros-673137` | historical `0102fd8915c88fdd7c66231467745c17c0005fe4` | MIT independent rederivation in `docs/refined-deduction.md`, explicitly crediting tawanerguo; not Lean-formalized. Later HEAD `1610b97...` archives newer operating points, so the historical revision is the exact evidence target. |
 | `teal-sea/zeta-lab` | `c02ad1a56ce18d99c326d87e9318d064621d3fea` | MIT, sorry-free external `four_point_cert` and zeta stability bridge. Its four-point theorem has exactly the WI-009 coefficients and target `2310/10^6`; it does not contain the WI-011 `m=438` splice or exact constant. |

@@ -1,9 +1,13 @@
 # Mathia WI-011 finite formalization
 
-This directory machine-checks the finite deduction layer requested by qwen-lean issue #101.
+This directory machine-checks the finite deduction layer controlled by
+[`murillo128/mathia#74`](https://github.com/murillo128/mathia/issues/74).
+The original qwen-lean issue
+[`#101`](https://github.com/murillo128/qwen-lean/issues/101) is a closed, superseded execution
+record; this repository and PR remain the child Lean artifact for the Mathia-owned question.
 
 - `WI011_GATE0.md` records the independently reviewed statement, adversarial, prior-art, mathlib,
-  and dependency gate.
+  and dependency gate, plus its reconciliation with the repaired current Mathia WI-011.
 - `WI011TraceEnergy.lean` proves the scalar trace--energy envelope, pressure transfer, and exact
   `m=438` branch/radical arithmetic.
 - `WI011FourPointAssembly.lean` proves the four-point coefficient ledger, the parameterized local
