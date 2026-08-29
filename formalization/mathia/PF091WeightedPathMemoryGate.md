@@ -1,6 +1,6 @@
 # PF-091 weighted-path memory: statement and reuse gate
 
-Date: 2026-08-29  
+Date: 2026-08-29
 Toolchain: Lean 4.32.0, mathlib `v4.32.0` (`81a5d257c8e410db227a6665ed08f64fea08e997`)
 
 This is the blocking Gate-0 artifact for qwen-lean issue #102. It audits only the
@@ -246,6 +246,11 @@ silently weakening that condition by omitting the optional dominance theorem.
 - Targeted web searches for the exact three-vertex formula, the endpoint-vs-average
   weighted-path source, and Lean/Isabelle/Coq effective-resistance formalizations
   did not locate an exact or stronger compatible formal source.
+- Aksoy--Rashid--Hasan--Tahar's 2026
+  [Isabelle/HOL network-matrix formalization](https://arxiv.org/abs/2603.25682)
+  includes weighted Laplacians, Kron reduction, and power dissipation, but does
+  not state this endpoint-vs-average path identity and supplies no reusable Lean
+  declaration.
 - A source audit of pinned mathlib found no Moore--Penrose inverse or weighted
   effective-resistance definition. `Matrix.NonsingularInverse` explicitly says
   pseudoinverses are not considered, and `SimpleGraph.lapMatrix` is the unweighted
@@ -299,3 +304,21 @@ or new axioms, pass the `j=2,3,4` regression corollaries and the `j=2`
 Feshbach-bookkeeping check, run repository-native lightweight checks, and pass
 `git diff --check`. The resulting finite theorem must not claim any surface/PDE
 promotion.
+
+## Proof realization and Mathia mapping
+
+`PF091WeightedPathMemory.lean` realizes the frozen surfaces as follows:
+
+- `weightedPath3_characteristic_factor`, `muMinus_isEigenvalue`, and
+  `muPlus_isEigenvalue` formalize the PF-081 three-vertex spectrum;
+- `h_quadratic_limit` and `muMinus_scaled_limit` make the upstream `-3/8`
+  coefficient and the scale `b^2/a` explicit;
+- `feshbach_overlap_sq` proves the normalized PF-081 coupling `3/4`;
+- `pathPotential_weak_equation`, `pathEnergy_eq_resistance`, and
+  `pathResistance_eq` formalize the PF-080/PF-091 finite resistance mechanism
+  with the centered source and gauge exposed;
+- the `j=2,3,4` corollaries check indexing, while
+  `twoScale_upstream_bookkeeping` recovers `-3*b^2/(8*a)` at `j=2`.
+
+These are finite graph statements only. Promotion to the hyperbolic-surface
+coefficient in PF-091 remains outside issue #102 and outside the Lean file.
