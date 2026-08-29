@@ -31,6 +31,8 @@ The declarations are frozen to the following shape (names may gain local
 helper lemmas without changing these public statements):
 
 ```lean
+noncomputable section
+
 namespace Mathia.WP014
 
 abbrev TailPoint := {x : ℝ // 2 < x}
