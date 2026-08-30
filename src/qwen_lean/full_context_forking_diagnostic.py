@@ -74,6 +74,7 @@ SCIENTIFIC_SEEDS = tuple(range(100, 106))
 KNOWN_CONTEXT_LENGTH = 24_576
 NATIVE_CONTEXT_LENGTH = 262_144
 GPU_MEMORY_UTILIZATION = 0.89
+CALIBRATED_GPU_NAME_FRAGMENT = "RTX 4070 Ti"
 
 
 @dataclass(frozen=True)
@@ -816,6 +817,45 @@ def _validate_checkpoint_review(
     return review
 
 
+def _validate_scientific_runtime_hardware(
+    runtime: Mapping[str, Any], calibration: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Fail closed unless generation uses the exact calibrated GPU class.
+
+    Both the controlling issue and the accepted calibration bind the scientific
+    run to the project RTX 4070 Ti.  Compute capability alone is insufficient:
+    several materially different Ada devices report capability 8.9.
+    """
+    attempts = calibration.get("attempts")
+    if not isinstance(attempts, list) or not attempts:
+        raise ValueError("calibration evidence lacks hardware-bound attempts")
+    calibrated_totals = {
+        int(attempt["gpu_memory_total_bytes"])
+        for attempt in attempts
+        if isinstance(attempt, dict)
+        and attempt.get("gpu_memory_total_bytes") is not None
+    }
+    if len(calibrated_totals) != 1:
+        raise ValueError("calibration evidence has ambiguous GPU memory identity")
+    calibrated_total = calibrated_totals.pop()
+    observed_name = str(runtime.get("cuda_device", ""))
+    observed_total = int(runtime.get("nvml_gpu_memory_total_bytes", -1))
+    if (
+        CALIBRATED_GPU_NAME_FRAGMENT not in observed_name
+        or observed_total != calibrated_total
+    ):
+        raise RuntimeError(
+            "full-context generation requires the exact calibrated RTX 4070 Ti "
+            f"hardware ({calibrated_total} bytes), got {observed_name!r} "
+            f"({observed_total} bytes)"
+        )
+    return {
+        "gpu_name_fragment": CALIBRATED_GPU_NAME_FRAGMENT,
+        "gpu_memory_total_bytes": calibrated_total,
+        "status": "matched",
+    }
+
+
 def _scientific_generation_hash(
     config: FullContextForkingConfig,
     calibration_evidence_path: Path,
@@ -1226,6 +1266,12 @@ def run_full_context_generation(
     runtime["selected_max_context_length"] = selected
     runtime["package_versions"] = _validated_package_versions()
     device_index = int(runtime["cuda_device_index"])
+    runtime["nvml_gpu_memory_total_bytes"] = _nvml_memory_snapshot(device_index)[
+        "gpu_memory_total_bytes"
+    ]
+    runtime["calibrated_hardware_binding"] = _validate_scientific_runtime_hardware(
+        runtime, calibration
+    )
     _assert_no_other_compute_process(device_index)
     started = time.perf_counter()
     status = "failed"

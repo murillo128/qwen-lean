@@ -17,10 +17,10 @@ from qwen_lean.full_context_forking_diagnostic import (
     _next_calibration_action,
     _reasoning_transition_index,
     _validate_checkpoint_review,
+    _validate_scientific_runtime_hardware,
     full_context_requests,
 )
 from qwen_lean.native_thinking_assessment import MathiaTask, _file_sha256
-
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config/qwen35-full-context-forking.json"
@@ -171,6 +171,41 @@ def test_generation_requires_published_pass_review_of_exact_calibration(
     review.write_text(json.dumps(value), encoding="utf-8")
     with pytest.raises(RuntimeError, match="not PASS"):
         _validate_checkpoint_review(calibration, review)
+
+
+def test_scientific_generation_requires_exact_calibrated_gpu_identity() -> None:
+    calibration = {
+        "attempts": [
+            {"gpu_memory_total_bytes": 12_878_610_432},
+            {"gpu_memory_total_bytes": 12_878_610_432},
+        ]
+    }
+    expected_runtime = {
+        "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
+        "nvml_gpu_memory_total_bytes": 12_878_610_432,
+    }
+    assert _validate_scientific_runtime_hardware(expected_runtime, calibration) == {
+        "gpu_name_fragment": "RTX 4070 Ti",
+        "gpu_memory_total_bytes": 12_878_610_432,
+        "status": "matched",
+    }
+
+    with pytest.raises(RuntimeError, match="exact calibrated RTX 4070 Ti"):
+        _validate_scientific_runtime_hardware(
+            {
+                "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+                "nvml_gpu_memory_total_bytes": 21_469_052_928,
+            },
+            calibration,
+        )
+    with pytest.raises(RuntimeError, match="exact calibrated RTX 4070 Ti"):
+        _validate_scientific_runtime_hardware(
+            {
+                "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
+                "nvml_gpu_memory_total_bytes": 12_000_000_000,
+            },
+            calibration,
+        )
 
 
 def test_transition_index_uses_exact_qwen3_vocab_without_parser_internals() -> None:
