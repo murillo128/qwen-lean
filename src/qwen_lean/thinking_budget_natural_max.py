@@ -58,7 +58,7 @@ CAPACITY_ATTEMPT_SCHEMA = "qwen35-thinking-budget-natural-max-capacity-attempt-v
 CAPACITY_EVIDENCE_SCHEMA = "qwen35-thinking-budget-natural-max-capacity-v1"
 GENERATION_SCHEMA = "qwen35-thinking-budget-natural-max-generation-v1"
 VERIFICATION_SCHEMA = "qwen35-thinking-budget-natural-max-verification-v1"
-RESULTS_SCHEMA = "qwen35-thinking-budget-natural-max-results-v1"
+RESULTS_SCHEMA = "qwen35-thinking-budget-natural-max-results-v2"
 ARM = "BNAT-MAX"
 
 
@@ -1567,29 +1567,7 @@ def write_natural_evidence(
             and row["bnat_max"]["reasoning_end_position_token_count"] is not None
             and int(row["bnat_max"]["reasoning_end_position_token_count"]) > 16384
         ],
-        "cost": {
-            "total_generated_tokens": sum(
-                int(row["raw_response_token_count"]) for row in generations
-            ),
-            "total_reasoning_tokens": sum(
-                int(row["reasoning_token_count"]) for row in generations
-            ),
-            "total_final_tokens": sum(
-                int(row["parsed_final_token_count"]) for row in generations
-            ),
-            "total_normalized_final_tokens": sum(
-                int(row["normalized_final_token_count"]) for row in generations
-            ),
-            "generation_wall_time_seconds": sum(
-                float(row["segment_wall_time_seconds"]) for row in generation_segments
-            ),
-            "verification_wall_time_seconds": sum(
-                float(row["wall_time_seconds"]) for row in verification_segments
-            ),
-            "peak_gpu_memory_bytes": max(
-                int(row["gpu_memory_peak_bytes"]) for row in generation_segments
-            ),
-        },
+        "cost": _natural_cost(generations, generation_segments, verification_segments),
         "conclusion": conclusion,
         "artifact_integrity": {
             "capacity_attempts_jsonl_sha256": _file_sha256(
@@ -1610,16 +1588,84 @@ def write_natural_evidence(
             "raw_artifacts_git_ignored": True,
         },
     }
-    wall = float(result["cost"]["generation_wall_time_seconds"])
-    result["cost"]["throughput_generated_tokens_per_wall_second"] = (
-        float(result["cost"]["total_generated_tokens"]) / wall if wall else None
-    )
     evidence_dir.mkdir(parents=True, exist_ok=True)
     _atomic_write_json(evidence_dir / "natural-max-results.json", result)
     (evidence_dir / "NATURAL_MAX.md").write_text(
         _render_natural_readme(result), encoding="utf-8"
     )
     return result
+
+
+def _natural_cost(
+    generations: Sequence[Mapping[str, Any]],
+    generation_segments: Sequence[Mapping[str, Any]],
+    verification_segments: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    candidate_latencies = [
+        float(row["generation_latency_seconds"]) for row in generations
+    ]
+    if any(latency <= 0 for latency in candidate_latencies):
+        raise ValueError("natural-max candidate generation latency is not positive")
+    persisted_segment_candidates = sum(
+        int(row["persisted_candidate_count"]) for row in generation_segments
+    )
+    if persisted_segment_candidates > len(generations):
+        raise ValueError("natural-max segment coverage exceeds durable candidates")
+
+    total_generated_tokens = sum(
+        int(row["raw_response_token_count"]) for row in generations
+    )
+    candidate_latency_seconds = sum(candidate_latencies)
+    segment_coverage_complete = persisted_segment_candidates == len(generations)
+    observed_peak_gpu_memory_bytes = (
+        max(int(row["gpu_memory_peak_bytes"]) for row in generation_segments)
+        if generation_segments
+        else None
+    )
+    limitation = None
+    if not segment_coverage_complete:
+        limitation = (
+            "The interrupted pre-restart process did not persist its segment-level "
+            "wall-clock/VRAM finalizer. Per-candidate generation latencies cover all "
+            "durable candidates, but segment wall-clock and peak-VRAM telemetry cover "
+            f"only {persisted_segment_candidates}/{len(generations)} candidates."
+        )
+
+    return {
+        "total_generated_tokens": total_generated_tokens,
+        "total_reasoning_tokens": sum(
+            int(row["reasoning_token_count"]) for row in generations
+        ),
+        "total_final_tokens": sum(
+            int(row["parsed_final_token_count"]) for row in generations
+        ),
+        "total_normalized_final_tokens": sum(
+            int(row["normalized_final_token_count"]) for row in generations
+        ),
+        "sum_candidate_generation_latency_seconds": candidate_latency_seconds,
+        "candidate_generation_latency_record_count": len(candidate_latencies),
+        "candidate_generation_latency_complete": len(candidate_latencies)
+        == len(generations),
+        "throughput_generated_tokens_per_candidate_generation_latency_second": (
+            total_generated_tokens / candidate_latency_seconds
+            if candidate_latency_seconds
+            else None
+        ),
+        "recorded_generation_segment_wall_time_seconds": sum(
+            float(row["segment_wall_time_seconds"]) for row in generation_segments
+        ),
+        "recorded_generation_segment_persisted_candidate_count": (
+            persisted_segment_candidates
+        ),
+        "recorded_generation_segment_expected_candidate_count": len(generations),
+        "recorded_generation_segment_coverage_complete": segment_coverage_complete,
+        "observed_peak_gpu_memory_bytes": observed_peak_gpu_memory_bytes,
+        "peak_gpu_memory_measurement_complete": segment_coverage_complete,
+        "generation_segment_telemetry_limitation": limitation,
+        "verification_wall_time_seconds": sum(
+            float(row["wall_time_seconds"]) for row in verification_segments
+        ),
+    }
 
 
 def _natural_paired_table(
@@ -1815,6 +1861,7 @@ def _natural_conclusion(
 def _render_natural_readme(result: Mapping[str, Any]) -> str:
     combined = result["summaries"]["combined"]
     forced = result["b16_forced_subset"]
+    cost = result["cost"]
     return "\n".join(
         [
             "# Qwen3.5-4B BNAT-MAX natural-thinking continuation",
@@ -1839,6 +1886,26 @@ def _render_natural_readme(result: Mapping[str, Any]) -> str:
             ),
             "",
             (f"**OBSERVED conclusion:** `{result['conclusion']['category']}`."),
+            "",
+            (
+                "The complete 16/16 durable candidate records contain "
+                f"{cost['sum_candidate_generation_latency_seconds']:.2f} seconds of "
+                "per-candidate generation latency, yielding "
+                f"{cost['throughput_generated_tokens_per_candidate_generation_latency_second']:.3f} "
+                "generated tokens per candidate-latency second."
+            ),
+            "",
+            (
+                "Segment-level wall-clock and peak-VRAM telemetry are incomplete: "
+                "the retained segment covers "
+                f"{cost['recorded_generation_segment_persisted_candidate_count']}/"
+                f"{cost['recorded_generation_segment_expected_candidate_count']} "
+                "candidates after the restart. Its observed wall time is "
+                f"{cost['recorded_generation_segment_wall_time_seconds']:.2f} seconds "
+                "and its observed peak is "
+                f"{cost['observed_peak_gpu_memory_bytes']} bytes; neither is claimed "
+                "as complete-run telemetry."
+            ),
             "",
             (
                 "This is a 16-candidate capability check, not evidence of "

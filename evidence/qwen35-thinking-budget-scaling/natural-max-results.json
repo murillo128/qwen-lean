@@ -151,9 +151,17 @@
     "stage1_config_sha256": "518c7456d52e9a1d833675f0d56ba72308aa75bb5926ffb968f258c2c651657f"
   },
   "cost": {
-    "generation_wall_time_seconds": 65037.69055977301,
-    "peak_gpu_memory_bytes": 19665649664,
-    "throughput_generated_tokens_per_wall_second": 52.64707234419903,
+    "candidate_generation_latency_complete": true,
+    "candidate_generation_latency_record_count": 16,
+    "generation_segment_telemetry_limitation": "The interrupted pre-restart process did not persist its segment-level wall-clock/VRAM finalizer. Per-candidate generation latencies cover all durable candidates, but segment wall-clock and peak-VRAM telemetry cover only 6/16 candidates.",
+    "observed_peak_gpu_memory_bytes": 19665649664,
+    "peak_gpu_memory_measurement_complete": false,
+    "recorded_generation_segment_coverage_complete": false,
+    "recorded_generation_segment_expected_candidate_count": 16,
+    "recorded_generation_segment_persisted_candidate_count": 6,
+    "recorded_generation_segment_wall_time_seconds": 65037.69055977301,
+    "sum_candidate_generation_latency_seconds": 141773.61281070928,
+    "throughput_generated_tokens_per_candidate_generation_latency_second": 24.151490055992667,
     "total_final_tokens": 2264,
     "total_generated_tokens": 3424044,
     "total_normalized_final_tokens": 2264,
@@ -993,7 +1001,7 @@
     "top_k": 20,
     "top_p": 0.95
   },
-  "schema_version": "qwen35-thinking-budget-natural-max-results-v1",
+  "schema_version": "qwen35-thinking-budget-natural-max-results-v2",
   "selection": {
     "eligible_task_counts": {
       "fresh-composition-valid-v2": 319,

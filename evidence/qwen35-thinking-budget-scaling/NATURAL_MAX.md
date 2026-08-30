@@ -8,4 +8,8 @@ Within the immutable 11-candidate B16-forced subset, 11 consumed the available c
 
 **OBSERVED conclusion:** `natural_thinking_consumes_available_context`.
 
+The complete 16/16 durable candidate records contain 141773.61 seconds of per-candidate generation latency, yielding 24.151 generated tokens per candidate-latency second.
+
+Segment-level wall-clock and peak-VRAM telemetry are incomplete: the retained segment covers 6/16 candidates after the restart. Its observed wall time is 65037.69 seconds and its observed peak is 19665649664 bytes; neither is claimed as complete-run telemetry.
+
 This is a 16-candidate capability check, not evidence of statistical superiority. Historical Stage 1 and B4/B8/B16 artifacts remain unchanged, and no larger program is authorized.

@@ -8,6 +8,7 @@ from qwen_lean.thinking_budget_natural_max import (
     ARM,
     CAPACITY_ATTEMPT_SCHEMA,
     NaturalMaxConfig,
+    _natural_cost,
     _natural_conclusion,
     _natural_paired_table,
     load_capacity_attempts,
@@ -176,6 +177,50 @@ def test_conclusion_detects_new_verified_capability_after_16k() -> None:
 
     assert conclusion["category"] == ("natural_long_thinking_adds_verified_capability")
     assert conclusion["new_verified_after_more_than_16k_reasoning"] == ["mini-0"]
+
+
+def test_cost_uses_complete_candidate_latencies_when_segment_coverage_is_partial() -> (
+    None
+):
+    generations = [
+        {
+            "raw_response_token_count": 40,
+            "reasoning_token_count": 35,
+            "parsed_final_token_count": 5,
+            "normalized_final_token_count": 5,
+            "generation_latency_seconds": 10.0,
+        },
+        {
+            "raw_response_token_count": 50,
+            "reasoning_token_count": 50,
+            "parsed_final_token_count": 0,
+            "normalized_final_token_count": 0,
+            "generation_latency_seconds": 20.0,
+        },
+    ]
+    generation_segments = [
+        {
+            "persisted_candidate_count": 1,
+            "segment_wall_time_seconds": 12.0,
+            "gpu_memory_peak_bytes": 100,
+        }
+    ]
+
+    cost = _natural_cost(generations, generation_segments, [{"wall_time_seconds": 2.0}])
+
+    assert cost["sum_candidate_generation_latency_seconds"] == 30.0
+    assert (
+        cost["throughput_generated_tokens_per_candidate_generation_latency_second"]
+        == 3.0
+    )
+    assert cost["candidate_generation_latency_complete"] is True
+    assert cost["recorded_generation_segment_wall_time_seconds"] == 12.0
+    assert cost["recorded_generation_segment_persisted_candidate_count"] == 1
+    assert cost["recorded_generation_segment_expected_candidate_count"] == 2
+    assert cost["recorded_generation_segment_coverage_complete"] is False
+    assert cost["observed_peak_gpu_memory_bytes"] == 100
+    assert cost["peak_gpu_memory_measurement_complete"] is False
+    assert "only 1/2 candidates" in cost["generation_segment_telemetry_limitation"]
 
 
 def _attempt(
