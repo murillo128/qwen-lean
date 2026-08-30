@@ -295,12 +295,13 @@ def test_committed_attempt_recovery_binds_exact_published_review(
 def test_attempt_recovery_starts_at_one_without_synthetic_attempt_zero(
     tmp_path: Path,
 ) -> None:
+    requests = _recovery_requests()
     recovery = _load_attempt_recovery(
         _config(),
         CALIBRATION_PATH,
         CALIBRATION_REVIEW_PATH,
         ATTEMPT_RECOVERY_PATH,
-        _recovery_requests(),
+        requests,
     )
     attempt_path = tmp_path / "branch-attempts.jsonl"
     provenance, recovered_counts = _prepare_attempt_recovery(
@@ -318,22 +319,46 @@ def test_attempt_recovery_starts_at_one_without_synthetic_attempt_zero(
     assert "attempt_index" not in events[0]
     assert provenance["raw_journal_recovered"] is False
     assert recovered_counts == {branch_id: 1}
-    assert _branch_attempt_counts(attempt_path, recovered_counts)[branch_id] == 1
+    assert (
+        _branch_attempt_counts(
+            attempt_path,
+            requests,
+            recovered_counts,
+            attempt_recovery_provenance=provenance,
+        )[branch_id]
+        == 1
+    )
 
+    request = requests[0]
     with attempt_path.open("a", encoding="utf-8") as handle:
         for event_kind in ("started", "failed"):
-            handle.write(
-                json.dumps(
+            event = {
+                "schema_version": BRANCH_ATTEMPT_SCHEMA,
+                "event": event_kind,
+                "branch_id": branch_id,
+                "attempt_index": 1,
+                "fork_state": request.state.label,
+                "branch_seed": request.seed,
+                "max_tokens": request.max_tokens,
+                "attempt_recovery_provenance": provenance,
+            }
+            if event_kind == "failed":
+                event.update(
                     {
-                        "schema_version": BRANCH_ATTEMPT_SCHEMA,
-                        "event": event_kind,
-                        "branch_id": branch_id,
-                        "attempt_index": 1,
+                        "error": "RuntimeError: test failure",
+                        "branch_gpu_memory": {},
                     }
                 )
-                + "\n"
-            )
-    assert _branch_attempt_counts(attempt_path, recovered_counts)[branch_id] == 2
+            handle.write(json.dumps(event) + "\n")
+    assert (
+        _branch_attempt_counts(
+            attempt_path,
+            requests,
+            recovered_counts,
+            attempt_recovery_provenance=provenance,
+        )[branch_id]
+        == 2
+    )
     summary = _branch_attempt_summary(attempt_path)
     assert summary["started_attempt_count"] == 1
     assert summary["recovered_failed_attempt_count"] == 1
@@ -345,12 +370,13 @@ def test_attempt_recovery_starts_at_one_without_synthetic_attempt_zero(
 def test_attempt_recovery_fails_closed_on_unjournaled_records_and_conflicts(
     tmp_path: Path,
 ) -> None:
+    requests = _recovery_requests()
     recovery = _load_attempt_recovery(
         _config(),
         CALIBRATION_PATH,
         CALIBRATION_REVIEW_PATH,
         ATTEMPT_RECOVERY_PATH,
-        _recovery_requests(),
+        requests,
     )
     branch_id = str(recovery["scope"]["branch_id"])
     unjournaled = tmp_path / "unjournaled.jsonl"
@@ -383,6 +409,108 @@ def test_attempt_recovery_fails_closed_on_unjournaled_records_and_conflicts(
             ATTEMPT_RECOVERY_PATH,
             recovery,
             persisted_branch_ids=[],
+        )
+
+    binding_conflict = tmp_path / "binding-conflict.jsonl"
+    provenance, recovered_counts = _prepare_attempt_recovery(
+        binding_conflict,
+        ATTEMPT_RECOVERY_PATH,
+        recovery,
+        persisted_branch_ids=[],
+    )
+    request = requests[0]
+    with binding_conflict.open("a", encoding="utf-8") as handle:
+        for event_kind in ("started", "failed"):
+            event = {
+                "schema_version": BRANCH_ATTEMPT_SCHEMA,
+                "event": event_kind,
+                "branch_id": branch_id,
+                "attempt_index": 1,
+                "fork_state": request.state.label,
+                "branch_seed": 999,
+                "max_tokens": 1,
+                "attempt_recovery_provenance": provenance,
+            }
+            if event_kind == "failed":
+                event.update({"error": "bad", "branch_gpu_memory": {}})
+            handle.write(json.dumps(event) + "\n")
+    with pytest.raises(ValueError, match="request binding changed"):
+        _branch_attempt_counts(
+            binding_conflict,
+            requests,
+            recovered_counts,
+            attempt_recovery_provenance=provenance,
+        )
+
+    provenance_conflict = tmp_path / "provenance-conflict.jsonl"
+    provenance, recovered_counts = _prepare_attempt_recovery(
+        provenance_conflict,
+        ATTEMPT_RECOVERY_PATH,
+        recovery,
+        persisted_branch_ids=[],
+    )
+    with provenance_conflict.open("a", encoding="utf-8") as handle:
+        handle.write(
+            json.dumps(
+                {
+                    "schema_version": BRANCH_ATTEMPT_SCHEMA,
+                    "event": "started",
+                    "branch_id": branch_id,
+                    "attempt_index": 1,
+                    "fork_state": request.state.label,
+                    "branch_seed": request.seed,
+                    "max_tokens": request.max_tokens,
+                    "attempt_recovery_provenance": {
+                        **provenance,
+                        "next_attempt_index": 0,
+                    },
+                }
+            )
+            + "\n"
+        )
+    with pytest.raises(ValueError, match="attempt-recovery provenance changed"):
+        _branch_attempt_counts(
+            provenance_conflict,
+            requests,
+            recovered_counts,
+            attempt_recovery_provenance=provenance,
+        )
+
+    hash_conflict = tmp_path / "hash-conflict.jsonl"
+    provenance, recovered_counts = _prepare_attempt_recovery(
+        hash_conflict,
+        ATTEMPT_RECOVERY_PATH,
+        recovery,
+        persisted_branch_ids=[],
+    )
+    common = {
+        "schema_version": BRANCH_ATTEMPT_SCHEMA,
+        "branch_id": branch_id,
+        "attempt_index": 1,
+        "fork_state": request.state.label,
+        "branch_seed": request.seed,
+        "max_tokens": request.max_tokens,
+        "attempt_recovery_provenance": provenance,
+    }
+    with hash_conflict.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({**common, "event": "started"}) + "\n")
+        handle.write(
+            json.dumps(
+                {
+                    **common,
+                    "event": "persisted",
+                    "generation_record_sha256": "0" * 64,
+                }
+            )
+            + "\n"
+        )
+    with pytest.raises(ValueError, match="differs from durable generation"):
+        _branch_attempt_counts(
+            hash_conflict,
+            requests,
+            recovered_counts,
+            attempt_recovery_provenance=provenance,
+            persisted_record_hashes={branch_id: "1" * 64},
         )
 
 

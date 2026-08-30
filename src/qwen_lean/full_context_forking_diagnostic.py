@@ -1291,12 +1291,21 @@ def _prepare_attempt_recovery(
 
 
 def _branch_attempt_counts(
-    path: Path, recovered_attempt_counts: Mapping[str, int] | None = None
+    path: Path,
+    expected_requests: Sequence[ForkRequest],
+    recovered_attempt_counts: Mapping[str, int] | None = None,
+    *,
+    attempt_recovery_provenance: Mapping[str, Any] | None = None,
+    persisted_record_hashes: Mapping[str, str] | None = None,
 ) -> Counter[str]:
+    expected = {request.branch_id: request for request in expected_requests}
+    if len(expected) != len(expected_requests):
+        raise ValueError("duplicate expected branch identity")
+    record_hashes = dict(persisted_record_hashes or {})
     counts: Counter[str] = Counter(recovered_attempt_counts or {})
     if not path.exists():
         return counts
-    started: set[tuple[str, int]] = set()
+    started: dict[tuple[str, int], dict[str, Any]] = {}
     terminal: set[tuple[str, int]] = set()
     for line in _restart_safe_jsonl_lines(path):
         event = json.loads(line)
@@ -1308,20 +1317,79 @@ def _branch_attempt_counts(
         if event_kind not in {"started", "persisted", "failed", "interrupted"}:
             raise ValueError("unknown branch-attempt event")
         branch_id = str(event["branch_id"])
-        attempt_index = int(event["attempt_index"])
+        request = expected.get(branch_id)
+        if request is None:
+            raise ValueError(f"unknown branch-attempt identity: {branch_id}")
+        raw_attempt_index = event.get("attempt_index")
+        if (
+            not isinstance(raw_attempt_index, int)
+            or isinstance(raw_attempt_index, bool)
+            or raw_attempt_index < 0
+        ):
+            raise ValueError("invalid branch-attempt index")
+        attempt_index = raw_attempt_index
+        common = {
+            "schema_version": BRANCH_ATTEMPT_SCHEMA,
+            "branch_id": branch_id,
+            "attempt_index": attempt_index,
+            "fork_state": request.state.label,
+            "branch_seed": request.seed,
+            "max_tokens": request.max_tokens,
+        }
+        for field, value in common.items():
+            if event.get(field) != value:
+                raise ValueError(
+                    f"branch-attempt request binding changed: {branch_id} {field}"
+                )
+        expected_provenance: Mapping[str, Any] | None = None
+        if (
+            attempt_recovery_provenance is not None
+            and branch_id == attempt_recovery_provenance["branch_id"]
+            and attempt_index >= int(attempt_recovery_provenance["next_attempt_index"])
+        ):
+            expected_provenance = attempt_recovery_provenance
+        if expected_provenance is None:
+            if "attempt_recovery_provenance" in event:
+                raise ValueError("unexpected attempt-recovery provenance")
+        elif event.get("attempt_recovery_provenance") != expected_provenance:
+            raise ValueError("attempt-recovery provenance changed")
+        common_keys = {*common, "event"}
+        if expected_provenance is not None:
+            common_keys.add("attempt_recovery_provenance")
+        if event_kind == "started":
+            allowed_keys = common_keys
+        elif event_kind == "persisted":
+            allowed_keys = {*common_keys, "generation_record_sha256"}
+        else:
+            allowed_keys = {*common_keys, "error", "branch_gpu_memory"}
+        if set(event) != allowed_keys:
+            raise ValueError("branch-attempt event fields differ from schema")
         key = (branch_id, attempt_index)
         if event_kind == "started":
             if attempt_index != counts[branch_id] or key in started:
                 raise ValueError(
                     "branch-attempt sequence conflicts with recovery state"
                 )
-            started.add(key)
+            started[key] = event
             counts[branch_id] += 1
         else:
             if key not in started or key in terminal:
                 raise ValueError(
                     "branch-attempt terminal event lacks one matching start"
                 )
+            started_event = started[key]
+            for field in common_keys - {"event"}:
+                if event[field] != started_event[field]:
+                    raise ValueError("branch-attempt terminal metadata changed")
+            if event_kind == "persisted":
+                expected_record_hash = record_hashes.get(branch_id)
+                if (
+                    expected_record_hash is None
+                    or event["generation_record_sha256"] != expected_record_hash
+                ):
+                    raise ValueError(
+                        "persisted attempt hash differs from durable generation"
+                    )
             terminal.add(key)
     return counts
 
@@ -1330,6 +1398,7 @@ async def _run_full_context_branches(
     config: FullContextForkingConfig,
     tokenizer: Any,
     pending: Sequence[ForkRequest],
+    expected_requests: Sequence[ForkRequest],
     generation_path: Path,
     attempt_path: Path,
     snapshot_path: Path,
@@ -1338,16 +1407,23 @@ async def _run_full_context_branches(
     device_index: int,
     attempt_recovery_provenance: Mapping[str, Any],
     recovered_attempt_counts: Mapping[str, int],
+    persisted_record_hashes: Mapping[str, str],
 ) -> list[dict[str, Any]]:
     from vllm import SamplingParams
     from vllm.inputs import TokensPrompt
     from vllm.v1.engine.async_llm import AsyncLLM
 
+    attempt_counts = _branch_attempt_counts(
+        attempt_path,
+        expected_requests,
+        recovered_attempt_counts,
+        attempt_recovery_provenance=attempt_recovery_provenance,
+        persisted_record_hashes=persisted_record_hashes,
+    )
     engine = AsyncLLM.from_engine_args(
         _full_context_engine_args(config, snapshot_path, selected_context_length)
     )
     persisted: list[dict[str, Any]] = []
-    attempt_counts = _branch_attempt_counts(attempt_path, recovered_attempt_counts)
     try:
         for request in pending:
             attempt_index = attempt_counts[request.branch_id]
@@ -1519,6 +1595,21 @@ def run_full_context_generation(
     completed = {str(record["branch_id"]) for record in prior}
     pending = [request for request in expected if request.branch_id not in completed]
     if not pending:
+        recovery_provenance, recovered_attempt_counts = _prepare_attempt_recovery(
+            attempt_path,
+            attempt_recovery_path,
+            attempt_recovery,
+            persisted_branch_ids=[str(record["branch_id"]) for record in prior],
+        )
+        _branch_attempt_counts(
+            attempt_path,
+            expected,
+            recovered_attempt_counts,
+            attempt_recovery_provenance=recovery_provenance,
+            persisted_record_hashes={
+                str(record["branch_id"]): _sha256_json(record) for record in prior
+            },
+        )
         return {
             "status": "already_complete",
             "expected_branches": len(expected),
@@ -1526,6 +1617,7 @@ def run_full_context_generation(
             "selected_max_context_length": selected,
             "integrity": integrity,
             "attempt_recovery_evidence_sha256": _file_sha256(attempt_recovery_path),
+            "attempt_recovery": recovery_provenance,
         }
 
     _configure_fork_runtime()
@@ -1553,12 +1645,16 @@ def run_full_context_generation(
     status = "failed"
     error_text: str | None = None
     new_records: list[dict[str, Any]] = []
+    prior_record_hashes = {
+        str(record["branch_id"]): _sha256_json(record) for record in prior
+    }
     try:
         new_records = asyncio.run(
             _run_full_context_branches(
                 config,
                 tokenizer,
                 pending,
+                expected,
                 generation_path,
                 attempt_path,
                 snapshot_path,
@@ -1566,7 +1662,21 @@ def run_full_context_generation(
                 device_index=device_index,
                 attempt_recovery_provenance=recovery_provenance,
                 recovered_attempt_counts=recovered_attempt_counts,
+                persisted_record_hashes=prior_record_hashes,
             )
+        )
+        _branch_attempt_counts(
+            attempt_path,
+            expected,
+            recovered_attempt_counts,
+            attempt_recovery_provenance=recovery_provenance,
+            persisted_record_hashes={
+                **prior_record_hashes,
+                **{
+                    str(record["branch_id"]): _sha256_json(record)
+                    for record in new_records
+                },
+            },
         )
         status = "completed"
     except BaseException as error:
@@ -1606,6 +1716,8 @@ def run_full_context_verification(
     parent_generations_path: Path,
     artifact_dir: Path,
     calibration_evidence_path: Path,
+    checkpoint_review_path: Path,
+    attempt_recovery_path: Path,
     *,
     project_roots: Mapping[str, Path],
     workers: int | None = None,
@@ -1639,6 +1751,28 @@ def run_full_context_verification(
         raise RuntimeError(
             f"full-context generation is incomplete: {len(generations)}/{len(expected)}"
         )
+    attempt_recovery = _load_attempt_recovery(
+        config,
+        calibration_evidence_path,
+        checkpoint_review_path,
+        attempt_recovery_path,
+        expected,
+    )
+    recovery_provenance, recovered_attempt_counts = _prepare_attempt_recovery(
+        artifact_dir / "branch-attempts.jsonl",
+        attempt_recovery_path,
+        attempt_recovery,
+        persisted_branch_ids=[str(record["branch_id"]) for record in generations],
+    )
+    _branch_attempt_counts(
+        artifact_dir / "branch-attempts.jsonl",
+        expected,
+        recovered_attempt_counts,
+        attempt_recovery_provenance=recovery_provenance,
+        persisted_record_hashes={
+            str(record["branch_id"]): _sha256_json(record) for record in generations
+        },
+    )
     environment_tasks, _ = load_mathia_tasks(config.counterfactual.native, mathia_root)
     environments = validate_lean_environments(
         config.counterfactual.native, environment_tasks, project_roots
@@ -1660,6 +1794,7 @@ def run_full_context_verification(
             "new_verifications": 0,
             "integrity": integrity,
             "environments": environments,
+            "attempt_recovery": recovery_provenance,
         }
     verifier = LeanVerifier(
         project_roots[TARGET_WORKLOAD],
@@ -1708,6 +1843,7 @@ def run_full_context_verification(
         "verification_wall_time_seconds": time.perf_counter() - started,
         "integrity": integrity,
         "environments": environments,
+        "attempt_recovery": recovery_provenance,
     }
 
 
@@ -1851,6 +1987,7 @@ def write_full_context_evidence(
     artifact_dir: Path,
     calibration_evidence_path: Path,
     checkpoint_review_path: Path,
+    attempt_recovery_path: Path,
     output_path: Path,
     *,
     parent_release_package_path: Path | None = None,
@@ -1884,6 +2021,28 @@ def write_full_context_evidence(
     )
     if len(generations) != len(requests):
         raise RuntimeError("cannot write evidence from incomplete generation")
+    attempt_recovery = _load_attempt_recovery(
+        config,
+        calibration_evidence_path,
+        checkpoint_review_path,
+        attempt_recovery_path,
+        requests,
+    )
+    recovery_provenance, recovered_attempt_counts = _prepare_attempt_recovery(
+        artifact_dir / "branch-attempts.jsonl",
+        attempt_recovery_path,
+        attempt_recovery,
+        persisted_branch_ids=[str(record["branch_id"]) for record in generations],
+    )
+    _branch_attempt_counts(
+        artifact_dir / "branch-attempts.jsonl",
+        requests,
+        recovered_attempt_counts,
+        attempt_recovery_provenance=recovery_provenance,
+        persisted_record_hashes={
+            str(record["branch_id"]): _sha256_json(record) for record in generations
+        },
+    )
     verification_records = load_fork_verification_records(
         artifact_dir / "verifications.jsonl", requests
     )
@@ -2007,9 +2166,10 @@ def write_full_context_evidence(
             "raw_generations_sha256": generation_sha,
             "raw_verifications_sha256": verification_sha,
         },
-        "restart_safety": _branch_attempt_summary(
-            artifact_dir / "branch-attempts.jsonl"
-        ),
+        "restart_safety": {
+            **_branch_attempt_summary(artifact_dir / "branch-attempts.jsonl"),
+            "attempt_recovery": recovery_provenance,
+        },
         "outcomes": {
             "nonempty_final_branch_count": sum(
                 1

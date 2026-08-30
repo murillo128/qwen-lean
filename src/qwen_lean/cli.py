@@ -902,6 +902,16 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=root / "evidence/qwen35-full-context-forking/calibration.json",
     )
+    full_context_verify.add_argument(
+        "--checkpoint-review",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
+    )
+    full_context_verify.add_argument(
+        "--attempt-recovery",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
+    )
     full_context_verify.add_argument("--minif2f-root", type=Path, required=True)
     full_context_verify.add_argument("--mathlib-root", type=Path, default=root)
     full_context_verify.add_argument("--workers", type=int)
@@ -928,6 +938,11 @@ def _parser() -> argparse.ArgumentParser:
         "--checkpoint-review",
         type=Path,
         default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
+    )
+    full_context_evidence.add_argument(
+        "--attempt-recovery",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
     )
     full_context_evidence.add_argument(
         "--output",
@@ -2588,6 +2603,8 @@ def main(argv: list[str] | None = None) -> int:
             args.parent_generations,
             args.artifact_dir,
             args.calibration,
+            args.checkpoint_review,
+            args.attempt_recovery,
             project_roots={
                 "minif2f-valid-clean-v2": args.minif2f_root,
                 "fresh-composition-valid-v2": args.mathlib_root,
@@ -2606,6 +2623,7 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
+            args.attempt_recovery,
             args.output,
             parent_release_package_path=args.parent_package,
         )
