@@ -852,7 +852,7 @@ def _parser() -> argparse.ArgumentParser:
     full_context_calibrate.add_argument(
         "--output",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+        default=root / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
     )
 
     full_context_generate = subparsers.add_parser(
@@ -871,17 +871,14 @@ def _parser() -> argparse.ArgumentParser:
     full_context_generate.add_argument(
         "--calibration",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+        default=root / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
     )
     full_context_generate.add_argument(
         "--checkpoint-review",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
-    )
-    full_context_generate.add_argument(
-        "--attempt-recovery",
-        type=Path,
-        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
+        default=(
+            root / "evidence/qwen35-full-context-forking/calibration-review-rtx4000.json"
+        ),
     )
 
     full_context_verify = subparsers.add_parser(
@@ -900,17 +897,14 @@ def _parser() -> argparse.ArgumentParser:
     full_context_verify.add_argument(
         "--calibration",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+        default=root / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
     )
     full_context_verify.add_argument(
         "--checkpoint-review",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
-    )
-    full_context_verify.add_argument(
-        "--attempt-recovery",
-        type=Path,
-        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
+        default=(
+            root / "evidence/qwen35-full-context-forking/calibration-review-rtx4000.json"
+        ),
     )
     full_context_verify.add_argument("--minif2f-root", type=Path, required=True)
     full_context_verify.add_argument("--mathlib-root", type=Path, default=root)
@@ -932,17 +926,14 @@ def _parser() -> argparse.ArgumentParser:
     full_context_evidence.add_argument(
         "--calibration",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration.json",
+        default=root / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
     )
     full_context_evidence.add_argument(
         "--checkpoint-review",
         type=Path,
-        default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
-    )
-    full_context_evidence.add_argument(
-        "--attempt-recovery",
-        type=Path,
-        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
+        default=(
+            root / "evidence/qwen35-full-context-forking/calibration-review-rtx4000.json"
+        ),
     )
     full_context_evidence.add_argument(
         "--output",
@@ -2587,7 +2578,6 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
-            args.attempt_recovery,
             parent_release_package_path=args.parent_package,
         )
         print(json.dumps(summary, indent=2))
@@ -2604,7 +2594,6 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
-            args.attempt_recovery,
             project_roots={
                 "minif2f-valid-clean-v2": args.minif2f_root,
                 "fresh-composition-valid-v2": args.mathlib_root,
@@ -2623,7 +2612,6 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
-            args.attempt_recovery,
             args.output,
             parent_release_package_path=args.parent_package,
         )

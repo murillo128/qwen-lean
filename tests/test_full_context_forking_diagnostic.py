@@ -17,9 +17,11 @@ from qwen_lean.full_context_forking_diagnostic import (
     _branch_attempt_counts,
     _branch_attempt_summary,
     _classify_outcome,
+    _load_calibration_evidence,
     _load_attempt_recovery,
     _next_calibration_action,
     _prepare_attempt_recovery,
+    _require_active_authority,
     _reasoning_transition_index,
     _validate_checkpoint_review,
     _validate_scientific_runtime_hardware,
@@ -29,7 +31,13 @@ from qwen_lean.native_thinking_assessment import MathiaTask, _file_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config/qwen35-full-context-forking.json"
+SUPERSEDED_CONFIG_PATH = (
+    ROOT / "config/qwen35-full-context-forking-superseded-rtx4070ti.json"
+)
 CALIBRATION_PATH = ROOT / "evidence/qwen35-full-context-forking/calibration.json"
+ACTIVE_CALIBRATION_PATH = (
+    ROOT / "evidence/qwen35-full-context-forking/calibration-rtx4000.json"
+)
 CALIBRATION_REVIEW_PATH = (
     ROOT / "evidence/qwen35-full-context-forking/calibration-review.json"
 )
@@ -40,6 +48,10 @@ ATTEMPT_RECOVERY_PATH = (
 
 def _config() -> FullContextForkingConfig:
     return FullContextForkingConfig.load(CONFIG_PATH)
+
+
+def _superseded_config() -> FullContextForkingConfig:
+    return FullContextForkingConfig.load(SUPERSEDED_CONFIG_PATH)
 
 
 def _attempt(index: int, length: int, status: str) -> dict[str, object]:
@@ -89,6 +101,45 @@ def test_config_binds_reviewed_issue92_without_mutating_it() -> None:
         "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
         "parent_ordinal": 0,
     }
+    assert config.hardware == {
+        "authorization": "active_project_local_gpu",
+        "cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_device_name": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_device_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
+        "nvml_memory_total_bytes": 21_469_593_600,
+    }
+    assert config.value["superseded_audit"]["selected_max_context_length"] == 64_512
+    assert config.value["superseded_audit"]["active_authorization"] is False
+    assert (
+        config.value["superseded_audit"]["transfer_attempt_state_to_active_requests"]
+        is False
+    )
+
+
+def test_superseded_configuration_is_audit_only() -> None:
+    config = _superseded_config()
+    assert config.is_active is False
+    with pytest.raises(RuntimeError, match="audit-only"):
+        _require_active_authority(config)
+
+
+def test_active_calibration_is_hardware_bound_and_fails_closed(
+    tmp_path: Path,
+) -> None:
+    config = _config()
+    evidence = _load_calibration_evidence(config, ACTIVE_CALIBRATION_PATH)
+    assert evidence["selected_max_context_length"] == 262_144
+    assert evidence["selected_length_success_count"] == 2
+    assert {attempt["gpu_uuid"] for attempt in evidence["attempts"]} == {
+        "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2"
+    }
+
+    tampered = json.loads(ACTIVE_CALIBRATION_PATH.read_text(encoding="utf-8"))
+    tampered["attempts"][0]["gpu_uuid"] = "GPU-wrong"
+    tampered_path = tmp_path / "tampered-calibration.json"
+    tampered_path.write_text(json.dumps(tampered), encoding="utf-8")
+    with pytest.raises(ValueError, match="hardware identity changed"):
+        _load_calibration_evidence(config, tampered_path)
 
 
 def test_calibration_progresses_then_refines_and_repeat_confirms() -> None:
@@ -186,34 +237,43 @@ def test_generation_requires_published_pass_review_of_exact_calibration(
 
 
 def test_scientific_generation_requires_exact_calibrated_gpu_identity() -> None:
+    config = _config()
     calibration = {
         "attempts": [
-            {"gpu_memory_total_bytes": 12_878_610_432},
-            {"gpu_memory_total_bytes": 12_878_610_432},
+            {"gpu_memory_total_bytes": 21_469_593_600},
+            {"gpu_memory_total_bytes": 21_469_593_600},
         ]
     }
     expected_runtime = {
-        "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
-        "nvml_gpu_memory_total_bytes": 12_878_610_432,
+        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_gpu_name": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_gpu_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
+        "nvml_gpu_memory_total_bytes": 21_469_593_600,
     }
-    assert _validate_scientific_runtime_hardware(expected_runtime, calibration) == {
-        "gpu_name_fragment": "RTX 4070 Ti",
-        "gpu_memory_total_bytes": 12_878_610_432,
-        "status": "matched",
+    assert _validate_scientific_runtime_hardware(
+        config, expected_runtime, calibration
+    ) == {
+        "cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_device_name": "NVIDIA RTX 4000 Ada Generation",
+        "nvml_device_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
+        "nvml_memory_total_bytes": 21_469_593_600,
+        "status": "matched_active_authority",
     }
 
-    with pytest.raises(RuntimeError, match="exact calibrated RTX 4070 Ti"):
+    with pytest.raises(RuntimeError, match="exact active RTX 4000 Ada"):
         _validate_scientific_runtime_hardware(
+            config,
             {
-                "cuda_device": "NVIDIA RTX 4000 Ada Generation",
-                "nvml_gpu_memory_total_bytes": 21_469_052_928,
+                **expected_runtime,
+                "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
             },
             calibration,
         )
-    with pytest.raises(RuntimeError, match="exact calibrated RTX 4070 Ti"):
+    with pytest.raises(RuntimeError, match="exact active RTX 4000 Ada"):
         _validate_scientific_runtime_hardware(
+            config,
             {
-                "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
+                **expected_runtime,
                 "nvml_gpu_memory_total_bytes": 12_000_000_000,
             },
             calibration,
@@ -222,17 +282,36 @@ def test_scientific_generation_requires_exact_calibrated_gpu_identity() -> None:
 
 def _recovery_requests():
     return full_context_requests(
-        _config(),
+        _superseded_config(),
         _parent(),
         selected_context_length=64_512,
         calibration_evidence_path=CALIBRATION_PATH,
     )
 
 
+def test_active_requests_do_not_inherit_superseded_attempt_identity(
+    tmp_path: Path,
+) -> None:
+    active = full_context_requests(
+        _config(),
+        _parent(),
+        selected_context_length=262_144,
+        calibration_evidence_path=ACTIVE_CALIBRATION_PATH,
+    )
+    superseded = _recovery_requests()
+    assert active[0].branch_id != superseded[0].branch_id
+    assert active[0].generation_config_sha256 != (
+        superseded[0].generation_config_sha256
+    )
+    assert active[0].max_tokens == 261_891
+    counts = _branch_attempt_counts(tmp_path / "absent.jsonl", active)
+    assert counts[active[0].branch_id] == 0
+
+
 def test_committed_attempt_recovery_binds_exact_published_review(
     tmp_path: Path,
 ) -> None:
-    config = _config()
+    config = _superseded_config()
     requests = _recovery_requests()
     recovery = _load_attempt_recovery(
         config,
@@ -297,7 +376,7 @@ def test_attempt_recovery_starts_at_one_without_synthetic_attempt_zero(
 ) -> None:
     requests = _recovery_requests()
     recovery = _load_attempt_recovery(
-        _config(),
+        _superseded_config(),
         CALIBRATION_PATH,
         CALIBRATION_REVIEW_PATH,
         ATTEMPT_RECOVERY_PATH,
@@ -372,7 +451,7 @@ def test_attempt_recovery_fails_closed_on_unjournaled_records_and_conflicts(
 ) -> None:
     requests = _recovery_requests()
     recovery = _load_attempt_recovery(
-        _config(),
+        _superseded_config(),
         CALIBRATION_PATH,
         CALIBRATION_REVIEW_PATH,
         ATTEMPT_RECOVERY_PATH,
