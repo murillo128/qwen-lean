@@ -1180,9 +1180,7 @@ def load_natural_generation_records(
             normalized_count = (
                 0
                 if normalized_final is None
-                else len(
-                    tokenizer.encode(normalized_final, add_special_tokens=False)
-                )
+                else len(tokenizer.encode(normalized_final, add_special_tokens=False))
             )
             if parsed_count != int(record["parsed_final_token_count"]):
                 raise ValueError(
@@ -1443,7 +1441,9 @@ def write_natural_evidence(
     }
     selected_task_ids = {row.task.task_id for row in selected}
     if set(b16_generation) != selected_task_ids:
-        raise RuntimeError("immutable B16 task population differs from frozen selection")
+        raise RuntimeError(
+            "immutable B16 task population differs from frozen selection"
+        )
     if any(
         str(row["candidate_id"]) not in historical_verification_by_id
         for row in b16_generation.values()
@@ -1704,9 +1704,7 @@ def _natural_paired_table(
 def _natural_summary(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     count = len(rows)
     natural = [row["bnat_max"] for row in rows]
-    deployed_categories = Counter(
-        str(row["deployed_lean_category"]) for row in natural
-    )
+    deployed_categories = Counter(str(row["deployed_lean_category"]) for row in natural)
     strict_categories = Counter(str(row["strict_lean_category"]) for row in natural)
     format_counts = {
         key: sum(int(row["format_diagnostics"][key]) for row in natural)
