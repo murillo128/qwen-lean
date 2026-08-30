@@ -878,6 +878,11 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=root / "evidence/qwen35-full-context-forking/calibration-review.json",
     )
+    full_context_generate.add_argument(
+        "--attempt-recovery",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/attempt-recovery.json",
+    )
 
     full_context_verify = subparsers.add_parser(
         "qwen35-full-context-verify",
@@ -2567,6 +2572,7 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
+            args.attempt_recovery,
             parent_release_package_path=args.parent_package,
         )
         print(json.dumps(summary, indent=2))

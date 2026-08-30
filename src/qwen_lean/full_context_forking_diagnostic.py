@@ -60,6 +60,7 @@ CALIBRATION_EVIDENCE_SCHEMA = "qwen35-full-context-calibration-v1"
 CHECKPOINT_REVIEW_SCHEMA = "qwen35-full-context-calibration-review-v1"
 GENERATION_SEGMENT_SCHEMA = "qwen35-full-context-generation-segment-v1"
 BRANCH_ATTEMPT_SCHEMA = "qwen35-full-context-branch-attempt-v1"
+ATTEMPT_RECOVERY_SCHEMA = "qwen35-full-context-attempt-recovery-v1"
 FINAL_EVIDENCE_SCHEMA = "qwen35-full-context-forking-results-v1"
 REVIEWED_TARGET_COMMIT = "6f6838041ef517518d3fcfa68889ea2988074c83"
 HANDOFF_COMMIT = "bcd72d5203d82e27d50e42ec6d2d2afa061c2504"
@@ -75,6 +76,17 @@ KNOWN_CONTEXT_LENGTH = 24_576
 NATIVE_CONTEXT_LENGTH = 262_144
 GPU_MEMORY_UTILIZATION = 0.89
 CALIBRATED_GPU_NAME_FRAGMENT = "RTX 4070 Ti"
+TRANSITION_REVIEW_COMMENT_ID = 5_454_413_666
+TRANSITION_REVIEWED_COMMIT = "b100c4b7da4a180298afd139f1a568135c45e266"
+TRANSITION_REVIEW_URL = (
+    "https://github.com/murillo128/qwen-lean/pull/99#issuecomment-5454413666"
+)
+TRANSITION_REVIEW_BODY_SHA256 = (
+    "b18bfa0551abb6f1845c429d1bb302c05c2957aaddb106a2cb13814b41b8cc89"
+)
+TRANSITION_REVIEW_EVIDENCE_SHA256 = (
+    "5e426fabb6ef3d09654559b4eeccfc42c1242d8df77c82df739e8254d5fde951"
+)
 
 
 @dataclass(frozen=True)
@@ -856,6 +868,111 @@ def _validate_scientific_runtime_hardware(
     }
 
 
+def _expected_attempt_recovery(
+    config: FullContextForkingConfig,
+    calibration_evidence_path: Path,
+    checkpoint_review_path: Path,
+    expected_requests: Sequence[ForkRequest],
+) -> dict[str, Any]:
+    calibration = _load_calibration_evidence(config, calibration_evidence_path)
+    review = _validate_checkpoint_review(
+        calibration_evidence_path, checkpoint_review_path
+    )
+    expected_review_fields = {
+        "reviewed_commit": TRANSITION_REVIEWED_COMMIT,
+        "reviewed_base_commit": REVIEWED_TARGET_COMMIT,
+        "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
+        "selected_max_context_length": 64_512,
+        "safe_to_progress_to_scientific_branches": True,
+        "published_review_url": TRANSITION_REVIEW_URL,
+    }
+    for field, value in expected_review_fields.items():
+        if review.get(field) != value:
+            raise ValueError(f"transition review binding changed: {field}")
+    if _file_sha256(checkpoint_review_path) != TRANSITION_REVIEW_EVIDENCE_SHA256:
+        raise ValueError("transition review evidence bytes changed")
+    targets = [
+        request
+        for request in expected_requests
+        if request.state.label == "P0" and request.seed == 100
+    ]
+    if len(targets) != 1:
+        raise ValueError("retry recovery target is not exactly P0/seed-100")
+    target = targets[0]
+    return {
+        "schema_version": ATTEMPT_RECOVERY_SCHEMA,
+        "status": "accepted_published_review_recovery",
+        "scope": {
+            "branch_id": target.branch_id,
+            "parent_candidate_id": target.parent.handoff["candidate_id"],
+            "workload": target.parent.task.workload,
+            "task_id": target.parent.task.task_id,
+            "fork_state": target.state.label,
+            "fork_fraction": target.state.fraction,
+            "fork_prefix_len": target.state.prefix_len,
+            "branch_seed": target.seed,
+            "max_new_tokens": target.max_tokens,
+            "fork_generation_config_sha256": target.generation_config_sha256,
+        },
+        "attempt_recovery": {
+            "failed_attempt_index": 0,
+            "failed_attempt_terminal_status": "failed",
+            "next_attempt_index": 1,
+            "persisted_scientific_record_count_at_review": 0,
+            "raw_journal_recovered": False,
+            "mechanism": "published_independent_transition_review",
+        },
+        "authority": {
+            "review_schema_version": review["schema_version"],
+            "review_verdict": review["verdict"],
+            "reviewed_commit": TRANSITION_REVIEWED_COMMIT,
+            "reviewed_base_commit": review["reviewed_base_commit"],
+            "published_review_comment_id": TRANSITION_REVIEW_COMMENT_ID,
+            "published_review_url": TRANSITION_REVIEW_URL,
+            "published_review_author": "murillo128",
+            "published_review_created_at": "2026-08-28T15:27:32Z",
+            "published_review_updated_at": "2026-08-28T15:27:32Z",
+            "published_review_body_sha256": TRANSITION_REVIEW_BODY_SHA256,
+        },
+        "bindings": {
+            "full_context_config_file_sha256": _file_sha256(config.path),
+            "full_context_config_sha256": full_context_config_sha256(config),
+            "calibration_evidence_path": str(
+                calibration_evidence_path.resolve().relative_to(config.repository_root)
+            ),
+            "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
+            "calibration_review_path": str(
+                checkpoint_review_path.resolve().relative_to(config.repository_root)
+            ),
+            "calibration_review_sha256": TRANSITION_REVIEW_EVIDENCE_SHA256,
+            "counterfactual_results_sha256": COUNTERFACTUAL_RESULTS_SHA256,
+            "selected_max_context_length": calibration["selected_max_context_length"],
+            "expected_branch_count": len(expected_requests),
+        },
+    }
+
+
+def _load_attempt_recovery(
+    config: FullContextForkingConfig,
+    calibration_evidence_path: Path,
+    checkpoint_review_path: Path,
+    recovery_path: Path,
+    expected_requests: Sequence[ForkRequest],
+) -> dict[str, Any]:
+    recovery = json.loads(recovery_path.read_text(encoding="utf-8"))
+    expected = _expected_attempt_recovery(
+        config,
+        calibration_evidence_path,
+        checkpoint_review_path,
+        expected_requests,
+    )
+    if recovery != expected:
+        raise ValueError(
+            "attempt-recovery checkpoint differs from reviewed P0/100 state"
+        )
+    return recovery
+
+
 def _scientific_generation_hash(
     config: FullContextForkingConfig,
     calibration_evidence_path: Path,
@@ -1059,16 +1176,153 @@ def load_full_context_generation_records(
     ]
 
 
-def _branch_attempt_counts(path: Path) -> Counter[str]:
-    counts: Counter[str] = Counter()
+def _attempt_recovery_disclosure(
+    recovery_path: Path, recovery: Mapping[str, Any]
+) -> dict[str, Any]:
+    scope = recovery["scope"]
+    attempt = recovery["attempt_recovery"]
+    authority = recovery["authority"]
+    return {
+        "schema_version": BRANCH_ATTEMPT_SCHEMA,
+        "event": "recovery_checkpoint_applied",
+        "branch_id": scope["branch_id"],
+        "fork_state": scope["fork_state"],
+        "branch_seed": scope["branch_seed"],
+        "failed_attempt_index": attempt["failed_attempt_index"],
+        "next_attempt_index": attempt["next_attempt_index"],
+        "persisted_scientific_record_count_at_review": attempt[
+            "persisted_scientific_record_count_at_review"
+        ],
+        "raw_journal_recovered": attempt["raw_journal_recovered"],
+        "attempt_recovery_evidence_sha256": _file_sha256(recovery_path),
+        "reviewed_commit": authority["reviewed_commit"],
+        "published_review_url": authority["published_review_url"],
+    }
+
+
+def _prepare_attempt_recovery(
+    attempt_path: Path,
+    recovery_path: Path,
+    recovery: Mapping[str, Any],
+    *,
+    persisted_branch_ids: Sequence[str],
+) -> tuple[dict[str, Any], dict[str, int]]:
+    disclosure = _attempt_recovery_disclosure(recovery_path, recovery)
+    branch_id = str(disclosure["branch_id"])
+    next_attempt_index = int(disclosure["next_attempt_index"])
+    provenance = {
+        "mode": "published_review_checkpoint",
+        "branch_id": branch_id,
+        "failed_attempt_index": int(disclosure["failed_attempt_index"]),
+        "next_attempt_index": next_attempt_index,
+        "raw_journal_recovered": False,
+        "attempt_recovery_evidence_sha256": disclosure[
+            "attempt_recovery_evidence_sha256"
+        ],
+        "reviewed_commit": disclosure["reviewed_commit"],
+        "published_review_url": disclosure["published_review_url"],
+    }
+    if not attempt_path.exists():
+        if persisted_branch_ids:
+            raise ValueError(
+                "attempt-recovery checkpoint cannot accompany unjournaled "
+                "scientific records"
+            )
+        _append_jsonl(attempt_path, disclosure)
+        return provenance, {branch_id: next_attempt_index}
+
+    events = [json.loads(line) for line in _restart_safe_jsonl_lines(attempt_path)]
+    disclosures = [
+        event for event in events if event.get("event") == "recovery_checkpoint_applied"
+    ]
+    if disclosures:
+        if len(disclosures) != 1 or disclosures[0] != disclosure:
+            raise ValueError("attempt-recovery disclosure conflicts with checkpoint")
+        if events[0] != disclosure:
+            raise ValueError(
+                "attempt-recovery disclosure is not the first journal event"
+            )
+        journaled_persisted_ids = sorted(
+            str(event["branch_id"])
+            for event in events
+            if event.get("event") == "persisted"
+        )
+        if journaled_persisted_ids != sorted(persisted_branch_ids):
+            raise ValueError(
+                "persisted scientific records conflict with recovery journal"
+            )
+        return provenance, {branch_id: next_attempt_index}
+
+    # A genuinely recovered original raw journal takes precedence over the
+    # compact checkpoint.  It must independently contain exactly the failed
+    # attempt reviewed at b100c4b7; no synthetic attempt-0 event is accepted.
+    target_events = [
+        event for event in events if str(event.get("branch_id")) == branch_id
+    ]
+    starts = [
+        event
+        for event in target_events
+        if event.get("event") == "started" and event.get("attempt_index") == 0
+    ]
+    terminals = [
+        event
+        for event in target_events
+        if event.get("event") == "failed" and event.get("attempt_index") == 0
+    ]
+    persisted = [
+        event
+        for event in target_events
+        if event.get("event") == "persisted" and event.get("attempt_index") == 0
+    ]
+    if len(starts) != 1 or len(terminals) != 1 or persisted:
+        raise ValueError("raw attempt journal conflicts with reviewed P0/100 failure")
+    journaled_persisted_ids = sorted(
+        str(event["branch_id"]) for event in events if event.get("event") == "persisted"
+    )
+    if journaled_persisted_ids != sorted(persisted_branch_ids):
+        raise ValueError(
+            "persisted scientific records conflict with raw attempt journal"
+        )
+    return {
+        **provenance,
+        "mode": "recovered_original_raw_journal",
+        "raw_journal_recovered": True,
+    }, {}
+
+
+def _branch_attempt_counts(
+    path: Path, recovered_attempt_counts: Mapping[str, int] | None = None
+) -> Counter[str]:
+    counts: Counter[str] = Counter(recovered_attempt_counts or {})
     if not path.exists():
         return counts
+    started: set[tuple[str, int]] = set()
+    terminal: set[tuple[str, int]] = set()
     for line in _restart_safe_jsonl_lines(path):
         event = json.loads(line)
         if event.get("schema_version") != BRANCH_ATTEMPT_SCHEMA:
             raise ValueError("unknown branch-attempt schema")
-        if event.get("event") == "started":
-            counts[str(event["branch_id"])] += 1
+        event_kind = event.get("event")
+        if event_kind == "recovery_checkpoint_applied":
+            continue
+        if event_kind not in {"started", "persisted", "failed", "interrupted"}:
+            raise ValueError("unknown branch-attempt event")
+        branch_id = str(event["branch_id"])
+        attempt_index = int(event["attempt_index"])
+        key = (branch_id, attempt_index)
+        if event_kind == "started":
+            if attempt_index != counts[branch_id] or key in started:
+                raise ValueError(
+                    "branch-attempt sequence conflicts with recovery state"
+                )
+            started.add(key)
+            counts[branch_id] += 1
+        else:
+            if key not in started or key in terminal:
+                raise ValueError(
+                    "branch-attempt terminal event lacks one matching start"
+                )
+            terminal.add(key)
     return counts
 
 
@@ -1082,6 +1336,8 @@ async def _run_full_context_branches(
     *,
     selected_context_length: int,
     device_index: int,
+    attempt_recovery_provenance: Mapping[str, Any],
+    recovered_attempt_counts: Mapping[str, int],
 ) -> list[dict[str, Any]]:
     from vllm import SamplingParams
     from vllm.inputs import TokensPrompt
@@ -1091,7 +1347,7 @@ async def _run_full_context_branches(
         _full_context_engine_args(config, snapshot_path, selected_context_length)
     )
     persisted: list[dict[str, Any]] = []
-    attempt_counts = _branch_attempt_counts(attempt_path)
+    attempt_counts = _branch_attempt_counts(attempt_path, recovered_attempt_counts)
     try:
         for request in pending:
             attempt_index = attempt_counts[request.branch_id]
@@ -1104,6 +1360,10 @@ async def _run_full_context_branches(
                 "branch_seed": request.seed,
                 "max_tokens": request.max_tokens,
             }
+            if request.branch_id == attempt_recovery_provenance["branch_id"]:
+                started_event["attempt_recovery_provenance"] = dict(
+                    attempt_recovery_provenance
+                )
             _append_jsonl(attempt_path, started_event)
             attempt_counts[request.branch_id] += 1
             monitor = _GpuMemoryMonitor(device_index, required=True)
@@ -1217,6 +1477,7 @@ def run_full_context_generation(
     artifact_dir: Path,
     calibration_evidence_path: Path,
     checkpoint_review_path: Path,
+    attempt_recovery_path: Path,
     *,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -1242,8 +1503,16 @@ def run_full_context_generation(
         selected_context_length=selected,
         calibration_evidence_path=calibration_evidence_path,
     )
+    attempt_recovery = _load_attempt_recovery(
+        config,
+        calibration_evidence_path,
+        checkpoint_review_path,
+        attempt_recovery_path,
+        expected,
+    )
     artifact_dir.mkdir(parents=True, exist_ok=True)
     generation_path = artifact_dir / "generations.jsonl"
+    attempt_path = artifact_dir / "branch-attempts.jsonl"
     prior = load_full_context_generation_records(
         generation_path, expected, selected_context_length=selected
     )
@@ -1256,6 +1525,7 @@ def run_full_context_generation(
             "new_branches": 0,
             "selected_max_context_length": selected,
             "integrity": integrity,
+            "attempt_recovery_evidence_sha256": _file_sha256(attempt_recovery_path),
         }
 
     _configure_fork_runtime()
@@ -1273,6 +1543,12 @@ def run_full_context_generation(
         runtime, calibration
     )
     _assert_no_other_compute_process(device_index)
+    recovery_provenance, recovered_attempt_counts = _prepare_attempt_recovery(
+        attempt_path,
+        attempt_recovery_path,
+        attempt_recovery,
+        persisted_branch_ids=[str(record["branch_id"]) for record in prior],
+    )
     started = time.perf_counter()
     status = "failed"
     error_text: str | None = None
@@ -1284,10 +1560,12 @@ def run_full_context_generation(
                 tokenizer,
                 pending,
                 generation_path,
-                artifact_dir / "branch-attempts.jsonl",
+                attempt_path,
                 snapshot_path,
                 selected_context_length=selected,
                 device_index=device_index,
+                attempt_recovery_provenance=recovery_provenance,
+                recovered_attempt_counts=recovered_attempt_counts,
             )
         )
         status = "completed"
@@ -1307,6 +1585,7 @@ def run_full_context_generation(
                 "selected_max_context_length": selected,
                 "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
                 "checkpoint_reviewed_commit": review["reviewed_commit"],
+                "attempt_recovery": recovery_provenance,
                 "runtime": runtime,
             },
         )
@@ -1316,6 +1595,7 @@ def run_full_context_generation(
         "new_branches": len(new_records),
         "selected_max_context_length": selected,
         "integrity": integrity,
+        "attempt_recovery": recovery_provenance,
         "runtime": runtime,
     }
 
@@ -1435,6 +1715,7 @@ def _branch_attempt_summary(path: Path) -> dict[str, Any]:
     starts: Counter[str] = Counter()
     terminal: Counter[str] = Counter()
     status_counts: Counter[str] = Counter()
+    recovery_disclosures: list[dict[str, Any]] = []
     if path.exists():
         for line in _restart_safe_jsonl_lines(path):
             event = json.loads(line)
@@ -1442,26 +1723,48 @@ def _branch_attempt_summary(path: Path) -> dict[str, Any]:
                 raise ValueError("unknown branch-attempt schema")
             branch_id = str(event["branch_id"])
             event_kind = str(event["event"])
-            if event_kind == "started":
+            if event_kind == "recovery_checkpoint_applied":
+                recovery_disclosures.append(event)
+            elif event_kind == "started":
                 starts[branch_id] += 1
             elif event_kind in {"persisted", "failed", "interrupted"}:
                 terminal[branch_id] += 1
                 status_counts[event_kind] += 1
             else:
                 raise ValueError("unknown branch-attempt event")
+    if len(recovery_disclosures) > 1:
+        raise ValueError("multiple attempt-recovery disclosures")
     incomplete_starts = sum(
         max(0, starts[branch_id] - terminal[branch_id]) for branch_id in starts
     )
     retried_branch_ids = sorted(
-        branch_id for branch_id, count in starts.items() if count > 1
+        branch_id
+        for branch_id, count in starts.items()
+        if count > 1
+        or (
+            count > 0
+            and any(
+                str(disclosure["branch_id"]) == branch_id
+                for disclosure in recovery_disclosures
+            )
+        )
+    )
+    recovered_failed_attempt_count = sum(
+        int(disclosure["next_attempt_index"]) - int(disclosure["failed_attempt_index"])
+        for disclosure in recovery_disclosures
     )
     return {
         "started_attempt_count": sum(starts.values()),
+        "recovered_failed_attempt_count": recovered_failed_attempt_count,
+        "total_disclosed_attempt_count": sum(starts.values())
+        + recovered_failed_attempt_count,
         "terminal_attempt_count": sum(terminal.values()),
         "terminal_status_counts": dict(sorted(status_counts.items())),
         "incomplete_started_attempt_count": incomplete_starts,
         "retried_in_flight_branch_count": len(retried_branch_ids),
         "retried_in_flight_branch_ids_sha256": _sha256_json(retried_branch_ids),
+        "attempt_recovery_disclosure_count": len(recovery_disclosures),
+        "attempt_recovery_disclosure_sha256": _sha256_json(recovery_disclosures),
     }
 
 
