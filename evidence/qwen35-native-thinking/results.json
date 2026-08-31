@@ -1,0 +1,878 @@
+{
+  "analysis": {
+    "combined": {
+      "arms": {
+        "t0": {
+          "candidate_count": 2444,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.955810147299509,
+              "unique": 2336
+            },
+            "first_lean_construct_counts": {
+              "apply": 52,
+              "calc": 3,
+              "cases": 12,
+              "constructor": 212,
+              "exact": 3,
+              "ext": 2,
+              "have": 1940,
+              "induction": 1,
+              "intro": 6,
+              "norm_num": 10,
+              "rfl": 8,
+              "ring": 7,
+              "rw": 2,
+              "simp": 3,
+              "simp_all": 9,
+              "term": 93,
+              "trivial": 81
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 10,
+              "fraction": 0.4,
+              "unique": 4
+            }
+          },
+          "finish_reason_counts": {
+            "eos": 1974,
+            "token_limit": 470
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 6,
+              "fraction": 0.0024549918166939444,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "final_tokens": {
+              "count": 2444,
+              "max": 4096.0,
+              "mean": 1410.3842062193125,
+              "median": 659.0,
+              "min": 2.0,
+              "p90": 4096.0,
+              "p95": 4096.0
+            },
+            "markdown_fence": {
+              "count": 8,
+              "fraction": 0.0032733224222585926
+            },
+            "reasoning_present": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 2444,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "reasoning_tokens": {
+              "count": 2444,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 419,
+              "fraction": 0.17144026186579378
+            },
+            "sorry_or_admit": {
+              "count": 51,
+              "fraction": 0.020867430441898527
+            },
+            "token_limit_before_usable_final": {
+              "count": 0,
+              "fraction": 0.0
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.004091653027823241,
+            "pass@4": 0.009819967266775777
+          },
+          "solved_within_4": {
+            "count": 6,
+            "fraction": 0.009819967266775777
+          },
+          "verified_candidate": {
+            "count": 10,
+            "fraction": 0.004091653027823241
+          },
+          "verifier_result_counts": {
+            "lean_rejected": 2434,
+            "verified": 10
+          }
+        },
+        "t1": {
+          "candidate_count": 2444,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.0016366612111292963,
+              "unique": 4
+            },
+            "first_lean_construct_counts": {
+              "empty": 2434,
+              "norm_num": 4,
+              "ring": 5,
+              "term": 1
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 6,
+              "fraction": 0.3333333333333333,
+              "unique": 2
+            }
+          },
+          "finish_reason_counts": {
+            "eos": 9,
+            "token_limit": 2435
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 0,
+              "fraction": 0.0,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 2434,
+              "fraction": 0.9959083469721768
+            },
+            "final_tokens": {
+              "count": 2444,
+              "max": 34.0,
+              "mean": 0.026595744680851064,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "markdown_fence": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_present": {
+              "count": 2444,
+              "fraction": 1.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 10,
+              "max": 1325.6666666666667,
+              "mean": 881.9191176470589,
+              "median": 1006.25,
+              "min": 119.44117647058823,
+              "p90": 1239.2666666666667,
+              "p95": 1282.4666666666667
+            },
+            "reasoning_tokens": {
+              "count": 2444,
+              "max": 4096.0,
+              "mean": 4093.082651391162,
+              "median": 4096.0,
+              "min": 1338.0,
+              "p90": 4096.0,
+              "p95": 4096.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "sorry_or_admit": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "token_limit_before_usable_final": {
+              "count": 2434,
+              "fraction": 0.9959083469721768
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.0024549918166939444,
+            "pass@4": 0.008183306055646482
+          },
+          "solved_within_4": {
+            "count": 5,
+            "fraction": 0.008183306055646482
+          },
+          "verified_candidate": {
+            "count": 6,
+            "fraction": 0.0024549918166939444
+          },
+          "verifier_result_counts": {
+            "empty_candidate": 2434,
+            "lean_rejected": 4,
+            "verified": 6
+          }
+        }
+      },
+      "direct_branching_deep": {
+        "available": false,
+        "reason": "frozen source-proof-free Mathia projection has no structural class field"
+      },
+      "paired": {
+        "mcnemar_exact_two_sided": {
+          "discordant_t0_only": 3,
+          "discordant_t1_only": 2,
+          "p_value": 1.0
+        },
+        "paired_bootstrap_t1_minus_t0": {
+          "pass@1": {
+            "estimate": -0.0016366612111292963,
+            "interval": [
+              -0.004500818330605565,
+              0.0008183306055646482
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          },
+          "pass@4": {
+            "estimate": -0.0016366612111292963,
+            "interval": [
+              -0.008183306055646482,
+              0.004909983633387889
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          }
+        },
+        "paired_delta_t1_minus_t0": {
+          "pass@1": -0.0016366612111292963,
+          "pass@4": -0.0016366612111292963
+        },
+        "solved_at_4_overlap": {
+          "both": 3,
+          "neither": 603,
+          "t0_only": 3,
+          "t1_only": 2
+        },
+        "task_level_verified_proof_overlap": {
+          "fraction": 0.004909983633387889,
+          "tasks_with_shared_normalized_verified_proof": 3
+        }
+      },
+      "task_count": 611
+    },
+    "fresh-composition-valid-v2": {
+      "arms": {
+        "t0": {
+          "candidate_count": 1552,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.9594072164948454,
+              "unique": 1489
+            },
+            "first_lean_construct_counts": {
+              "apply": 52,
+              "cases": 12,
+              "constructor": 212,
+              "exact": 3,
+              "ext": 1,
+              "have": 1121,
+              "intro": 2,
+              "rfl": 7,
+              "simp": 3,
+              "simp_all": 9,
+              "term": 49,
+              "trivial": 81
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 0,
+              "fraction": null,
+              "unique": 0
+            }
+          },
+          "finish_reason_counts": {
+            "eos": 1143,
+            "token_limit": 409
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 2,
+              "fraction": 0.001288659793814433,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "final_tokens": {
+              "count": 1552,
+              "max": 4096.0,
+              "mean": 1814.4426546391753,
+              "median": 1171.5,
+              "min": 3.0,
+              "p90": 4096.0,
+              "p95": 4096.0
+            },
+            "markdown_fence": {
+              "count": 7,
+              "fraction": 0.004510309278350515
+            },
+            "reasoning_present": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 1552,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "reasoning_tokens": {
+              "count": 1552,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 374,
+              "fraction": 0.24097938144329897
+            },
+            "sorry_or_admit": {
+              "count": 40,
+              "fraction": 0.02577319587628866
+            },
+            "token_limit_before_usable_final": {
+              "count": 0,
+              "fraction": 0.0
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.0,
+            "pass@4": 0.0
+          },
+          "solved_within_4": {
+            "count": 0,
+            "fraction": 0.0
+          },
+          "verified_candidate": {
+            "count": 0,
+            "fraction": 0.0
+          },
+          "verifier_result_counts": {
+            "lean_rejected": 1552
+          }
+        },
+        "t1": {
+          "candidate_count": 1552,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.001288659793814433,
+              "unique": 2
+            },
+            "first_lean_construct_counts": {
+              "empty": 1551,
+              "term": 1
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 0,
+              "fraction": null,
+              "unique": 0
+            }
+          },
+          "finish_reason_counts": {
+            "token_limit": 1552
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 0,
+              "fraction": 0.0,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 1551,
+              "fraction": 0.9993556701030928
+            },
+            "final_tokens": {
+              "count": 1552,
+              "max": 34.0,
+              "mean": 0.02190721649484536,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "markdown_fence": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_present": {
+              "count": 1552,
+              "fraction": 1.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 1,
+              "max": 119.44117647058823,
+              "mean": 119.44117647058823,
+              "median": 119.44117647058823,
+              "min": 119.44117647058823,
+              "p90": 119.44117647058823,
+              "p95": 119.44117647058823
+            },
+            "reasoning_tokens": {
+              "count": 1552,
+              "max": 4096.0,
+              "mean": 4095.9774484536083,
+              "median": 4096.0,
+              "min": 4061.0,
+              "p90": 4096.0,
+              "p95": 4096.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "sorry_or_admit": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "token_limit_before_usable_final": {
+              "count": 1551,
+              "fraction": 0.9993556701030928
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.0,
+            "pass@4": 0.0
+          },
+          "solved_within_4": {
+            "count": 0,
+            "fraction": 0.0
+          },
+          "verified_candidate": {
+            "count": 0,
+            "fraction": 0.0
+          },
+          "verifier_result_counts": {
+            "empty_candidate": 1551,
+            "lean_rejected": 1
+          }
+        }
+      },
+      "direct_branching_deep": {
+        "available": false,
+        "reason": "frozen source-proof-free Mathia projection has no structural class field"
+      },
+      "paired": {
+        "mcnemar_exact_two_sided": {
+          "discordant_t0_only": 0,
+          "discordant_t1_only": 0,
+          "p_value": 1.0
+        },
+        "paired_bootstrap_t1_minus_t0": {
+          "pass@1": {
+            "estimate": 0.0,
+            "interval": [
+              0.0,
+              0.0
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          },
+          "pass@4": {
+            "estimate": 0.0,
+            "interval": [
+              0.0,
+              0.0
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          }
+        },
+        "paired_delta_t1_minus_t0": {
+          "pass@1": 0.0,
+          "pass@4": 0.0
+        },
+        "solved_at_4_overlap": {
+          "both": 0,
+          "neither": 388,
+          "t0_only": 0,
+          "t1_only": 0
+        },
+        "task_level_verified_proof_overlap": {
+          "fraction": 0.0,
+          "tasks_with_shared_normalized_verified_proof": 0
+        }
+      },
+      "task_count": 388
+    },
+    "minif2f-valid-clean-v2": {
+      "arms": {
+        "t0": {
+          "candidate_count": 892,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.9495515695067265,
+              "unique": 847
+            },
+            "first_lean_construct_counts": {
+              "calc": 3,
+              "ext": 1,
+              "have": 819,
+              "induction": 1,
+              "intro": 4,
+              "norm_num": 10,
+              "rfl": 1,
+              "ring": 7,
+              "rw": 2,
+              "term": 44
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 10,
+              "fraction": 0.4,
+              "unique": 4
+            }
+          },
+          "finish_reason_counts": {
+            "eos": 831,
+            "token_limit": 61
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 4,
+              "fraction": 0.004484304932735426,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "final_tokens": {
+              "count": 892,
+              "max": 4096.0,
+              "mean": 707.3587443946188,
+              "median": 225.5,
+              "min": 2.0,
+              "p90": 2226.3999999999996,
+              "p95": 4096.0
+            },
+            "markdown_fence": {
+              "count": 1,
+              "fraction": 0.0011210762331838565
+            },
+            "reasoning_present": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 892,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "reasoning_tokens": {
+              "count": 892,
+              "max": 0.0,
+              "mean": 0.0,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 45,
+              "fraction": 0.05044843049327354
+            },
+            "sorry_or_admit": {
+              "count": 11,
+              "fraction": 0.01233183856502242
+            },
+            "token_limit_before_usable_final": {
+              "count": 0,
+              "fraction": 0.0
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.011210762331838564,
+            "pass@4": 0.026905829596412557
+          },
+          "solved_within_4": {
+            "count": 6,
+            "fraction": 0.026905829596412557
+          },
+          "verified_candidate": {
+            "count": 10,
+            "fraction": 0.011210762331838564
+          },
+          "verifier_result_counts": {
+            "lean_rejected": 882,
+            "verified": 10
+          }
+        },
+        "t1": {
+          "candidate_count": 892,
+          "diversity": {
+            "all_final_outputs": {
+              "fraction": 0.0033632286995515697,
+              "unique": 3
+            },
+            "first_lean_construct_counts": {
+              "empty": 883,
+              "norm_num": 4,
+              "ring": 5
+            },
+            "normalization": "dataset-v3 normalized_proof_structure without source dependencies",
+            "verified_final_outputs": {
+              "count": 6,
+              "fraction": 0.3333333333333333,
+              "unique": 2
+            }
+          },
+          "finish_reason_counts": {
+            "eos": 9,
+            "token_limit": 883
+          },
+          "interface_diagnostics": {
+            "apparent_natural_language": {
+              "count": 0,
+              "fraction": 0.0,
+              "heuristic_id": "final-line-four-words-v1",
+              "used_for_filtering_or_repair": false
+            },
+            "empty_or_missing_final": {
+              "count": 883,
+              "fraction": 0.9899103139013453
+            },
+            "final_tokens": {
+              "count": 892,
+              "max": 4.0,
+              "mean": 0.034753363228699555,
+              "median": 0.0,
+              "min": 0.0,
+              "p90": 0.0,
+              "p95": 0.0
+            },
+            "markdown_fence": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "reasoning_present": {
+              "count": 892,
+              "fraction": 1.0
+            },
+            "reasoning_to_final_token_ratio": {
+              "count": 9,
+              "max": 1325.6666666666667,
+              "mean": 966.6388888888889,
+              "median": 1006.25,
+              "min": 446.0,
+              "p90": 1248.8666666666668,
+              "p95": 1287.2666666666667
+            },
+            "reasoning_tokens": {
+              "count": 892,
+              "max": 4096.0,
+              "mean": 4088.0459641255607,
+              "median": 4096.0,
+              "min": 1338.0,
+              "p90": 4096.0,
+              "p95": 4096.0
+            },
+            "repeated_declaration_or_by": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "sorry_or_admit": {
+              "count": 0,
+              "fraction": 0.0
+            },
+            "token_limit_before_usable_final": {
+              "count": 883,
+              "fraction": 0.9899103139013453
+            }
+          },
+          "pass_at_k": {
+            "pass@1": 0.006726457399103139,
+            "pass@4": 0.02242152466367713
+          },
+          "solved_within_4": {
+            "count": 5,
+            "fraction": 0.02242152466367713
+          },
+          "verified_candidate": {
+            "count": 6,
+            "fraction": 0.006726457399103139
+          },
+          "verifier_result_counts": {
+            "empty_candidate": 883,
+            "lean_rejected": 3,
+            "verified": 6
+          }
+        }
+      },
+      "direct_branching_deep": {
+        "available": false,
+        "reason": "frozen source-proof-free Mathia projection has no structural class field"
+      },
+      "paired": {
+        "mcnemar_exact_two_sided": {
+          "discordant_t0_only": 3,
+          "discordant_t1_only": 2,
+          "p_value": 1.0
+        },
+        "paired_bootstrap_t1_minus_t0": {
+          "pass@1": {
+            "estimate": -0.004484304932735426,
+            "interval": [
+              -0.013452914798206279,
+              0.002242152466367713
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          },
+          "pass@4": {
+            "estimate": -0.004484304932735426,
+            "interval": [
+              -0.02242152466367713,
+              0.013452914798206279
+            ],
+            "interval_percentiles": [
+              2.5,
+              97.5
+            ],
+            "method": "paired-task-percentile-bootstrap",
+            "resamples": 10000,
+            "seed": 0
+          }
+        },
+        "paired_delta_t1_minus_t0": {
+          "pass@1": -0.004484304932735426,
+          "pass@4": -0.004484304932735426
+        },
+        "solved_at_4_overlap": {
+          "both": 3,
+          "neither": 215,
+          "t0_only": 3,
+          "t1_only": 2
+        },
+        "task_level_verified_proof_overlap": {
+          "fraction": 0.013452914798206279,
+          "tasks_with_shared_normalized_verified_proof": 3
+        }
+      },
+      "task_count": 223
+    }
+  },
+  "causal_contract": {
+    "candidate_seed_mapping_identical": true,
+    "model_revision_identical": true,
+    "no_output_repair": true,
+    "only_intended_variable": "chat_template_kwargs.enable_thinking",
+    "reasoning_never_submitted_to_lean": true,
+    "sampling_identical": true,
+    "user_message_identical_between_arms": true,
+    "verifier_semantics_identical": true
+  },
+  "cost": {
+    "compute_matched": false,
+    "t0": {
+      "final_tokens": 3446979,
+      "generated_tokens_per_solved_task": 574496.5,
+      "generated_tokens_per_verified_candidate": 344697.9,
+      "generation_wall_time_seconds": 15178.901476888219,
+      "peak_gpu_memory_bytes": 19827130368,
+      "raw_generated_tokens": 3446979,
+      "raw_generated_tokens_per_second": 227.0901491289378,
+      "reasoning_tokens": 0
+    },
+    "t1": {
+      "final_tokens": 65,
+      "generated_tokens_per_solved_task": 2000713.8,
+      "generated_tokens_per_verified_candidate": 1667261.5,
+      "generation_wall_time_seconds": 43311.6215207011,
+      "peak_gpu_memory_bytes": 19944570880,
+      "raw_generated_tokens": 10003569,
+      "raw_generated_tokens_per_second": 230.96731659466323,
+      "reasoning_tokens": 10003494
+    },
+    "verification_wall_time_seconds": 1941.8982833740301
+  },
+  "experiment_id": "qwen35-4b-native-thinking-mathia-v1",
+  "interpretation": {
+    "automatic_architecture_change_authorized": false,
+    "category": "t1_hurts_with_token_or_format_behavior",
+    "external_planner_issue_changed": false
+  },
+  "limitations": [
+    "Thinking intentionally consumes additional test-time tokens; the arms are not compute matched.",
+    "Natural-language contamination is a deterministic heuristic diagnostic only.",
+    "The accepted frozen workload metadata does not expose a source-proof-free direct/branching/deep label, so that optional breakdown is unavailable."
+  ],
+  "mathia_binding": {
+    "counts": {
+      "fresh-composition-valid-v2": 388,
+      "minif2f-valid-clean-v2": 223
+    },
+    "file_sha256": {
+      "accepted_intuitions.jsonl": "67bcb9278445f06c6fb21081eb7ff9fb6fe2aa73b42c63d9225422f5a7d25b5d",
+      "freeze.json": "40e9492bf31eef774cd1f8ac4fb70b6760f762191c6af381b7bfa54e3c5c4349",
+      "source_tasks.jsonl": "300ecea0061590e36cde03c53bcc39b5699ed0615f8e05573ebfbc89f657f861"
+    },
+    "freeze_id": "frontier_assisted_intuition_corpus_26b3030e14ab4df8694b9c14ab30a297214f33f7a7ebdb8686ccd2ffae37849f",
+    "ordered_task_ids_sha256": {
+      "fresh-composition-valid-v2": "2d7b298fbb5ac6ff8927c09181b1fdae5897875441639894b60c4839a9783674",
+      "minif2f-valid-clean-v2": "25f2c121dad941b5c70788030f0c78ec85696ce5baa4fb8bac99ee8c86eca1e0"
+    }
+  },
+  "model": {
+    "license": "Apache-2.0",
+    "model_id": "Qwen/Qwen3.5-4B",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "tokenizer_id": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "schema_version": "qwen35-native-thinking-final-evidence-v1",
+  "status": "complete"
+}

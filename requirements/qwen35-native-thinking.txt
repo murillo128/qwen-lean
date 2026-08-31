@@ -1,0 +1,7 @@
+# Runtime used for issue #89. Installed in the pre-existing local issue-33
+# environment; this file records the reproducible native-reasoning lane.
+vllm @ git+https://github.com/vllm-project/vllm.git@41f179b57
+transformers==5.15.0
+torch==2.13.0
+huggingface-hub==1.27.0
+nvidia-ml-py==13.610.43
