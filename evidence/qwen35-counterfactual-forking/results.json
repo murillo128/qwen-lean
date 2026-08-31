@@ -1,0 +1,5697 @@
+{
+  "analysis": {
+    "confirmation": {
+      "Delta_mb_distribution": {
+        "count": 0,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "min": null,
+        "p90": null,
+        "p95": null
+      },
+      "intervals": [],
+      "selected_interval_count": 0,
+      "sign_replication": {
+        "count": 0,
+        "fraction": null
+      },
+      "stable_negative_count": 0,
+      "stable_positive_count": 0,
+      "tasks_with_stable_interval": {
+        "count": 0,
+        "fraction": 0.0
+      }
+    },
+    "discovery": {
+      "Delta_op_distribution": {
+        "count": 180,
+        "max": 0.16666666666666666,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": -0.16666666666666666,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "F_distribution": {
+        "count": 210,
+        "max": 0.16666666666666666,
+        "mean": 0.0007936507936507937,
+        "median": 0.0,
+        "min": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "V_op_distribution": {
+        "count": 210,
+        "max": 0.16666666666666666,
+        "mean": 0.0007936507936507937,
+        "median": 0.0,
+        "min": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "adjacent_deltas": [
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": 0.16666666666666666,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": -0.16666666666666666,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P15",
+          "before_state": "P0",
+          "task_id": "numbertheory_sqmod4in01d"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P30",
+          "before_state": "P15",
+          "task_id": "numbertheory_sqmod4in01d"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P45",
+          "before_state": "P30",
+          "task_id": "numbertheory_sqmod4in01d"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P60",
+          "before_state": "P45",
+          "task_id": "numbertheory_sqmod4in01d"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P75",
+          "before_state": "P60",
+          "task_id": "numbertheory_sqmod4in01d"
+        },
+        {
+          "Delta_op": 0.0,
+          "after_state": "P90",
+          "before_state": "P75",
+          "task_id": "numbertheory_sqmod4in01d"
+        }
+      ],
+      "all_zero_task_count": 29,
+      "branch_count": 1260,
+      "per_prefix": [
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 4096,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 3482,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 2868,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 2253,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 1639,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 1024,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+          "remaining_budget": 410,
+          "task_id": "aime_1984_p5",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 4096,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 3482,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 2868,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 2253,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 1639,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 1024,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+          "remaining_budget": 410,
+          "task_id": "aime_1991_p6",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 4096,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 3482,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 2868,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 2253,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 1639,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 1024,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+          "remaining_budget": 410,
+          "task_id": "amc12_2000_p15",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 4096,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 3482,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 2868,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 2253,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 1639,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 1024,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+          "remaining_budget": 410,
+          "task_id": "amc12_2001_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 4096,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 3482,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 2868,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 2253,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 1639,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 1024,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+          "remaining_budget": 410,
+          "task_id": "amc12a_2008_p8",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 4096,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 3482,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 2868,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 2253,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 1639,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 1024,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+          "remaining_budget": 410,
+          "task_id": "amc12a_2009_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 4096,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 3482,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 2868,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 2253,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 1639,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 1024,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+          "remaining_budget": 410,
+          "task_id": "amc12a_2015_p10",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 4096,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 3482,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 2868,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 2253,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 1639,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 1024,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+          "remaining_budget": 410,
+          "task_id": "amc12a_2019_p21",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 4096,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 3482,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 2868,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 2253,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 1639,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 1024,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+          "remaining_budget": 410,
+          "task_id": "amc12a_2019_p9",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 4096,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 3482,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 2868,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 2253,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 1639,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 1024,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+          "remaining_budget": 410,
+          "task_id": "imo_1964_p1_2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 4096,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 3482,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 2868,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 2253,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 1639,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 1024,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+          "remaining_budget": 410,
+          "task_id": "imo_1965_p1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 4096,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 3482,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 2868,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 2253,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 1639,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 1024,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+          "remaining_budget": 410,
+          "task_id": "imo_1984_p2",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 4096,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 3482,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 2868,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 2253,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 1639,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 1024,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+          "remaining_budget": 410,
+          "task_id": "imo_1987_p4",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 4096,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 3482,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 2868,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 2253,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 1639,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 1024,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+          "remaining_budget": 410,
+          "task_id": "imo_2006_p3",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 4096,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 3482,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 2868,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 2253,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 1639,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 1024,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+          "remaining_budget": 410,
+          "task_id": "induction_sum2kp1npqsqm1",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 4096,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 3482,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 2868,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 2253,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 1639,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 1024,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+          "remaining_budget": 410,
+          "task_id": "mathd_algebra_116",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 4096,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 3482,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 2868,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 2253,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 1639,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 1024,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+          "remaining_budget": 410,
+          "task_id": "mathd_algebra_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 4096,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 3482,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 2868,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 2253,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 1639,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 1024,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+          "remaining_budget": 410,
+          "task_id": "mathd_algebra_182",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 4096,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 3482,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 2868,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 2253,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 1639,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 1024,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+          "remaining_budget": 410,
+          "task_id": "mathd_algebra_462",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 4096,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 3482,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 2868,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 2253,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 1639,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 1024,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+          "remaining_budget": 410,
+          "task_id": "mathd_algebra_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_13",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_149",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_169",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_221",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.16666666666666666,
+          "V_op": 0.16666666666666666,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 1,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 1,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_33",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_466",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_48",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_64",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 4096,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 3482,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 2868,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 2253,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 1639,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 1024,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+          "remaining_budget": 410,
+          "task_id": "mathd_numbertheory_780",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.0,
+          "fork_prefix_len": 0,
+          "fork_state": "P0",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 4096,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.15,
+          "fork_prefix_len": 614,
+          "fork_state": "P15",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 3482,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.3,
+          "fork_prefix_len": 1228,
+          "fork_state": "P30",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 2868,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.45,
+          "fork_prefix_len": 1843,
+          "fork_state": "P45",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 2253,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.6,
+          "fork_prefix_len": 2457,
+          "fork_state": "P60",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 1639,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.75,
+          "fork_prefix_len": 3072,
+          "fork_state": "P75",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 1024,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        },
+        {
+          "F": 0.0,
+          "V_op": 0.0,
+          "branch_count": 6,
+          "fork_fraction": 0.9,
+          "fork_prefix_len": 3686,
+          "fork_state": "P90",
+          "nonempty_final_branches": 0,
+          "parent_candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+          "remaining_budget": 410,
+          "task_id": "numbertheory_sqmod4in01d",
+          "verified_branches": 0,
+          "workload": "minif2f-valid-clean-v2"
+        }
+      ],
+      "task_ranges": [
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "aime_1984_p5"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "aime_1991_p6"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12_2000_p15"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12_2001_p9"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12a_2008_p8"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12a_2009_p9"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12a_2015_p10"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12a_2019_p21"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "amc12a_2019_p9"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "imo_1964_p1_2"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "imo_1965_p1"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "imo_1984_p2"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "imo_1987_p4"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "imo_2006_p3"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "induction_sum2kp1npqsqm1"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_algebra_116"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_algebra_13"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_algebra_182"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_algebra_462"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_algebra_48"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_13"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_149"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_169"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_221"
+        },
+        {
+          "any_nonzero_variation": true,
+          "range": 0.16666666666666666,
+          "task_id": "mathd_numbertheory_33"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_466"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_48"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_64"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "mathd_numbertheory_780"
+        },
+        {
+          "any_nonzero_variation": false,
+          "range": 0.0,
+          "task_id": "numbertheory_sqmod4in01d"
+        }
+      ],
+      "tasks_with_any_nonzero_variation": {
+        "count": 1,
+        "fraction": 0.03333333333333333
+      },
+      "tasks_with_range_ge_0_5": {
+        "count": 0,
+        "fraction": 0.0
+      }
+    },
+    "eligible_task_count": 30,
+    "interpretation": "weak_or_uninformative_under_frozen_model_interface_and_budget",
+    "outcome_regimes": {
+      "all_zero_task_count": 29,
+      "empty_candidate_branch_count": 1259,
+      "lean_rejected_branch_count": 0,
+      "no_final_branch_count": 1259,
+      "verified_branch_count": 1
+    },
+    "parent_diagnostics": {
+      "final_production_counts": {
+        "none": 30
+      },
+      "finish_reason_counts": {
+        "token_limit": 30
+      }
+    },
+    "promising_checks": {
+      "at_least_25pct_confirmed_intervals_stable": false,
+      "at_least_25pct_tasks_range_ge_0_5": false,
+      "at_least_half_confirmed_signs_replicate": false,
+      "nonzero_lean_verified_branches": true
+    },
+    "runtime": {
+      "generation_segment_count": 7,
+      "generation_segment_status_counts": {
+        "completed": 1,
+        "failed": 6
+      },
+      "generation_wall_time_seconds": 19554.709359513,
+      "parser_final_content_parity_counts": {
+        "exact_before_terminal_eos": 1,
+        "legacy_strict_raw_suffix": 932,
+        "no_final_content": 327
+      },
+      "peak_gpu_memory_bytes": 12855390208,
+      "retry_outcome_variation": {
+        "branch_ids": [
+          "counterfactual-fork-51aa382ff5ae225d9bb6262291672880"
+        ],
+        "interpretation": "fixed per-request seeds did not make interrupted asynchronous vLLM requests deterministic across process restarts",
+        "observed": true
+      },
+      "suffix_text_vllm_parity_counts": {
+        "diagnostic_mismatch_token_ids_authoritative": 7,
+        "exact": 490,
+        "legacy_unrecorded": 763
+      },
+      "total_generated_tokens": 2838955,
+      "verification_wall_time_seconds": 7.476183239999955,
+      "verifier_category_counts": {
+        "empty_candidate": 1259,
+        "verified": 1
+      },
+      "verifier_workload_count": 1260
+    }
+  },
+  "configuration": {
+    "confirmation_seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011
+    ],
+    "discovery_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105
+    ],
+    "engine_gpu_memory_utilization": 0.89,
+    "fork_fractions": [
+      0.15,
+      0.3,
+      0.45,
+      0.6,
+      0.75,
+      0.9
+    ],
+    "fork_generation_config_sha256": "6621f23d7dde4f77d5782d65526cd535cc4b09dd38fde9da542c0976c9fde056",
+    "handoff_commit": "bcd72d5203d82e27d50e42ec6d2d2afa061c2504",
+    "handoff_manifest_sha256": "e17eef9ea8fdd566908b6c70b6305ee9f671d62f924e3f2ee677fe9f4bb33f3a",
+    "mathia_freeze_id": "frontier_assisted_intuition_corpus_26b3030e14ab4df8694b9c14ab30a297214f33f7a7ebdb8686ccd2ffae37849f",
+    "model_id": "Qwen/Qwen3.5-4B",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "native_generation_config_sha256": "b30d52a83b5c179ceb53a012351271f71f245d5a52b6b77013c42d226d1e8820",
+    "parent_engine_gpu_memory_utilization": 0.9,
+    "total_generation_budget": 4096
+  },
+  "confirmation_plan": {
+    "confirmation_seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011
+    ],
+    "discovery_generation_records_sha256": "7ded13c79a17fd4deed468e609d5b56d1236c7db94d4bbb38919c9387877e7d2",
+    "fork_generation_config_sha256": "6621f23d7dde4f77d5782d65526cd535cc4b09dd38fde9da542c0976c9fde056",
+    "maximum_negative_intervals": 10,
+    "maximum_positive_intervals": 10,
+    "schema_version": "qwen35-counterfactual-confirmation-plan-v1",
+    "selected_interval_count": 0,
+    "selected_intervals": [],
+    "selection_threshold": 0.3333333333333333
+  },
+  "experiment_id": "qwen35-4b-mathia-counterfactual-forking-v1",
+  "identities": {
+    "confirmation_branch_count": 0,
+    "confirmation_plan_sha256": "243fa5b32e4d84473d917ca8c6c35cd97307592c41040554c895a8f5b23650d8",
+    "discovery_branch_count": 1260,
+    "ordered_confirmation_branch_ids_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "ordered_discovery_branch_ids_sha256": "1ee0683d62788b3c3be0cb2583471d616e6920675baa5b1e0085ac9ac3bd5f9c",
+    "parents": [
+      {
+        "candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "cc0fbec62db6c912192e286ec5427a94eb6fec1a5577ea0d24ffb2df7e011f7d",
+        "raw_response_token_ids_sha256": "d9f61572662c1b73e6bf7e2aa2f1766f48453cf6825a1fece570367e7e6f3750",
+        "task_id": "amc12a_2019_p21"
+      },
+      {
+        "candidate_id": "native-thinking-8563f7bbd1b7b68f0af918c056a58593",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "a0b650efb93f5f91cb843f0de7fed63ef878919e1a1aeb358e2ff31bf6c178e2",
+        "raw_response_token_ids_sha256": "f9b50cdd9ec732440e18c47fd02f1460d9233fbdd5a4e33d0a5f892e6f162b4e",
+        "task_id": "amc12a_2015_p10"
+      },
+      {
+        "candidate_id": "native-thinking-a05338bfbb6879ea264285b35c959fa2",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "0b43d65bffe6479d95f25fb4c420aa73df3a9ff49cc940f95d1c27506cb0f624",
+        "raw_response_token_ids_sha256": "8100f460446cf9444a8f8bc46b9bb92c11e8bdd2129e32f14b7c282d2fd4ce21",
+        "task_id": "amc12a_2008_p8"
+      },
+      {
+        "candidate_id": "native-thinking-3ed486d2bb632315de1aae04110b91b2",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "e9e46484f90e70220fa48499d9cc78f7c4aab999419642e0a63bbb6cbd891510",
+        "raw_response_token_ids_sha256": "d851042cc4de27a6e9f136e3006e80b99601b40a35d737a73b109e133270b634",
+        "task_id": "mathd_algebra_182"
+      },
+      {
+        "candidate_id": "native-thinking-0a7a7d51c5d9d7dd35ac53af8b4d686c",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "d201d2747e76ff5ee40ba3e695c46ebf19c0d0b93056f75579236af0c0c4572e",
+        "raw_response_token_ids_sha256": "163010f62dc548db572a49ac49d07c6f758549b5840f17829741ff2bca1e0bb6",
+        "task_id": "aime_1984_p5"
+      },
+      {
+        "candidate_id": "native-thinking-cfe7819696223b8e4eb85a3a17c0b763",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "bf59701b67544c124cdad3adaf7f36f9d48583cba4a84d1adf4616bea6103a7b",
+        "raw_response_token_ids_sha256": "7ec473ceeaa4c42b09cf35f0e74bdd9157f0c7f8178fa0cbb6ec68cd98db7738",
+        "task_id": "mathd_numbertheory_780"
+      },
+      {
+        "candidate_id": "native-thinking-eeda426da240d961b17e110e33f47de8",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "2b87ef42910ebd9f7029ba4e33fadd331e7a4cd3033e5596514a2735b2097704",
+        "raw_response_token_ids_sha256": "fe2494b9fe615bdfe0bb6c9b62d4e9ba8f67f9e0cc049d473dcff4e41613c2aa",
+        "task_id": "mathd_algebra_116"
+      },
+      {
+        "candidate_id": "native-thinking-a88f7b8c5a07334afaa1a4c937cb0e4f",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "f211b5db8460d6d4f70ed8de59d46dabe85c19f119942f034b48034c788f252b",
+        "raw_response_token_ids_sha256": "ad9e82782dcf1586b2f97b9b4bbe42a145057c0953ba2ade18b0022cd02913a0",
+        "task_id": "mathd_numbertheory_13"
+      },
+      {
+        "candidate_id": "native-thinking-ba24f2ccca59d06a176fd2e769f367d6",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "7cf3faa5b0ab9530b708f281eaff9b0c2e659559ddc4b4766b5a8e07c9196c13",
+        "raw_response_token_ids_sha256": "980c395000d62b30b692ef6236962e125dde394804bb863dfbe76bc044de1714",
+        "task_id": "mathd_numbertheory_169"
+      },
+      {
+        "candidate_id": "native-thinking-adefa54647d6a25d3472ad4eca9ff8f5",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "cf49de555f4a07832fb795da03d64fc7d05de59a380efafb54e541f19324b2cd",
+        "raw_response_token_ids_sha256": "5deaa03a2fb63a370b2a73a1c820bf4180bec9876862dccc261483257bb38024",
+        "task_id": "amc12a_2009_p9"
+      },
+      {
+        "candidate_id": "native-thinking-0869a6a92b698e88a6e7f66bf837b0a7",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "4d68296b37bd4fa4364dbf765b8f57f33dab2992ee903d7bdcd347295bce2dd5",
+        "raw_response_token_ids_sha256": "f6cf091fb22c658c1f38db5b239bfbd09152bc0b37029fb86e60c87fe01fa244",
+        "task_id": "amc12a_2019_p9"
+      },
+      {
+        "candidate_id": "native-thinking-65ff39c7c8d184482a1aa89cf7117183",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "da822686bfff61976792cbc3716e847d82150a8cc21f35d6030b7866a8f11e16",
+        "raw_response_token_ids_sha256": "a1756aa10a072174ab76cb9796a736835464eb56803ab5fa7055dc3cf3191630",
+        "task_id": "mathd_algebra_13"
+      },
+      {
+        "candidate_id": "native-thinking-e5550331c7f38e7f5f6612af62399ce8",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "0e60777b7b3ee6451cf41644de72d55f46e9628c408fbf80d081d8d6aabdfb4c",
+        "raw_response_token_ids_sha256": "8efba2a05cda5a2eab132f703e63fc2565f37289bf685e067556e5d1838afbf7",
+        "task_id": "induction_sum2kp1npqsqm1"
+      },
+      {
+        "candidate_id": "native-thinking-f3882c911063b5f52f235a58b1b9d9d3",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "c2f2fb072803104edf0fb33eaaf1b7d5b32c2633c37d1d71d0bc377078ee0597",
+        "raw_response_token_ids_sha256": "526b318427849acbbdc602bc53623dfe45193604b7c38752e7c5dac943b1b345",
+        "task_id": "aime_1991_p6"
+      },
+      {
+        "candidate_id": "native-thinking-0022b789c32ac517c464bb139aa51b5f",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "65d6b06c2d718eac5c3006f950248a416dd6372de899a4f08a6ea5de8081ca7d",
+        "raw_response_token_ids_sha256": "3960d58978734478af7409818f88238df25b5d9c07df2adc8d1f57299756b27d",
+        "task_id": "mathd_numbertheory_149"
+      },
+      {
+        "candidate_id": "native-thinking-363805fbed1f1096ae908593f7cdb96a",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "e95c1f9aac8b0c9ce3b52c23cc4412c93542ff9886d9264bf54998065d4e87fb",
+        "raw_response_token_ids_sha256": "6c85e3de9b5ef3eba5471ed0cac4bbe7666048bcd306c9d9e03fa6a9eb66ceaf",
+        "task_id": "imo_1984_p2"
+      },
+      {
+        "candidate_id": "native-thinking-dc809f3719618be75b74aa1949a20be8",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "409e3e6bff7d9254c4ee0d834f6d5d26a5fb65e7d5bc632e315029a046e3ab1e",
+        "raw_response_token_ids_sha256": "09ad28c9ed4a087bbb76657a563cb3953b23f61ef9dd9de0df25451479966fb8",
+        "task_id": "imo_2006_p3"
+      },
+      {
+        "candidate_id": "native-thinking-8ede6fac3de7835a4f7af6a586a3c9f3",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "6f6002809ab4684a49775bf6c511d971ad30e65e66228730301bb75d6db10bdb",
+        "raw_response_token_ids_sha256": "7fdd5937cd367b5dea00bda16e00a08fb84cef66d3f09c7fe899fb00fae4c3f5",
+        "task_id": "mathd_algebra_462"
+      },
+      {
+        "candidate_id": "native-thinking-e0985da0ed09e8fdef5453b8ebd68487",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "49be30bb661faf01e655063e0fff0b96a47f16c0fb1bc2e97ea131556b65dd73",
+        "raw_response_token_ids_sha256": "d58e8c6d6512626c1859bc19f7a8bc636f4f92215cb7a826e8290f7cab67c583",
+        "task_id": "imo_1964_p1_2"
+      },
+      {
+        "candidate_id": "native-thinking-bf98a1bbf7104e79f109dd057f2d1dc5",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "41a3081d8575ded189bc10ab4b7b704bae20ee9b450a0133e0efc4ce6a7c8596",
+        "raw_response_token_ids_sha256": "995109ed98d52abf34c4c109b6edff18b2ce449b798c3cc050328b524aa8bda3",
+        "task_id": "mathd_numbertheory_221"
+      },
+      {
+        "candidate_id": "native-thinking-6e4c8776ba8c8e8aa6a66877bc4a738a",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "f2cce5305e25df12edc2cbafd377b6a5e3187bc901c4e65f78922e6935de9cca",
+        "raw_response_token_ids_sha256": "4b6891dfd182d898877e6eda8e62125afd5d5c41ea380f0abd3b204e5612c8b2",
+        "task_id": "mathd_numbertheory_64"
+      },
+      {
+        "candidate_id": "native-thinking-ea55b0701e915e87402f620bc926f0c4",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "d158f54239c11fbebc046310565596f904febc008f4c0252547f3a88d9c496c3",
+        "raw_response_token_ids_sha256": "5318025789cfab11e9927af3e3ab0f5da643cd777e45f687bd51aa6825ea27e1",
+        "task_id": "imo_1987_p4"
+      },
+      {
+        "candidate_id": "native-thinking-c92c8d6d433c33be8479c4f178aab321",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "babe17039ab2ed58f72a2154f4b4d539049bf0a3f9de97b5eec9d89323e270e2",
+        "raw_response_token_ids_sha256": "9fa3b923e50dd1255ecf045ceb66f7a44b8a679db63e76c57933f00945fe5a20",
+        "task_id": "mathd_numbertheory_33"
+      },
+      {
+        "candidate_id": "native-thinking-c64f900b0fab88d846150b01d36d74ae",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "489f22f19b34f80820730be6842e6a46850ceb848aa5c1ef31656fa67b70c385",
+        "raw_response_token_ids_sha256": "1574b755446bcced5f5bde97be6ce4ae4d9732ef6ad4b8c89259218a44968356",
+        "task_id": "amc12_2001_p9"
+      },
+      {
+        "candidate_id": "native-thinking-da80cc188fcc73c09c5ae06975bf48fc",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "ef59ba008cbf74bee29beacf2fc32e12195324729cddabb8defc86b2c4876d10",
+        "raw_response_token_ids_sha256": "f570f2ab64d9fb6e7ca9a1d75e853ead23aaab22445ee996dabc6750c4d4eafe",
+        "task_id": "imo_1965_p1"
+      },
+      {
+        "candidate_id": "native-thinking-8a1024d7ec41fded323477b0e664e028",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "f4e70fb9480292530ecb3e0f6a3bbcda0c55f92c44fb9b757e717de153049e84",
+        "raw_response_token_ids_sha256": "a079ecffc1fe42e49c726b05258c85aba618a4f05cd732a5717d44556a6588f2",
+        "task_id": "mathd_numbertheory_48"
+      },
+      {
+        "candidate_id": "native-thinking-8eae40dc1a2fd1343b50e7a71e67d427",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "5a727b7edec83a426cddf13845af51776d56deacde8dea9f943f970438a3cde4",
+        "raw_response_token_ids_sha256": "bea5aaa505b0c723067e8f16a5eaefa3c8f91385261fd72f2a14f47bcbde50c0",
+        "task_id": "numbertheory_sqmod4in01d"
+      },
+      {
+        "candidate_id": "native-thinking-fd45405720605e7e7b5e817a135b85f7",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "424236f960c72a2d336510c0eceb29b1ec040a2cdf047c99fa0fac6e7406ec5a",
+        "raw_response_token_ids_sha256": "e5aaf6062e97f5a729f0792ef7aa2bf855cdacd2bc0e020c16e7d47113de315f",
+        "task_id": "mathd_numbertheory_466"
+      },
+      {
+        "candidate_id": "native-thinking-6985c82abf7e457786eb97589687d2e0",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "e1de5e2b5e9b5450950bc819b25de532c1c1d7f005d96b81f6646d58901c0348",
+        "raw_response_token_ids_sha256": "93e136eb6e6d621ff4fbf53a9884e6b181abb28f416d73a8a47d1068249135e3",
+        "task_id": "mathd_algebra_48"
+      },
+      {
+        "candidate_id": "native-thinking-477566c9a3570891be731fadd89bae0d",
+        "forks": [
+          {
+            "prefix_len": 0,
+            "remaining_budget": 4096,
+            "state": "P0"
+          },
+          {
+            "prefix_len": 614,
+            "remaining_budget": 3482,
+            "state": "P15"
+          },
+          {
+            "prefix_len": 1228,
+            "remaining_budget": 2868,
+            "state": "P30"
+          },
+          {
+            "prefix_len": 1843,
+            "remaining_budget": 2253,
+            "state": "P45"
+          },
+          {
+            "prefix_len": 2457,
+            "remaining_budget": 1639,
+            "state": "P60"
+          },
+          {
+            "prefix_len": 3072,
+            "remaining_budget": 1024,
+            "state": "P75"
+          },
+          {
+            "prefix_len": 3686,
+            "remaining_budget": 410,
+            "state": "P90"
+          }
+        ],
+        "raw_generation_record_sha256": "3a795031f0458bd5861c4d206a1edbbceaf44e5e47d99162e50ae59759ea867e",
+        "raw_response_token_ids_sha256": "c8fb2d56477b31c4dda08d6ef259e2b3d18e9a79e4d06d52d627401b3b3aea2d",
+        "task_id": "amc12_2000_p15"
+      }
+    ]
+  },
+  "integrity": {
+    "all_parent_parser_parity_passed": true,
+    "eligible_parent_count": 30,
+    "parent_transport": {
+      "asset_name": "qwen-lean-issue92-counterfactual-parent-handoff.tar.zst",
+      "asset_sha256": "2418ed7694c95b970075c0c170e26e796638d0ec34749a5f420fdc39acb052ef",
+      "asset_size_bytes": 539601,
+      "compact_generations_sha256": "e0383d34d4c59833c70582178dabcd28c7e90e6c7642cbf09a488189d79e4210",
+      "extraction_order": "frozen handoff manifest candidate order",
+      "mode": "immutable_github_release_compact_jsonl",
+      "package_metadata_schema": "qwen-lean-issue92-counterfactual-parent-handoff-package-v1",
+      "package_metadata_sha256": "ee8145ca6adb40fd28cd704273618cb9f8cf0c7f50f0dd61d8aa760537d890c5",
+      "record_hashes_match_handoff": true,
+      "release_tag": "issue-92-counterfactual-parent-handoff",
+      "release_url": "https://github.com/murillo128/qwen-lean/releases/tag/issue-92-counterfactual-parent-handoff",
+      "validated_record_count": 120
+    },
+    "pre_inference_evidence_sha256": "d4c57fee68d6dc9a86c16510c04c8c586b9d5c972ea9b19aee051732abc6b0b3",
+    "referenced_parent_record_count": 120
+  },
+  "limitations": [
+    "bounded 30-task candidate-index-0 Mathia-guided T1 sample",
+    "token-quantile checkpoints are not semantic decision boundaries",
+    "operational discovery deltas mix state with consumed token budget",
+    "matched-budget confirmation uses 12 Bernoulli branches per side",
+    "go/no-go thresholds are heuristics rather than statistical theorems",
+    "negative or weak signal is retained without selecting a training method",
+    "execution required restart after 6 failed or interrupted discovery generation segments; the completed restart-safe JSONL is the authoritative sample",
+    "vLLM emitted-text diagnostics differed from tokenizer-decoded authoritative token IDs in 7 persisted branches; parsing and verification used the token-ID reconstruction",
+    "OBSERVED: fixed per-request seeds did not reproduce identical outcomes for at least one interrupted asynchronous vLLM request after process restart"
+  ],
+  "schema_version": "qwen35-counterfactual-forking-results-v1",
+  "status": "completed"
+}
