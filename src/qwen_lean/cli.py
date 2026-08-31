@@ -160,6 +160,25 @@ from .native_thinking_assessment import (
     run_verification as run_native_thinking_verification,
     write_final_evidence as write_native_thinking_evidence,
 )
+from .thinking_budget_continuation import (
+    CONTINUATION_ARMS,
+    ThinkingBudgetContinuationConfig,
+    run_continuation_gate,
+    run_continuation_generation,
+    run_continuation_verification,
+    write_continuation_evidence,
+)
+from .thinking_budget_natural_max import (
+    NaturalMaxConfig,
+    run_capacity_attempt as run_natural_max_capacity,
+    run_natural_generation,
+    run_natural_verification,
+    write_natural_evidence,
+)
+from .thinking_budget_scaling import (
+    ThinkingBudgetScalingConfig,
+    run_runtime_gate as run_thinking_budget_gate,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -686,6 +705,244 @@ def _parser() -> argparse.ArgumentParser:
         "--evidence-dir",
         type=Path,
         default=root / "evidence/qwen35-native-thinking",
+    )
+
+    thinking_budget_gate = subparsers.add_parser(
+        "qwen35-thinking-budget-gate",
+        help="run the Stage 2 native thinking-token-budget runtime gate",
+    )
+    thinking_budget_gate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    thinking_budget_gate.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    thinking_budget_gate.add_argument(
+        "--stage1-results",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/results.json",
+    )
+    thinking_budget_gate.add_argument("--mathia-root", type=Path, required=True)
+    thinking_budget_gate.add_argument("--artifact-dir", type=Path, required=True)
+    thinking_budget_gate.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root / "evidence/qwen35-thinking-budget-scaling/runtime-gate.json"
+        ),
+    )
+
+    continuation_gate = subparsers.add_parser(
+        "qwen35-thinking-budget-continuation-gate",
+        help="run the revised canonical-output Stage 2 continuation gate",
+    )
+    continuation_gate.add_argument(
+        "--continuation-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-continuation.json",
+    )
+    continuation_gate.add_argument(
+        "--scaling-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    continuation_gate.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    continuation_gate.add_argument(
+        "--stage1-results",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/results.json",
+    )
+    continuation_gate.add_argument("--mathia-root", type=Path, required=True)
+    continuation_gate.add_argument("--artifact-dir", type=Path, required=True)
+    continuation_gate.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-thinking-budget-scaling/continuation-gate.json"
+        ),
+    )
+
+    continuation_generate = subparsers.add_parser(
+        "qwen35-thinking-budget-continuation-generate",
+        help="run or resume one frozen B4/B8/B16 continuation arm",
+    )
+    continuation_generate.add_argument(
+        "--continuation-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-continuation.json",
+    )
+    continuation_generate.add_argument(
+        "--scaling-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    continuation_generate.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    continuation_generate.add_argument(
+        "--stage1-results",
+        type=Path,
+        default=root / "evidence/qwen35-native-thinking/results.json",
+    )
+    continuation_generate.add_argument("--mathia-root", type=Path, required=True)
+    continuation_generate.add_argument(
+        "--arm", choices=CONTINUATION_ARMS, required=True
+    )
+    continuation_generate.add_argument("--artifact-dir", type=Path, required=True)
+    continuation_generate.add_argument(
+        "--gate",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-thinking-budget-scaling/continuation-gate.json"
+        ),
+    )
+
+    continuation_verify = subparsers.add_parser(
+        "qwen35-thinking-budget-continuation-verify",
+        help="run or resume strict and normalized continuation verification",
+    )
+    continuation_verify.add_argument(
+        "--continuation-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-continuation.json",
+    )
+    continuation_verify.add_argument(
+        "--scaling-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    continuation_verify.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    continuation_verify.add_argument("--mathia-root", type=Path, required=True)
+    continuation_verify.add_argument("--minif2f-root", type=Path, required=True)
+    continuation_verify.add_argument("--mathlib-root", type=Path, default=root)
+    continuation_verify.add_argument("--artifact-dir", type=Path, required=True)
+    continuation_verify.add_argument("--workers", type=int)
+
+    continuation_evidence = subparsers.add_parser(
+        "qwen35-thinking-budget-continuation-evidence",
+        help="write compact dual-interface continuation evidence",
+    )
+    continuation_evidence.add_argument(
+        "--continuation-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-continuation.json",
+    )
+    continuation_evidence.add_argument(
+        "--scaling-config",
+        type=Path,
+        default=root / "config/qwen35-thinking-budget-scaling.json",
+    )
+    continuation_evidence.add_argument(
+        "--stage1-config",
+        type=Path,
+        default=root / "config/qwen35-native-thinking-ab.json",
+    )
+    continuation_evidence.add_argument("--mathia-root", type=Path, required=True)
+    continuation_evidence.add_argument("--minif2f-root", type=Path, required=True)
+    continuation_evidence.add_argument("--mathlib-root", type=Path, default=root)
+    continuation_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    continuation_evidence.add_argument(
+        "--gate",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-thinking-budget-scaling/continuation-gate.json"
+        ),
+    )
+    continuation_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-thinking-budget-scaling",
+    )
+
+    natural_capacity = subparsers.add_parser(
+        "qwen35-thinking-budget-natural-max-capacity",
+        help="run one resumable BNAT-MAX machine-capacity search attempt",
+    )
+    natural_generate = subparsers.add_parser(
+        "qwen35-thinking-budget-natural-max-generate",
+        help="run or resume the frozen 16-candidate BNAT-MAX arm",
+    )
+    natural_verify = subparsers.add_parser(
+        "qwen35-thinking-budget-natural-max-verify",
+        help="run or resume strict/deployed BNAT-MAX Lean verification",
+    )
+    natural_evidence = subparsers.add_parser(
+        "qwen35-thinking-budget-natural-max-evidence",
+        help="write compact paired B16/BNAT-MAX evidence",
+    )
+    for natural_parser in (
+        natural_capacity,
+        natural_generate,
+        natural_verify,
+        natural_evidence,
+    ):
+        natural_parser.add_argument(
+            "--natural-config",
+            type=Path,
+            default=root / "config/qwen35-thinking-budget-natural-max.json",
+        )
+        natural_parser.add_argument(
+            "--scaling-config",
+            type=Path,
+            default=root / "config/qwen35-thinking-budget-scaling.json",
+        )
+        natural_parser.add_argument(
+            "--stage1-config",
+            type=Path,
+            default=root / "config/qwen35-native-thinking-ab.json",
+        )
+        natural_parser.add_argument("--mathia-root", type=Path, required=True)
+        natural_parser.add_argument("--artifact-dir", type=Path, required=True)
+        natural_parser.add_argument(
+            "--historical-artifact-dir",
+            type=Path,
+            default=(
+                root / "artifacts/qwen35-thinking-budget-scaling/continuation"
+            ),
+        )
+    natural_capacity.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-thinking-budget-scaling/natural-max-capacity.json"
+        ),
+    )
+    for natural_parser in (natural_generate, natural_verify, natural_evidence):
+        natural_parser.add_argument(
+            "--capacity",
+            type=Path,
+            default=(
+                root
+                / "evidence/qwen35-thinking-budget-scaling/natural-max-capacity.json"
+            ),
+        )
+    natural_verify.add_argument("--minif2f-root", type=Path, required=True)
+    natural_verify.add_argument("--mathlib-root", type=Path, default=root)
+    natural_verify.add_argument("--workers", type=int)
+    natural_evidence.add_argument("--minif2f-root", type=Path, required=True)
+    natural_evidence.add_argument("--mathlib-root", type=Path, default=root)
+    natural_evidence.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=root / "evidence/qwen35-thinking-budget-scaling",
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2223,6 +2480,146 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.preflight,
             args.evidence_dir,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-gate":
+        evidence = run_thinking_budget_gate(
+            ThinkingBudgetScalingConfig.load(args.config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.output,
+            stage1_results_path=args.stage1_results,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen35-thinking-budget-continuation-gate":
+        evidence = run_continuation_gate(
+            ThinkingBudgetContinuationConfig.load(args.continuation_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.output,
+            stage1_results_path=args.stage1_results,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] == "passed" else 1
+
+    if args.command == "qwen35-thinking-budget-continuation-generate":
+        summary = run_continuation_generation(
+            ThinkingBudgetContinuationConfig.load(args.continuation_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.arm,
+            args.artifact_dir,
+            args.gate,
+            stage1_results_path=args.stage1_results,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-continuation-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_continuation_verification(
+            ThinkingBudgetContinuationConfig.load(args.continuation_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-continuation-evidence":
+        evidence = write_continuation_evidence(
+            ThinkingBudgetContinuationConfig.load(args.continuation_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.gate,
+            args.evidence_dir,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-natural-max-capacity":
+        evidence = run_natural_max_capacity(
+            NaturalMaxConfig.load(args.natural_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.historical_artifact_dir,
+            args.output,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0 if evidence["status"] in {"passed", "search_pending"} else 1
+
+    if args.command == "qwen35-thinking-budget-natural-max-generate":
+        summary = run_natural_generation(
+            NaturalMaxConfig.load(args.natural_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.historical_artifact_dir,
+            args.capacity,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-natural-max-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_natural_verification(
+            NaturalMaxConfig.load(args.natural_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.historical_artifact_dir,
+            args.capacity,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-thinking-budget-natural-max-evidence":
+        evidence = write_natural_evidence(
+            NaturalMaxConfig.load(args.natural_config),
+            ThinkingBudgetScalingConfig.load(args.scaling_config),
+            NativeThinkingConfig.load(args.stage1_config),
+            args.mathia_root,
+            args.artifact_dir,
+            args.historical_artifact_dir,
+            args.capacity,
+            args.evidence_dir,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
         )
         print(json.dumps(evidence, indent=2))
         return 0

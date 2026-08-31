@@ -1,0 +1,247 @@
+{
+  "base_scaling_config_sha256": "cf9222dbdfb334aa6c439c8b59b8fbd369259f2319678cbea97add9e0d89b8b6",
+  "canonical_output_contract": {
+    "canonical_answer": "parsed_final_exact",
+    "legacy_generation_contract_field": {
+      "actual_module_path": "vllm/v1/sample/thinking_budget_state.py",
+      "actual_role": "thinking_budget_control_source_sha256",
+      "authoritative_for_parser_identity": false,
+      "field": "canonical_output.parser_source_sha256",
+      "preserved_for_immutable_candidate_binding": true,
+      "value": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e"
+    },
+    "normalization": "lean-wrapper-normalization-v1",
+    "parser": "qwen3",
+    "parser_runtime_identity": {
+      "implementation_class": "vllm.parser.qwen3.Qwen3Parser",
+      "implementation_source": {
+        "module_path": "vllm/parser/qwen3.py",
+        "sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb"
+      },
+      "registered_adapter_source": {
+        "module_path": "vllm/parser/engine/adapters.py",
+        "sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d"
+      },
+      "registered_class": "vllm.parser.engine.adapters.Qwen3ParserReasoningAdapter",
+      "registered_name": "qwen3",
+      "validated": true
+    },
+    "raw_suffix_identity_is_diagnostic": true
+  },
+  "checks": {
+    "all_probe_records_present": true,
+    "exact_parsed_and_normalized_hashes_retained": true,
+    "exactly_one_frozen_normalization_pass": true,
+    "forced_boundaries_continue_to_nonempty_final": true,
+    "normalization_idempotent": true,
+    "normalization_replay_deterministic": true,
+    "pinned_parser_replay_deterministic": true,
+    "pinned_parser_runtime_source_identity": true,
+    "raw_token_ids_retained": true,
+    "reasoning_bounded": true,
+    "reasoning_markers_absent_from_parsed_final": true
+  },
+  "conclusion": "continuation_runtime_gate_passed",
+  "continuation_config_sha256": "9ce974ef55c57736cd42a47251af76e9bfd8f6d6780514057a97718ce8c3135e",
+  "failed_checks": [],
+  "historical_gate": {
+    "evidence_path": "evidence/qwen35-thinking-budget-scaling/runtime-gate.json",
+    "evidence_sha256": "302cfeb1a348d61387e83764a5a142975069fcec84708fb146bb7a3fab871f0e",
+    "preserve_unchanged": true,
+    "reviewed_target": "034c96fb54761e843ff68fb21d688b22a2a645ef"
+  },
+  "mathia_binding": {
+    "counts": {
+      "fresh-composition-valid-v2": 388,
+      "minif2f-valid-clean-v2": 223
+    },
+    "file_sha256": {
+      "accepted_intuitions.jsonl": "67bcb9278445f06c6fb21081eb7ff9fb6fe2aa73b42c63d9225422f5a7d25b5d",
+      "freeze.json": "40e9492bf31eef774cd1f8ac4fb70b6760f762191c6af381b7bfa54e3c5c4349",
+      "source_tasks.jsonl": "300ecea0061590e36cde03c53bcc39b5699ed0615f8e05573ebfbc89f657f861"
+    },
+    "freeze_id": "frontier_assisted_intuition_corpus_26b3030e14ab4df8694b9c14ab30a297214f33f7a7ebdb8686ccd2ffae37849f",
+    "ordered_task_ids_sha256": {
+      "fresh-composition-valid-v2": "2d7b298fbb5ac6ff8927c09181b1fdae5897875441639894b60c4839a9783674",
+      "minif2f-valid-clean-v2": "25f2c121dad941b5c70788030f0c78ec85696ce5baa4fb8bac99ee8c86eca1e0"
+    }
+  },
+  "probes": [
+    {
+      "arm": "continuation-gate-B32",
+      "candidate_id": "thinking-budget-gate-b16cfc5e94713429db22d0d61ffd20ce",
+      "final_has_reasoning_marker": false,
+      "finish_reason": "token_limit",
+      "generation_latency_seconds": 5.172474465100095,
+      "max_reasoning_tokens": 32,
+      "normalization_applied": false,
+      "normalization_idempotent": true,
+      "normalization_replay_matches_stored": true,
+      "normalized_final_sha256": "d833c17ee6a89c2811455a227d2271479bc6b4c6cffcd82d425fc87875068989",
+      "normalized_final_token_count": 126,
+      "normalized_final_token_count_stored": 126,
+      "parsed_final_sha256": "d833c17ee6a89c2811455a227d2271479bc6b4c6cffcd82d425fc87875068989",
+      "parsed_final_token_count": 126,
+      "parsed_final_token_count_stored": 126,
+      "parser_final_content_is_exact_raw_suffix": false,
+      "parser_replay_matches_stored": true,
+      "raw_response_sha256": "ffa49479f872fc67fa79e3109762a96dcd445d02d6e98e59a2ad7ed8a46eb08f",
+      "raw_response_token_count": 160,
+      "raw_response_token_ids_sha256": "3ec5101ea4e1d71a808c047f5832077621b225dbe7256cbc82a7942e2fbf8fa9",
+      "reasoning_content_sha256": "a0c938099679a3414959a67d47ab024deeeeacd6cebd02461f78efd171bfbcd9",
+      "reasoning_exit_audit": "forced_at_budget",
+      "reasoning_token_count": 31,
+      "seed": 0,
+      "task_id": "amc12a_2019_p21",
+      "total_output_ceiling": 160,
+      "workload": "minif2f-valid-clean-v2"
+    },
+    {
+      "arm": "continuation-gate-B64",
+      "candidate_id": "thinking-budget-gate-06740ac2f52a29588a63552f33911781",
+      "final_has_reasoning_marker": false,
+      "finish_reason": "token_limit",
+      "generation_latency_seconds": 6.186395630938932,
+      "max_reasoning_tokens": 64,
+      "normalization_applied": false,
+      "normalization_idempotent": true,
+      "normalization_replay_matches_stored": true,
+      "normalized_final_sha256": "ccb1b85f224d821565b8bd540a715e97fd668d7c078ec17be7d497702147d2eb",
+      "normalized_final_token_count": 128,
+      "normalized_final_token_count_stored": 128,
+      "parsed_final_sha256": "ccb1b85f224d821565b8bd540a715e97fd668d7c078ec17be7d497702147d2eb",
+      "parsed_final_token_count": 128,
+      "parsed_final_token_count_stored": 128,
+      "parser_final_content_is_exact_raw_suffix": true,
+      "parser_replay_matches_stored": true,
+      "raw_response_sha256": "467a8b47171b4f08334b3e4dca86925e437864e37f9d61516273d618f8c2478b",
+      "raw_response_token_count": 192,
+      "raw_response_token_ids_sha256": "b18b824b04be256c07b438568310e6cca2a94d1d7788f03bfc2d849d31310020",
+      "reasoning_content_sha256": "f9378cd09981349173da2d2fdc1512e04fac0a365788bd943a4507ed13cb7eed",
+      "reasoning_exit_audit": "forced_at_budget",
+      "reasoning_token_count": 63,
+      "seed": 0,
+      "task_id": "amc12a_2019_p21",
+      "total_output_ceiling": 192,
+      "workload": "minif2f-valid-clean-v2"
+    },
+    {
+      "arm": "continuation-gate-B128",
+      "candidate_id": "thinking-budget-gate-0af873335b7bb28547280dda1ffea1c2",
+      "final_has_reasoning_marker": false,
+      "finish_reason": "token_limit",
+      "generation_latency_seconds": 7.987265679053962,
+      "max_reasoning_tokens": 128,
+      "normalization_applied": false,
+      "normalization_idempotent": true,
+      "normalization_replay_matches_stored": true,
+      "normalized_final_sha256": "1946f9096b6e59461572f97b8ac68e820f5f5f1ba42489e431e2ea509a5c562e",
+      "normalized_final_token_count": 128,
+      "normalized_final_token_count_stored": 128,
+      "parsed_final_sha256": "1946f9096b6e59461572f97b8ac68e820f5f5f1ba42489e431e2ea509a5c562e",
+      "parsed_final_token_count": 128,
+      "parsed_final_token_count_stored": 128,
+      "parser_final_content_is_exact_raw_suffix": true,
+      "parser_replay_matches_stored": true,
+      "raw_response_sha256": "4511b674772286536f0f520ea8851fee2d50652ff87c45f4247167d31a489d7e",
+      "raw_response_token_count": 256,
+      "raw_response_token_ids_sha256": "70a082492942bc9c7d72b848488efd5732dba40d1b2d82c4f762d42a0ebf7d93",
+      "reasoning_content_sha256": "1e3b995e22e23a3ce4959e4bff836d5bd43966009233bffa1a189962cf845082",
+      "reasoning_exit_audit": "forced_at_budget",
+      "reasoning_token_count": 127,
+      "seed": 0,
+      "task_id": "amc12a_2019_p21",
+      "total_output_ceiling": 256,
+      "workload": "minif2f-valid-clean-v2"
+    }
+  ],
+  "raw_artifacts": {
+    "generation_path": "artifacts/qwen35-thinking-budget-scaling/continuation-gate-generations.jsonl",
+    "generation_sha256": "928b954a63ce10b2255a67590049ccd7bc5250609728c1c7eb06b3f5be9d9729",
+    "segment_path": "artifacts/qwen35-thinking-budget-scaling/continuation-gate-segments.jsonl",
+    "segment_sha256": "553ae706409bbb2ea437c334d8215ef58382bd2035c1803f531cd1d7981b4197"
+  },
+  "raw_suffix_identity": {
+    "blocking": false,
+    "mismatch_count": 1
+  },
+  "runtime": {
+    "arm": null,
+    "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+    "cuda_device_capability": [
+      8,
+      9
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_total_memory_bytes": 20989804544,
+    "error": null,
+    "gpu_memory_before_bytes": 483917824,
+    "gpu_memory_monitoring": "nvml_device_used_bytes",
+    "gpu_memory_peak_bytes": 19455934464,
+    "gpu_memory_peak_delta_bytes": 18972016640,
+    "gpu_memory_sample_count": 375,
+    "gpu_memory_sampling_interval_seconds": 0.1,
+    "inference_execution": "local_cuda",
+    "model_snapshot_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "package_versions": {
+      "nvidia-ml-py": "13.610.43",
+      "torch": "2.13.0+cu132",
+      "transformers": "5.15.0",
+      "vllm": "0.27.2rc1.dev203+g41f179b57"
+    },
+    "persisted_candidate_count": 3,
+    "requested_candidate_count": 3,
+    "schema_version": "qwen35-thinking-budget-runtime-segment-v1",
+    "segment_kind": "continuation_runtime_gate",
+    "segment_wall_time_seconds": 41.18897172412835,
+    "status": "completed",
+    "torch_cuda_version": "13.2"
+  },
+  "runtime_support": {
+    "checks": {
+      "chat_protocol_supports_thinking_token_budget": true,
+      "engine_supports_reasoning_config": true,
+      "exact_vllm_version": true,
+      "qwen3_reasoning_parser_preserved": true,
+      "sampling_params_supports_thinking_token_budget": true,
+      "thinking_budget_source_matches_frozen_runtime": true
+    },
+    "package_versions": {
+      "nvidia-ml-py": "13.610.43",
+      "torch": "2.13.0+cu132",
+      "transformers": "5.15.0",
+      "vllm": "0.27.2rc1.dev203+g41f179b57"
+    },
+    "parser_runtime_identity": {
+      "implementation_class": "vllm.parser.qwen3.Qwen3Parser",
+      "implementation_source": {
+        "module_path": "vllm/parser/qwen3.py",
+        "sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb"
+      },
+      "registered_adapter_source": {
+        "module_path": "vllm/parser/engine/adapters.py",
+        "sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d"
+      },
+      "registered_class": "vllm.parser.engine.adapters.Qwen3ParserReasoningAdapter",
+      "registered_name": "qwen3",
+      "validated": true
+    },
+    "passed": true,
+    "thinking_budget_state_module": "vllm/v1/sample/thinking_budget_state.py",
+    "thinking_budget_state_sha256": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e"
+  },
+  "schema_version": "qwen35-thinking-budget-continuation-gate-v1",
+  "scientific_generation_authorized": true,
+  "scientific_generation_candidate_count": 0,
+  "scientific_generation_started": false,
+  "selection_binding": {
+    "ordered_selection_sha256": "e39209e94c0417fd0dc9e8e76843955258b136271a715ba2b2f9218b4c6f2946",
+    "probe_task_id": "amc12a_2019_p21",
+    "probe_workload": "minif2f-valid-clean-v2",
+    "prompt_sha256": "ddf8b4dc42d73f9a689b85d99385f7ad0f702d68b82da2aa4d7eedd2eebcc8c1",
+    "rendered_prompt_sha256": "14071d668e7e1adaf3202a3e7a264a01a38dd57c95f99407d6028209757e704c",
+    "rendered_prompt_token_count": 253
+  },
+  "stage1_config_sha256": "518c7456d52e9a1d833675f0d56ba72308aa75bb5926ffb968f258c2c651657f",
+  "status": "passed"
+}

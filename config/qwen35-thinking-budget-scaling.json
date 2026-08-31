@@ -1,0 +1,54 @@
+{
+  "schema_version": "qwen35-thinking-budget-scaling-config-v1",
+  "experiment_id": "qwen35-4b-thinking-budget-scaling-v1",
+  "stage1": {
+    "reviewed_target": "cbd93de8a96bba9c93fac8afb95e8a8d12205715",
+    "config_sha256": "518c7456d52e9a1d833675f0d56ba72308aa75bb5926ffb968f258c2c651657f",
+    "results_sha256": "5733df8939418fd4c841124e993832169cd05bab546c060972398f7250a163fe"
+  },
+  "runtime_gate": {
+    "vllm_version": "0.27.2rc1.dev203+g41f179b57",
+    "thinking_budget_state_sha256": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e",
+    "probe_workload": "minif2f-valid-clean-v2",
+    "probe_final_allowance": 128,
+    "reasoning_budgets": [
+      0,
+      8,
+      32
+    ]
+  },
+  "selection": {
+    "method": "first-per-workload-in-frozen-stage1-order-with-t1-prompt-at-most-ceiling",
+    "tasks_per_workload": 8,
+    "prompt_token_ceiling": 4096,
+    "outcome_fields_forbidden": true
+  },
+  "sampling": {
+    "candidates_per_task": 1,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "presence_penalty": 0.0,
+    "repetition_penalty": 1.0,
+    "seed": 0,
+    "stop": "tokenizer_eos_or_token_limit"
+  },
+  "arms": {
+    "B4": {
+      "max_reasoning_tokens": 4096,
+      "total_output_ceiling": 8192,
+      "nominal_final_allowance": 4096
+    },
+    "B8": {
+      "max_reasoning_tokens": 8192,
+      "total_output_ceiling": 12288,
+      "nominal_final_allowance": 4096
+    },
+    "B16": {
+      "max_reasoning_tokens": 16384,
+      "total_output_ceiling": 20480,
+      "nominal_final_allowance": 4096
+    }
+  }
+}

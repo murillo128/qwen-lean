@@ -1,0 +1,30 @@
+{
+  "schema_version": "qwen35-thinking-budget-continuation-config-v1",
+  "experiment_id": "qwen35-4b-thinking-budget-scaling-continuation-v1",
+  "base_scaling_config": {
+    "path": "config/qwen35-thinking-budget-scaling.json",
+    "sha256": "cf9222dbdfb334aa6c439c8b59b8fbd369259f2319678cbea97add9e0d89b8b6"
+  },
+  "historical_gate": {
+    "reviewed_target": "034c96fb54761e843ff68fb21d688b22a2a645ef",
+    "evidence_path": "evidence/qwen35-thinking-budget-scaling/runtime-gate.json",
+    "evidence_sha256": "302cfeb1a348d61387e83764a5a142975069fcec84708fb146bb7a3fab871f0e",
+    "preserve_unchanged": true
+  },
+  "canonical_output": {
+    "parser": "qwen3",
+    "parser_source_sha256": "962f8f55210eb0a431cb9c78b013e35f7a7dd58d06d6fb2e7fcff1b457356f8e",
+    "canonical_answer": "parsed_final_exact",
+    "normalization": "lean-wrapper-normalization-v1",
+    "raw_suffix_identity_is_diagnostic": true
+  },
+  "continuation_gate": {
+    "probe_workload": "minif2f-valid-clean-v2",
+    "probe_final_allowance": 128,
+    "reasoning_budgets": [
+      32,
+      64,
+      128
+    ]
+  }
+}

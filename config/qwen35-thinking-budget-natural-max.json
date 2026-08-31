@@ -1,0 +1,43 @@
+{
+  "schema_version": "qwen35-thinking-budget-natural-max-config-v1",
+  "experiment_id": "qwen35-4b-thinking-budget-natural-max-v1",
+  "historical_stage2": {
+    "continuation_config_path": "config/qwen35-thinking-budget-continuation.json",
+    "continuation_config_sha256": "9ce974ef55c57736cd42a47251af76e9bfd8f6d6780514057a97718ce8c3135e",
+    "continuation_results_path": "evidence/qwen35-thinking-budget-scaling/continuation-results.json",
+    "continuation_results_sha256": "c741a61829c8a5378501a239d13b0e62c7b8722b2d8f72dcd24d3de814f4aac6",
+    "generations_sha256": "fed3c3f866a67d57dae86b307c178091ad5db926078c3030a6bb56ee5ccc1112",
+    "verifications_sha256": "c170e62a6679f1e983447b8d58fa9182754b3ea0ce3d3917c866c8cb0c57c387",
+    "preserve_unchanged": true
+  },
+  "capacity_search": {
+    "model_native_context_ceiling": 262144,
+    "known_stable_lower_bound": 24576,
+    "lattice_quantum": 4096,
+    "algorithm": "try-native-then-validate-lower-and-bisect-largest-passing-lattice-point",
+    "gpu_memory_utilization": 0.9,
+    "gpu_memory_utilization_tuned": false,
+    "max_num_seqs": 1,
+    "max_in_flight_requests": 1,
+    "smoke_decode_tokens": 8,
+    "smoke_prompt_method": "newline-token-prefix-plus-first-frozen-rendered-prompt",
+    "smoke_total_tokens": "candidate-max-model-len",
+    "smoke_sampling": "greedy-seed-0"
+  },
+  "arm": {
+    "name": "BNAT-MAX",
+    "enable_thinking": true,
+    "thinking_token_budget": null,
+    "candidate_index": 0,
+    "seed": 0,
+    "max_tokens": "machine-supported-context-minus-exact-rendered-prompt-token-count",
+    "reserved_final_allowance": 0
+  },
+  "canonical_output": {
+    "parser": "qwen3",
+    "parser_implementation_sha256": "8a7ee658322de7b736ea5b0f802d70dd07a124b5878b4f8ad2f99eca8e1d35fb",
+    "parser_adapter_sha256": "2f9e31e13734b7df75d424f45cf39d723bef7c5415a9bc6851b121cbb6b4ae6d",
+    "canonical_answer": "parsed_final_exact",
+    "normalization": "lean-wrapper-normalization-v1"
+  }
+}
