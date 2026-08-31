@@ -1,0 +1,135 @@
+{
+  "adapter": {
+    "adapter_config_sha256": "e644d254241c71151cfafd5f21656abf70014c9a47cb81aa7725ed2ca659626d",
+    "adapter_model_sha256": "60263fc6eaa5e922c80c8f074b062129b29a9edb525da25a348fcd31ff4ff58a",
+    "base_model_name_or_path": "Qwen/Qwen3.5-4B-Base",
+    "lora_alpha": 32,
+    "r": 16,
+    "revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "target_modules": "^model\\.layers\\.\\d+\\.(?:self_attn\\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\\.(?:in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)|mlp\\.(?:gate_proj|up_proj|down_proj))$"
+  },
+  "artifacts": {
+    "hf_runtime_sha256": "211962b5b3cfd992b97dc6164204ec4a1dff359a1a75f2432c3a84dca60b6255",
+    "runtime_adapter_model_sha256": "6a725f9d6093e4e9f6af4313adcf0c42c980b6268786fa19a486f14a61386251",
+    "runtime_tensor_payload_sha256": "c941802ccc12a886ed42ac8abf551b0bfcd73a12f021f5b9f6d77360996a5642",
+    "source_adapter_model_sha256": "60263fc6eaa5e922c80c8f074b062129b29a9edb525da25a348fcd31ff4ff58a",
+    "source_tensor_payload_sha256": "3255dab29da0159e742832360b8fce576fddd382490e7d518369297468bb1989",
+    "vllm_runtime_sha256": "f8d17a9fbea686e70248a90c40fc6816a3af9e07539904c197530cf76fb93220"
+  },
+  "classification": "PASS: Qwen3.5 PEFT-to-vLLM LoRA transport is active and complete",
+  "functional": {
+    "hf_forward_sensitivity": [
+      {
+        "adapter_argmax_token_id": 22,
+        "base_argmax_token_id": 22,
+        "l2_logit_delta": 33.7885627746582,
+        "maximum_absolute_logit_delta": 0.3349609375,
+        "mean_absolute_logit_delta": 0.053569577634334564,
+        "probe_id": "anchor-0",
+        "prompt_sha256": "ce83c6ab9315773b651c45b705dcdc8b36a9f312944c0ed3b2a94355427a6546"
+      },
+      {
+        "adapter_argmax_token_id": 15,
+        "base_argmax_token_id": 15,
+        "l2_logit_delta": 45.00788497924805,
+        "maximum_absolute_logit_delta": 0.5,
+        "mean_absolute_logit_delta": 0.07140759378671646,
+        "probe_id": "anchor-1",
+        "prompt_sha256": "2ec539506409c68efa8149859d549c0d7b77489420a99f533c256b79b414fd46"
+      },
+      {
+        "adapter_argmax_token_id": 16,
+        "base_argmax_token_id": 16,
+        "l2_logit_delta": 83.61186981201172,
+        "maximum_absolute_logit_delta": 0.6875,
+        "mean_absolute_logit_delta": 0.1376686990261078,
+        "probe_id": "anchor-2",
+        "prompt_sha256": "5629a178d6139d037faa780eb63558f9532c6b2e8b0cd7b3cc565f26f85c3d8b"
+      },
+      {
+        "adapter_argmax_token_id": 10741,
+        "base_argmax_token_id": 10741,
+        "l2_logit_delta": 44.41533279418945,
+        "maximum_absolute_logit_delta": 0.46875,
+        "mean_absolute_logit_delta": 0.07048217207193375,
+        "probe_id": "anchor-3",
+        "prompt_sha256": "7316bf60047c4b272f47080efac94b51e4e95b4e53a6966d0a7665cd415e8872"
+      }
+    ],
+    "vllm_pairs": [
+      {
+        "output_changed": false,
+        "probe_id": "anchor-0",
+        "same_first_token_logprob_delta": 0.13538908958435059
+      },
+      {
+        "output_changed": true,
+        "probe_id": "anchor-1",
+        "same_first_token_logprob_delta": null
+      },
+      {
+        "output_changed": true,
+        "probe_id": "anchor-2",
+        "same_first_token_logprob_delta": 0.04468858242034912
+      },
+      {
+        "output_changed": false,
+        "probe_id": "anchor-3",
+        "same_first_token_logprob_delta": 0.07631850242614746
+      }
+    ]
+  },
+  "gate_id": "qwen35-vllm-lora-parity-v2",
+  "model": {
+    "add_special_tokens": false,
+    "architecture_class": "Qwen3_5ForCausalLM",
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "text_only": true,
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "optimizer_updates": 0,
+  "quality_interpretation": "none; deterministic transport sentinel only",
+  "requirements": {
+    "adapter_identity_matched": true,
+    "hf_forward_effect": true,
+    "local_cuda_only": true,
+    "no_optimizer_updates": true,
+    "vllm_functional_effect": true,
+    "vllm_static_mapping_complete": true
+  },
+  "schema_version": "generalist-v3-lora-parity-evidence-v1",
+  "static_mapping": {
+    "loaded_runtime_module_count": 152,
+    "missing_loaded_runtime_modules": [],
+    "peft_module_count": 248,
+    "runtime_adapter_module_count": 296,
+    "runtime_tensor_count": 592,
+    "semantic_transform_verified": true,
+    "source_tensor_count": 496,
+    "target_family_counts": {
+      "full_attention": 32,
+      "gated_deltanet": 120,
+      "mlp": 96
+    },
+    "target_suffix_counts": {
+      "down_proj": 32,
+      "gate_proj": 32,
+      "in_proj_a": 24,
+      "in_proj_b": 24,
+      "in_proj_qkv": 24,
+      "in_proj_z": 24,
+      "k_proj": 8,
+      "o_proj": 8,
+      "out_proj": 24,
+      "q_proj": 8,
+      "up_proj": 32,
+      "v_proj": 8
+    },
+    "unexpected_loaded_runtime_modules": []
+  },
+  "status": "passed",
+  "target_regex": "^model\\.layers\\.\\d+\\.(?:self_attn\\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\\.(?:in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)|mlp\\.(?:gate_proj|up_proj|down_proj))$"
+}

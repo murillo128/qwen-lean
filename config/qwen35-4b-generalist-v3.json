@@ -1,0 +1,225 @@
+{
+  "schema_version": "generalist-v3-config-v1",
+  "artifact_id": "qwen-lean-generalist-v3",
+  "model": {
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "text_only": true,
+    "architecture_class": "Qwen3_5ForCausalLM",
+    "add_special_tokens": false,
+    "chat_template": null
+  },
+  "dataset": {
+    "package_id": "lean-proof-continuation-v3",
+    "accepted_merge_commit": "17fa650412d211405e23c1ca3f7765b6c2a94032",
+    "committed_manifest": "data/lean-proof-continuation-v3/manifest.json",
+    "local_artifact_root": "artifacts/dataset-v3/lean-proof-continuation-v3",
+    "binding": {
+      "manifest_sha256": "ff73265f882e975e339fd4238fc465e4dd733856c68a6032ad8e435ae73b8dc7",
+      "records_sha256": "10f548fd824fd61edf894cf275d4035f9ef4f0f1860628cf1168e498e3d7dc96",
+      "optimizer_view_sha256": "0ea4043628dda878ac574e1cde06dfe6bdf69bc602f12f7f83dcfd8e6d07f96d",
+      "validation_membership_sha256": "0ec547ff16ce0091bc6f48f673585e4253158aef52cd9dc850d299394c6876fb",
+      "test_membership_sha256": "6bb99ed9c476f8ad2dfe7111ecc7b4ec92fbdd6ef21d66ecfe9d71155fdffc19",
+      "training_theorems": 178448,
+      "validation_theorems": 48,
+      "test_theorems": 48,
+      "derived_optimizer_examples": 317554
+    },
+    "consume_as_frozen": true,
+    "theorem_mass_invariant": "1/1",
+    "whole_mass": "1/2",
+    "continuation_mass": "1/2-when-safe-with-declared-whole-only-fallback"
+  },
+  "serialization": {
+    "id": "lean-proof-continuation-v3-materialized-v1",
+    "whole_interface": "canonical-declaration-space-colon-equals-space-to-full-proof",
+    "incremental_interface": "canonical-declaration-space-colon-equals-space-plus-safe-prefix-to-continuation",
+    "supervise_prompt": false,
+    "supervise_eos": true,
+    "terminal_eos_count": 1,
+    "packing": false,
+    "truncation": false,
+    "prompt_target_tokenization": "separate-no-special-tokens"
+  },
+  "precision": {
+    "preferred": {
+      "lane": "bf16-lora",
+      "minimum_vram_bytes": 51539607552,
+      "base_dtype": "bfloat16",
+      "compute_dtype": "bfloat16"
+    },
+    "fallback": {
+      "lane": "nf4-qlora",
+      "load_in_4bit": true,
+      "quantization_type": "nf4",
+      "double_quantization": true,
+      "compute_dtype": "bfloat16"
+    }
+  },
+  "lora": {
+    "task_type": "CAUSAL_LM",
+    "target_regex": "^model\\.layers\\.\\d+\\.(?:self_attn\\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\\.(?:in_proj_qkv|in_proj_z|in_proj_a|in_proj_b|out_proj)|mlp\\.(?:gate_proj|up_proj|down_proj))$",
+    "target_suffixes": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "in_proj_qkv",
+      "in_proj_z",
+      "in_proj_a",
+      "in_proj_b",
+      "out_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "expected_module_counts": {
+      "q_proj": 8,
+      "k_proj": 8,
+      "v_proj": 8,
+      "o_proj": 8,
+      "in_proj_qkv": 24,
+      "in_proj_z": 24,
+      "in_proj_a": 24,
+      "in_proj_b": 24,
+      "out_proj": 24,
+      "gate_proj": 32,
+      "up_proj": 32,
+      "down_proj": 32
+    },
+    "r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.0,
+    "bias": "none",
+    "modules_to_save": null
+  },
+  "training": {
+    "stream_id": "dataset-v3-quarantined-structural-stream-seed0-v1",
+    "stream_seed": 0,
+    "sample_theorem_uniformly": false,
+    "sample_theorem_by_structural_multiplier": true,
+    "sample_example_by_exact_mass": true,
+    "sample_with_replacement": true,
+    "maximum_optimizer_steps": 8000,
+    "per_device_micro_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "optimizer": "paged_adamw_8bit",
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 1.0,
+    "lr_schedule": "linear-warmup-then-constant",
+    "warmup_steps": 100,
+    "seed": 0,
+    "data_seed": 0,
+    "gradient_checkpointing": true,
+    "packing": false,
+    "truncation": false,
+    "context_choices": [4096, 8192, 16384, 32768, 65536, 131072, 262144],
+    "canonical_context_tokens": 262144,
+    "canonical_maximum_observed_sequence_tokens": 157034,
+    "resolved_context_tokens": 16384,
+    "execution_view": {
+      "maximum_sequence_tokens": 16384,
+      "expected_quarantined_examples": 51,
+      "quarantine_label": "long-context-quarantined / optimizer-ineligible-for-#83",
+      "renormalize_remaining_example_mass_within_theorem": true,
+      "exclude_theorem_when_no_example_remains": true,
+      "recompute_structure_from_eligible_proof_variants": true
+    },
+    "structural_reweighting": {
+      "bucket_order": ["direct", "multi-step", "branching", "deep"],
+      "raw_multiplier": "sqrt((1/K)/f_b)",
+      "lower_bound": 0.75,
+      "upper_bound": 1.5,
+      "normalize_training_set_mean_to": 1.0
+    },
+    "retained_steps": [100, 250, 500, 1000, 2000, 4000, 8000],
+    "configurations": {
+      "C0": {"learning_rate": 0.00003, "base_kl_lambda": 0.0, "eligible": false},
+      "C1": {"learning_rate": 0.00003, "base_kl_lambda": 0.1, "eligible": true},
+      "C2": {"learning_rate": 0.00001, "base_kl_lambda": 0.1, "eligible": true},
+      "C3": {"learning_rate": 0.00001, "base_kl_lambda": 0.3, "eligible": true, "rescue_only": true}
+    }
+  },
+  "preservation": {
+    "anchor_count": 512,
+    "whole_anchors": 256,
+    "incremental_anchors": 256,
+    "selection_seed": 0,
+    "selection_rule": "hash-order round-robin over task-kind, structural-bucket, proof-form/first-construct and coarse-input-length strata; prefer <=4096-token inputs; no eligible structural bucket above 40% when enough examples exist",
+    "maximum_anchor_fraction_per_structural_bucket": 0.4,
+    "length_buckets": [256, 512, 1024, 2048, 4096],
+    "reference_position": "final-input-next-token",
+    "reference_logits": "full-vocabulary",
+    "reference_logits_dtype": "float16",
+    "anchor_schedule": "seed0-shuffle-without-replacement-per-512-step-cycle",
+    "loss_direction": "KL(p_base||p_current)",
+    "anchor_microbatches_per_optimizer_step": 1
+  },
+  "evaluation": {
+    "validation_membership": "all-48-dataset-v3-validation-compositions",
+    "sealed_test_membership": "all-48-dataset-v3-test-compositions",
+    "interfaces": ["whole", "incremental"],
+    "incremental_boundary_rule": "upper-middle-by-segment-index-then-prefix-offset",
+    "candidates_per_task": 8,
+    "reported_metrics": ["pass@1", "pass@4", "pass@8", "solved-within-8"],
+    "sampling": {
+      "do_sample": true,
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "top_k": -1,
+      "max_new_tokens": 1024,
+      "stop": "tokenizer_eos_or_token_limit",
+      "seed": 0
+    },
+    "inference": {
+      "execution": "project-controlled-local-cuda",
+      "engine": "vllm",
+      "engine_version": "0.17.0",
+      "dtype": "bfloat16",
+      "tensor_parallel_size": 1,
+      "gpu_memory_utilization": 0.95,
+      "max_model_len": 262144,
+      "max_num_seqs": 8,
+      "enforce_eager": true,
+      "language_model_only": true,
+      "enable_prefix_caching": true,
+      "use_flashinfer_sampler": false,
+      "expected_cuda_device_name_fragment": "Ada"
+    },
+    "verifier_timeout_seconds": 30.0,
+    "normalization": "dataset-v3-structural-proof-v1",
+    "selection_rule": [
+      "combined_solved_at_8_desc",
+      "whole_solved_at_8_desc",
+      "retained_base_solved_desc",
+      "combined_verified_density_desc",
+      "normalized_template_diversity_desc",
+      "mean_anchor_kl_asc",
+      "optimizer_step_asc",
+      "learning_rate_asc"
+    ]
+  },
+  "collapse_gates": {
+    "repeated_template": {
+      "theorem_fraction_gte": 0.5,
+      "verified_occurrence_fraction_lt": 0.1
+    },
+    "short_eos": {
+      "whole_eos_fraction_gte": 0.95,
+      "whole_le_64_token_fraction_gte": 0.8,
+      "requires_whole_solved_at_8_not_above_base": true
+    },
+    "base_coverage": {
+      "minimum_base_solved_interface_tasks": 8,
+      "retention_fraction_lt": 0.5,
+      "requires_combined_solved_below_base": true
+    },
+    "positive_500_step": {
+      "combined_solved_gain": 2,
+      "verified_density_relative_gain": 0.25,
+      "density_branch_requires_no_solved_decrease": true
+    }
+  }
+}

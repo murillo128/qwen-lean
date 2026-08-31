@@ -1,0 +1,569 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="3025" viewBox="0 0 1000 3025">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.line{fill:none;stroke-width:2.5}.point{stroke:#fff;stroke-width:1}</style>
+<text x="80.0" y="38" font-size="22" font-weight="700">Qwen-Lean v3 structural capability trajectory</text>
+<text x="80.0" y="58.0" font-size="16" font-weight="700">direct whole solved@8</text>
+<line class="grid" x1="80.0" y1="240.00" x2="965.0" y2="240.00"/>
+<text x="70.0" y="244.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="197.50" x2="965.0" y2="197.50"/>
+<text x="70.0" y="201.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="155.00" x2="965.0" y2="155.00"/>
+<text x="70.0" y="159.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="112.50" x2="965.0" y2="112.50"/>
+<text x="70.0" y="116.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="70.00" x2="965.0" y2="70.00"/>
+<text x="70.0" y="74.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="240.0" x2="965.0" y2="240.0"/>
+<line class="axis" x1="80.0" y1="70.0" x2="80.0" y2="240.0"/>
+<text x="22.0" y="155.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 155.0)">solved tasks</text>
+<text x="80.00" y="260.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="260.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="260.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="260.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,240.00 257.00,82.59 522.50,82.59 965.00,82.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="82.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="82.59" r="3.5"/>
+<line x1="605.0" y1="52.0" x2="627.0" y2="52.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="56.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,240.00 257.00,240.00 522.50,240.00 965.00,240.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="240.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="240.00" r="3.5"/>
+<line x1="695.0" y1="52.0" x2="717.0" y2="52.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="56.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,240.00 257.00,82.59 522.50,240.00 965.00,240.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="82.59" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="240.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="240.00" r="3.5"/>
+<line x1="785.0" y1="52.0" x2="807.0" y2="52.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="56.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,240.00 257.00,240.00 522.50,240.00 965.00,240.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="240.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="240.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="240.00" r="3.5"/>
+<line x1="875.0" y1="52.0" x2="897.0" y2="52.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="56.0" font-size="11">C3</text>
+<text x="522.5" y="278.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="303.0" font-size="16" font-weight="700">direct whole verified density</text>
+<line class="grid" x1="80.0" y1="485.00" x2="965.0" y2="485.00"/>
+<text x="70.0" y="489.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="442.50" x2="965.0" y2="442.50"/>
+<text x="70.0" y="446.50" font-size="11" text-anchor="end">0.004219</text>
+<line class="grid" x1="80.0" y1="400.00" x2="965.0" y2="400.00"/>
+<text x="70.0" y="404.00" font-size="11" text-anchor="end">0.008438</text>
+<line class="grid" x1="80.0" y1="357.50" x2="965.0" y2="357.50"/>
+<text x="70.0" y="361.50" font-size="11" text-anchor="end">0.01266</text>
+<line class="grid" x1="80.0" y1="315.00" x2="965.0" y2="315.00"/>
+<text x="70.0" y="319.00" font-size="11" text-anchor="end">0.01688</text>
+<line class="axis" x1="80.0" y1="485.0" x2="965.0" y2="485.0"/>
+<line class="axis" x1="80.0" y1="315.0" x2="80.0" y2="485.0"/>
+<text x="22.0" y="400.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 400.0)">verified density</text>
+<text x="80.00" y="505.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="505.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="505.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="505.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,485.00 257.00,406.30 522.50,327.59 965.00,406.30"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="406.30" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="327.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="406.30" r="3.5"/>
+<line x1="605.0" y1="297.0" x2="627.0" y2="297.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="301.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,485.00 257.00,485.00 522.50,485.00 965.00,485.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="485.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="485.00" r="3.5"/>
+<line x1="695.0" y1="297.0" x2="717.0" y2="297.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="301.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,485.00 257.00,406.30 522.50,485.00 965.00,485.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="406.30" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="485.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="485.00" r="3.5"/>
+<line x1="785.0" y1="297.0" x2="807.0" y2="297.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="301.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,485.00 257.00,485.00 522.50,485.00 965.00,485.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="485.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="485.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="485.00" r="3.5"/>
+<line x1="875.0" y1="297.0" x2="897.0" y2="297.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="301.0" font-size="11">C3</text>
+<text x="522.5" y="523.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="548.0" font-size="16" font-weight="700">direct incremental solved@8</text>
+<line class="grid" x1="80.0" y1="730.00" x2="965.0" y2="730.00"/>
+<text x="70.0" y="734.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="687.50" x2="965.0" y2="687.50"/>
+<text x="70.0" y="691.50" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="645.00" x2="965.0" y2="645.00"/>
+<text x="70.0" y="649.00" font-size="11" text-anchor="end">1.08</text>
+<line class="grid" x1="80.0" y1="602.50" x2="965.0" y2="602.50"/>
+<text x="70.0" y="606.50" font-size="11" text-anchor="end">1.62</text>
+<line class="grid" x1="80.0" y1="560.00" x2="965.0" y2="560.00"/>
+<text x="70.0" y="564.00" font-size="11" text-anchor="end">2.16</text>
+<line class="axis" x1="80.0" y1="730.0" x2="965.0" y2="730.0"/>
+<line class="axis" x1="80.0" y1="560.0" x2="80.0" y2="730.0"/>
+<text x="22.0" y="645.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 645.0)">solved tasks</text>
+<text x="80.00" y="750.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="750.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="750.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="750.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,730.00 257.00,651.30 522.50,651.30 965.00,572.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="651.30" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="651.30" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="572.59" r="3.5"/>
+<line x1="605.0" y1="542.0" x2="627.0" y2="542.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="546.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,730.00 257.00,651.30 522.50,651.30 965.00,730.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="651.30" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="651.30" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="730.00" r="3.5"/>
+<line x1="695.0" y1="542.0" x2="717.0" y2="542.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="546.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,730.00 257.00,730.00 522.50,730.00 965.00,730.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="730.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="730.00" r="3.5"/>
+<line x1="785.0" y1="542.0" x2="807.0" y2="542.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="546.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,730.00 257.00,730.00 522.50,651.30 965.00,730.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="730.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="651.30" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="730.00" r="3.5"/>
+<line x1="875.0" y1="542.0" x2="897.0" y2="542.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="546.0" font-size="11">C3</text>
+<text x="522.5" y="768.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="793.0" font-size="16" font-weight="700">direct incremental verified density</text>
+<line class="grid" x1="80.0" y1="975.00" x2="965.0" y2="975.00"/>
+<text x="70.0" y="979.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="932.50" x2="965.0" y2="932.50"/>
+<text x="70.0" y="936.50" font-size="11" text-anchor="end">0.008438</text>
+<line class="grid" x1="80.0" y1="890.00" x2="965.0" y2="890.00"/>
+<text x="70.0" y="894.00" font-size="11" text-anchor="end">0.01688</text>
+<line class="grid" x1="80.0" y1="847.50" x2="965.0" y2="847.50"/>
+<text x="70.0" y="851.50" font-size="11" text-anchor="end">0.02531</text>
+<line class="grid" x1="80.0" y1="805.00" x2="965.0" y2="805.00"/>
+<text x="70.0" y="809.00" font-size="11" text-anchor="end">0.03375</text>
+<line class="axis" x1="80.0" y1="975.0" x2="965.0" y2="975.0"/>
+<line class="axis" x1="80.0" y1="805.0" x2="80.0" y2="975.0"/>
+<text x="22.0" y="890.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 890.0)">verified density</text>
+<text x="80.00" y="995.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="995.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="995.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="995.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,975.00 257.00,935.65 522.50,935.65 965.00,817.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="935.65" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="935.65" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="817.59" r="3.5"/>
+<line x1="605.0" y1="787.0" x2="627.0" y2="787.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="791.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,975.00 257.00,935.65 522.50,935.65 965.00,975.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="935.65" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="935.65" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="975.00" r="3.5"/>
+<line x1="695.0" y1="787.0" x2="717.0" y2="787.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="791.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,975.00 257.00,975.00 522.50,975.00 965.00,975.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="975.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="975.00" r="3.5"/>
+<line x1="785.0" y1="787.0" x2="807.0" y2="787.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="791.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,975.00 257.00,975.00 522.50,935.65 965.00,975.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="975.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="935.65" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="975.00" r="3.5"/>
+<line x1="875.0" y1="787.0" x2="897.0" y2="787.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="791.0" font-size="11">C3</text>
+<text x="522.5" y="1013.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1038.0" font-size="16" font-weight="700">branching whole solved@8</text>
+<line class="grid" x1="80.0" y1="1220.00" x2="965.0" y2="1220.00"/>
+<text x="70.0" y="1224.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1177.50" x2="965.0" y2="1177.50"/>
+<text x="70.0" y="1181.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="1135.00" x2="965.0" y2="1135.00"/>
+<text x="70.0" y="1139.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="1092.50" x2="965.0" y2="1092.50"/>
+<text x="70.0" y="1096.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="1050.00" x2="965.0" y2="1050.00"/>
+<text x="70.0" y="1054.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="1220.0" x2="965.0" y2="1220.0"/>
+<line class="axis" x1="80.0" y1="1050.0" x2="80.0" y2="1220.0"/>
+<text x="22.0" y="1135.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1135.0)">solved tasks</text>
+<text x="80.00" y="1240.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1240.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1240.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1240.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1220.00 257.00,1220.00 522.50,1220.00 965.00,1220.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1220.00" r="3.5"/>
+<line x1="605.0" y1="1032.0" x2="627.0" y2="1032.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1036.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1220.00 257.00,1220.00 522.50,1220.00 965.00,1220.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1220.00" r="3.5"/>
+<line x1="695.0" y1="1032.0" x2="717.0" y2="1032.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1036.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1220.00 257.00,1220.00 522.50,1220.00 965.00,1220.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1220.00" r="3.5"/>
+<line x1="785.0" y1="1032.0" x2="807.0" y2="1032.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1036.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1220.00 257.00,1220.00 522.50,1220.00 965.00,1220.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1220.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1220.00" r="3.5"/>
+<line x1="875.0" y1="1032.0" x2="897.0" y2="1032.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1036.0" font-size="11">C3</text>
+<text x="522.5" y="1258.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1283.0" font-size="16" font-weight="700">branching whole verified density</text>
+<line class="grid" x1="80.0" y1="1465.00" x2="965.0" y2="1465.00"/>
+<text x="70.0" y="1469.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1422.50" x2="965.0" y2="1422.50"/>
+<text x="70.0" y="1426.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="1380.00" x2="965.0" y2="1380.00"/>
+<text x="70.0" y="1384.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="1337.50" x2="965.0" y2="1337.50"/>
+<text x="70.0" y="1341.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="1295.00" x2="965.0" y2="1295.00"/>
+<text x="70.0" y="1299.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="1465.0" x2="965.0" y2="1465.0"/>
+<line class="axis" x1="80.0" y1="1295.0" x2="80.0" y2="1465.0"/>
+<text x="22.0" y="1380.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1380.0)">verified density</text>
+<text x="80.00" y="1485.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1485.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1485.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1485.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1465.00 257.00,1465.00 522.50,1465.00 965.00,1465.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1465.00" r="3.5"/>
+<line x1="605.0" y1="1277.0" x2="627.0" y2="1277.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1281.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1465.00 257.00,1465.00 522.50,1465.00 965.00,1465.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1465.00" r="3.5"/>
+<line x1="695.0" y1="1277.0" x2="717.0" y2="1277.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1281.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1465.00 257.00,1465.00 522.50,1465.00 965.00,1465.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1465.00" r="3.5"/>
+<line x1="785.0" y1="1277.0" x2="807.0" y2="1277.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1281.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1465.00 257.00,1465.00 522.50,1465.00 965.00,1465.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1465.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1465.00" r="3.5"/>
+<line x1="875.0" y1="1277.0" x2="897.0" y2="1277.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1281.0" font-size="11">C3</text>
+<text x="522.5" y="1503.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1528.0" font-size="16" font-weight="700">branching incremental solved@8</text>
+<line class="grid" x1="80.0" y1="1710.00" x2="965.0" y2="1710.00"/>
+<text x="70.0" y="1714.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1667.50" x2="965.0" y2="1667.50"/>
+<text x="70.0" y="1671.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="1625.00" x2="965.0" y2="1625.00"/>
+<text x="70.0" y="1629.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="1582.50" x2="965.0" y2="1582.50"/>
+<text x="70.0" y="1586.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="1540.00" x2="965.0" y2="1540.00"/>
+<text x="70.0" y="1544.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="1710.0" x2="965.0" y2="1710.0"/>
+<line class="axis" x1="80.0" y1="1540.0" x2="80.0" y2="1710.0"/>
+<text x="22.0" y="1625.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1625.0)">solved tasks</text>
+<text x="80.00" y="1730.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1730.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1730.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1730.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1710.00 257.00,1710.00 522.50,1710.00 965.00,1710.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1710.00" r="3.5"/>
+<line x1="605.0" y1="1522.0" x2="627.0" y2="1522.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1526.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1710.00 257.00,1710.00 522.50,1710.00 965.00,1710.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1710.00" r="3.5"/>
+<line x1="695.0" y1="1522.0" x2="717.0" y2="1522.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1526.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1710.00 257.00,1710.00 522.50,1710.00 965.00,1710.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1710.00" r="3.5"/>
+<line x1="785.0" y1="1522.0" x2="807.0" y2="1522.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1526.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1710.00 257.00,1710.00 522.50,1710.00 965.00,1710.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1710.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1710.00" r="3.5"/>
+<line x1="875.0" y1="1522.0" x2="897.0" y2="1522.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1526.0" font-size="11">C3</text>
+<text x="522.5" y="1748.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="1773.0" font-size="16" font-weight="700">branching incremental verified density</text>
+<line class="grid" x1="80.0" y1="1955.00" x2="965.0" y2="1955.00"/>
+<text x="70.0" y="1959.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="1912.50" x2="965.0" y2="1912.50"/>
+<text x="70.0" y="1916.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="1870.00" x2="965.0" y2="1870.00"/>
+<text x="70.0" y="1874.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="1827.50" x2="965.0" y2="1827.50"/>
+<text x="70.0" y="1831.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="1785.00" x2="965.0" y2="1785.00"/>
+<text x="70.0" y="1789.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="1955.0" x2="965.0" y2="1955.0"/>
+<line class="axis" x1="80.0" y1="1785.0" x2="80.0" y2="1955.0"/>
+<text x="22.0" y="1870.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 1870.0)">verified density</text>
+<text x="80.00" y="1975.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="1975.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="1975.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="1975.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,1955.00 257.00,1955.00 522.50,1955.00 965.00,1955.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="1955.00" r="3.5"/>
+<line x1="605.0" y1="1767.0" x2="627.0" y2="1767.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="1771.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,1955.00 257.00,1955.00 522.50,1955.00 965.00,1955.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="1955.00" r="3.5"/>
+<line x1="695.0" y1="1767.0" x2="717.0" y2="1767.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="1771.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,1955.00 257.00,1955.00 522.50,1955.00 965.00,1955.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="1955.00" r="3.5"/>
+<line x1="785.0" y1="1767.0" x2="807.0" y2="1767.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="1771.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,1955.00 257.00,1955.00 522.50,1955.00 965.00,1955.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="1955.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="1955.00" r="3.5"/>
+<line x1="875.0" y1="1767.0" x2="897.0" y2="1767.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="1771.0" font-size="11">C3</text>
+<text x="522.5" y="1993.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="2018.0" font-size="16" font-weight="700">deep whole solved@8</text>
+<line class="grid" x1="80.0" y1="2200.00" x2="965.0" y2="2200.00"/>
+<text x="70.0" y="2204.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="2157.50" x2="965.0" y2="2157.50"/>
+<text x="70.0" y="2161.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="2115.00" x2="965.0" y2="2115.00"/>
+<text x="70.0" y="2119.00" font-size="11" text-anchor="end">1.62</text>
+<line class="grid" x1="80.0" y1="2072.50" x2="965.0" y2="2072.50"/>
+<text x="70.0" y="2076.50" font-size="11" text-anchor="end">2.43</text>
+<line class="grid" x1="80.0" y1="2030.00" x2="965.0" y2="2030.00"/>
+<text x="70.0" y="2034.00" font-size="11" text-anchor="end">3.24</text>
+<line class="axis" x1="80.0" y1="2200.0" x2="965.0" y2="2200.0"/>
+<line class="axis" x1="80.0" y1="2030.0" x2="80.0" y2="2200.0"/>
+<text x="22.0" y="2115.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 2115.0)">solved tasks</text>
+<text x="80.00" y="2220.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="2220.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="2220.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="2220.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,2200.00 257.00,2042.59 522.50,2147.53 965.00,2042.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="2042.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="2147.53" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="2042.59" r="3.5"/>
+<line x1="605.0" y1="2012.0" x2="627.0" y2="2012.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="2016.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,2200.00 257.00,2147.53 522.50,2200.00 965.00,2200.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="2147.53" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="2200.00" r="3.5"/>
+<line x1="695.0" y1="2012.0" x2="717.0" y2="2012.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="2016.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,2200.00 257.00,2147.53 522.50,2200.00 965.00,2200.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="2147.53" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="2200.00" r="3.5"/>
+<line x1="785.0" y1="2012.0" x2="807.0" y2="2012.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="2016.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,2200.00 257.00,2200.00 522.50,2200.00 965.00,2200.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="2200.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="2200.00" r="3.5"/>
+<line x1="875.0" y1="2012.0" x2="897.0" y2="2012.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="2016.0" font-size="11">C3</text>
+<text x="522.5" y="2238.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="2263.0" font-size="16" font-weight="700">deep whole verified density</text>
+<line class="grid" x1="80.0" y1="2445.00" x2="965.0" y2="2445.00"/>
+<text x="70.0" y="2449.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="2402.50" x2="965.0" y2="2402.50"/>
+<text x="70.0" y="2406.50" font-size="11" text-anchor="end">0.006328</text>
+<line class="grid" x1="80.0" y1="2360.00" x2="965.0" y2="2360.00"/>
+<text x="70.0" y="2364.00" font-size="11" text-anchor="end">0.01266</text>
+<line class="grid" x1="80.0" y1="2317.50" x2="965.0" y2="2317.50"/>
+<text x="70.0" y="2321.50" font-size="11" text-anchor="end">0.01898</text>
+<line class="grid" x1="80.0" y1="2275.00" x2="965.0" y2="2275.00"/>
+<text x="70.0" y="2279.00" font-size="11" text-anchor="end">0.02531</text>
+<line class="axis" x1="80.0" y1="2445.0" x2="965.0" y2="2445.0"/>
+<line class="axis" x1="80.0" y1="2275.0" x2="80.0" y2="2445.0"/>
+<text x="22.0" y="2360.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 2360.0)">verified density</text>
+<text x="80.00" y="2465.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="2465.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="2465.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="2465.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,2445.00 257.00,2287.59 522.50,2392.53 965.00,2287.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="2287.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="2392.53" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="2287.59" r="3.5"/>
+<line x1="605.0" y1="2257.0" x2="627.0" y2="2257.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="2261.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,2445.00 257.00,2392.53 522.50,2445.00 965.00,2445.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="2392.53" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="2445.00" r="3.5"/>
+<line x1="695.0" y1="2257.0" x2="717.0" y2="2257.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="2261.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,2445.00 257.00,2392.53 522.50,2445.00 965.00,2445.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="2392.53" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="2445.00" r="3.5"/>
+<line x1="785.0" y1="2257.0" x2="807.0" y2="2257.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="2261.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,2445.00 257.00,2445.00 522.50,2445.00 965.00,2445.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="2445.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="2445.00" r="3.5"/>
+<line x1="875.0" y1="2257.0" x2="897.0" y2="2257.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="2261.0" font-size="11">C3</text>
+<text x="522.5" y="2483.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="2508.0" font-size="16" font-weight="700">deep incremental solved@8</text>
+<line class="grid" x1="80.0" y1="2690.00" x2="965.0" y2="2690.00"/>
+<text x="70.0" y="2694.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="2647.50" x2="965.0" y2="2647.50"/>
+<text x="70.0" y="2651.50" font-size="11" text-anchor="end">0.27</text>
+<line class="grid" x1="80.0" y1="2605.00" x2="965.0" y2="2605.00"/>
+<text x="70.0" y="2609.00" font-size="11" text-anchor="end">0.54</text>
+<line class="grid" x1="80.0" y1="2562.50" x2="965.0" y2="2562.50"/>
+<text x="70.0" y="2566.50" font-size="11" text-anchor="end">0.81</text>
+<line class="grid" x1="80.0" y1="2520.00" x2="965.0" y2="2520.00"/>
+<text x="70.0" y="2524.00" font-size="11" text-anchor="end">1.08</text>
+<line class="axis" x1="80.0" y1="2690.0" x2="965.0" y2="2690.0"/>
+<line class="axis" x1="80.0" y1="2520.0" x2="80.0" y2="2690.0"/>
+<text x="22.0" y="2605.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 2605.0)">solved tasks</text>
+<text x="80.00" y="2710.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="2710.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="2710.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="2710.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,2690.00 257.00,2532.59 522.50,2532.59 965.00,2690.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="2532.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="2532.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="2690.00" r="3.5"/>
+<line x1="605.0" y1="2502.0" x2="627.0" y2="2502.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="2506.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,2690.00 257.00,2690.00 522.50,2690.00 965.00,2690.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="2690.00" r="3.5"/>
+<line x1="695.0" y1="2502.0" x2="717.0" y2="2502.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="2506.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,2690.00 257.00,2690.00 522.50,2690.00 965.00,2690.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="2690.00" r="3.5"/>
+<line x1="785.0" y1="2502.0" x2="807.0" y2="2502.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="2506.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,2690.00 257.00,2690.00 522.50,2532.59 965.00,2690.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="2690.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="2532.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="2690.00" r="3.5"/>
+<line x1="875.0" y1="2502.0" x2="897.0" y2="2502.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="2506.0" font-size="11">C3</text>
+<text x="522.5" y="2728.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="2753.0" font-size="16" font-weight="700">deep incremental verified density</text>
+<line class="grid" x1="80.0" y1="2935.00" x2="965.0" y2="2935.00"/>
+<text x="70.0" y="2939.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="2892.50" x2="965.0" y2="2892.50"/>
+<text x="70.0" y="2896.50" font-size="11" text-anchor="end">0.002109</text>
+<line class="grid" x1="80.0" y1="2850.00" x2="965.0" y2="2850.00"/>
+<text x="70.0" y="2854.00" font-size="11" text-anchor="end">0.004219</text>
+<line class="grid" x1="80.0" y1="2807.50" x2="965.0" y2="2807.50"/>
+<text x="70.0" y="2811.50" font-size="11" text-anchor="end">0.006328</text>
+<line class="grid" x1="80.0" y1="2765.00" x2="965.0" y2="2765.00"/>
+<text x="70.0" y="2769.00" font-size="11" text-anchor="end">0.008438</text>
+<line class="axis" x1="80.0" y1="2935.0" x2="965.0" y2="2935.0"/>
+<line class="axis" x1="80.0" y1="2765.0" x2="80.0" y2="2935.0"/>
+<text x="22.0" y="2850.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 2850.0)">verified density</text>
+<text x="80.00" y="2955.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="2955.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="2955.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="2955.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,2935.00 257.00,2777.59 522.50,2777.59 965.00,2935.00"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="2777.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="2777.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="2935.00" r="3.5"/>
+<line x1="605.0" y1="2747.0" x2="627.0" y2="2747.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="2751.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,2935.00 257.00,2935.00 522.50,2935.00 965.00,2935.00"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="2935.00" r="3.5"/>
+<line x1="695.0" y1="2747.0" x2="717.0" y2="2747.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="2751.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,2935.00 257.00,2935.00 522.50,2935.00 965.00,2935.00"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="2935.00" r="3.5"/>
+<line x1="785.0" y1="2747.0" x2="807.0" y2="2747.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="2751.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,2935.00 257.00,2935.00 522.50,2777.59 965.00,2935.00"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="2935.00" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="2777.59" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="2935.00" r="3.5"/>
+<line x1="875.0" y1="2747.0" x2="897.0" y2="2747.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="2751.0" font-size="11">C3</text>
+<text x="522.5" y="2973.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+</svg>

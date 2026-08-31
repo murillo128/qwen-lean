@@ -1,0 +1,292 @@
+{
+  "anchors_and_base_logits": {
+    "anchor_manifest_sha256": "14f936479ada929b9ff7b6910c4f90349ab2ab4d450ab2b3e2a23c9df00dfa44",
+    "anchors_sha256": "8cce80eaae31e56430effdf9a1f342eb43dbd558f386e288739e46434d1c17fa",
+    "base_logits_approximation": null,
+    "base_logits_dtype": "float16",
+    "base_logits_metadata_sha256": "6dd5e0de05cd53a352b1210b442ae722a9537474167dbae4c9bb3afc5a45620d",
+    "base_logits_sha256": "490b55689617f436d3c939b324542f069771255e456b4c90ebeaf5f292c5143a",
+    "base_logits_vocabulary_size": 248320,
+    "kind_counts": {
+      "continuation": 256,
+      "whole": 256
+    },
+    "preferred_length_count": 506,
+    "structural_bucket_counts": {
+      "branching": 149,
+      "deep": 149,
+      "direct": 64,
+      "multi-step": 150
+    }
+  },
+  "artifacts": {
+    "stage0_freeze_sha256": "5a3a353026e20b9bd35da19626fb3f5c2d4ca31026e3139bd1a60ab0106d4f40",
+    "structural_sampling_file_sha256": "3b924229512146636a861c7ea1c372a64863004dcb895bf4f34fd88a0005b9a9",
+    "tokenizer_census_sha256": "0f068e218e995b5815950d26feca83425dd7e5a5c8793c4dd05cb0b098359a65",
+    "training_execution_view_sha256": "a5857e0a54378b2b3489c0032534f4dce10a5d9db85f5b958ff7ea38f2c193e6"
+  },
+  "clean_gpu_baseline": {
+    "artifact_sha256": "6c99e83b6587cdfd0cbbf770c6a760dce6359d7b33549cc943817c6bd3a5db9c",
+    "compute_processes": [],
+    "no_other_compute_processes": true,
+    "nvidia_smi_free_fraction": 0.9776312576312576,
+    "torch_mem_get_info_before_model_load": {
+      "free_bytes": 20812529664,
+      "total_bytes": 20989804544
+    }
+  },
+  "dataset_binding": {
+    "derived_optimizer_examples": 317554,
+    "manifest_sha256": "ff73265f882e975e339fd4238fc465e4dd733856c68a6032ad8e435ae73b8dc7",
+    "optimizer_view_sha256": "0ea4043628dda878ac574e1cde06dfe6bdf69bc602f12f7f83dcfd8e6d07f96d",
+    "package_root": "/workspace/qwen-lean/artifacts/dataset-v3/lean-proof-continuation-v3",
+    "records_sha256": "10f548fd824fd61edf894cf275d4035f9ef4f0f1860628cf1168e498e3d7dc96",
+    "test_membership_sha256": "6bb99ed9c476f8ad2dfe7111ecc7b4ec92fbdd6ef21d66ecfe9d71155fdffc19",
+    "test_theorems": 48,
+    "training_theorems": 178448,
+    "validation_membership_sha256": "0ec547ff16ce0091bc6f48f673585e4253158aef52cd9dc850d299394c6876fb",
+    "validation_theorems": 48
+  },
+  "execution_view": {
+    "affected_structural_bucket_counts": {
+      "deep": 51
+    },
+    "affected_task_kind_counts": {
+      "continuation": 34,
+      "whole": 17
+    },
+    "census_quarantine_identity_matched": true,
+    "dataset_v3_mutated": false,
+    "excluded_theorem_ids_sha256": "de29cd8b622e8ade85a7367e4af3b06158c6ea8ed15b46a08f09618a68098711",
+    "excluded_theorems": 17,
+    "execution_view_identity_sha256": "35b64132f85fd2b61de5f256d8aec379746eb2e1f4c4d03793dd8f18fc1ea9ca",
+    "independent_census_count": 51,
+    "independent_census_identity_sha256": "d570d7f4142da84142023a439ceedad6a0969cd5ff4392a9a007ee09306fb35a",
+    "maximum_eligible_example": {
+      "example_id": "1141226073fd63f32fdbea99bd5aaca7bffc949da42d68017ad4bf661ce2dcae",
+      "prompt_tokens": 15507,
+      "sequence_tokens": 15617,
+      "statement_id": "194f9a007f03c4b7851e11372cd82dfd098fb4149a89421dc0b443a4047ea7ce",
+      "structural_bucket": "deep",
+      "target_tokens_excluding_eos": 109,
+      "task_kind": "whole"
+    },
+    "maximum_sequence_tokens": 16384,
+    "quarantined_examples": 51,
+    "quarantined_examples_sha256": "881f38b612139ce5d46ecc3a7a4eedb4dac174b9b498ff1c2c90a97a82a8c00c",
+    "quarantined_unique_theorems": 17,
+    "retained_examples": 317503,
+    "retained_theorems": 178431,
+    "silent_drops": 0,
+    "truncated_examples": 0
+  },
+  "marker": "OBSERVED",
+  "model": {
+    "add_special_tokens": false,
+    "architecture_class": "Qwen3_5ForCausalLM",
+    "chat_template": null,
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "text_only": true,
+    "tokenizer_id": "Qwen/Qwen3.5-4B-Base",
+    "tokenizer_revision": "1001bb4d826a52d1f399e183466143f4da7b741b"
+  },
+  "near_maximum_preflight": {
+    "allocated_memory_headroom_bytes": 5573969920,
+    "artifact_sha256": "6bbd1e2d45eaa0ef992751867efa1d08b04cb0425ed94ded0c1a4b020cd2c71b",
+    "example": {
+      "configured_context_tokens": 16384,
+      "example_id": "1141226073fd63f32fdbea99bd5aaca7bffc949da42d68017ad4bf661ce2dcae",
+      "prompt_tokens": 15507,
+      "sequence_tokens": 15617,
+      "statement_id": "194f9a007f03c4b7851e11372cd82dfd098fb4149a89421dc0b443a4047ea7ce",
+      "target_tokens_excluding_eos": 109,
+      "task_kind": "whole",
+      "truncated_or_dropped": false
+    },
+    "forward_backward": {
+      "all_gradients_finite": true,
+      "all_trainable_gradients_present": true,
+      "gradient_norm_before_clipping": 4.993422031402588,
+      "loss": 1.070852518081665,
+      "loss_finite": true,
+      "optimizer_created": false,
+      "optimizer_update_run": false
+    },
+    "free_memory_observations_bytes": {
+      "after_backward": 4672847872,
+      "after_forward_and_loss": 7044726784,
+      "after_model_load": 16146366464,
+      "before_model_load": 20812529664
+    },
+    "minimum_allocated_memory_headroom_bytes": 1073741824,
+    "peak_cuda_allocated_bytes": 15415834624,
+    "peak_cuda_reserved_bytes": 16087252992,
+    "runtime": {
+      "activation_cpu_offload": false,
+      "activation_cpu_offload_min_sequence_tokens": 4096,
+      "allocated_memory_headroom_bytes": 5573969920,
+      "allocated_memory_headroom_gate_passed": true,
+      "cuda_allocator_config": "expandable_segments:True",
+      "cuda_device": "NVIDIA RTX 4000 Ada Generation",
+      "cuda_device_capability": [
+        8,
+        9
+      ],
+      "cuda_device_index": 0,
+      "cuda_device_total_memory_bytes": 20989804544,
+      "execution": "project-controlled-local-cuda",
+      "free_memory_observations_bytes": {
+        "after_backward": 4672847872,
+        "after_forward_and_loss": 7044726784,
+        "after_model_load": 16146366464,
+        "before_model_load": 20812529664
+      },
+      "full_attention_sdpa_backend": "FLASH_ATTENTION",
+      "gradient_checkpointing_use_reentrant": false,
+      "linear_attention_chunk_size": 32,
+      "lm_head_loss_chunk_tokens": 64,
+      "minimum_allocated_memory_headroom_bytes": 1073741824,
+      "mlp_sequence_chunk_tokens": 1024,
+      "packages": {
+        "accelerate": "1.14.0",
+        "bitsandbytes": "0.50.1",
+        "datasets": "5.0.1",
+        "flash-linear-attention": "0.5.2",
+        "huggingface-hub": "1.28.0",
+        "peft": "0.20.0",
+        "safetensors": "0.8.0",
+        "torch": "2.13.0",
+        "transformers": "5.15.1",
+        "trl": "1.10.0"
+      },
+      "peak_cuda_allocated_bytes": 15415834624,
+      "peak_cuda_reserved_bytes": 16087252992,
+      "python": "3.12.14",
+      "reserved_memory_headroom_bytes": 4902551552,
+      "torch_cuda_version": "13.0",
+      "wall_time_seconds": 36.20421015098691
+    }
+  },
+  "protocol": {
+    "adapter_training_started": false,
+    "base_canary_generation_started": true,
+    "optimizer_updates": 0,
+    "semantic_sealed_test_accessed": false
+  },
+  "schema_version": "generalist-v3-stage0-evidence-v1",
+  "status": "passed",
+  "structural_sampling": {
+    "multipliers": [
+      {
+        "bounded_multiplier": 0.75,
+        "eligible_incremental_examples": 0,
+        "eligible_theorems": 128960,
+        "eligible_whole_examples": 129929,
+        "expected_optimizer_mass_fraction": 0.5917572852321983,
+        "normalized_multiplier": 0.8187643002579587,
+        "pre_quarantine_theorems": 128960,
+        "raw_multiplier": 0.5881358419705619,
+        "raw_theorem_fraction": 0.7227443661695557,
+        "structural_bucket": "direct"
+      },
+      {
+        "bounded_multiplier": 1.241504769825944,
+        "eligible_incremental_examples": 45006,
+        "eligible_theorems": 28941,
+        "eligible_whole_examples": 29148,
+        "expected_optimizer_mass_fraction": 0.21983115977684287,
+        "normalized_multiplier": 1.3553330455112762,
+        "pre_quarantine_theorems": 28941,
+        "raw_multiplier": 1.241504769825944,
+        "raw_theorem_fraction": 0.16219715184020714,
+        "structural_bucket": "multi-step"
+      },
+      {
+        "bounded_multiplier": 1.5,
+        "eligible_incremental_examples": 2159,
+        "eligible_theorems": 1062,
+        "eligible_whole_examples": 1070,
+        "expected_optimizer_mass_fraction": 0.00974637464200674,
+        "normalized_multiplier": 1.6375286005159173,
+        "pre_quarantine_theorems": 1062,
+        "raw_multiplier": 6.481013120912989,
+        "raw_theorem_fraction": 0.0059518805588714965,
+        "structural_bucket": "branching"
+      },
+      {
+        "bounded_multiplier": 1.5,
+        "eligible_incremental_examples": 90628,
+        "eligible_theorems": 19468,
+        "eligible_whole_examples": 19563,
+        "expected_optimizer_mass_fraction": 0.17866518034895218,
+        "normalized_multiplier": 1.6375286005159173,
+        "pre_quarantine_theorems": 19485,
+        "raw_multiplier": 1.5137163096017652,
+        "raw_theorem_fraction": 0.10910660143136562,
+        "structural_bucket": "deep"
+      }
+    ],
+    "post_quarantine_bucket_counts": {
+      "branching": 1062,
+      "deep": 19468,
+      "direct": 128960,
+      "multi-step": 28941
+    },
+    "pre_quarantine_bucket_counts": {
+      "branching": 1062,
+      "deep": 19485,
+      "direct": 128960,
+      "multi-step": 28941
+    },
+    "structural_sampling_sha256": "8c950d4883128500fb7a73c7c984cede61f949b241416028f9e75ef6ca968623",
+    "theorem_to_bucket_mapping_sha256": "04c80971c00bcba17449553ce70ad71a61a55d59155a1fb08eda9d856b89eda6"
+  },
+  "training_stream": {
+    "canonical_rows_sha256": "9c632a0df2354dc791f359abac5f298d84fdff9a4068c7f0b194e1f9f437c63c",
+    "gzip_file_sha256": "c5c939a23d8e0c5aee4eef9c658b969c4677732a72e0db41a415241d34861010",
+    "kind_counts": {
+      "continuation": 12983,
+      "whole": 51017
+    },
+    "manifest_sha256": "f2fdbdc991f1a552fe5dd4d1536da8fee640d9907ad273c5d901e8a7077dbb03",
+    "microbatches": 64000,
+    "optimizer_steps": 8000,
+    "structural_bucket_counts": {
+      "branching": 654,
+      "deep": 11310,
+      "direct": 37913,
+      "multi-step": 14123
+    },
+    "structural_distribution_agreement": {
+      "branching": {
+        "absolute_difference": 0.0004723753579932606,
+        "expected_fraction": 0.00974637464200674,
+        "observed_fraction": 0.01021875,
+        "ordinary_finite_sample_limit": 0.005,
+        "passed": true
+      },
+      "deep": {
+        "absolute_difference": 0.0019464303489521717,
+        "expected_fraction": 0.17866518034895218,
+        "observed_fraction": 0.17671875,
+        "ordinary_finite_sample_limit": 0.00908534328987648,
+        "passed": true
+      },
+      "direct": {
+        "absolute_difference": 0.0006333397678016661,
+        "expected_fraction": 0.5917572852321983,
+        "observed_fraction": 0.592390625,
+        "ordinary_finite_sample_limit": 0.011657147500196374,
+        "passed": true
+      },
+      "multi-step": {
+        "absolute_difference": 0.0008407152231571235,
+        "expected_fraction": 0.21983115977684287,
+        "observed_fraction": 0.220671875,
+        "ordinary_finite_sample_limit": 0.009822005869195264,
+        "passed": true
+      }
+    }
+  }
+}

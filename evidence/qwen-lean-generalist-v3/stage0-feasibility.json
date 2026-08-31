@@ -1,0 +1,92 @@
+{
+  "schema_version": "generalist-v3-stage0-feasibility-v1",
+  "status": "design-return-required",
+  "dataset_binding": {
+    "accepted_merge_commit": "17fa650412d211405e23c1ca3f7765b6c2a94032",
+    "manifest_sha256": "ff73265f882e975e339fd4238fc465e4dd733856c68a6032ad8e435ae73b8dc7",
+    "records_sha256": "10f548fd824fd61edf894cf275d4035f9ef4f0f1860628cf1168e498e3d7dc96",
+    "optimizer_view_sha256": "0ea4043628dda878ac574e1cde06dfe6bdf69bc602f12f7f83dcfd8e6d07f96d",
+    "training_theorems": 178448,
+    "derived_optimizer_examples": 317554,
+    "validation_theorems": 48,
+    "test_theorems": 48
+  },
+  "tokenizer_census": {
+    "model_id": "Qwen/Qwen3.5-4B-Base",
+    "model_revision": "1001bb4d826a52d1f399e183466143f4da7b741b",
+    "add_special_tokens": false,
+    "terminal_eos_tokens": 1,
+    "context_bucket_counts": {
+      "4096": 317265,
+      "8192": 117,
+      "16384": 121,
+      "32768": 33,
+      "65536": 12,
+      "131072": 3,
+      "262144": 3
+    },
+    "maximum_example": {
+      "statement_id": "af80ead053cb0a0fd6984f85ed647a5814f8a0e6854ffce99821a5e281a1052b",
+      "example_id": "ccf0c48566e0a6669edb4478a443dfebe05ae2d1d40af5be35dcf8c3cf7edd7a",
+      "task_kind": "whole",
+      "prompt_tokens": 156938,
+      "target_tokens_excluding_eos": 95,
+      "sequence_tokens": 157034
+    },
+    "smallest_supported_no_truncation_context_tokens": 262144,
+    "truncated_or_dropped": 0
+  },
+  "near_maximum_preflight": {
+    "command": "PYTHONPATH=src PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True <isolated-generalist-python> tools/qwen35_v3.py preflight",
+    "optimizer_created": false,
+    "optimizer_updates": 0,
+    "forward_completed": false,
+    "backward_completed": false,
+    "failure": {
+      "category": "cuda-out-of-memory",
+      "stage": "decoder-layer-0 Gated DeltaNet in_proj_qkv LoRA output addition",
+      "requested_allocation_bytes_approx": 5143225958,
+      "requested_allocation_reported": "4.79 GiB",
+      "gpu_total_capacity_reported": "19.55 GiB",
+      "gpu_free_at_failure_reported": "4.69 GiB",
+      "process_gpu_use_reported": "14.85 GiB",
+      "pytorch_allocated_reported": "14.48 GiB",
+      "pytorch_reserved_unallocated_reported": "179.06 MiB"
+    }
+  },
+  "runtime": {
+    "execution": "project-controlled-local-cuda",
+    "gpu": "NVIDIA RTX 4000 Ada Generation",
+    "gpu_total_memory_mib": 20475,
+    "python": "3.12.14",
+    "packages": {
+      "accelerate": "1.14.0",
+      "bitsandbytes": "0.50.1",
+      "datasets": "5.0.1",
+      "flash-linear-attention": "0.5.2",
+      "peft": "0.20.0",
+      "torch": "2.13.0",
+      "transformers": "5.15.1",
+      "trl": "1.10.0"
+    }
+  },
+  "protocol": {
+    "base_canary_generation_started": false,
+    "adapter_training_started": false,
+    "optimizer_updates": 0,
+    "sealed_test_generation_or_verification_started": false,
+    "sealed_test_per_task_outcomes_inspected": false,
+    "sealed_test_aggregate_record_metadata_was_read_during_preflight_diagnostic": true,
+    "aggregate_metadata_influenced_hyperparameters_or_selection": false
+  },
+  "validation": {
+    "v3_and_verifier_focused_tests": "21 passed",
+    "python_compilation": "passed",
+    "full_repository_suite": "not claimed"
+  },
+  "conclusion": {
+    "marker": "BLOCKED",
+    "finding": "The frozen combination of all-example no-truncation, the accepted Qwen3.5 LoRA target set, and the default 20 GiB Ada lane is not executable with the validated QLoRA runtime. Continuing requires a material design decision about corpus membership/serialization, larger verified local hardware, or a new exact long-sequence execution mechanism.",
+    "model_quality_interpretation": "none; the failure occurred before Base canary generation or any optimizer update"
+  }
+}

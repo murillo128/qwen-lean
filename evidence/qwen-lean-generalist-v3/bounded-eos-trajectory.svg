@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="575" viewBox="0 0 1000 575">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.axis{stroke:#9ca3af;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}.line{fill:none;stroke-width:2.5}.point{stroke:#fff;stroke-width:1}</style>
+<text x="80.0" y="38" font-size="22" font-weight="700">Qwen-Lean v3 EOS finish fraction by interface</text>
+<text x="80.0" y="58.0" font-size="16" font-weight="700">whole EOS fraction</text>
+<line class="grid" x1="80.0" y1="240.00" x2="965.0" y2="240.00"/>
+<text x="70.0" y="244.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="197.50" x2="965.0" y2="197.50"/>
+<text x="70.0" y="201.50" font-size="11" text-anchor="end">0.2363</text>
+<line class="grid" x1="80.0" y1="155.00" x2="965.0" y2="155.00"/>
+<text x="70.0" y="159.00" font-size="11" text-anchor="end">0.4725</text>
+<line class="grid" x1="80.0" y1="112.50" x2="965.0" y2="112.50"/>
+<text x="70.0" y="116.50" font-size="11" text-anchor="end">0.7087</text>
+<line class="grid" x1="80.0" y1="70.00" x2="965.0" y2="70.00"/>
+<text x="70.0" y="74.00" font-size="11" text-anchor="end">0.945</text>
+<line class="axis" x1="80.0" y1="240.0" x2="965.0" y2="240.0"/>
+<line class="axis" x1="80.0" y1="70.0" x2="80.0" y2="240.0"/>
+<text x="22.0" y="155.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 155.0)">EOS fraction</text>
+<text x="80.00" y="260.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="260.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="260.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="260.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,202.52 257.00,86.34 522.50,82.59 965.00,87.28"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="202.52" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="86.34" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="82.59" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="87.28" r="3.5"/>
+<line x1="605.0" y1="52.0" x2="627.0" y2="52.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="56.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,202.52 257.00,93.84 522.50,144.90 965.00,133.66"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="202.52" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="93.84" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="144.90" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="133.66" r="3.5"/>
+<line x1="695.0" y1="52.0" x2="717.0" y2="52.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="56.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,202.52 257.00,102.27 522.50,147.24 965.00,129.44"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="202.52" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="102.27" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="147.24" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="129.44" r="3.5"/>
+<line x1="785.0" y1="52.0" x2="807.0" y2="52.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="56.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,202.52 257.00,120.07 522.50,142.56 965.00,128.50"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="202.52" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="120.07" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="142.56" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="128.50" r="3.5"/>
+<line x1="875.0" y1="52.0" x2="897.0" y2="52.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="56.0" font-size="11">C3</text>
+<text x="522.5" y="278.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+<text x="80.0" y="303.0" font-size="16" font-weight="700">incremental EOS fraction</text>
+<line class="grid" x1="80.0" y1="485.00" x2="965.0" y2="485.00"/>
+<text x="70.0" y="489.00" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80.0" y1="442.50" x2="965.0" y2="442.50"/>
+<text x="70.0" y="446.50" font-size="11" text-anchor="end">0.2398</text>
+<line class="grid" x1="80.0" y1="400.00" x2="965.0" y2="400.00"/>
+<text x="70.0" y="404.00" font-size="11" text-anchor="end">0.4795</text>
+<line class="grid" x1="80.0" y1="357.50" x2="965.0" y2="357.50"/>
+<text x="70.0" y="361.50" font-size="11" text-anchor="end">0.7193</text>
+<line class="grid" x1="80.0" y1="315.00" x2="965.0" y2="315.00"/>
+<text x="70.0" y="319.00" font-size="11" text-anchor="end">0.9591</text>
+<line class="axis" x1="80.0" y1="485.0" x2="965.0" y2="485.0"/>
+<line class="axis" x1="80.0" y1="315.0" x2="80.0" y2="485.0"/>
+<text x="22.0" y="400.0" font-size="11" text-anchor="middle" transform="rotate(-90 22.0 400.0)">EOS fraction</text>
+<text x="80.00" y="505.0" font-size="11" text-anchor="middle">0</text>
+<text x="257.00" y="505.0" font-size="11" text-anchor="middle">100</text>
+<text x="522.50" y="505.0" font-size="11" text-anchor="middle">250</text>
+<text x="965.00" y="505.0" font-size="11" text-anchor="middle">500</text>
+<polyline class="line" stroke="#6b7280" points="80.00,424.07 257.00,343.29 522.50,335.90 965.00,327.59"/>
+<circle class="point" fill="#6b7280" cx="80.00" cy="424.07" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="257.00" cy="343.29" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="522.50" cy="335.90" r="3.5"/>
+<circle class="point" fill="#6b7280" cx="965.00" cy="327.59" r="3.5"/>
+<line x1="605.0" y1="297.0" x2="627.0" y2="297.0" stroke="#6b7280" stroke-width="3"/>
+<text x="633.0" y="301.0" font-size="11">C0</text>
+<polyline class="line" stroke="#2563eb" points="80.00,424.07 257.00,338.67 522.50,329.90 965.00,347.90"/>
+<circle class="point" fill="#2563eb" cx="80.00" cy="424.07" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="257.00" cy="338.67" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="522.50" cy="329.90" r="3.5"/>
+<circle class="point" fill="#2563eb" cx="965.00" cy="347.90" r="3.5"/>
+<line x1="695.0" y1="297.0" x2="717.0" y2="297.0" stroke="#2563eb" stroke-width="3"/>
+<text x="723.0" y="301.0" font-size="11">C1</text>
+<polyline class="line" stroke="#ea580c" points="80.00,424.07 257.00,347.90 522.50,337.75 965.00,335.90"/>
+<circle class="point" fill="#ea580c" cx="80.00" cy="424.07" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="257.00" cy="347.90" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="522.50" cy="337.75" r="3.5"/>
+<circle class="point" fill="#ea580c" cx="965.00" cy="335.90" r="3.5"/>
+<line x1="785.0" y1="297.0" x2="807.0" y2="297.0" stroke="#ea580c" stroke-width="3"/>
+<text x="813.0" y="301.0" font-size="11">C2</text>
+<polyline class="line" stroke="#16a34a" points="80.00,424.07 257.00,347.90 522.50,341.44 965.00,337.75"/>
+<circle class="point" fill="#16a34a" cx="80.00" cy="424.07" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="257.00" cy="347.90" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="522.50" cy="341.44" r="3.5"/>
+<circle class="point" fill="#16a34a" cx="965.00" cy="337.75" r="3.5"/>
+<line x1="875.0" y1="297.0" x2="897.0" y2="297.0" stroke="#16a34a" stroke-width="3"/>
+<text x="903.0" y="301.0" font-size="11">C3</text>
+<text x="522.5" y="523.0" font-size="11" text-anchor="middle">optimizer step (Base = 0)</text>
+</svg>

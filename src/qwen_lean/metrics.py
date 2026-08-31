@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import math
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from statistics import fmean
-from typing import Any, Iterable
+from typing import Any
 
-from .schema import CandidateResult, RESULT_CATEGORIES
+from .schema import RESULT_CATEGORIES, CandidateResult
 
 
 SUMMARY_SCHEMA_VERSION = "phase1-summary-v1"
@@ -83,6 +84,7 @@ def summarize_results(
 
     complete = not completeness_errors
     pass_metrics: dict[str, float] | None = None
+    solved_within_k: dict[str, int] | None = None
     if complete:
         pass_metrics = {
             f"pass@{k}": fmean(
@@ -92,6 +94,16 @@ def summarize_results(
                     k,
                 )
                 for item in per_task
+            )
+            for k in applicable_ks
+        }
+        solved_within_k = {
+            f"solved@{k}": sum(
+                any(
+                    result.category == "verified" and result.candidate_index < k
+                    for result in by_task[task_id]
+                )
+                for task_id in expected_task_ids
             )
             for k in applicable_ks
         }
@@ -124,6 +136,7 @@ def summarize_results(
             else 0.0,
         },
         "pass_at_k": pass_metrics,
+        "tasks_solved_within_k": solved_within_k,
         "category_counts": category_counts,
         "category_fractions": {
             category: count / candidate_count if candidate_count else 0.0
