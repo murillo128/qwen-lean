@@ -1,5 +1,5 @@
 {
-  "schema_version": "qwen35-full-context-forking-config-v2",
+  "schema_version": "qwen35-full-context-forking-config-v1",
   "counterfactual_config_path": "config/qwen35-counterfactual-forking.json",
   "reviewed_target": {
     "pr": 95,
@@ -47,28 +47,5 @@
     "great_majority_numerator": 5,
     "great_majority_denominator": 6,
     "state_dependent_means_any_exact_rate_difference": true
-  },
-  "hardware": {
-    "authorization": "active_project_local_gpu",
-    "cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
-    "nvml_device_name": "NVIDIA RTX 4000 Ada Generation",
-    "nvml_device_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
-    "nvml_memory_total_bytes": 21469593600
-  },
-  "superseded_audit": {
-    "reason": "authoritative_hardware_contract_correction_before_science",
-    "config_path": "config/qwen35-full-context-forking-superseded-rtx4070ti.json",
-    "config_file_sha256": "36ac92c984ae286d94c69bb7a585cdd0bc2416dec1989c43e7bedf06917574d5",
-    "calibration_path": "evidence/qwen35-full-context-forking/calibration.json",
-    "calibration_sha256": "3536cbb87a98a1b946f210c3c8b09e9ee8e85fa329ca6e62266836982f775197",
-    "selected_max_context_length": 64512,
-    "recorded_gpu_memory_total_bytes": 12878610432,
-    "calibration_review_path": "evidence/qwen35-full-context-forking/calibration-review.json",
-    "calibration_review_sha256": "5e426fabb6ef3d09654559b4eeccfc42c1242d8df77c82df739e8254d5fde951",
-    "attempt_recovery_path": "evidence/qwen35-full-context-forking/attempt-recovery.json",
-    "attempt_recovery_sha256": "6f0f2ef05ae10d5de8b2be90411f56bfdf43a45e0c8a1cd9ae95f549a26507d3",
-    "persisted_scientific_record_count": 0,
-    "active_authorization": false,
-    "transfer_attempt_state_to_active_requests": false
   }
 }

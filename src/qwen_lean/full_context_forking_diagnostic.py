@@ -53,16 +53,13 @@ from .native_thinking_assessment import (
 )
 from .verifier import LeanVerifier
 
-CONFIG_SCHEMA = "qwen35-full-context-forking-config-v2"
-SUPERSEDED_CONFIG_SCHEMA = "qwen35-full-context-forking-config-v1"
+CONFIG_SCHEMA = "qwen35-full-context-forking-config-v1"
 CALIBRATION_PROBE_SCHEMA = "qwen35-full-context-calibration-probe-v1"
 CALIBRATION_EVENT_SCHEMA = "qwen35-full-context-calibration-event-v1"
-CALIBRATION_EVIDENCE_SCHEMA = "qwen35-full-context-calibration-v2"
-SUPERSEDED_CALIBRATION_EVIDENCE_SCHEMA = "qwen35-full-context-calibration-v1"
+CALIBRATION_EVIDENCE_SCHEMA = "qwen35-full-context-calibration-v1"
 CHECKPOINT_REVIEW_SCHEMA = "qwen35-full-context-calibration-review-v1"
 GENERATION_SEGMENT_SCHEMA = "qwen35-full-context-generation-segment-v1"
 BRANCH_ATTEMPT_SCHEMA = "qwen35-full-context-branch-attempt-v1"
-ATTEMPT_RECOVERY_SCHEMA = "qwen35-full-context-attempt-recovery-v1"
 FINAL_EVIDENCE_SCHEMA = "qwen35-full-context-forking-results-v1"
 REVIEWED_TARGET_COMMIT = "6f6838041ef517518d3fcfa68889ea2988074c83"
 HANDOFF_COMMIT = "bcd72d5203d82e27d50e42ec6d2d2afa061c2504"
@@ -77,32 +74,6 @@ SCIENTIFIC_SEEDS = tuple(range(100, 106))
 KNOWN_CONTEXT_LENGTH = 24_576
 NATIVE_CONTEXT_LENGTH = 262_144
 GPU_MEMORY_UTILIZATION = 0.89
-ACTIVE_GPU_NAME = "NVIDIA RTX 4000 Ada Generation"
-ACTIVE_GPU_UUID = "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2"
-ACTIVE_GPU_MEMORY_TOTAL_BYTES = 21_469_593_600
-SUPERSEDED_CONFIG_FILE_SHA256 = (
-    "36ac92c984ae286d94c69bb7a585cdd0bc2416dec1989c43e7bedf06917574d5"
-)
-SUPERSEDED_CALIBRATION_SHA256 = (
-    "3536cbb87a98a1b946f210c3c8b09e9ee8e85fa329ca6e62266836982f775197"
-)
-SUPERSEDED_REVIEW_SHA256 = (
-    "5e426fabb6ef3d09654559b4eeccfc42c1242d8df77c82df739e8254d5fde951"
-)
-SUPERSEDED_RECOVERY_SHA256 = (
-    "6f0f2ef05ae10d5de8b2be90411f56bfdf43a45e0c8a1cd9ae95f549a26507d3"
-)
-TRANSITION_REVIEW_COMMENT_ID = 5_454_413_666
-TRANSITION_REVIEWED_COMMIT = "b100c4b7da4a180298afd139f1a568135c45e266"
-TRANSITION_REVIEW_URL = (
-    "https://github.com/murillo128/qwen-lean/pull/99#issuecomment-5454413666"
-)
-TRANSITION_REVIEW_BODY_SHA256 = (
-    "b18bfa0551abb6f1845c429d1bb302c05c2957aaddb106a2cb13814b41b8cc89"
-)
-TRANSITION_REVIEW_EVIDENCE_SHA256 = (
-    "5e426fabb6ef3d09654559b4eeccfc42c1242d8df77c82df739e8254d5fde951"
-)
 
 
 @dataclass(frozen=True)
@@ -148,18 +119,10 @@ class FullContextForkingConfig:
     def classification(self) -> dict[str, Any]:
         return self.value["classification"]
 
-    @property
-    def hardware(self) -> dict[str, Any]:
-        return self.value.get("hardware", {})
 
-    @property
-    def is_active(self) -> bool:
-        return self.value.get("schema_version") == CONFIG_SCHEMA
-
-
-def _expected_full_context_config(*, active: bool) -> dict[str, Any]:
-    expected: dict[str, Any] = {
-        "schema_version": CONFIG_SCHEMA if active else SUPERSEDED_CONFIG_SCHEMA,
+def validate_full_context_config(config: FullContextForkingConfig) -> None:
+    expected = {
+        "schema_version": CONFIG_SCHEMA,
         "counterfactual_config_path": "config/qwen35-counterfactual-forking.json",
         "reviewed_target": {
             "pr": 95,
@@ -211,71 +174,13 @@ def _expected_full_context_config(*, active: bool) -> dict[str, Any]:
             "state_dependent_means_any_exact_rate_difference": True,
         },
     }
-    if active:
-        expected["hardware"] = {
-            "authorization": "active_project_local_gpu",
-            "cuda_device_name": ACTIVE_GPU_NAME,
-            "nvml_device_name": ACTIVE_GPU_NAME,
-            "nvml_device_uuid": ACTIVE_GPU_UUID,
-            "nvml_memory_total_bytes": ACTIVE_GPU_MEMORY_TOTAL_BYTES,
-        }
-        expected["superseded_audit"] = {
-            "reason": "authoritative_hardware_contract_correction_before_science",
-            "config_path": (
-                "config/qwen35-full-context-forking-superseded-rtx4070ti.json"
-            ),
-            "config_file_sha256": SUPERSEDED_CONFIG_FILE_SHA256,
-            "calibration_path": (
-                "evidence/qwen35-full-context-forking/calibration.json"
-            ),
-            "calibration_sha256": SUPERSEDED_CALIBRATION_SHA256,
-            "selected_max_context_length": 64_512,
-            "recorded_gpu_memory_total_bytes": 12_878_610_432,
-            "calibration_review_path": (
-                "evidence/qwen35-full-context-forking/calibration-review.json"
-            ),
-            "calibration_review_sha256": SUPERSEDED_REVIEW_SHA256,
-            "attempt_recovery_path": (
-                "evidence/qwen35-full-context-forking/attempt-recovery.json"
-            ),
-            "attempt_recovery_sha256": SUPERSEDED_RECOVERY_SHA256,
-            "persisted_scientific_record_count": 0,
-            "active_authorization": False,
-            "transfer_attempt_state_to_active_requests": False,
-        }
-    return expected
-
-
-def validate_full_context_config(config: FullContextForkingConfig) -> None:
-    active = _expected_full_context_config(active=True)
-    superseded = _expected_full_context_config(active=False)
-    if config.value not in (active, superseded):
+    if config.value != expected:
         raise ValueError("full-context diagnostic config differs from issue #98")
-    if not config.is_active and config.path.name != (
-        "qwen35-full-context-forking-superseded-rtx4070ti.json"
-    ):
-        raise ValueError("superseded full-context config is audit-only")
-    if config.is_active:
-        audit = config.value["superseded_audit"]
-        for path_key, sha_key in (
-            ("config_path", "config_file_sha256"),
-            ("calibration_path", "calibration_sha256"),
-            ("calibration_review_path", "calibration_review_sha256"),
-            ("attempt_recovery_path", "attempt_recovery_sha256"),
-        ):
-            path = config.repository_root / str(audit[path_key])
-            if not path.is_file() or _file_sha256(path) != audit[sha_key]:
-                raise ValueError(f"superseded audit binding changed: {path_key}")
     if _file_sha256(
         config.repository_root
         / str(config.reviewed_target["counterfactual_results_path"])
     ) != str(config.reviewed_target["counterfactual_results_sha256"]):
         raise ValueError("reviewed issue-92 compact results changed")
-
-
-def _require_active_authority(config: FullContextForkingConfig) -> None:
-    if not config.is_active:
-        raise RuntimeError("superseded full-context configuration is audit-only")
 
 
 def full_context_config_sha256(config: FullContextForkingConfig) -> str:
@@ -309,64 +214,20 @@ def _target_parent(
     return parent, integrity
 
 
-def _nvml_memory_snapshot(device_index: int) -> dict[str, Any]:
+def _nvml_memory_snapshot(device_index: int) -> dict[str, int]:
     import pynvml
 
     pynvml.nvmlInit()
     try:
         handle = pynvml.nvmlDeviceGetHandleByIndex(device_index)
         info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-        raw_name = pynvml.nvmlDeviceGetName(handle)
-        raw_uuid = pynvml.nvmlDeviceGetUUID(handle)
         return {
-            "gpu_name": (
-                raw_name.decode("utf-8")
-                if isinstance(raw_name, bytes)
-                else str(raw_name)
-            ),
-            "gpu_uuid": (
-                raw_uuid.decode("utf-8")
-                if isinstance(raw_uuid, bytes)
-                else str(raw_uuid)
-            ),
             "gpu_memory_total_bytes": int(info.total),
             "gpu_memory_free_bytes": int(info.free),
             "gpu_memory_used_bytes": int(info.used),
         }
     finally:
         pynvml.nvmlShutdown()
-
-
-def _bind_active_runtime_hardware(
-    config: FullContextForkingConfig,
-    runtime: Mapping[str, Any],
-    snapshot: Mapping[str, Any],
-) -> dict[str, Any]:
-    _require_active_authority(config)
-    expected = config.hardware
-    observed = {
-        "cuda_device_name": str(runtime.get("cuda_device", "")),
-        "nvml_device_name": str(snapshot.get("gpu_name", "")),
-        "nvml_device_uuid": str(snapshot.get("gpu_uuid", "")),
-        "nvml_memory_total_bytes": int(
-            snapshot.get("gpu_memory_total_bytes", -1)
-        ),
-    }
-    expected_identity = {
-        key: expected[key]
-        for key in (
-            "cuda_device_name",
-            "nvml_device_name",
-            "nvml_device_uuid",
-            "nvml_memory_total_bytes",
-        )
-    }
-    if observed != expected_identity:
-        raise RuntimeError(
-            "full-context execution requires the exact active RTX 4000 Ada "
-            f"hardware binding {expected_identity}, got {observed}"
-        )
-    return {**observed, "status": "matched_active_authority"}
 
 
 def _calibration_engine_args(
@@ -483,7 +344,6 @@ def run_calibration_probe(
     seed: int,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
-    _require_active_authority(config)
     if not KNOWN_CONTEXT_LENGTH <= context_length <= NATIVE_CONTEXT_LENGTH:
         raise ValueError("calibration context length is outside the frozen bounds")
     _configure_fork_runtime()
@@ -503,9 +363,6 @@ def run_calibration_probe(
     _assert_no_other_compute_process(device_index)
     versions = _validated_package_versions()
     before = _nvml_memory_snapshot(device_index)
-    runtime["active_hardware_binding"] = _bind_active_runtime_hardware(
-        config, runtime, before
-    )
     monitor = _GpuMemoryMonitor(device_index, required=True)
     monitor.start()
     started = time.perf_counter()
@@ -739,8 +596,6 @@ def _compact_calibration_evidence(
                         "returncode",
                         "engine_initialized_and_real_continuation_finished",
                         "gpu_memory_total_bytes",
-                        "gpu_name",
-                        "gpu_uuid",
                         "gpu_memory_free_before_bytes",
                         "gpu_memory_peak_bytes",
                         "gpu_memory_peak_delta_bytes",
@@ -758,8 +613,6 @@ def _compact_calibration_evidence(
         "config_sha256": full_context_config_sha256(config),
         "reviewed_target": config.reviewed_target,
         "diagnostic_target": config.diagnostic_target,
-        "hardware_authorization": config.hardware,
-        "superseded_audit": config.value["superseded_audit"],
         "calibration_method": {
             "search": "progressive_then_binary_refinement",
             "known_reviewed_context_length": KNOWN_CONTEXT_LENGTH,
@@ -802,7 +655,6 @@ def run_context_calibration(
     *,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
-    _require_active_authority(config)
     artifact_dir.mkdir(parents=True, exist_ok=True)
     probes_dir = artifact_dir / "calibration-probes"
     probes_dir.mkdir(parents=True, exist_ok=True)
@@ -892,8 +744,6 @@ def run_context_calibration(
             "returncode": completed_process.returncode,
             "engine_initialized_and_real_continuation_finished": passed,
             "gpu_memory_total_bytes": memory_before.get("gpu_memory_total_bytes"),
-            "gpu_name": memory_before.get("gpu_name"),
-            "gpu_uuid": memory_before.get("gpu_uuid"),
             "gpu_memory_free_before_bytes": memory_before.get("gpu_memory_free_bytes"),
             "gpu_memory_peak_bytes": memory_observed.get("gpu_memory_peak_bytes"),
             "gpu_memory_peak_delta_bytes": memory_observed.get(
@@ -928,20 +778,10 @@ def run_context_calibration(
 
 
 def _load_calibration_evidence(
-    config: FullContextForkingConfig,
-    path: Path,
-    *,
-    allow_superseded_audit: bool = False,
+    config: FullContextForkingConfig, path: Path
 ) -> dict[str, Any]:
-    if not config.is_active and not allow_superseded_audit:
-        _require_active_authority(config)
     evidence = json.loads(path.read_text(encoding="utf-8"))
-    expected_schema = (
-        CALIBRATION_EVIDENCE_SCHEMA
-        if config.is_active
-        else SUPERSEDED_CALIBRATION_EVIDENCE_SCHEMA
-    )
-    if evidence.get("schema_version") != expected_schema:
+    if evidence.get("schema_version") != CALIBRATION_EVIDENCE_SCHEMA:
         raise ValueError("unknown calibration evidence schema")
     if evidence.get("status") != "passed":
         raise ValueError("context calibration did not pass")
@@ -953,29 +793,6 @@ def _load_calibration_evidence(
     required = int(config.calibration["required_successes_at_selected_length"])
     if int(evidence.get("selected_length_success_count", 0)) < required:
         raise ValueError("selected context lacks repeat confirmation")
-    if not config.is_active:
-        return evidence
-    if evidence.get("hardware_authorization") != config.hardware:
-        raise ValueError("calibration hardware authorization changed")
-    attempts = evidence.get("attempts")
-    if not isinstance(attempts, list) or not attempts:
-        raise ValueError("calibration evidence lacks hardware-bound attempts")
-    for attempt in attempts:
-        observed = {
-            "nvml_device_name": attempt.get("gpu_name"),
-            "nvml_device_uuid": attempt.get("gpu_uuid"),
-            "nvml_memory_total_bytes": attempt.get("gpu_memory_total_bytes"),
-        }
-        expected = {
-            key: config.hardware[key]
-            for key in (
-                "nvml_device_name",
-                "nvml_device_uuid",
-                "nvml_memory_total_bytes",
-            )
-        }
-        if observed != expected:
-            raise ValueError("calibration attempt hardware identity changed")
     return evidence
 
 
@@ -997,147 +814,6 @@ def _validate_checkpoint_review(
     if not review.get("published_review_url"):
         raise ValueError("checkpoint review was not published")
     return review
-
-
-def _validate_scientific_runtime_hardware(
-    config: FullContextForkingConfig,
-    runtime: Mapping[str, Any],
-    calibration: Mapping[str, Any],
-) -> dict[str, Any]:
-    """Fail closed unless generation uses the exact actively calibrated GPU."""
-    _require_active_authority(config)
-    attempts = calibration.get("attempts")
-    if not isinstance(attempts, list) or not attempts:
-        raise ValueError("calibration evidence lacks hardware-bound attempts")
-    calibrated_totals = {
-        int(attempt["gpu_memory_total_bytes"])
-        for attempt in attempts
-        if isinstance(attempt, dict)
-        and attempt.get("gpu_memory_total_bytes") is not None
-    }
-    if len(calibrated_totals) != 1:
-        raise ValueError("calibration evidence has ambiguous GPU memory identity")
-    calibrated_total = calibrated_totals.pop()
-    snapshot = {
-        "gpu_name": runtime.get("nvml_gpu_name"),
-        "gpu_uuid": runtime.get("nvml_gpu_uuid"),
-        "gpu_memory_total_bytes": runtime.get("nvml_gpu_memory_total_bytes"),
-    }
-    binding = _bind_active_runtime_hardware(config, runtime, snapshot)
-    if calibrated_total != binding["nvml_memory_total_bytes"]:
-        raise RuntimeError(
-            "scientific GPU memory differs from the active calibration attempts"
-        )
-    return binding
-
-
-def _expected_attempt_recovery(
-    config: FullContextForkingConfig,
-    calibration_evidence_path: Path,
-    checkpoint_review_path: Path,
-    expected_requests: Sequence[ForkRequest],
-) -> dict[str, Any]:
-    calibration = _load_calibration_evidence(
-        config,
-        calibration_evidence_path,
-        allow_superseded_audit=True,
-    )
-    review = _validate_checkpoint_review(
-        calibration_evidence_path, checkpoint_review_path
-    )
-    expected_review_fields = {
-        "reviewed_commit": TRANSITION_REVIEWED_COMMIT,
-        "reviewed_base_commit": REVIEWED_TARGET_COMMIT,
-        "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
-        "selected_max_context_length": 64_512,
-        "safe_to_progress_to_scientific_branches": True,
-        "published_review_url": TRANSITION_REVIEW_URL,
-    }
-    for field, value in expected_review_fields.items():
-        if review.get(field) != value:
-            raise ValueError(f"transition review binding changed: {field}")
-    if _file_sha256(checkpoint_review_path) != TRANSITION_REVIEW_EVIDENCE_SHA256:
-        raise ValueError("transition review evidence bytes changed")
-    targets = [
-        request
-        for request in expected_requests
-        if request.state.label == "P0" and request.seed == 100
-    ]
-    if len(targets) != 1:
-        raise ValueError("retry recovery target is not exactly P0/seed-100")
-    target = targets[0]
-    return {
-        "schema_version": ATTEMPT_RECOVERY_SCHEMA,
-        "status": "accepted_published_review_recovery",
-        "scope": {
-            "branch_id": target.branch_id,
-            "parent_candidate_id": target.parent.handoff["candidate_id"],
-            "workload": target.parent.task.workload,
-            "task_id": target.parent.task.task_id,
-            "fork_state": target.state.label,
-            "fork_fraction": target.state.fraction,
-            "fork_prefix_len": target.state.prefix_len,
-            "branch_seed": target.seed,
-            "max_new_tokens": target.max_tokens,
-            "fork_generation_config_sha256": target.generation_config_sha256,
-        },
-        "attempt_recovery": {
-            "failed_attempt_index": 0,
-            "failed_attempt_terminal_status": "failed",
-            "next_attempt_index": 1,
-            "persisted_scientific_record_count_at_review": 0,
-            "raw_journal_recovered": False,
-            "mechanism": "published_independent_transition_review",
-        },
-        "authority": {
-            "review_schema_version": review["schema_version"],
-            "review_verdict": review["verdict"],
-            "reviewed_commit": TRANSITION_REVIEWED_COMMIT,
-            "reviewed_base_commit": review["reviewed_base_commit"],
-            "published_review_comment_id": TRANSITION_REVIEW_COMMENT_ID,
-            "published_review_url": TRANSITION_REVIEW_URL,
-            "published_review_author": "murillo128",
-            "published_review_created_at": "2026-08-28T15:27:32Z",
-            "published_review_updated_at": "2026-08-28T15:27:32Z",
-            "published_review_body_sha256": TRANSITION_REVIEW_BODY_SHA256,
-        },
-        "bindings": {
-            "full_context_config_file_sha256": _file_sha256(config.path),
-            "full_context_config_sha256": full_context_config_sha256(config),
-            "calibration_evidence_path": str(
-                calibration_evidence_path.resolve().relative_to(config.repository_root)
-            ),
-            "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
-            "calibration_review_path": str(
-                checkpoint_review_path.resolve().relative_to(config.repository_root)
-            ),
-            "calibration_review_sha256": TRANSITION_REVIEW_EVIDENCE_SHA256,
-            "counterfactual_results_sha256": COUNTERFACTUAL_RESULTS_SHA256,
-            "selected_max_context_length": calibration["selected_max_context_length"],
-            "expected_branch_count": len(expected_requests),
-        },
-    }
-
-
-def _load_attempt_recovery(
-    config: FullContextForkingConfig,
-    calibration_evidence_path: Path,
-    checkpoint_review_path: Path,
-    recovery_path: Path,
-    expected_requests: Sequence[ForkRequest],
-) -> dict[str, Any]:
-    recovery = json.loads(recovery_path.read_text(encoding="utf-8"))
-    expected = _expected_attempt_recovery(
-        config,
-        calibration_evidence_path,
-        checkpoint_review_path,
-        expected_requests,
-    )
-    if recovery != expected:
-        raise ValueError(
-            "attempt-recovery checkpoint differs from reviewed P0/100 state"
-        )
-    return recovery
 
 
 def _scientific_generation_hash(
@@ -1343,226 +1019,16 @@ def load_full_context_generation_records(
     ]
 
 
-def _attempt_recovery_disclosure(
-    recovery_path: Path, recovery: Mapping[str, Any]
-) -> dict[str, Any]:
-    scope = recovery["scope"]
-    attempt = recovery["attempt_recovery"]
-    authority = recovery["authority"]
-    return {
-        "schema_version": BRANCH_ATTEMPT_SCHEMA,
-        "event": "recovery_checkpoint_applied",
-        "branch_id": scope["branch_id"],
-        "fork_state": scope["fork_state"],
-        "branch_seed": scope["branch_seed"],
-        "failed_attempt_index": attempt["failed_attempt_index"],
-        "next_attempt_index": attempt["next_attempt_index"],
-        "persisted_scientific_record_count_at_review": attempt[
-            "persisted_scientific_record_count_at_review"
-        ],
-        "raw_journal_recovered": attempt["raw_journal_recovered"],
-        "attempt_recovery_evidence_sha256": _file_sha256(recovery_path),
-        "reviewed_commit": authority["reviewed_commit"],
-        "published_review_url": authority["published_review_url"],
-    }
-
-
-def _prepare_attempt_recovery(
-    attempt_path: Path,
-    recovery_path: Path,
-    recovery: Mapping[str, Any],
-    *,
-    persisted_branch_ids: Sequence[str],
-) -> tuple[dict[str, Any], dict[str, int]]:
-    disclosure = _attempt_recovery_disclosure(recovery_path, recovery)
-    branch_id = str(disclosure["branch_id"])
-    next_attempt_index = int(disclosure["next_attempt_index"])
-    provenance = {
-        "mode": "published_review_checkpoint",
-        "branch_id": branch_id,
-        "failed_attempt_index": int(disclosure["failed_attempt_index"]),
-        "next_attempt_index": next_attempt_index,
-        "raw_journal_recovered": False,
-        "attempt_recovery_evidence_sha256": disclosure[
-            "attempt_recovery_evidence_sha256"
-        ],
-        "reviewed_commit": disclosure["reviewed_commit"],
-        "published_review_url": disclosure["published_review_url"],
-    }
-    if not attempt_path.exists():
-        if persisted_branch_ids:
-            raise ValueError(
-                "attempt-recovery checkpoint cannot accompany unjournaled "
-                "scientific records"
-            )
-        _append_jsonl(attempt_path, disclosure)
-        return provenance, {branch_id: next_attempt_index}
-
-    events = [json.loads(line) for line in _restart_safe_jsonl_lines(attempt_path)]
-    disclosures = [
-        event for event in events if event.get("event") == "recovery_checkpoint_applied"
-    ]
-    if disclosures:
-        if len(disclosures) != 1 or disclosures[0] != disclosure:
-            raise ValueError("attempt-recovery disclosure conflicts with checkpoint")
-        if events[0] != disclosure:
-            raise ValueError(
-                "attempt-recovery disclosure is not the first journal event"
-            )
-        journaled_persisted_ids = sorted(
-            str(event["branch_id"])
-            for event in events
-            if event.get("event") == "persisted"
-        )
-        if journaled_persisted_ids != sorted(persisted_branch_ids):
-            raise ValueError(
-                "persisted scientific records conflict with recovery journal"
-            )
-        return provenance, {branch_id: next_attempt_index}
-
-    # A genuinely recovered original raw journal takes precedence over the
-    # compact checkpoint.  It must independently contain exactly the failed
-    # attempt reviewed at b100c4b7; no synthetic attempt-0 event is accepted.
-    target_events = [
-        event for event in events if str(event.get("branch_id")) == branch_id
-    ]
-    starts = [
-        event
-        for event in target_events
-        if event.get("event") == "started" and event.get("attempt_index") == 0
-    ]
-    terminals = [
-        event
-        for event in target_events
-        if event.get("event") == "failed" and event.get("attempt_index") == 0
-    ]
-    persisted = [
-        event
-        for event in target_events
-        if event.get("event") == "persisted" and event.get("attempt_index") == 0
-    ]
-    if len(starts) != 1 or len(terminals) != 1 or persisted:
-        raise ValueError("raw attempt journal conflicts with reviewed P0/100 failure")
-    journaled_persisted_ids = sorted(
-        str(event["branch_id"]) for event in events if event.get("event") == "persisted"
-    )
-    if journaled_persisted_ids != sorted(persisted_branch_ids):
-        raise ValueError(
-            "persisted scientific records conflict with raw attempt journal"
-        )
-    return {
-        **provenance,
-        "mode": "recovered_original_raw_journal",
-        "raw_journal_recovered": True,
-    }, {}
-
-
-def _branch_attempt_counts(
-    path: Path,
-    expected_requests: Sequence[ForkRequest],
-    recovered_attempt_counts: Mapping[str, int] | None = None,
-    *,
-    attempt_recovery_provenance: Mapping[str, Any] | None = None,
-    persisted_record_hashes: Mapping[str, str] | None = None,
-) -> Counter[str]:
-    expected = {request.branch_id: request for request in expected_requests}
-    if len(expected) != len(expected_requests):
-        raise ValueError("duplicate expected branch identity")
-    record_hashes = dict(persisted_record_hashes or {})
-    counts: Counter[str] = Counter(recovered_attempt_counts or {})
+def _branch_attempt_counts(path: Path) -> Counter[str]:
+    counts: Counter[str] = Counter()
     if not path.exists():
         return counts
-    started: dict[tuple[str, int], dict[str, Any]] = {}
-    terminal: set[tuple[str, int]] = set()
     for line in _restart_safe_jsonl_lines(path):
         event = json.loads(line)
         if event.get("schema_version") != BRANCH_ATTEMPT_SCHEMA:
             raise ValueError("unknown branch-attempt schema")
-        event_kind = event.get("event")
-        if event_kind == "recovery_checkpoint_applied":
-            if attempt_recovery_provenance is None:
-                raise ValueError(
-                    "superseded attempt-recovery disclosure is not valid for "
-                    "active request identities"
-                )
-            continue
-        if event_kind not in {"started", "persisted", "failed", "interrupted"}:
-            raise ValueError("unknown branch-attempt event")
-        branch_id = str(event["branch_id"])
-        request = expected.get(branch_id)
-        if request is None:
-            raise ValueError(f"unknown branch-attempt identity: {branch_id}")
-        raw_attempt_index = event.get("attempt_index")
-        if (
-            not isinstance(raw_attempt_index, int)
-            or isinstance(raw_attempt_index, bool)
-            or raw_attempt_index < 0
-        ):
-            raise ValueError("invalid branch-attempt index")
-        attempt_index = raw_attempt_index
-        common = {
-            "schema_version": BRANCH_ATTEMPT_SCHEMA,
-            "branch_id": branch_id,
-            "attempt_index": attempt_index,
-            "fork_state": request.state.label,
-            "branch_seed": request.seed,
-            "max_tokens": request.max_tokens,
-        }
-        for field, value in common.items():
-            if event.get(field) != value:
-                raise ValueError(
-                    f"branch-attempt request binding changed: {branch_id} {field}"
-                )
-        expected_provenance: Mapping[str, Any] | None = None
-        if (
-            attempt_recovery_provenance is not None
-            and branch_id == attempt_recovery_provenance["branch_id"]
-            and attempt_index >= int(attempt_recovery_provenance["next_attempt_index"])
-        ):
-            expected_provenance = attempt_recovery_provenance
-        if expected_provenance is None:
-            if "attempt_recovery_provenance" in event:
-                raise ValueError("unexpected attempt-recovery provenance")
-        elif event.get("attempt_recovery_provenance") != expected_provenance:
-            raise ValueError("attempt-recovery provenance changed")
-        common_keys = {*common, "event"}
-        if expected_provenance is not None:
-            common_keys.add("attempt_recovery_provenance")
-        if event_kind == "started":
-            allowed_keys = common_keys
-        elif event_kind == "persisted":
-            allowed_keys = {*common_keys, "generation_record_sha256"}
-        else:
-            allowed_keys = {*common_keys, "error", "branch_gpu_memory"}
-        if set(event) != allowed_keys:
-            raise ValueError("branch-attempt event fields differ from schema")
-        key = (branch_id, attempt_index)
-        if event_kind == "started":
-            if attempt_index != counts[branch_id] or key in started:
-                raise ValueError(
-                    "branch-attempt sequence conflicts with recovery state"
-                )
-            started[key] = event
-            counts[branch_id] += 1
-        else:
-            if key not in started or key in terminal:
-                raise ValueError(
-                    "branch-attempt terminal event lacks one matching start"
-                )
-            started_event = started[key]
-            for field in common_keys - {"event"}:
-                if event[field] != started_event[field]:
-                    raise ValueError("branch-attempt terminal metadata changed")
-            if event_kind == "persisted":
-                expected_record_hash = record_hashes.get(branch_id)
-                if (
-                    expected_record_hash is None
-                    or event["generation_record_sha256"] != expected_record_hash
-                ):
-                    raise ValueError(
-                        "persisted attempt hash differs from durable generation"
-                    )
-            terminal.add(key)
+        if event.get("event") == "started":
+            counts[str(event["branch_id"])] += 1
     return counts
 
 
@@ -1570,32 +1036,22 @@ async def _run_full_context_branches(
     config: FullContextForkingConfig,
     tokenizer: Any,
     pending: Sequence[ForkRequest],
-    expected_requests: Sequence[ForkRequest],
     generation_path: Path,
     attempt_path: Path,
     snapshot_path: Path,
     *,
     selected_context_length: int,
     device_index: int,
-    attempt_recovery_provenance: Mapping[str, Any] | None,
-    recovered_attempt_counts: Mapping[str, int] | None,
-    persisted_record_hashes: Mapping[str, str],
 ) -> list[dict[str, Any]]:
     from vllm import SamplingParams
     from vllm.inputs import TokensPrompt
     from vllm.v1.engine.async_llm import AsyncLLM
 
-    attempt_counts = _branch_attempt_counts(
-        attempt_path,
-        expected_requests,
-        recovered_attempt_counts,
-        attempt_recovery_provenance=attempt_recovery_provenance,
-        persisted_record_hashes=persisted_record_hashes,
-    )
     engine = AsyncLLM.from_engine_args(
         _full_context_engine_args(config, snapshot_path, selected_context_length)
     )
     persisted: list[dict[str, Any]] = []
+    attempt_counts = _branch_attempt_counts(attempt_path)
     try:
         for request in pending:
             attempt_index = attempt_counts[request.branch_id]
@@ -1608,13 +1064,6 @@ async def _run_full_context_branches(
                 "branch_seed": request.seed,
                 "max_tokens": request.max_tokens,
             }
-            if (
-                attempt_recovery_provenance is not None
-                and request.branch_id == attempt_recovery_provenance["branch_id"]
-            ):
-                started_event["attempt_recovery_provenance"] = dict(
-                    attempt_recovery_provenance
-                )
             _append_jsonl(attempt_path, started_event)
             attempt_counts[request.branch_id] += 1
             monitor = _GpuMemoryMonitor(device_index, required=True)
@@ -1731,7 +1180,6 @@ def run_full_context_generation(
     *,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
-    _require_active_authority(config)
     calibration = _load_calibration_evidence(config, calibration_evidence_path)
     review = _validate_checkpoint_review(
         calibration_evidence_path, checkpoint_review_path
@@ -1754,34 +1202,20 @@ def run_full_context_generation(
         selected_context_length=selected,
         calibration_evidence_path=calibration_evidence_path,
     )
-    active_attempt_state = {
-        "status": "new_active_request_identities",
-        "initial_attempt_index": 0,
-        "superseded_attempt_state_transferred": False,
-    }
     artifact_dir.mkdir(parents=True, exist_ok=True)
     generation_path = artifact_dir / "generations.jsonl"
-    attempt_path = artifact_dir / "branch-attempts.jsonl"
     prior = load_full_context_generation_records(
         generation_path, expected, selected_context_length=selected
     )
     completed = {str(record["branch_id"]) for record in prior}
     pending = [request for request in expected if request.branch_id not in completed]
     if not pending:
-        _branch_attempt_counts(
-            attempt_path,
-            expected,
-            persisted_record_hashes={
-                str(record["branch_id"]): _sha256_json(record) for record in prior
-            },
-        )
         return {
             "status": "already_complete",
             "expected_branches": len(expected),
             "new_branches": 0,
             "selected_max_context_length": selected,
             "integrity": integrity,
-            "active_attempt_state": active_attempt_state,
         }
 
     _configure_fork_runtime()
@@ -1792,54 +1226,23 @@ def run_full_context_generation(
     runtime["selected_max_context_length"] = selected
     runtime["package_versions"] = _validated_package_versions()
     device_index = int(runtime["cuda_device_index"])
-    runtime_snapshot = _nvml_memory_snapshot(device_index)
-    runtime["nvml_gpu_name"] = runtime_snapshot["gpu_name"]
-    runtime["nvml_gpu_uuid"] = runtime_snapshot["gpu_uuid"]
-    runtime["nvml_gpu_memory_total_bytes"] = runtime_snapshot[
-        "gpu_memory_total_bytes"
-    ]
-    runtime["calibrated_hardware_binding"] = _validate_scientific_runtime_hardware(
-        config, runtime, calibration
-    )
     _assert_no_other_compute_process(device_index)
-    recovery_provenance = None
-    recovered_attempt_counts: dict[str, int] = {}
     started = time.perf_counter()
     status = "failed"
     error_text: str | None = None
     new_records: list[dict[str, Any]] = []
-    prior_record_hashes = {
-        str(record["branch_id"]): _sha256_json(record) for record in prior
-    }
     try:
         new_records = asyncio.run(
             _run_full_context_branches(
                 config,
                 tokenizer,
                 pending,
-                expected,
                 generation_path,
-                attempt_path,
+                artifact_dir / "branch-attempts.jsonl",
                 snapshot_path,
                 selected_context_length=selected,
                 device_index=device_index,
-                attempt_recovery_provenance=recovery_provenance,
-                recovered_attempt_counts=recovered_attempt_counts,
-                persisted_record_hashes=prior_record_hashes,
             )
-        )
-        _branch_attempt_counts(
-            attempt_path,
-            expected,
-            recovered_attempt_counts,
-            attempt_recovery_provenance=recovery_provenance,
-            persisted_record_hashes={
-                **prior_record_hashes,
-                **{
-                    str(record["branch_id"]): _sha256_json(record)
-                    for record in new_records
-                },
-            },
         )
         status = "completed"
     except BaseException as error:
@@ -1858,7 +1261,6 @@ def run_full_context_generation(
                 "selected_max_context_length": selected,
                 "calibration_evidence_sha256": _file_sha256(calibration_evidence_path),
                 "checkpoint_reviewed_commit": review["reviewed_commit"],
-                "active_attempt_state": active_attempt_state,
                 "runtime": runtime,
             },
         )
@@ -1868,7 +1270,6 @@ def run_full_context_generation(
         "new_branches": len(new_records),
         "selected_max_context_length": selected,
         "integrity": integrity,
-        "active_attempt_state": active_attempt_state,
         "runtime": runtime,
     }
 
@@ -1879,13 +1280,11 @@ def run_full_context_verification(
     parent_generations_path: Path,
     artifact_dir: Path,
     calibration_evidence_path: Path,
-    checkpoint_review_path: Path,
     *,
     project_roots: Mapping[str, Path],
     workers: int | None = None,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
-    _require_active_authority(config)
     calibration = _load_calibration_evidence(config, calibration_evidence_path)
     selected = int(calibration["selected_max_context_length"])
     snapshot_path = _resolve_model_snapshot(config.counterfactual.native)
@@ -1914,13 +1313,6 @@ def run_full_context_verification(
         raise RuntimeError(
             f"full-context generation is incomplete: {len(generations)}/{len(expected)}"
         )
-    _branch_attempt_counts(
-        artifact_dir / "branch-attempts.jsonl",
-        expected,
-        persisted_record_hashes={
-            str(record["branch_id"]): _sha256_json(record) for record in generations
-        },
-    )
     environment_tasks, _ = load_mathia_tasks(config.counterfactual.native, mathia_root)
     environments = validate_lean_environments(
         config.counterfactual.native, environment_tasks, project_roots
@@ -1942,10 +1334,6 @@ def run_full_context_verification(
             "new_verifications": 0,
             "integrity": integrity,
             "environments": environments,
-            "active_attempt_state": {
-                "initial_attempt_index": 0,
-                "superseded_attempt_state_transferred": False,
-            },
         }
     verifier = LeanVerifier(
         project_roots[TARGET_WORKLOAD],
@@ -1994,10 +1382,6 @@ def run_full_context_verification(
         "verification_wall_time_seconds": time.perf_counter() - started,
         "integrity": integrity,
         "environments": environments,
-        "active_attempt_state": {
-            "initial_attempt_index": 0,
-            "superseded_attempt_state_transferred": False,
-        },
     }
 
 
@@ -2005,7 +1389,6 @@ def _branch_attempt_summary(path: Path) -> dict[str, Any]:
     starts: Counter[str] = Counter()
     terminal: Counter[str] = Counter()
     status_counts: Counter[str] = Counter()
-    recovery_disclosures: list[dict[str, Any]] = []
     if path.exists():
         for line in _restart_safe_jsonl_lines(path):
             event = json.loads(line)
@@ -2013,48 +1396,26 @@ def _branch_attempt_summary(path: Path) -> dict[str, Any]:
                 raise ValueError("unknown branch-attempt schema")
             branch_id = str(event["branch_id"])
             event_kind = str(event["event"])
-            if event_kind == "recovery_checkpoint_applied":
-                recovery_disclosures.append(event)
-            elif event_kind == "started":
+            if event_kind == "started":
                 starts[branch_id] += 1
             elif event_kind in {"persisted", "failed", "interrupted"}:
                 terminal[branch_id] += 1
                 status_counts[event_kind] += 1
             else:
                 raise ValueError("unknown branch-attempt event")
-    if len(recovery_disclosures) > 1:
-        raise ValueError("multiple attempt-recovery disclosures")
     incomplete_starts = sum(
         max(0, starts[branch_id] - terminal[branch_id]) for branch_id in starts
     )
     retried_branch_ids = sorted(
-        branch_id
-        for branch_id, count in starts.items()
-        if count > 1
-        or (
-            count > 0
-            and any(
-                str(disclosure["branch_id"]) == branch_id
-                for disclosure in recovery_disclosures
-            )
-        )
-    )
-    recovered_failed_attempt_count = sum(
-        int(disclosure["next_attempt_index"]) - int(disclosure["failed_attempt_index"])
-        for disclosure in recovery_disclosures
+        branch_id for branch_id, count in starts.items() if count > 1
     )
     return {
         "started_attempt_count": sum(starts.values()),
-        "recovered_failed_attempt_count": recovered_failed_attempt_count,
-        "total_disclosed_attempt_count": sum(starts.values())
-        + recovered_failed_attempt_count,
         "terminal_attempt_count": sum(terminal.values()),
         "terminal_status_counts": dict(sorted(status_counts.items())),
         "incomplete_started_attempt_count": incomplete_starts,
         "retried_in_flight_branch_count": len(retried_branch_ids),
         "retried_in_flight_branch_ids_sha256": _sha256_json(retried_branch_ids),
-        "attempt_recovery_disclosure_count": len(recovery_disclosures),
-        "attempt_recovery_disclosure_sha256": _sha256_json(recovery_disclosures),
     }
 
 
@@ -2145,7 +1506,6 @@ def write_full_context_evidence(
     *,
     parent_release_package_path: Path | None = None,
 ) -> dict[str, Any]:
-    _require_active_authority(config)
     calibration = _load_calibration_evidence(config, calibration_evidence_path)
     checkpoint_review = _validate_checkpoint_review(
         calibration_evidence_path, checkpoint_review_path
@@ -2175,13 +1535,6 @@ def write_full_context_evidence(
     )
     if len(generations) != len(requests):
         raise RuntimeError("cannot write evidence from incomplete generation")
-    _branch_attempt_counts(
-        artifact_dir / "branch-attempts.jsonl",
-        requests,
-        persisted_record_hashes={
-            str(record["branch_id"]): _sha256_json(record) for record in generations
-        },
-    )
     verification_records = load_fork_verification_records(
         artifact_dir / "verifications.jsonl", requests
     )
@@ -2305,13 +1658,9 @@ def write_full_context_evidence(
             "raw_generations_sha256": generation_sha,
             "raw_verifications_sha256": verification_sha,
         },
-        "restart_safety": {
-            **_branch_attempt_summary(artifact_dir / "branch-attempts.jsonl"),
-            "active_request_attempt_state": {
-                "initial_attempt_index": 0,
-                "superseded_attempt_state_transferred": False,
-            },
-        },
+        "restart_safety": _branch_attempt_summary(
+            artifact_dir / "branch-attempts.jsonl"
+        ),
         "outcomes": {
             "nonempty_final_branch_count": sum(
                 1

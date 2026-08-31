@@ -10,48 +10,24 @@ from qwen_lean.counterfactual_forking_assessment import (
     fork_states,
 )
 from qwen_lean.full_context_forking_diagnostic import (
-    BRANCH_ATTEMPT_SCHEMA,
     CHECKPOINT_REVIEW_SCHEMA,
     COUNTERFACTUAL_RESULTS_SHA256,
     FullContextForkingConfig,
-    _branch_attempt_counts,
-    _branch_attempt_summary,
     _classify_outcome,
-    _load_calibration_evidence,
-    _load_attempt_recovery,
     _next_calibration_action,
-    _prepare_attempt_recovery,
-    _require_active_authority,
     _reasoning_transition_index,
     _validate_checkpoint_review,
-    _validate_scientific_runtime_hardware,
     full_context_requests,
 )
 from qwen_lean.native_thinking_assessment import MathiaTask, _file_sha256
 
+
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config/qwen35-full-context-forking.json"
-SUPERSEDED_CONFIG_PATH = (
-    ROOT / "config/qwen35-full-context-forking-superseded-rtx4070ti.json"
-)
-CALIBRATION_PATH = ROOT / "evidence/qwen35-full-context-forking/calibration.json"
-ACTIVE_CALIBRATION_PATH = (
-    ROOT / "evidence/qwen35-full-context-forking/calibration-rtx4000.json"
-)
-CALIBRATION_REVIEW_PATH = (
-    ROOT / "evidence/qwen35-full-context-forking/calibration-review.json"
-)
-ATTEMPT_RECOVERY_PATH = (
-    ROOT / "evidence/qwen35-full-context-forking/attempt-recovery.json"
-)
 
 
 def _config() -> FullContextForkingConfig:
     return FullContextForkingConfig.load(CONFIG_PATH)
-
-
-def _superseded_config() -> FullContextForkingConfig:
-    return FullContextForkingConfig.load(SUPERSEDED_CONFIG_PATH)
 
 
 def _attempt(index: int, length: int, status: str) -> dict[str, object]:
@@ -84,7 +60,7 @@ def _parent() -> ParentTrajectory:
         record={},
         record_sha256="g" * 64,
         raw_response_token_ids=tuple(range(4096)),
-        rendered_prompt_token_ids=tuple(range(253)),
+        rendered_prompt_token_ids=tuple(range(100)),
         rendered_prompt_sha256="q" * 64,
         states=fork_states(4096),
         parser_parity={"status": "passed"},
@@ -101,45 +77,6 @@ def test_config_binds_reviewed_issue92_without_mutating_it() -> None:
         "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
         "parent_ordinal": 0,
     }
-    assert config.hardware == {
-        "authorization": "active_project_local_gpu",
-        "cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_device_name": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_device_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
-        "nvml_memory_total_bytes": 21_469_593_600,
-    }
-    assert config.value["superseded_audit"]["selected_max_context_length"] == 64_512
-    assert config.value["superseded_audit"]["active_authorization"] is False
-    assert (
-        config.value["superseded_audit"]["transfer_attempt_state_to_active_requests"]
-        is False
-    )
-
-
-def test_superseded_configuration_is_audit_only() -> None:
-    config = _superseded_config()
-    assert config.is_active is False
-    with pytest.raises(RuntimeError, match="audit-only"):
-        _require_active_authority(config)
-
-
-def test_active_calibration_is_hardware_bound_and_fails_closed(
-    tmp_path: Path,
-) -> None:
-    config = _config()
-    evidence = _load_calibration_evidence(config, ACTIVE_CALIBRATION_PATH)
-    assert evidence["selected_max_context_length"] == 262_144
-    assert evidence["selected_length_success_count"] == 2
-    assert {attempt["gpu_uuid"] for attempt in evidence["attempts"]} == {
-        "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2"
-    }
-
-    tampered = json.loads(ACTIVE_CALIBRATION_PATH.read_text(encoding="utf-8"))
-    tampered["attempts"][0]["gpu_uuid"] = "GPU-wrong"
-    tampered_path = tmp_path / "tampered-calibration.json"
-    tampered_path.write_text(json.dumps(tampered), encoding="utf-8")
-    with pytest.raises(ValueError, match="hardware identity changed"):
-        _load_calibration_evidence(config, tampered_path)
 
 
 def test_calibration_progresses_then_refines_and_repeat_confirms() -> None:
@@ -234,363 +171,6 @@ def test_generation_requires_published_pass_review_of_exact_calibration(
     review.write_text(json.dumps(value), encoding="utf-8")
     with pytest.raises(RuntimeError, match="not PASS"):
         _validate_checkpoint_review(calibration, review)
-
-
-def test_scientific_generation_requires_exact_calibrated_gpu_identity() -> None:
-    config = _config()
-    calibration = {
-        "attempts": [
-            {"gpu_memory_total_bytes": 21_469_593_600},
-            {"gpu_memory_total_bytes": 21_469_593_600},
-        ]
-    }
-    expected_runtime = {
-        "cuda_device": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_gpu_name": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_gpu_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
-        "nvml_gpu_memory_total_bytes": 21_469_593_600,
-    }
-    assert _validate_scientific_runtime_hardware(
-        config, expected_runtime, calibration
-    ) == {
-        "cuda_device_name": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_device_name": "NVIDIA RTX 4000 Ada Generation",
-        "nvml_device_uuid": "GPU-0afc281d-457f-2cb0-ee10-0911e0ab62b2",
-        "nvml_memory_total_bytes": 21_469_593_600,
-        "status": "matched_active_authority",
-    }
-
-    with pytest.raises(RuntimeError, match="exact active RTX 4000 Ada"):
-        _validate_scientific_runtime_hardware(
-            config,
-            {
-                **expected_runtime,
-                "cuda_device": "NVIDIA GeForce RTX 4070 Ti",
-            },
-            calibration,
-        )
-    with pytest.raises(RuntimeError, match="exact active RTX 4000 Ada"):
-        _validate_scientific_runtime_hardware(
-            config,
-            {
-                **expected_runtime,
-                "nvml_gpu_memory_total_bytes": 12_000_000_000,
-            },
-            calibration,
-        )
-
-
-def _recovery_requests():
-    return full_context_requests(
-        _superseded_config(),
-        _parent(),
-        selected_context_length=64_512,
-        calibration_evidence_path=CALIBRATION_PATH,
-    )
-
-
-def test_active_requests_do_not_inherit_superseded_attempt_identity(
-    tmp_path: Path,
-) -> None:
-    active = full_context_requests(
-        _config(),
-        _parent(),
-        selected_context_length=262_144,
-        calibration_evidence_path=ACTIVE_CALIBRATION_PATH,
-    )
-    superseded = _recovery_requests()
-    assert active[0].branch_id != superseded[0].branch_id
-    assert active[0].generation_config_sha256 != (
-        superseded[0].generation_config_sha256
-    )
-    assert active[0].max_tokens == 261_891
-    counts = _branch_attempt_counts(tmp_path / "absent.jsonl", active)
-    assert counts[active[0].branch_id] == 0
-
-
-def test_committed_attempt_recovery_binds_exact_published_review(
-    tmp_path: Path,
-) -> None:
-    config = _superseded_config()
-    requests = _recovery_requests()
-    recovery = _load_attempt_recovery(
-        config,
-        CALIBRATION_PATH,
-        CALIBRATION_REVIEW_PATH,
-        ATTEMPT_RECOVERY_PATH,
-        requests,
-    )
-    assert recovery["scope"] == {
-        "branch_id": "full-context-fork-8398e5a881d6a1dc5e4ec1a6532f02cc",
-        "parent_candidate_id": "native-thinking-752f2a6728b47b5a89263445496c7b80",
-        "workload": "minif2f-valid-clean-v2",
-        "task_id": "amc12a_2019_p21",
-        "fork_state": "P0",
-        "fork_fraction": 0.0,
-        "fork_prefix_len": 0,
-        "branch_seed": 100,
-        "max_new_tokens": 64_259,
-        "fork_generation_config_sha256": (
-            "ee3ce5f11b2846a0a582e73c2ed9e47d54376548a2e34922727512cb1ffe5b33"
-        ),
-    }
-    assert recovery["attempt_recovery"] == {
-        "failed_attempt_index": 0,
-        "failed_attempt_terminal_status": "failed",
-        "next_attempt_index": 1,
-        "persisted_scientific_record_count_at_review": 0,
-        "raw_journal_recovered": False,
-        "mechanism": "published_independent_transition_review",
-    }
-
-    tampered = json.loads(ATTEMPT_RECOVERY_PATH.read_text(encoding="utf-8"))
-    tampered["attempt_recovery"]["next_attempt_index"] = 0
-    tampered_path = tmp_path / "attempt-recovery.json"
-    tampered_path.write_text(json.dumps(tampered), encoding="utf-8")
-    with pytest.raises(ValueError, match="differs from reviewed P0/100 state"):
-        _load_attempt_recovery(
-            config,
-            CALIBRATION_PATH,
-            CALIBRATION_REVIEW_PATH,
-            tampered_path,
-            requests,
-        )
-
-    tampered_review = tmp_path / "calibration-review.json"
-    tampered_review.write_text(
-        CALIBRATION_REVIEW_PATH.read_text(encoding="utf-8") + " ",
-        encoding="utf-8",
-    )
-    with pytest.raises(ValueError, match="transition review evidence bytes changed"):
-        _load_attempt_recovery(
-            config,
-            CALIBRATION_PATH,
-            tampered_review,
-            ATTEMPT_RECOVERY_PATH,
-            requests,
-        )
-
-
-def test_attempt_recovery_starts_at_one_without_synthetic_attempt_zero(
-    tmp_path: Path,
-) -> None:
-    requests = _recovery_requests()
-    recovery = _load_attempt_recovery(
-        _superseded_config(),
-        CALIBRATION_PATH,
-        CALIBRATION_REVIEW_PATH,
-        ATTEMPT_RECOVERY_PATH,
-        requests,
-    )
-    attempt_path = tmp_path / "branch-attempts.jsonl"
-    provenance, recovered_counts = _prepare_attempt_recovery(
-        attempt_path,
-        ATTEMPT_RECOVERY_PATH,
-        recovery,
-        persisted_branch_ids=[],
-    )
-    branch_id = str(recovery["scope"]["branch_id"])
-    events = [
-        json.loads(line)
-        for line in attempt_path.read_text(encoding="utf-8").splitlines()
-    ]
-    assert [event["event"] for event in events] == ["recovery_checkpoint_applied"]
-    assert "attempt_index" not in events[0]
-    assert provenance["raw_journal_recovered"] is False
-    assert recovered_counts == {branch_id: 1}
-    assert (
-        _branch_attempt_counts(
-            attempt_path,
-            requests,
-            recovered_counts,
-            attempt_recovery_provenance=provenance,
-        )[branch_id]
-        == 1
-    )
-
-    request = requests[0]
-    with attempt_path.open("a", encoding="utf-8") as handle:
-        for event_kind in ("started", "failed"):
-            event = {
-                "schema_version": BRANCH_ATTEMPT_SCHEMA,
-                "event": event_kind,
-                "branch_id": branch_id,
-                "attempt_index": 1,
-                "fork_state": request.state.label,
-                "branch_seed": request.seed,
-                "max_tokens": request.max_tokens,
-                "attempt_recovery_provenance": provenance,
-            }
-            if event_kind == "failed":
-                event.update(
-                    {
-                        "error": "RuntimeError: test failure",
-                        "branch_gpu_memory": {},
-                    }
-                )
-            handle.write(json.dumps(event) + "\n")
-    assert (
-        _branch_attempt_counts(
-            attempt_path,
-            requests,
-            recovered_counts,
-            attempt_recovery_provenance=provenance,
-        )[branch_id]
-        == 2
-    )
-    summary = _branch_attempt_summary(attempt_path)
-    assert summary["started_attempt_count"] == 1
-    assert summary["recovered_failed_attempt_count"] == 1
-    assert summary["total_disclosed_attempt_count"] == 2
-    assert summary["attempt_recovery_disclosure_count"] == 1
-    assert summary["retried_in_flight_branch_count"] == 1
-
-
-def test_attempt_recovery_fails_closed_on_unjournaled_records_and_conflicts(
-    tmp_path: Path,
-) -> None:
-    requests = _recovery_requests()
-    recovery = _load_attempt_recovery(
-        _superseded_config(),
-        CALIBRATION_PATH,
-        CALIBRATION_REVIEW_PATH,
-        ATTEMPT_RECOVERY_PATH,
-        requests,
-    )
-    branch_id = str(recovery["scope"]["branch_id"])
-    unjournaled = tmp_path / "unjournaled.jsonl"
-    with pytest.raises(ValueError, match="unjournaled scientific records"):
-        _prepare_attempt_recovery(
-            unjournaled,
-            ATTEMPT_RECOVERY_PATH,
-            recovery,
-            persisted_branch_ids=[branch_id],
-        )
-    assert not unjournaled.exists()
-
-    conflict = tmp_path / "conflict.jsonl"
-    with conflict.open("w", encoding="utf-8") as handle:
-        for event_kind in ("started", "persisted"):
-            handle.write(
-                json.dumps(
-                    {
-                        "schema_version": BRANCH_ATTEMPT_SCHEMA,
-                        "event": event_kind,
-                        "branch_id": branch_id,
-                        "attempt_index": 0,
-                    }
-                )
-                + "\n"
-            )
-    with pytest.raises(ValueError, match="conflicts with reviewed P0/100 failure"):
-        _prepare_attempt_recovery(
-            conflict,
-            ATTEMPT_RECOVERY_PATH,
-            recovery,
-            persisted_branch_ids=[],
-        )
-
-    binding_conflict = tmp_path / "binding-conflict.jsonl"
-    provenance, recovered_counts = _prepare_attempt_recovery(
-        binding_conflict,
-        ATTEMPT_RECOVERY_PATH,
-        recovery,
-        persisted_branch_ids=[],
-    )
-    request = requests[0]
-    with binding_conflict.open("a", encoding="utf-8") as handle:
-        for event_kind in ("started", "failed"):
-            event = {
-                "schema_version": BRANCH_ATTEMPT_SCHEMA,
-                "event": event_kind,
-                "branch_id": branch_id,
-                "attempt_index": 1,
-                "fork_state": request.state.label,
-                "branch_seed": 999,
-                "max_tokens": 1,
-                "attempt_recovery_provenance": provenance,
-            }
-            if event_kind == "failed":
-                event.update({"error": "bad", "branch_gpu_memory": {}})
-            handle.write(json.dumps(event) + "\n")
-    with pytest.raises(ValueError, match="request binding changed"):
-        _branch_attempt_counts(
-            binding_conflict,
-            requests,
-            recovered_counts,
-            attempt_recovery_provenance=provenance,
-        )
-
-    provenance_conflict = tmp_path / "provenance-conflict.jsonl"
-    provenance, recovered_counts = _prepare_attempt_recovery(
-        provenance_conflict,
-        ATTEMPT_RECOVERY_PATH,
-        recovery,
-        persisted_branch_ids=[],
-    )
-    with provenance_conflict.open("a", encoding="utf-8") as handle:
-        handle.write(
-            json.dumps(
-                {
-                    "schema_version": BRANCH_ATTEMPT_SCHEMA,
-                    "event": "started",
-                    "branch_id": branch_id,
-                    "attempt_index": 1,
-                    "fork_state": request.state.label,
-                    "branch_seed": request.seed,
-                    "max_tokens": request.max_tokens,
-                    "attempt_recovery_provenance": {
-                        **provenance,
-                        "next_attempt_index": 0,
-                    },
-                }
-            )
-            + "\n"
-        )
-    with pytest.raises(ValueError, match="attempt-recovery provenance changed"):
-        _branch_attempt_counts(
-            provenance_conflict,
-            requests,
-            recovered_counts,
-            attempt_recovery_provenance=provenance,
-        )
-
-    hash_conflict = tmp_path / "hash-conflict.jsonl"
-    provenance, recovered_counts = _prepare_attempt_recovery(
-        hash_conflict,
-        ATTEMPT_RECOVERY_PATH,
-        recovery,
-        persisted_branch_ids=[],
-    )
-    common = {
-        "schema_version": BRANCH_ATTEMPT_SCHEMA,
-        "branch_id": branch_id,
-        "attempt_index": 1,
-        "fork_state": request.state.label,
-        "branch_seed": request.seed,
-        "max_tokens": request.max_tokens,
-        "attempt_recovery_provenance": provenance,
-    }
-    with hash_conflict.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps({**common, "event": "started"}) + "\n")
-        handle.write(
-            json.dumps(
-                {
-                    **common,
-                    "event": "persisted",
-                    "generation_record_sha256": "0" * 64,
-                }
-            )
-            + "\n"
-        )
-    with pytest.raises(ValueError, match="differs from durable generation"):
-        _branch_attempt_counts(
-            hash_conflict,
-            requests,
-            recovered_counts,
-            attempt_recovery_provenance=provenance,
-            persisted_record_hashes={branch_id: "1" * 64},
-        )
 
 
 def test_transition_index_uses_exact_qwen3_vocab_without_parser_internals() -> None:
