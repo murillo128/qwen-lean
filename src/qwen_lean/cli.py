@@ -175,6 +175,12 @@ from .full_context_forking_diagnostic import (
     run_full_context_verification,
     write_full_context_evidence,
 )
+from .full_context_forking_expansion import (
+    run_expansion_generation,
+    run_expansion_verification,
+    write_expansion_evidence,
+    write_expansion_manifest,
+)
 from .qwen35_posttrained_assessment import (
     Qwen35AssessmentConfig,
     run_assessment as run_qwen35_posttrained_assessment,
@@ -939,6 +945,171 @@ def _parser() -> argparse.ArgumentParser:
         "--output",
         type=Path,
         default=root / "evidence/qwen35-full-context-forking/results.json",
+    )
+
+    expansion_manifest = subparsers.add_parser(
+        "qwen35-full-context-expansion-manifest",
+        help="freeze the GO-authorized remaining 29 issue-92 parents",
+    )
+    expansion_manifest.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    expansion_manifest.add_argument("--mathia-root", type=Path, required=True)
+    expansion_manifest.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    expansion_manifest.add_argument("--parent-package", type=Path)
+    expansion_manifest.add_argument(
+        "--calibration",
+        type=Path,
+        default=root
+        / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
+    )
+    expansion_manifest.add_argument(
+        "--diagnostic-evidence",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/results.json",
+    )
+    expansion_manifest.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/expansion-manifest.json"
+        ),
+    )
+
+    expansion_generate = subparsers.add_parser(
+        "qwen35-full-context-expansion-generate",
+        help="run or resume the GO-authorized 29-task full-context expansion",
+    )
+    expansion_generate.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    expansion_generate.add_argument("--mathia-root", type=Path, required=True)
+    expansion_generate.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    expansion_generate.add_argument("--parent-package", type=Path)
+    expansion_generate.add_argument("--artifact-dir", type=Path, required=True)
+    expansion_generate.add_argument(
+        "--calibration",
+        type=Path,
+        default=root
+        / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
+    )
+    expansion_generate.add_argument(
+        "--checkpoint-review",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/calibration-review-rtx4000.json"
+        ),
+    )
+    expansion_generate.add_argument(
+        "--diagnostic-evidence",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/results.json",
+    )
+    expansion_generate.add_argument(
+        "--manifest",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/expansion-manifest.json"
+        ),
+    )
+
+    expansion_verify = subparsers.add_parser(
+        "qwen35-full-context-expansion-verify",
+        help="run or resume Lean checks for the 29-task expansion",
+    )
+    expansion_verify.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    expansion_verify.add_argument("--mathia-root", type=Path, required=True)
+    expansion_verify.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    expansion_verify.add_argument("--parent-package", type=Path)
+    expansion_verify.add_argument("--artifact-dir", type=Path, required=True)
+    expansion_verify.add_argument(
+        "--calibration",
+        type=Path,
+        default=root
+        / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
+    )
+    expansion_verify.add_argument(
+        "--checkpoint-review",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/calibration-review-rtx4000.json"
+        ),
+    )
+    expansion_verify.add_argument(
+        "--diagnostic-evidence",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/results.json",
+    )
+    expansion_verify.add_argument(
+        "--manifest",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/expansion-manifest.json"
+        ),
+    )
+    expansion_verify.add_argument("--minif2f-root", type=Path, required=True)
+    expansion_verify.add_argument("--mathlib-root", type=Path, default=root)
+    expansion_verify.add_argument("--workers", type=int)
+
+    expansion_evidence = subparsers.add_parser(
+        "qwen35-full-context-expansion-evidence",
+        help="write compact evidence for the 29-task confirmation",
+    )
+    expansion_evidence.add_argument(
+        "--config",
+        type=Path,
+        default=root / "config/qwen35-full-context-forking.json",
+    )
+    expansion_evidence.add_argument("--mathia-root", type=Path, required=True)
+    expansion_evidence.add_argument(
+        "--parent-generations", type=Path, required=True
+    )
+    expansion_evidence.add_argument("--parent-package", type=Path)
+    expansion_evidence.add_argument("--artifact-dir", type=Path, required=True)
+    expansion_evidence.add_argument(
+        "--calibration",
+        type=Path,
+        default=root
+        / "evidence/qwen35-full-context-forking/calibration-rtx4000.json",
+    )
+    expansion_evidence.add_argument(
+        "--diagnostic-evidence",
+        type=Path,
+        default=root / "evidence/qwen35-full-context-forking/results.json",
+    )
+    expansion_evidence.add_argument(
+        "--manifest",
+        type=Path,
+        default=(
+            root
+            / "evidence/qwen35-full-context-forking/expansion-manifest.json"
+        ),
+    )
+    expansion_evidence.add_argument(
+        "--output",
+        type=Path,
+        default=(
+            root / "evidence/qwen35-full-context-forking/expansion-results.json"
+        ),
     )
 
     qwen35_4b_base_assess = subparsers.add_parser(
@@ -2612,6 +2783,72 @@ def main(argv: list[str] | None = None) -> int:
             args.artifact_dir,
             args.calibration,
             args.checkpoint_review,
+            args.output,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(evidence, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-expansion-manifest":
+        manifest = write_expansion_manifest(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.calibration,
+            args.diagnostic_evidence,
+            args.output,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(manifest, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-expansion-generate":
+        summary = run_expansion_generation(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            args.checkpoint_review,
+            args.diagnostic_evidence,
+            args.manifest,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-expansion-verify":
+        if args.workers is not None and args.workers < 1:
+            print("--workers must be positive")
+            return 2
+        summary = run_expansion_verification(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            args.checkpoint_review,
+            args.diagnostic_evidence,
+            args.manifest,
+            project_roots={
+                "minif2f-valid-clean-v2": args.minif2f_root,
+                "fresh-composition-valid-v2": args.mathlib_root,
+            },
+            workers=args.workers,
+            parent_release_package_path=args.parent_package,
+        )
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    if args.command == "qwen35-full-context-expansion-evidence":
+        evidence = write_expansion_evidence(
+            FullContextForkingConfig.load(args.config),
+            args.mathia_root,
+            args.parent_generations,
+            args.artifact_dir,
+            args.calibration,
+            args.diagnostic_evidence,
+            args.manifest,
             args.output,
             parent_release_package_path=args.parent_package,
         )
